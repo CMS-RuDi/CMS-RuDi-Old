@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<backend>
+    <module>
+        <id>mod_user_image</id>
+    </module>
+    <params>
+
+        <param type="flag" name="showtitle" default="on" />
+
+    </params>
+</backend>

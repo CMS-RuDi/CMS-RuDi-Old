@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<backend>
+    <module>
+        <id>mod_rss</id>
+    </module>
+    <params>
+        <param type="string" name="rssurl" default="http://www.lenta.ru/rss" />
+        <param type="flag" name="showdesc" default="on" />
+        <param type="number" name="itemslimit" default="5" />
+        <param type="number" name="cachetime" default="1" />
+        <param type="number" name="cols" default="2" />
+        <param type="flag" name="showicon" default="on" />
+    </params>
+</backend>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<backend>
+    <module>
+        <id dfs="">mod_respect</id>
+    </module>
+    <params>
+        <param type="number" name="limit" default="5" />
+        <param type="flag" name="show_awards" default="off" />
+        <param type="list_function" name="view_aw" function="getFullAwardsList" key_title="title" key_value="title" >
+            <option value="0" />
+        </param>
+        <param type="list" name="order">
+            <option value="desc" />
+            <option value="rand" />
+        </param>
+    </params>
+</backend>

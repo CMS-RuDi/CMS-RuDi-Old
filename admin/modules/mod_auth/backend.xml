@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<backend>
+    <module>
+        <id>mod_auth</id>
+    </module>
+    <params>
+        <param type="flag" name="autolog" default="on" />
+        <param type="flag" name="passrem" default="on" />
+    </params>
+</backend>

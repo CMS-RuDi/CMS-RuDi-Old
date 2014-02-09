@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<backend>
+    <module>
+        <id>mod_cart</id>
+    </module>
+    <params>
+
+        <param type="list" name="showtype">
+            <option value="list" />
+            <option value="qty" />
+            <option value="qtyprice" />
+        </param>
+
+        <param type="flag" name="showqty" default="on" />
+
+    </params>
+</backend>

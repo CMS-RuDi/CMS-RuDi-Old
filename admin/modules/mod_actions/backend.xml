@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<backend>
+    <module>
+        <id>mod_actions</id>
+    </module>
+    <params>
+
+        <param type="number" name="limit" default="15" />
+
+        <param type="flag" name="show_target" default="off" />
+
+		<param type="flag" name="show_link" default="on" />
+
+        <param type="list_db" multiple="1" name="action_types" src="cms_actions" src_title="title" src_value="id" />
+
+    </params>
+</backend>

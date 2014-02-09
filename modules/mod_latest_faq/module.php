@@ -1,0 +1,54 @@
+<?php
+/******************************************************************************/
+//                                                                            //
+//                           InstantCMS v1.10.3                               //
+//                        http://www.instantcms.ru/                           //
+//                                                                            //
+//                   written by InstantCMS Team, 2007-2013                    //
+//                produced by InstantSoft, (www.instantsoft.ru)               //
+//                                                                            //
+//                        LICENSED BY GNU/GPL v2                              //
+//                                                                            //
+/******************************************************************************/
+
+function mod_latest_faq($module_id, $cfg){
+
+    $inDB = cmsDatabase::getInstance();
+
+    if (!isset($cfg['newscount'])) { $cfg['newscount'] = 2;}
+    if (!isset($cfg['cat_id'])) { $cfg['cat_id'] = 0;}
+    if (!isset($cfg['maxlen'])) { $cfg['maxlen'] = 120;}
+
+    if ($cfg['cat_id']) {
+        $catsql = 'AND category_id = '.$cfg['cat_id'];
+    } else { $catsql = ''; }
+
+    $sql = "SELECT *
+            FROM cms_faq_quests
+            WHERE published = 1 ".$catsql."
+            ORDER BY pubdate DESC
+            LIMIT ".$cfg['newscount'];
+
+    $result = $inDB->query($sql) ;
+
+    $faq = array();
+
+    if ($inDB->num_rows($result)){
+
+        while($con = $inDB->fetch_assoc($result)){
+            $con['date'] = cmsCore::dateformat($con['pubdate']);
+            $con['href'] = '/faq/quest'.$con['id'].'.html';
+            $faq[] = $con;
+        }
+
+    }
+
+    cmsPage::initTemplate('modules', 'mod_latest_faq')->
+            assign('faq', $faq)->
+            assign('cfg', $cfg)->
+            display('mod_latest_faq.tpl');
+
+    return true;
+
+}
+?>

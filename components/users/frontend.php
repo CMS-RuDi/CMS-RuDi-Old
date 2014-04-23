@@ -245,7 +245,7 @@ if ($do=='editprofile'){
 		$profiles['showbirth']    = cmsCore::request('showbirth', 'int');
 		$profiles['description']  = cmsCore::request('description', 'str', '');
 		$users['birthdate']    = (int)$_REQUEST['birthdate']['year'].'-'.(int)$_REQUEST['birthdate']['month'].'-'.(int)$_REQUEST['birthdate']['day'];
-        $profiles['signature']      = $inDB->escape_string(cmsCore::request('signature', 'html', ''));
+        $profiles['signature']      = $inDB->escape_string(cmsCore::badTagClear(cmsCore::request('signature', 'html', '')));
         $profiles['signature_html'] = $inDB->escape_string(cmsCore::parseSmiles(cmsCore::request('signature', 'html', ''), true));
 		$profiles['allow_who']    = cmsCore::request('allow_who', 'str');
 		if (!preg_match('/^([a-zA-Z]+)$/ui', $profiles['allow_who'])) { $errors = true; }

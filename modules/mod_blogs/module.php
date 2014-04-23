@@ -12,59 +12,57 @@
 /******************************************************************************/
 
 function mod_blogs($module_id, $cfg){
+    $inDB = cmsDatabase::getInstance();
+    $default_cfg = array (
+        'sort' => 'pubdate',
+        'owner' => 'user',
+        'shownum' => 5,
+        'minrate' => 0,
+        'blog_id' => 0,
+        'showrss' => 1
+    );
+    
+    $cfg = array_merge($default_cfg, $cfg);
+    
+    cmsCore::loadClass('blog');
+    $inBlog = cmsBlogs::getInstance();
+    $inBlog->owner = $cfg['owner'];
 
-	$inDB = cmsDatabase::getInstance();
+    if($cfg['owner'] == 'club'){
+        cmsCore::loadModel('clubs');
+        $model = new cms_model_clubs();
+        $inDB->addSelect('b.user_id as bloglink');
+    }else{
+        cmsCore::loadModel('blogs');
+        $model = new cms_model_blogs();
+    }
 
-	$default_cfg = array (
-				  'sort' => 'pubdate',
-				  'owner' => 'user',
-				  'shownum' => 5,
-				  'minrate' => 0,
-                  'blog_id' => 0,
-				  'showrss' => 1
-				);
-	$cfg = array_merge($default_cfg, $cfg);
+    // получаем аватары владельцев
+    $inDB->addSelect('up.imageurl');
+    $inDB->addJoin('LEFT JOIN cms_user_profiles up ON up.user_id = u.id');
 
-	cmsCore::loadClass('blog');
-	$inBlog = cmsBlogs::getInstance();
-	$inBlog->owner = $cfg['owner'];
+    $inBlog->whereOnlyPublic();
 
-	if($cfg['owner'] == 'club'){
-		cmsCore::loadModel('clubs');
-		$model = new cms_model_clubs();
-		$inDB->addSelect('b.user_id as bloglink');
-	} else {
-		cmsCore::loadModel('blogs');
-		$model = new cms_model_blogs();
-	}
+    if($cfg['minrate']){
+        $inBlog->ratingGreaterThan($cfg['minrate']);
+    }
 
-	// получаем аватары владельцев
-	$inDB->addSelect('up.imageurl');
-	$inDB->addJoin('LEFT JOIN cms_user_profiles up ON up.user_id = u.id');
-
-	$inBlog->whereOnlyPublic();
-
-	if($cfg['minrate']){
-		$inBlog->ratingGreaterThan($cfg['minrate']);
-	}
-
-	if($cfg['blog_id']){
-		$inBlog->whereBlogIs($cfg['blog_id']);
-	}
+    if($cfg['blog_id']){
+        $inBlog->whereBlogIs($cfg['blog_id']);
+    }
 
     $inDB->orderBy('p.'.$cfg['sort'], 'DESC');
 
     $inDB->limit($cfg['shownum']);
 
-	$posts = $inBlog->getPosts(false, $model);
-	if(!$posts){ return false; }
+    $posts = $inBlog->getPosts(false, $model);
+    if(!$posts){ return false; }
 
-	cmsPage::initTemplate('modules', 'mod_blogs')->
-            assign('posts', $posts)->
-            assign('cfg', $cfg)->
-            display('mod_blogs.tpl');
+    cmsPage::initTemplate('modules', 'mod_blogs')->
+        assign('posts', $posts)->
+        assign('cfg', $cfg)->
+        display('mod_blogs.tpl');
 
-	return true;
-
+    return true;
 }
 ?>

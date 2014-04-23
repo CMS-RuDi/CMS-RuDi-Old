@@ -129,7 +129,7 @@
                                     <td><input type="checkbox" name="item[]" value="<?php echo $item['id']; ?>" /></td>
                                     <td><?php echo $item['id']; ?></td>
                                     <td width="16">
-                                        <img src="/templates/_default_/images/icons/article.png" border="0"/>
+                                        <img src="/templates/<?php echo TEMPLATE; ?>/images/icons/article.png" border="0"/>
                                     </td>
                                     <td>
                                         <a href="index.php?view=content&do=edit&id=<?php echo $item['id']; ?>">

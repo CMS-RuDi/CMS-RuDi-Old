@@ -71,7 +71,7 @@
                         <span class="usr_edithint">{$LANG.CAN_USE_BBCODE} </span>
                     </td>
                     <td valign="top">
-                        <textarea name="signature" class="text-input" style="width:300px" rows="2" id="signature">{$usr.signature}</textarea>
+                        <textarea name="signature" class="text-input" style="width:300px" rows="2" id="signature">{$usr.signature|escape:'html'}</textarea>
                     </td>
                 </tr>
                 {/if}

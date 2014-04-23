@@ -12,43 +12,45 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 //                                                                            //
 /******************************************************************************/
 
-	$opt = cmsCore::request('opt', 'str', 'list');
+$opt = cmsCore::request('opt', 'str', 'list');
 
-	echo '<h3>'.$_LANG['AD_SETTINGS'].'</h3>';
+echo '<h3>'.$_LANG['AD_SETTINGS'].'</h3>';
 
-	$cfg = $inCore->loadComponentConfig('content');
+$cfg = $inCore->loadComponentConfig('content');
 
-	if($opt=='saveconfig'){
+if($opt=='saveconfig'){
+    if(!cmsCore::validateForm()) { cmsCore::error404(); }
 
-		if(!cmsCore::validateForm()) { cmsCore::error404(); }
+    $cfg = array();
+    $cfg['readdesc']    = cmsCore::request('readdesc', 'int', 0);
+    $cfg['is_url_cyrillic'] = cmsCore::request('is_url_cyrillic', 'int', 0);
+    $cfg['rating']      = cmsCore::request('rating', 'int', 0);
+    $cfg['perpage']     = cmsCore::request('perpage', 'int', 0);
+    $cfg['pt_show']     = cmsCore::request('pt_show', 'int', 0);
+    $cfg['pt_disp']     = cmsCore::request('pt_disp', 'int', 0);
+    $cfg['pt_hide']     = cmsCore::request('pt_hide', 'int', 0);
+    $cfg['autokeys']    = cmsCore::request('autokeys', 'int', 0);
 
-		$cfg = array();
-        $cfg['readdesc']    = cmsCore::request('readdesc', 'int', 0);
-		$cfg['is_url_cyrillic'] = cmsCore::request('is_url_cyrillic', 'int', 0);
-		$cfg['rating']      = cmsCore::request('rating', 'int', 0);
-		$cfg['perpage']     = cmsCore::request('perpage', 'int', 0);
-        $cfg['pt_show']     = cmsCore::request('pt_show', 'int', 0);
-		$cfg['pt_disp']     = cmsCore::request('pt_disp', 'int', 0);
-		$cfg['pt_hide']     = cmsCore::request('pt_hide', 'int', 0);
-		$cfg['autokeys']    = cmsCore::request('autokeys', 'int', 0);
+    $cfg['img_small_w'] = cmsCore::request('img_small_w', 'int', 100);
+    $cfg['img_big_w']   = cmsCore::request('img_big_w', 'int', 200);
+    $cfg['img_sqr']     = cmsCore::request('img_sqr', 'int', 1);
+    $cfg['img_users']   = cmsCore::request('img_users', 'int', 1);
+    $cfg['watermark']   = cmsCore::request('watermark', 'int', 0);
+    $cfg['watermark_only_big'] = cmsCore::request('watermark_only_big', 'int', 0);
+    
+    $cfg['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
+    $cfg['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
+    $cfg['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
 
-        $cfg['img_small_w'] = cmsCore::request('img_small_w', 'int', 100);
-        $cfg['img_big_w']   = cmsCore::request('img_big_w', 'int', 200);
-        $cfg['img_sqr']     = cmsCore::request('img_sqr', 'int', 1);
-        $cfg['img_users']   = cmsCore::request('img_users', 'int', 1);
-		$cfg['watermark']   = cmsCore::request('watermark', 'int', 0);
-		$cfg['watermark_only_big'] = cmsCore::request('watermark_only_big', 'int', 0);
+    $inCore->saveComponentConfig('content', $cfg);
 
-		$inCore->saveComponentConfig('content', $cfg);
+    cmsCore::addSessionMessage($_LANG['AD_CONFIG_SAVE_SUCCESS'], 'success');
 
-		cmsCore::addSessionMessage($_LANG['AD_CONFIG_SAVE_SUCCESS'], 'success');
+    cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=config');
+}
 
-		cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=config');
-
-	}
-
-    require('../includes/jwtabs.php');
-    $GLOBALS['cp_page_head'][] = jwHeader();
+require('../includes/jwtabs.php');
+$GLOBALS['cp_page_head'][] = jwHeader();
 
 ?>
 
@@ -115,6 +117,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
             </td>
         </tr>
     </table>
+    
     {tab=<?php echo $_LANG['AD_PHOTO_ART']; ?>}
     <table width="550" border="0" cellpadding="10" cellspacing="0" class="proptable">
         <tr>
@@ -155,6 +158,37 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
            </td>
         </tr>
     </table>
+    
+    {tab=SEO}
+    <table width="550" border="0" cellpadding="10" cellspacing="0" class="proptable">
+        <tr>
+            <td>
+                <strong><?php echo $_LANG['AD_PAGE_TITLE']; ?>:</strong>
+            </td>
+            <td>
+                <input name="pagetitle" type="text" id="pagetitle" style="width:99%" value="<?php echo htmlspecialchars($cfg['pagetitle']); ?>" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong><?php echo icms_ucfirst($_LANG['KEYWORDS']); ?>:</strong>
+                <div class="hinttext"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+            </td>
+            <td>
+                <textarea name="meta_keys" style="width:97%" rows="2" id="meta_keys"><?php echo htmlspecialchars($cfg['meta_keys']);?></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong><?php echo $_LANG['DESCRIPTION']; ?>:</strong>
+                <div class="hinttext"><?php echo $_LANG['AD_LESS_THAN']; ?></div>
+            </td>
+            <td>
+                <textarea name="meta_desc" style="width:97%" rows="2" id="meta_desc"><?php echo htmlspecialchars($cfg['meta_desc']);?></textarea>
+            </td>
+        </tr>
+    </table>
+    
     {/tabs}
     <?php echo jwTabs(ob_get_clean()); ?>
     <p>

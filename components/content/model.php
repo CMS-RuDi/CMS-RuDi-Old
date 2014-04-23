@@ -14,59 +14,57 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 class cms_model_content{
-
-	public function __construct(){
-        $this->inDB   = cmsDatabase::getInstance();
-		$this->config = cmsCore::getInstance()->loadComponentConfig('content');
-		cmsCore::loadLanguage('components/content');
-		cmsCore::loadLib('tags');
-		cmsCore::loadLib('karma');
+    public $inDB;
+    
+    public function __construct(){
+        $this->inDB = cmsDatabase::getInstance();
+        
+        $this->config = cmsCore::getInstance()->loadComponentConfig('content');
+        
+        cmsCore::loadLanguage('components/content');
+        cmsCore::loadLib('tags');
+        cmsCore::loadLib('karma');
     }
 
 /* ==================================================================================================== */
 /* ==================================================================================================== */
 
     public static function getDefaultConfig() {
-
-        $cfg = array (
-				  'readdesc' => 0,
-				  'is_url_cyrillic' => 0,
-				  'rating' => 1,
-				  'perpage' => 15,
-				  'pt_show' => 1,
-				  'pt_disp' => 1,
-				  'pt_hide' => 1,
-				  'autokeys' => 1,
-				  'img_small_w' => 100,
-				  'img_big_w' => 200,
-				  'img_sqr' => 1,
-				  'img_users' => 1,
-				  'watermark' => 1
-				);
-
-        return $cfg;
-
+        return array (
+            'readdesc' => 0,
+            'is_url_cyrillic' => 0,
+            'rating' => 1,
+            'perpage' => 15,
+            'pt_show' => 1,
+            'pt_disp' => 1,
+            'pt_hide' => 1,
+            'autokeys' => 1,
+            'img_small_w' => 100,
+            'img_big_w' => 200,
+            'img_sqr' => 1,
+            'img_users' => 1,
+            'watermark' => 1,
+            'pagetitle' => '',
+            'meta_keys' => '',
+            'meta_desc' => ''
+        );
     }
 
 /* ==================================================================================================== */
 /* ==================================================================================================== */
 
     public function getCommentTarget($target, $target_id) {
-
         $result = array();
 
         switch($target){
-
             case 'article': $article = $this->inDB->get_fields('cms_content', "id='{$target_id}'", 'seolink, title');
                             if (!$article) { return false; }
                             $result['link']  = $this->getArticleURL(null, $article['seolink']);
                             $result['title'] = $article['title'];
                             break;
-
         }
 
         return ($result ? $result : false);
-
     }
 
 /* ==================================================================================================== */
@@ -198,7 +196,7 @@ class cms_model_content{
 
         if ($rs_rows){
             while($node = $this->inDB->fetch_assoc($rs_rows)){
-                if($inUser->is_admin || (cmsCore::checkUserAccess('category', $node['id']) &&
+                if($inUser->is_admin || (cmsCore::checkUserAccess('afisha_category', $node['id']) &&
                   ($node['is_public'] ||
                   ($node['modgrp_id'] && $node['modgrp_id'] == $inUser->group_id && cmsUser::isUserCan('content/autoadd'))))){
 					$subcats[] = $node;

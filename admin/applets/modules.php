@@ -42,10 +42,10 @@ function applet_modules(){
 
 	if ($do == 'config'){
 
-		$module_name    = cpModuleById($id);
-		$module_title   = cpModuleTitleById($id);
+        $module_name    = cpModuleById($id);
+        $module_title   = cpModuleTitleById($id);
 
-		if (!$module_name) { cmsCore::redirect('index.php?view=modules&do=edit&id='.$id); }
+        if (!$module_name) { cmsCore::redirect('index.php?view=modules&do=edit&id='.$id); }
 
         $xml_file = PATH.'/admin/modules/'.$module_name.'/backend.xml';
         $php_file = 'modules/'.$module_name.'/backend.php';
@@ -182,17 +182,17 @@ function applet_modules(){
 		$rs = $inDB->query("SELECT id, position FROM cms_modules ORDER BY position") ;
 
 		if ($inDB->num_rows($rs)){
-			$ord = 1;
-			while ($item = $inDB->fetch_assoc($rs)){
-                if(isset($latest_pos)){
-                    if($latest_pos != $item['position']){
-                        $ord = 1;
+                    $ord = 1;
+                    while ($item = $inDB->fetch_assoc($rs)){
+                        if(isset($latest_pos)){
+                            if($latest_pos != $item['position']){
+                                $ord = 1;
+                            }
+                        }
+                        $inDB->query("UPDATE cms_modules SET ordering = ".$ord." WHERE id=".$item['id']) ;
+                        $ord += 1;
+                        $latest_pos = $item['position'];
                     }
-                }
-				$inDB->query("UPDATE cms_modules SET ordering = ".$ord." WHERE id=".$item['id']) ;
-				$ord += 1;
-                $latest_pos = $item['position'];
-			}
 		}
 
 		cmsCore::redirect('index.php?view=modules');
@@ -202,139 +202,139 @@ function applet_modules(){
 //============================================================================//
 
 	if ($do == 'move_up'){
-		if ($id >= 0){ dbMoveUp('cms_modules', $id, $co); }
-		cmsCore::redirectBack();
+            if ($id >= 0){ dbMoveUp('cms_modules', $id, $co); }
+            cmsCore::redirectBack();
 	}
 
 	if ($do == 'move_down'){
-		if ($id >= 0){ dbMoveDown('cms_modules', $id, $co); }
-		cmsCore::redirectBack();
+            if ($id >= 0){ dbMoveDown('cms_modules', $id, $co); }
+            cmsCore::redirectBack();
 	}
 
 //============================================================================//
 //============================================================================//
 
 	if ($do == 'saveorder'){
-		if(isset($_REQUEST['ordering'])) {
-			$ord = $_REQUEST['ordering'];
-			$ids = $_REQUEST['ids'];
+            if(isset($_REQUEST['ordering'])) {
+                $ord = $_REQUEST['ordering'];
+                $ids = $_REQUEST['ids'];
 
-			foreach ($ord as $id=>$ordering){
-				$inDB->query("UPDATE cms_modules SET ordering = ".(int)$ordering." WHERE id = ".(int)$ids[$id]);
-			}
-			cmsCore::redirect('index.php?view=modules');
-		}
+                foreach ($ord as $id=>$ordering){
+                    $inDB->query("UPDATE cms_modules SET ordering = ".(int)$ordering." WHERE id = ".(int)$ids[$id]);
+                }
+                cmsCore::redirect('index.php?view=modules');
+            }
 	}
 
 //============================================================================//
 //============================================================================//
 
 	if ($do == 'show'){
-		if (!isset($_REQUEST['item'])){
-			if ($id >= 0){ dbShow('cms_modules', $id);  }
-			echo '1'; exit;
-		} else {
-			dbShowList('cms_modules', $_REQUEST['item']);
-			cmsCore::redirectBack();
-		}
+            if (!isset($_REQUEST['item'])){
+                if ($id >= 0){ dbShow('cms_modules', $id);  }
+                echo '1'; exit;
+            } else {
+                dbShowList('cms_modules', $_REQUEST['item']);
+                cmsCore::redirectBack();
+            }
 
 	}
 
 	if ($do == 'hide'){
-		if (!isset($_REQUEST['item'])){
-			if ($id >= 0){ dbHide('cms_modules', $id);  }
-			echo '1'; exit;
-		} else {
-			dbHideList('cms_modules', $_REQUEST['item']);
-			cmsCore::redirectBack();
-		}
+            if (!isset($_REQUEST['item'])){
+                if ($id >= 0){ dbHide('cms_modules', $id);  }
+                echo '1'; exit;
+            } else {
+                dbHideList('cms_modules', $_REQUEST['item']);
+                cmsCore::redirectBack();
+            }
 	}
 
 	if ($do == 'delete'){
-		if (!isset($_REQUEST['item'])){
-            $inCore->removeModule($id);
-		} else {
-            $inCore->removeModule(cmsCore::request('item', 'array_int', array()));
-		}
-        cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
-		cmsCore::redirect('index.php?view=modules');
+            if (!isset($_REQUEST['item'])){
+                $inCore->removeModule($id);
+            }else{
+                $inCore->removeModule(cmsCore::request('item', 'array_int', array()));
+            }
+            cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
+            cmsCore::redirect('index.php?view=modules');
 	}
 
 //============================================================================//
 //============================================================================//
 
 	if ($do == 'update'){
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
-        $id             = cmsCore::request('id', 'int', 0);
+            if (!cmsCore::validateForm()) { cmsCore::error404(); }
+            $id             = cmsCore::request('id', 'int', 0);
 
-        $name           = cmsCore::request('name', 'str', '');
-        $title          = cmsCore::request('title', 'str', '');
-        $position       = cmsCore::request('position', 'str', '');
-        $showtitle      = cmsCore::request('showtitle', 'int', 0);
-        $content    	= $inDB->escape_string(cmsCore::request('content', 'html', ''));
-        $published      = cmsCore::request('published', 'int', 0);
-        $css_prefix     = cmsCore::request('css_prefix', 'str', '');
-        $is_strict_bind = cmsCore::request('is_strict_bind', 'int', 0);
+            $name           = cmsCore::request('name', 'str', '');
+            $title          = cmsCore::request('title', 'str', '');
+            $position       = cmsCore::request('position', 'str', '');
+            $showtitle      = cmsCore::request('showtitle', 'int', 0);
+            $content        = $inDB->escape_string(cmsCore::request('content', 'html', ''));
+            $published      = cmsCore::request('published', 'int', 0);
+            $css_prefix     = cmsCore::request('css_prefix', 'str', '');
+            $is_strict_bind = cmsCore::request('is_strict_bind', 'int', 0);
 
-        $is_public      = cmsCore::request('is_public', 'int', '');
-        if (!$is_public){
-            $access_list = $inCore->arrayToYaml(cmsCore::request('allow_group', 'array_int'));
-        }
+            $is_public      = cmsCore::request('is_public', 'int', '');
+            if (!$is_public){
+                $access_list = $inCore->arrayToYaml(cmsCore::request('allow_group', 'array_int'));
+            }
 
-        $template       = cmsCore::request('template', 'str', '');
-        $cache          = cmsCore::request('cache', 'int', 0);
-        $cachetime      = cmsCore::request('cachetime', 'int', 0);
-        $cacheint       = cmsCore::request('cacheint', 'str', '');
+            $template       = cmsCore::request('template', 'str', '');
+            $cache          = cmsCore::request('cache', 'int', 0);
+            $cachetime      = cmsCore::request('cachetime', 'int', 0);
+            $cacheint       = cmsCore::request('cacheint', 'str', '');
 
-        $sql = "UPDATE cms_modules
-                SET name='$name',
-                    title='$title',
-                    position='$position',
-                    template='$template',
-                    showtitle=$showtitle,";
+            $sql = "UPDATE cms_modules
+                    SET name='$name',
+                        title='$title',
+                        position='$position',
+                        template='$template',
+                        showtitle=$showtitle,";
 
-                if ($content){
-                    $sql .= "content='$content',";
-                }
+                    if ($content){
+                        $sql .= "content='$content',";
+                    }
 
-        $sql .=	"
-                    published=$published,
-                    css_prefix='$css_prefix',
-                    access_list='$access_list',
-                    cachetime = '$cachetime',
-                    cacheint = '$cacheint',
-                    cache = '$cache',
-                    is_strict_bind = '$is_strict_bind'
-                WHERE id = $id
-                LIMIT 1";
-        $inDB->query($sql) ;
-
-        $sql = "DELETE FROM cms_modules_bind WHERE module_id = $id";
-        $inDB->query($sql) ;
-
-        if (cmsCore::request('show_all', 'int', 0)){
-            $sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position)
-                    VALUES ($id, 0, '{$position}')";
+            $sql .=	"
+                        published=$published,
+                        css_prefix='$css_prefix',
+                        access_list='$access_list',
+                        cachetime = '$cachetime',
+                        cacheint = '$cacheint',
+                        cache = '$cache',
+                        is_strict_bind = '$is_strict_bind'
+                    WHERE id = $id
+                    LIMIT 1";
             $inDB->query($sql) ;
-        } else {
-            $showin = $_REQUEST['showin'];
-            $showpos = $_REQUEST['showpos'];
-            if (sizeof($showin)>0){
-                foreach ($showin as $key=>$value){
-                    $sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position)
-                            VALUES ($id, $value, '{$showpos[$value]}')";
-                    $inDB->query($sql) ;
+
+            $sql = "DELETE FROM cms_modules_bind WHERE module_id = $id";
+            $inDB->query($sql) ;
+
+            if (cmsCore::request('show_all', 'int', 0)){
+                $sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position, tpl)
+                        VALUES ($id, 0, '{$position}', '". cmsConfig::getConfig('template') ."')";
+                $inDB->query($sql) ;
+            } else {
+                $showin = $_REQUEST['showin'];
+                $showpos = $_REQUEST['showpos'];
+                if (sizeof($showin)>0){
+                    foreach ($showin as $key=>$value){
+                        $sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position, tpl)
+                                VALUES ($id, $value, '{$showpos[$value]}', '". cmsConfig::getConfig('template') ."')";
+                        $inDB->query($sql) ;
+                    }
                 }
             }
-        }
 
-        cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
+            cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
 
-        if (!isset($_SESSION['editlist']) || @sizeof($_SESSION['editlist'])==0){
-            cmsCore::redirect('index.php?view=modules');
-        } else {
-            cmsCore::redirect('index.php?view=modules&do=edit');
-        }
+            if (!isset($_SESSION['editlist']) || @sizeof($_SESSION['editlist'])==0){
+                cmsCore::redirect('index.php?view=modules');
+            } else {
+                cmsCore::redirect('index.php?view=modules&do=edit');
+            }
 
 	}
 
@@ -342,101 +342,101 @@ function applet_modules(){
 //============================================================================//
 
 	if ($do == 'submit'){
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
-		$sql        = "SELECT ordering as max_o FROM cms_menu ORDER BY ordering DESC LIMIT 1";
-		$result     = $inDB->query($sql) ;
-		$row        = $inDB->fetch_assoc($result);
-		$maxorder   = $row['max_o'] + 1;
+            if (!cmsCore::validateForm()) { cmsCore::error404(); }
+            $sql        = "SELECT ordering as max_o FROM cms_menu ORDER BY ordering DESC LIMIT 1";
+            $result     = $inDB->query($sql) ;
+            $row        = $inDB->fetch_assoc($result);
+            $maxorder   = $row['max_o'] + 1;
 
-        $name           = cmsCore::request('name', 'str', '');
-        $title          = cmsCore::request('title', 'str', '');
-        $position       = cmsCore::request('position', 'str', '');
-        $showtitle      = cmsCore::request('showtitle', 'int', 0);
-		$content    	= $inDB->escape_string(cmsCore::request('content', 'html', ''));
-        $published      = cmsCore::request('published', 'int', 0);
-        $css_prefix     = cmsCore::request('css_prefix', 'str', '');
+            $name           = cmsCore::request('name', 'str', '');
+            $title          = cmsCore::request('title', 'str', '');
+            $position       = cmsCore::request('position', 'str', '');
+            $showtitle      = cmsCore::request('showtitle', 'int', 0);
+            $content    	= $inDB->escape_string(cmsCore::request('content', 'html', ''));
+            $published      = cmsCore::request('published', 'int', 0);
+            $css_prefix     = cmsCore::request('css_prefix', 'str', '');
 
-		$is_public      = cmsCore::request('is_public', 'int', '');
-		if (!$is_public){
-			$access_list = $inCore->arrayToYaml(cmsCore::request('allow_group', 'array_int'));
-		}
+            $is_public      = cmsCore::request('is_public', 'int', '');
+            if (!$is_public){
+                $access_list = $inCore->arrayToYaml(cmsCore::request('allow_group', 'array_int'));
+            }
 
-        $template       = cmsCore::request('template', 'str', '');
-        $cache          = cmsCore::request('cache', 'int', 0);
-        $cachetime      = cmsCore::request('cachetime', 'int', 0);
-        $cacheint       = cmsCore::request('cacheint', 'str', '');
-		$operate        = cmsCore::request('operate', 'str', '');
+            $template       = cmsCore::request('template', 'str', '');
+            $cache          = cmsCore::request('cache', 'int', 0);
+            $cachetime      = cmsCore::request('cachetime', 'int', 0);
+            $cacheint       = cmsCore::request('cacheint', 'str', '');
+            $operate        = cmsCore::request('operate', 'str', '');
 
-        $is_strict_bind = cmsCore::request('is_strict_bind', 'int', 0);
+            $is_strict_bind = cmsCore::request('is_strict_bind', 'int', 0);
 
-		if ($operate == 'user'){ //USER MODULE
-			$sql = "INSERT INTO cms_modules (position, name, title, is_external, content, ordering, showtitle, published, user, original, css_prefix, access_list, template, is_strict_bind)
-					VALUES ('$position', '$name', '$title', 0, '$content', '$maxorder', '$showtitle', '$published', 1, 1, '$css_prefix', '$access_list', '$template', '$is_strict_bind')";
-			$inDB->query($sql) ;
-		}
+            if ($operate == 'user'){ //USER MODULE
+                $sql = "INSERT INTO cms_modules (position, name, title, is_external, content, ordering, showtitle, published, user, original, css_prefix, access_list, template, is_strict_bind)
+                                VALUES ('$position', '$name', '$title', 0, '$content', '$maxorder', '$showtitle', '$published', 1, 1, '$css_prefix', '$access_list', '$template', '$is_strict_bind')";
+                $inDB->query($sql) ;
+            }
 
-		if ($operate == 'clone'){ //DUPLICATE MODULE
+            if ($operate == 'clone'){ //DUPLICATE MODULE
 
-			$mod_id     = cmsCore::request('clone_id', 'int', 0);
+                $mod_id     = cmsCore::request('clone_id', 'int', 0);
 
-			$sql        = "SELECT * FROM cms_modules WHERE id = $mod_id LIMIT 1";
-			$result     = $inDB->query($sql) ;
-			$original   = $inDB->fetch_assoc($result);
+                $sql        = "SELECT * FROM cms_modules WHERE id = $mod_id LIMIT 1";
+                $result     = $inDB->query($sql) ;
+                $original   = $inDB->fetch_assoc($result);
 
-			$sql = "INSERT INTO cms_modules (position, name, title, is_external,
-                                             content, ordering, showtitle, published,
-                                             original, user, config, css_prefix, template,
-                                             access_list, is_strict_bind,
-                                             cache, cachetime, cacheint)
-					VALUES (
-							'{$position}',
-							'{$original['name']}',
-							'{$title}',
-							'{$original['is_external']}',
-							'{$original['content']}',
-							'{$maxorder}',
-							'{$showtitle}',
-							'{$published}',
-							'0',
-							'{$original['user']}',
-							'{$original['config']}',
-							'$css_prefix',
-                            '{$template}',
-                            '{$access_list}',
-                            '{$is_strict_bind}',
-                            '{$cache}', '{$cachetime}', '{$cacheint}'
-                            )";
-			$inDB->query($sql);
+                $sql = "INSERT INTO cms_modules (position, name, title, is_external,
+                                     content, ordering, showtitle, published,
+                                     original, user, config, css_prefix, template,
+                                     access_list, is_strict_bind,
+                                     cache, cachetime, cacheint)
+                                VALUES (
+                                                '{$position}',
+                                                '{$original['name']}',
+                                                '{$title}',
+                                                '{$original['is_external']}',
+                                                '{$original['content']}',
+                                                '{$maxorder}',
+                                                '{$showtitle}',
+                                                '{$published}',
+                                                '0',
+                                                '{$original['user']}',
+                                                '{$original['config']}',
+                                                '$css_prefix',
+                    '{$template}',
+                    '{$access_list}',
+                    '{$is_strict_bind}',
+                    '{$cache}', '{$cachetime}', '{$cacheint}'
+                    )";
+                $inDB->query($sql);
 
-			if (cmsCore::request('del_orig', 'int', 0)){
-				$sql = "DELETE FROM cms_modules WHERE id = $mod_id";
-				$inDB->query($sql) ;
-			}
-		}
+                if (cmsCore::request('del_orig', 'int', 0)){
+                    $sql = "DELETE FROM cms_modules WHERE id = $mod_id";
+                    $inDB->query($sql) ;
+                }
+            }
 
-		$sql     = "SELECT LAST_INSERT_ID() as lastid FROM cms_modules";
-		$result  = $inDB->query($sql) ;
-		$row     = $inDB->fetch_assoc($result);
-		$lastid  = $row['lastid'];
+            $sql     = "SELECT LAST_INSERT_ID() as lastid FROM cms_modules";
+            $result  = $inDB->query($sql) ;
+            $row     = $inDB->fetch_assoc($result);
+            $lastid  = $row['lastid'];
 
-		if (isset($_REQUEST['show_all'])){
-			$sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position)
-					VALUES ($lastid, 0, '{$position}')";
-			$inDB->query($sql) ;
-		} else {
-			$showin = $_REQUEST['showin'];
-            $showpos = $_REQUEST['showpos'];
-			if (sizeof($showin)>0){
-				foreach ($showin as $key=>$value){
-					$sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position)
-							VALUES ($lastid, $value, '{$showpos[$value]}')";
-					$inDB->query($sql) ;
-				}
-			}
-		}
+            if (isset($_REQUEST['show_all'])){
+                $sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position, tpl)
+                                VALUES ($lastid, 0, '{$position}', '". cmsConfig::getConfig('template') ."')";
+                $inDB->query($sql) ;
+            } else {
+                $showin = $_REQUEST['showin'];
+    $showpos = $_REQUEST['showpos'];
+                if (sizeof($showin)>0){
+                    foreach ($showin as $key=>$value){
+                        $sql = "INSERT INTO cms_modules_bind (module_id, menu_id, position, tpl)
+                                        VALUES ($lastid, $value, '{$showpos[$value]}', '". cmsConfig::getConfig('template') ."')";
+                        $inDB->query($sql) ;
+                    }
+                }
+            }
 
-		cmsCore::addSessionMessage($_LANG['AD_MODULE_ADD_SITE'] , 'success');
-		cmsCore::redirect('index.php?view=modules');
+            cmsCore::addSessionMessage($_LANG['AD_MODULE_ADD_SITE'] , 'success');
+            cmsCore::redirect('index.php?view=modules');
 
 	}
 
@@ -473,7 +473,7 @@ function applet_modules(){
         $mod = $inDB->get_fields('cms_modules', "id = '$item_id'", '*');
         if(!$mod){ cmsCore::error404(); }
 
-        $sql = "SELECT id FROM cms_modules_bind WHERE module_id = $id AND menu_id = 0 LIMIT 1";
+        $sql = "SELECT id FROM cms_modules_bind WHERE module_id = $id AND menu_id = 0 AND tpl = '". cmsConfig::getConfig('template') ."' LIMIT 1";
         $result = $inDB->query($sql) ;
         if($inDB->num_rows($result)) { $show_all = true; } else { $show_all = false; }
 
@@ -667,7 +667,7 @@ function applet_modules(){
 
                     <?php
                         if ($do=='edit'){
-                            $bind_sql       = "SELECT * FROM cms_modules_bind WHERE module_id = ".$mod['id'];
+                            $bind_sql       = "SELECT * FROM cms_modules_bind WHERE module_id = ".$mod['id']." AND tpl = '". cmsConfig::getConfig('template') ."'";
                             $bind_res       = $inDB->query($bind_sql);
                             $bind           = array();
                             $bind_pos       = array();

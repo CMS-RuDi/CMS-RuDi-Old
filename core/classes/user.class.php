@@ -163,21 +163,20 @@ class cmsUser {
      * @return array
      */
     public function loadUser($user_id, $where='') {
+        if($user_id){
+            if(isset($this->loads_users[$user_id])) { return $this->loads_users[$user_id]; }
+        }
 
-		if($user_id){
-			if(isset($this->loads_users[$user_id])) { return $this->loads_users[$user_id]; }
-		}
-
-		$where = $user_id ? "u.id = '$user_id'" : $where;
-		if(!$where) { return false; }
+        $where = $user_id ? "u.id = '$user_id'" : $where;
+        if(!$where) { return false; }
 
         $inDB = cmsDatabase::getInstance();
 
         $sql  = "SELECT u.*, g.is_admin, g.alias, g.access, p.imageurl, p.imageurl as orig_imageurl, p.karma, p.city
-                   FROM cms_users u
-				   INNER JOIN cms_user_groups g ON g.id = u.group_id
-				   INNER JOIN cms_user_profiles p ON p.user_id = u.id
-                   WHERE {$where} AND u.is_deleted = 0 AND u.is_locked = 0 LIMIT 1";
+           FROM cms_users u
+                           INNER JOIN cms_user_groups g ON g.id = u.group_id
+                           INNER JOIN cms_user_profiles p ON p.user_id = u.id
+           WHERE {$where} AND u.is_deleted = 0 AND u.is_locked = 0 LIMIT 1";
 
         $result = $inDB->query($sql);
 
@@ -187,12 +186,11 @@ class cmsUser {
 
         $info['ip'] = cmsCore::strClear($_SERVER['REMOTE_ADDR']);
 
-		$info['imageurl'] = self::getUserAvatarUrl($info['id'], 'small', $info['imageurl'], $info['is_deleted']);
+        $info['imageurl'] = self::getUserAvatarUrl($info['id'], 'small', $info['imageurl'], $info['is_deleted']);
 
-		$info['access'] = explode(',', str_replace(', ', ',', $info['access']));
+        $info['access'] = explode(',', str_replace(', ', ',', $info['access']));
 
         return $this->loads_users[$info['id']] = cmsCore::callEvent('LOAD_USER', $info);
-
     }
 
 // ============================================================================ //
@@ -1637,7 +1635,7 @@ class cmsUser {
 
             if(is_array($tokens)){
 
-                $key = array_search($_POST['csrf_token'], $tokens);
+                $key = array_search($_POST['csrf_token'], $tokens, true);
 
                 if($key !== false){
                     unset($tokens[$key]);

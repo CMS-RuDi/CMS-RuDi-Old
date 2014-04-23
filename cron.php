@@ -19,14 +19,14 @@
 
     Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
-	define('PATH', dirname(__FILE__));
-	define("VALID_CMS", 1);
+    define('PATH', dirname(__FILE__));
+    define("VALID_CMS", 1);
 
-	include(PATH.'/core/cms.php');
+    include(PATH.'/core/cms.php');
 
     cmsCore::getInstance();
     cmsCore::loadClass('cron');
-	cmsCore::loadClass('actions');
+    cmsCore::loadClass('actions');
 
     $jobs = cmsCron::getJobs();
 
@@ -35,13 +35,11 @@
 
         // выполняем их
         foreach($jobs as $job){
-
-			// проверяем интервал запуска
-			if (!$job['job_interval'] || ($job['hours_ago'] > $job['job_interval']) || $job['is_new']) {
-				// запускаем задачу
-				cmsCron::executeJob($job);
-			}
-
+            // проверяем интервал запуска
+            if (!$job['job_interval'] || ($job['hours_ago'] > $job['job_interval']) || $job['is_new']) {
+                // запускаем задачу
+                cmsCron::executeJob($job);
+            }
         }
 
     }

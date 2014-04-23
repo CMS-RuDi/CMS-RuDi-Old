@@ -13,16 +13,19 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-define('CORE_VERSION', 		'1.10.3');
-define('CORE_BUILD', 		'2');
+define('CMS_RUDI', 1);
+define('CMS_RUDI_V', '0.0.2');
+
+define('CORE_VERSION', '1.10.3');
+define('CORE_BUILD', '2');
 define('CORE_VERSION_DATE', '2013-10-15');
-define('CORE_BUILD_DATE', 	'2013-11-21');
+define('CORE_BUILD_DATE', '2013-11-21');
 
 class cmsCore {
 
     private static   $instance;
 
-	private static   $jevix;
+    private static   $jevix;
 
     protected        $start_time;
 
@@ -32,12 +35,12 @@ class cmsCore {
     protected        $is_menu_id_strict;
 
     protected        $uri;
-	protected        $real_uri;
+    protected        $real_uri;
     public           $component;
     public           $do;
-	public           $components;
-	public           $plugins;
-	protected static $filters;
+    public           $components;
+    public           $plugins;
+    protected static $filters;
     protected        $url_without_com_name = false;
     private static   $is_ajax = false;
 
@@ -52,7 +55,7 @@ class cmsCore {
 
         // проверяем для совместимости
         if(!defined('HOST')){
-            define('HOST', 'http://' . self::getHost());
+            define('HOST', '//' . self::getHost());
         }
 
         if ($install_mode){ return; }
@@ -499,8 +502,8 @@ class cmsCore {
 		}
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     /**
      * Подключает функции для работы с графикой
      */
@@ -508,8 +511,8 @@ class cmsCore {
         include_once PATH.'/includes/graphic.inc.php';
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     public static function insertEditor($name, $text='', $height='350', $width='500', $toolbar='') {
         global $_LANG;
         $editor = self::callEvent('INSERT_WYSIWYG', array(
@@ -526,8 +529,8 @@ class cmsCore {
 
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     /**
      * Устанавливает кукис посетителю
      * @param string $name Название
@@ -680,9 +683,6 @@ class cmsCore {
                             $rule['target'] = str_replace('{'.$key.'}', $value, $rule['target']);
                         }
                     }
-
-                    //действие по-умолчанию: rewrite
-                    if (!$rule['action']) { $rule['action'] = 'rewrite'; }
 
                     //выполняем действие
                     switch($rule['action']){
@@ -1947,11 +1947,11 @@ class cmsCore {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static function dateFormat($date, $is_full_m = true, $is_time=false, $is_now_time = true){
+    static function dateFormat($date, $is_full_m = true, $is_time=false, $is_now_time = true){
 
         $inConf = cmsConfig::getInstance();
 
-	    global $_LANG;
+        global $_LANG;
 
 		// формируем входную $date с учетом смещения
         $date = date('Y-m-d H:i:s', strtotime($date)+($inConf->timediff*3600));
@@ -2194,7 +2194,7 @@ class cmsCore {
 			self::$jevix->cfgSetTagCutWithContent(array('script', 'style', 'meta'));
 			// Устанавливаем разрешённые параметры тегов. Также можно устанавливать допустимые значения этих параметров.
 			self::$jevix->cfgAllowTagParams('input', array('type'=>'#text', 'style', 'onclick' => '#text', 'value' => '#text'));
-			self::$jevix->cfgAllowTagParams('a', array('title', 'href', 'style', 'rel' => '#text', 'name' => '#text'));
+			self::$jevix->cfgAllowTagParams('a', array('class' => '#text', 'title', 'href', 'style', 'rel' => '#text', 'name' => '#text'));
 			self::$jevix->cfgAllowTagParams('img', array('src' => '#text', 'style', 'alt' => '#text', 'title', 'align' => array('right', 'left', 'center'), 'width' => '#int', 'height' => '#int', 'hspace' => '#int', 'vspace' => '#int'));
 			self::$jevix->cfgAllowTagParams('div', array('class' => '#text', 'style','align' => array('right', 'left', 'center')));
 			self::$jevix->cfgAllowTagParams('object', array('width' => '#int', 'height' => '#int', 'data' => '#text'));
@@ -2578,20 +2578,20 @@ class cmsCore {
         $string = trim(preg_replace ('/[^a-zа-яё0-9\-]/isu', '-', $str), '-');
         $string = preg_replace('#[\-]{2,}#i', '-', $string);
 
-		if(!$is_cyr){
+        if(!$is_cyr){
             $string = preg_replace(
                 array('/([а]+?)/iu','/([б]+?)/iu','/([в]+?)/iu','/([г]+?)/iu','/([д]+?)/iu','/([е]+?)/iu','/([ё]+?)/iu','/([ж]+?)/iu','/([з]+?)/iu','/([и]+?)/iu','/([й]+?)/iu','/([к]+?)/iu','/([л]+?)/iu','/([м]+?)/iu','/([н]+?)/iu','/([о]+?)/iu','/([п]+?)/iu','/([р]+?)/iu','/([с]+?)/iu','/([т]+?)/iu','/([у]+?)/iu','/([ф]+?)/iu','/([х]+?)/iu','/([ц]+?)/iu','/([ч]+?)/iu','/([ш]+?)/iu','/([щ]+?)/iu','/([ъ]+?)/iu','/([ы]+?)/iu','/([ь]+?)/iu','/([э]+?)/iu','/([ю]+?)/iu','/([я]+?)/iu'),
                 array('a','b','v','g','d','e','yo','zh','z','i','i','k','l','m','n','o','p','r','s',
                     't','u','f','h','c','ch','sh','sch','','y','','ye','yu','ja'),
                 $string
             );
-		}
+        }
 
-        if (empty($string)) $string = 'untitled';
-        if (is_numeric($string)) $string .= 'untitled';
+        if (empty($string)){ $string = 'untitled'; }
+        if (is_numeric($string)){ $string .= 'untitled'; }
 
         return $string;
-	}
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2696,12 +2696,31 @@ class cmsCore {
     public static function jsonOutput($data = array(), $is_header = true){
         // очищаем буфер
         ob_end_clean();
-		if($is_header){
-			header('Content-type: application/json; charset=utf-8');
-		}
-		self::halt(json_encode($data));
+        if($is_header){
+            header('Content-type: application/json; charset=utf-8');
+        }
+        self::halt(json_encode($data));
     }
 
+// DS Soft Edited
+    /**
+     * Проверяет есть ли в массиве $arr элемент с индексом $key, если есть возвращает
+     * его если нет возвращает значение по умолчанию $default
+     * @param array $arr
+     * @param mixed $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function getArrVal($arr=array(), $key=false, $default=false){
+        if (!empty($arr) && $key !== false){
+            if (isset($arr[$key])){
+                return $arr[$key];
+            }
+        }
+        
+        return $default;
+    }
+// End DS Soft Edited
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 } //cmsCore
 

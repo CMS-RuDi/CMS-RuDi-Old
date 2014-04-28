@@ -1,11 +1,11 @@
 {literal}
 <style type="text/css">
 html #popup_container .body {
-    width: 332px;
+    width: 333px;
 }
 #geo_window {
     height: 93px;
-    margin: 15px 12px;
+    margin: 10px;
 }
 .list select {
     margin: 0 0 10px;

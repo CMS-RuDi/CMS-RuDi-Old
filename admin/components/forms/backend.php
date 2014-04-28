@@ -174,7 +174,8 @@ if (in_array($opt, array('add_field', 'update_field'))) {
                    mb_strpos($exts, 'ht')) {
                 $exts  = str_replace(array('htm','php','ht'), '', mb_strtolower($exts));
             }
-            $item['config']['ext']   = $exts;
+
+            $item['config']['ext']   = str_replace(' ', '', $exts);
             $item['config']['size']  = cmsCore::request('f_file_size', 'int');
             break;
     }

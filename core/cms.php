@@ -123,6 +123,7 @@ class cmsCore {
         // ожидаем параметр с именем домена, например команда для CRON
         // php -f /path_to_site/cron.php site.ru
         if(PHP_SAPI == 'cli'){
+            global $argv;
             return isset($argv[1]) ?  $argv[1] : '';
         }
 
@@ -146,8 +147,9 @@ class cmsCore {
      * @return bool
      */
     private static function detectContext(){
-        if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-            $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+        if((isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+                $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
+                || isset($_SERVER['HTTP_X_PJAX'])) {
             self::$is_ajax = true;
         } else {
             self::$is_ajax = false;
@@ -436,8 +438,10 @@ class cmsCore {
         if (file_exists($plugin_file)){
             include_once($plugin_file);
             self::loadLanguage('plugins/'.$plugin);
-            $plugin_obj = new $plugin();
-            return $plugin_obj;
+            if(class_exists($plugin)){ 
+                $plugin_obj = new $plugin(); 
+                return $plugin_obj; 
+            } 
         }
         return false;
     }
@@ -494,12 +498,12 @@ class cmsCore {
      * @param string $file
      */
     public static function includeFile($file){
-		if (file_exists(PATH.'/'.$file)){
-        	include_once PATH.'/'.$file;
-			return true;
-		} else {
-			return false;
-		}
+        if (file_exists(PATH.'/'.$file)){
+        include_once PATH.'/'.$file;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -625,7 +629,7 @@ class cmsCore {
         // Есть ли в url GET параметры
         $pos_que  = mb_strpos($request_uri, '?');
         // если есть и это не go/url= и load/url=
-        if ($pos_que !== false && (mb_strpos($request_uri, 'url=') === false)){
+        if ($pos_que !== false && (mb_strpos($request_uri, '/url=') === false)){
 
             // получаем строку запроса
             $query_data = array();
@@ -900,7 +904,8 @@ class cmsCore {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static function error404(){
-
+        ob_end_clean();
+        
         self::loadClass('page');
 
         header("HTTP/1.0 404 Not Found");
@@ -912,7 +917,6 @@ class cmsCore {
         }
 
         self::halt();
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -989,27 +993,40 @@ class cmsCore {
      * @param string $var название переменной
      * @param string $type тип int | str | html | email | array | array_int | array_str | массив допустимых значений
      * @param string $default значение по умолчанию
+     * @param string $r Откуда брать значение get | post | request
      * @return mixed
      */
-    public static function request($var, $type='str', $default=false){
+    public static function request($var, $type='str', $default=false, $r = 'request'){
+        // Задаем суперглобальный массив, из которого будем получать данные 
+        switch ($r) { 
+            case 'post': 
+                $request = $_POST; 
+            break; 
+            case 'get': 
+                $request = $_GET; 
+            break; 
+            default: 
+                $request = $_REQUEST; 
+            break; 
+        }
 
-        if (isset($_REQUEST[$var])){
+        if (isset($request[$var])){
             // массив возможных параметров
             if(is_array($type)){
-                if(in_array($_REQUEST[$var], $type)){
-                    return self::strClear((string)$_REQUEST[$var]);
+                if(in_array($request[$var], $type)){
+                    return self::strClear((string)$request[$var]);
                 } else {
                     return $default;
                 }
             }
             switch($type){
-                case 'int':   if ($_REQUEST[$var]!=='') { return (int)$_REQUEST[$var];  } else { return (int)$default; } break;
-                case 'str':   if ($_REQUEST[$var]) { return (string)self::strClear($_REQUEST[$var]); } else { return (string)$default; } break;
-                case 'email': if(preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $_REQUEST[$var])){ return $_REQUEST[$var]; } else { return (string)$default; } break;
-                case 'html':  if ($_REQUEST[$var]) { return (string)self::strClear($_REQUEST[$var], false); } else { return (string)$default; } break;
-                case 'array': if (is_array($_REQUEST[$var])) { foreach($_REQUEST[$var] as $k=>$s){ $arr[$k] = self::strClear($s, false); } return $arr; } else { return $default; } break;
-                case 'array_int': if (is_array($_REQUEST[$var])) { foreach($_REQUEST[$var] as $k=>$i){ $arr[$k] = (int)$i; } return $arr; } else { return $default; } break;
-                case 'array_str': if (is_array($_REQUEST[$var])) { foreach($_REQUEST[$var] as $k=>$s){ $arr[$k] = self::strClear($s); } return $arr; } else { return $default; } break;
+                case 'int':   if ($request[$var]!=='') { return (int)$request[$var];  } else { return (int)$default; } break;
+                case 'str':   if ($request[$var]) { return (string)self::strClear($request[$var]); } else { return (string)$default; } break;
+                case 'email': if(preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $request[$var])){ return $request[$var]; } else { return (string)$default; } break;
+                case 'html':  if ($request[$var]) { return (string)self::strClear($request[$var], false); } else { return (string)$default; } break;
+                case 'array': if (is_array($request[$var])) { foreach($request[$var] as $k=>$s){ $arr[$k] = self::strClear($s, false); } return $arr; } else { return $default; } break;
+                case 'array_int': if (is_array($request[$var])) { foreach($request[$var] as $k=>$i){ $arr[$k] = (int)$i; } return $arr; } else { return $default; } break;
+                case 'array_str': if (is_array($request[$var])) { foreach($request[$var] as $k=>$s){ $arr[$k] = self::strClear($s); } return $arr; } else { return $default; } break;
             }
         } else {
             return $default;
@@ -1436,29 +1453,24 @@ class cmsCore {
      * в случае остутствия у группы доступа к текущему пункту меню
      */
     public function checkMenuAccess(){
-
-		$inPage = cmsPage::getInstance();
-
-		if (!$this->menu_item) { return true; }
-
-		$access_list = $this->menu_item['access_list'];
-
-		if (!self::checkContentAccess($access_list)) {
-
+        $inPage = cmsPage::getInstance();
+        
+        if (!$this->menu_item) { return true; }
+        
+        $access_list = $this->menu_item['access_list'];
+        
+        if (!self::checkContentAccess($access_list)) {
+            $inPage->addHeadJS('includes/jquery/jquery.js');
+            $inPage->addHeadJS('core/js/common.js');
+            
             ob_start();
-
             cmsPage::includeTemplateFile('special/accessdenied.php');
-
-			$inPage->page_body = ob_get_clean();
-
+            $inPage->page_body = ob_get_clean();
+            
             return false;
-
-		} else {
-
-			return true;
-
-		}
-
+        }else{
+            return true;
+        }
     }
 
     /**
@@ -1629,55 +1641,6 @@ class cmsCore {
      */
     public function getMenuStruct() {
         return $this->menu_struct;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * Возвращает прямую ссылку на пункт меню по его типу и опции
-     * @param string $linktype
-     * @param string $linkid
-     * @return string
-     */
-    public function getMenuLink($linktype, $linkid){
-
-        $inDB = cmsDatabase::getInstance();
-
-        $menulink = '';
-
-        if ($linktype=='component'){
-            $menulink = '/'.$linkid;
-        }
-
-        if ($linktype=='link'){
-            $menulink = $linkid;
-        }
-
-        if ($linktype=='category' || $linktype=='content'){
-            self::loadModel('content');
-            $model = new cms_model_content();
-            switch($linktype){
-                case 'category': $menulink = $model->getCategoryURL(null, $inDB->get_field('cms_category', "id='{$linkid}'", 'seolink')); break;
-                case 'content':  $menulink = $model->getArticleURL(null, $inDB->get_field('cms_content', "id='{$linkid}'", 'seolink')); break;
-            }
-        }
-
-        if ($linktype=='blog'){
-            self::loadModel('blogs');
-            $model = new cms_model_blogs();
-            $menulink = $model->getBlogURL($inDB->get_field('cms_blogs', "id={$linkid}", 'seolink'));
-        }
-
-        if ($linktype=='uccat'){
-            $menulink = '/catalog/'.$linkid;
-        }
-
-        if ($linktype=='photoalbum'){
-            $menulink = '/photos/'.$linkid;
-        }
-
-        return $menulink;
-
     }
 
     // LISTS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2262,7 +2225,7 @@ class cmsCore {
      * @param mixed $email
      * @param string $subject
      * @param string $message
-     * @param string $attachment
+     * @param mixed $attachment
      * @return bool
      */
     public static function mailText($email, $subject='', $message='', $attachment=''){
@@ -2302,7 +2265,13 @@ class cmsCore {
         $matches = array();
         if($attachment){
 
-            $mailer->AddAttachment($attachment);
+            if(is_array($attachment)){ 
+                foreach($attachment as $attach){ 
+                    $mailer->AddAttachment($attach); 
+                } 
+            }else{ 
+                $mailer->AddAttachment($attachment); 
+            } 
 
         } elseif(preg_match_all('/\[attachment:(.+)\]/iu', $message, $matches)){
 
@@ -2360,60 +2329,132 @@ class cmsCore {
         return $mailer;
 
     }
-
+    
+    
     // AJAX IMAGE UPLOAD ////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Добавляет запись о загружаемом изображении
      * @return bool
      */
-    public static function registerUploadImages($target_id, $target, $fileurl, $component){
-
-        return cmsDatabase::getInstance()->insert('cms_upload_images', array('target_id'=>$target_id,
-																			  'session_id'=>session_id(),
-																			  'fileurl'=>$fileurl,
-																			  'component'=>$component,
-																			  'target'=>$target));
-
+    public static function registerUploadImages($target_id, $target, $fileurl, $component, $table='cms_upload_images'){
+        return cmsDatabase::getInstance()->insert(
+            $table,
+            array(
+                'target_id' => $target_id,
+                'session_id' => session_id(),
+                'fileurl' => $fileurl,
+                'component' => $component,
+                'target' => $target
+            )
+        );
     }
+    
     /**
      * Устанавливает ID места назначения к загруженному изображению
      * @return bool
      */
-    public static function setIdUploadImage($target, $target_id){
-
-		$inDB = cmsDatabase::getInstance();
-		$sid=session_id();
-
-        return $inDB->query("UPDATE cms_upload_images SET target_id = '{$target_id}' WHERE session_id = '{$sid}' AND target = '{$target}' AND target_id = 0");
-
+    public static function setIdUploadImage($target, $target_id, $table='cms_upload_images'){
+        return cmsDatabase::getInstance()->query("UPDATE ". $table ." SET target_id = '". $target_id ."' WHERE session_id = '". session_id() ."' AND target = '". $target ."' AND target_id = 0");
     }
+    
     /**
      * Возвращает количество загруженных изображений для текущей сессии данного места назначения
      * @return int
      */
-    public static function getTargetCount($target_id=0){
-
-		$sid       = session_id();
-        $target_id = (int)$target_id;
-
-        return cmsDatabase::getInstance()->rows_count('cms_upload_images', "target_id = '{$target_id}' AND session_id = '{$sid}'");
-
+    public static function getTargetCount($target_id=0, $target=false, $table='cms_upload_images'){
+        if ($table !== 'cms_upload_images'){
+            return cmsDatabase::getInstance()->rows_count($table, "target_id = '". (int)$target_id ."'". ($target_id == 0 ? " AND session_id = '". session_id() ."'" : '') . ($target === false ? '' : " AND target = '". $target ."'"));
+        }
+        return cmsDatabase::getInstance()->rows_count($table, "target_id = '". (int)$target_id ."' AND session_id = '". session_id() ."'". ($target === false ? '' : " AND target = '". $target ."'"));
     }
+    
+    public static function getUploadImages($target_id=0, $target=false, $table='cms_upload_images', $component='content'){
+        $inDB = cmsDatabase::getInstance();
+        $rs = $inDB->query("SELECT * FROM ". $table ." WHERE target_id = '". $target_id ."'". ($target_id == 0 ? " AND session_id = '". session_id() ."'" : '') . ($target === false ? '' : " AND target='". $target ."'") ." ORDER BY id ASC");
+        
+        if ($inDB->num_rows($rs)){
+            $items = array();
+            while($item = $inDB->fetch_assoc($rs)){
+                $item['small_src'] = '/upload/'. $component .'/small/'. $item['fileurl'];
+                $item['medium_src'] = '/upload/'. $component .'/medium/'. $item['fileurl'];
+                $item['big_src'] = '/upload/'. $component .'/big/'. $item['fileurl'];
+                $items[$item['id']] = $item;
+            }
+            return $items;
+        }
+        
+        return false;
+    }
+    
     /**
      * Удаляет все изображения места их назначения
      * @return bool
      */
-    public static function deleteUploadImages($target_id, $target){
+    public static function deleteUploadImages($target_id, $target, $table='cms_upload_images', $component='content'){
         $inDB = cmsDatabase::getInstance();
-        $rs = $inDB->query("SELECT * FROM cms_upload_images WHERE target_id = '$target_id' AND target='$target'");
+        
+        $rs = $inDB->query("SELECT * FROM ". $table ." WHERE target_id = '". $target_id ."' AND target='". $target ."'");
+        
         if ($inDB->num_rows($rs)){
-            while($file = $inDB->fetch_assoc($rs)){
-                $filename = PATH.$file['fileurl'];
-                if (file_exists($filename)){ @unlink($filename); }
-                $inDB->query("DELETE FROM cms_upload_images WHERE id = '{$file['id']}'");
+        
+            if ($table !== 'cms_upload_images'){
+                while($file = $inDB->fetch_assoc($rs)){
+                    if (file_exists(PATH .'/upload/'. $component .'/small/'. $file['fileurl'])){
+                        unlink(PATH .'/upload/'. $component .'/small/'. $file['fileurl']);
+                    }
+                    if (file_exists(PATH .'/upload/'. $component .'/medium/'. $file['fileurl'])){
+                        unlink(PATH .'/upload/'. $component .'/medium/'. $file['fileurl']);
+                    }
+                    if (file_exists(PATH .'/upload/'. $component .'/big/'. $file['fileurl'])){
+                        unlink(PATH .'/upload/'. $component .'/big/'. $file['fileurl']);
+                    }
+                }
+            }else{
+                while($file = $inDB->fetch_assoc($rs)){
+                    $filename = PATH.$file['fileurl'];
+                    if (file_exists($filename)){ unlink($filename); }
+                }
+            }
+
+            $inDB->query("DELETE FROM ". $table ." WHERE target_id = '". $target_id ."' AND target='". $target ."'");
+        }
+        return true;
+    }
+    
+    /**
+     * Сохраняет названия и описания файлов, для заданного источника
+     * @param integer $target_id
+     * @param string $table
+     * @return boolean
+     */
+    public static function requestUploadImgTitles($target_id, $table){
+        $data = array();
+        
+        $titles = self::request('ajax_file_title', 'array_str');
+        $descriptions = self::request('ajax_file_description', 'array_str');
+        
+        if (!empty($titles)){
+            foreach ($titles as $k=>$v){
+                if (empty($data[$k])){ $data[$k] = array(); }
+                $data[$k]['title'] = $v;
             }
         }
+        
+        if (!empty($descriptions)){
+            foreach ($descriptions as $k=>$v){
+                if (empty($data[$k])){ $data[$k] = array(); }
+                $data[$k]['description'] = $v;
+            }
+        }
+        
+        if (!empty($data)){
+            $inDB = cmsDatabase::getInstance();
+            foreach ($data as $k=>$v){
+                $inDB->query("UPDATE ". $table ." SET title='". (empty($data[$k]['title']) ? '' : $inDB->escape_string($data[$k]['title'])) ."', description='". (empty($data[$k]['description']) ? '' : $inDB->escape_string($data[$k]['description'])) ."' WHERE id='". $k ."' AND target_id='". $target_id ."'");
+            }
+        }
+        
         return true;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2451,8 +2492,7 @@ class cmsCore {
      * @return bool
      */
     public static function isCached($target, $target_id, $cachetime=1, $cacheint='MINUTES'){
-
-        $where     = "target='$target' AND target_id='$target_id' AND cachedate >= DATE_SUB(NOW(), INTERVAL $cachetime $cacheint)";
+        $where = "target='$target' AND target_id='$target_id' AND cachedate >= DATE_SUB(NOW(), INTERVAL $cachetime $cacheint)";
         $cachefile = cmsDatabase::getInstance()->get_field('cms_cache', $where, 'cachefile');
 
         if ($cachefile){
@@ -2703,6 +2743,17 @@ class cmsCore {
     }
 
 // DS Soft Edited
+    
+    /**
+     * Возвращает объект класса miniCurl
+     * @param array $cfg
+     * @return \miniCurl
+     */
+    public static function initCurl($cfg=array()){
+        self::loadClass('curl');
+        return new miniCurl($cfg);
+    }
+
     /**
      * Проверяет есть ли в массиве $arr элемент с индексом $key, если есть возвращает
      * его если нет возвращает значение по умолчанию $default

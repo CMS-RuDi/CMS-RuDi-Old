@@ -12,13 +12,19 @@
 /******************************************************************************/
 
     function routes_users(){
-
+        $routes[] = array( 
+                            '_uri'  => '/^users\/change_email\/([a-z0-9]{32})\/(.+)$/i',
+                            'do'    => 'change_email',
+                            1       => 'token',
+                            2       => 'email'
+                        );
+        
         $routes[] = array(
                             '_uri'  => '/^users\/karma\/plus\/([0-9]+)$/i',
                             'do'    => 'votekarma',
                             'sign'  => 'plus',
                             1       => 'to'
-                         );
+                        );
 
         $routes[] = array(
                             '_uri'  => '/^users\/karma\/minus\/([0-9]+)$/i',

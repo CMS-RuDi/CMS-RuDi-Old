@@ -10,10 +10,7 @@
         <textarea name="message" id="message" class="ajax_autogrowarea"></textarea>
     </div>
 </form>
-<br />
-<div class="sess_messages" style="display:none">
-  <div class="message_info" id="error_mess"></div>
-</div>
+
 <script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
 {literal}
 <script type="text/javascript">

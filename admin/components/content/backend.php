@@ -31,9 +31,16 @@ if($opt=='saveconfig'){
     $cfg['pt_hide']     = cmsCore::request('pt_hide', 'int', 0);
     $cfg['autokeys']    = cmsCore::request('autokeys', 'int', 0);
 
+    $cfg['img_table'] = 'cms_content_images';
+    $cfg['img_big_w'] = cmsCore::request('img_big_w', 'int', 300);
+    $cfg['img_big_h'] = cmsCore::request('img_big_h', 'int', 300);
+    $cfg['img_medium_w'] = cmsCore::request('img_medium_w', 'int', 200);
+    $cfg['img_medium_h'] = cmsCore::request('img_medium_h', 'int', 200);
     $cfg['img_small_w'] = cmsCore::request('img_small_w', 'int', 100);
-    $cfg['img_big_w']   = cmsCore::request('img_big_w', 'int', 200);
-    $cfg['img_sqr']     = cmsCore::request('img_sqr', 'int', 1);
+    $cfg['img_small_h'] = cmsCore::request('img_small_h', 'int', 100);
+    $cfg['resize_type'] = cmsCore::request('resize_type', array('auto','exact','portrait','landscape','crop'), 'auto');
+    $cfg['img_on'] = cmsCore::request('img_on', 'int', 0);
+    
     $cfg['img_users']   = cmsCore::request('img_users', 'int', 1);
     $cfg['watermark']   = cmsCore::request('watermark', 'int', 0);
     $cfg['watermark_only_big'] = cmsCore::request('watermark_only_big', 'int', 0);
@@ -121,22 +128,34 @@ $GLOBALS['cp_page_head'][] = jwHeader();
     {tab=<?php echo $_LANG['AD_PHOTO_ART']; ?>}
     <table width="550" border="0" cellpadding="10" cellspacing="0" class="proptable">
         <tr>
-            <td><strong><?php echo $_LANG['AD_PHOTO_SMALL']; ?>:</strong></td>
-            <td width="120">
-                <input class="uispin" name="img_small_w" type="text" id="img_small_w" value="<?php echo $cfg['img_small_w'];?>" size="5" />
-            </td>
-        </tr>
-        <tr>
             <td><strong><?php echo $_LANG['AD_PHOTO_BIG']; ?>:</strong></td>
             <td>
-                <input class="uispin" name="img_big_w" type="text" id="img_big_w" value="<?php echo $cfg['img_big_w'];?>" size="5" />
+                <input class="uispin" name="img_big_w" type="text" id="img_big_w" value="<?php echo $cfg['img_big_w'];?>" size="5" /> x <input class="uispin" name="img_big_h" type="text" id="img_big_h" value="<?php echo $cfg['img_big_h'];?>" size="5" />
             </td>
         </tr>
         <tr>
-            <td><strong><?php echo $_LANG['AD_PHOTO_SQUARE']; ?>:</strong></td>
+            <td><strong><?php echo $_LANG['AD_PHOTO_MEDIUM']; ?>:</strong></td>
             <td>
-                <label><input name="img_sqr" type="radio" value="1" <?php if ($cfg['img_sqr']) { echo 'checked="checked"'; } ?>/> <?php echo $_LANG['YES']; ?> </label>
-                <label><input name="img_sqr" type="radio" value="0" <?php if (!$cfg['img_sqr']) { echo 'checked="checked"'; } ?>/> <?php echo $_LANG['NO']; ?> </label>
+                <input class="uispin" name="img_medium_w" type="text" id="img_medium_w" value="<?php echo $cfg['img_medium_w'];?>" size="5" /> x <input class="uispin" name="img_medium_h" type="text" id="img_medium_h" value="<?php echo $cfg['img_medium_h'];?>" size="5" />
+            </td>
+        </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_SMALL']; ?>:</strong></td>
+            <td width="120">
+                <input class="uispin" name="img_small_w" type="text" id="img_small_w" value="<?php echo $cfg['img_small_w'];?>" size="5" /> x <input class="uispin" name="img_small_h" type="text" id="img_small_h" value="<?php echo $cfg['img_small_h'];?>" size="5" />
+            </td>
+        </tr>
+        
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
+            <td>
+                <select name="resize_type" style="width: 200px;">
+                    <option value="auto"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
+                    <option value="exact"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
+                    <option value="portrait"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
+                    <option value="landscape"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
+                    <option value="crop"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
+                </select>
             </td>
         </tr>
         <tr>
@@ -147,6 +166,16 @@ $GLOBALS['cp_page_head'][] = jwHeader();
             <td>
                 <label><input name="img_users" type="radio" value="1" <?php if ($cfg['img_users']) { echo 'checked="checked"'; } ?>/> <?php echo $_LANG['YES']; ?> </label>
                 <label><input name="img_users" type="radio" value="0" <?php if (!$cfg['img_users']) { echo 'checked="checked"'; } ?>/> <?php echo $_LANG['NO']; ?> </label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong><?php echo $_LANG['AD_ALLOW_USERS_TO_MULTI']; ?>:</strong><br/>
+                <span class="hinttext"><?php echo $_LANG['AD_ALLOW_USERS_TO_MULTI_HINT']; ?></span>
+            </td>
+            <td>
+                <label><input name="img_on" type="radio" value="1" <?php if ($cfg['img_on']) { echo 'checked="checked"'; } ?>/> <?php echo $_LANG['YES']; ?> </label>
+                <label><input name="img_on" type="radio" value="0" <?php if (!$cfg['img_on']) { echo 'checked="checked"'; } ?>/> <?php echo $_LANG['NO']; ?> </label>
             </td>
         </tr>
         <tr>

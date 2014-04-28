@@ -976,7 +976,7 @@ class cms_model_users{
 		if(!$users_list) { return false; }
 
         foreach($users_list as $usr){
-            $this->deleteUser($usr['id'], true);
+            $this->deleteUser($usr['id']);
         }
 
         return true;

@@ -1,14 +1,8 @@
-//
-// Core js class
-// @author [AM]
-//
 (function($) {
   core = {
     verticalOffset: -390,
     horizontalOffset: 0,
     repositionOnResize: true,
-    overlayOpacity: 0.2,
-    overlayColor: '#ffffff',
     draggable: true,
     dialogClass: null,
     alert: function(message, title, callback) {
@@ -43,14 +37,7 @@
         $('#popup_overlay, #popup_container').remove();
       }
       var html = "<div id='popup_container'>" +
-        "<table>" +
-          "<tbody>" +
-          "<tr>" +
-            "<td class='tl'/><td class='b'/><td class='tr'/>" +
-          "</tr>" +
-          "<tr>" +
-            "<td class='b'/>" +
-            "<td class='body'>" +
+          "<div class='popup_body'>" +
               "<div class='popup_title_wrap'><div class='popup_x_button'/><div id='popup_title'/></div>" +
               "<div id='popup_progress'><img src='/images/progress.gif' alt="+LANG_LOADING+"'...' /></div>" +
               "<div id='popup_content'/>" +
@@ -62,14 +49,7 @@
                 "<input id='popup_cancel' type='button' class='button_no' value='" + LANG_CANCEL + "'/>" +
                 "<input id='popup_close' type='button' class='button_no' value='" + LANG_CLOSE + "'/>" +
               "</div>" +
-            "</td>" +
-            "<td class='b'/>" +
-          "</tr>" +
-          "<tr>" +
-            "<td class='bl'/><td class='b'/><td class='br'/>" +
-          "</tr>" +
-          "</tbody>" +
-        "</table>" +
+          "</div>" +
       "</div>";
 
       this._overlay('show');
@@ -88,12 +68,7 @@
       }
 
       var pos = ((msie && version <= 6 )||(($(window).height()<480)||($(window).width()<700))) ? 'absolute' : 'fixed';
-      $('#popup_container').css({
-        position: pos,
-        zIndex: 999,
-        padding: 0,
-        margin: 0
-      });
+      $('#popup_container').css({ position: pos });
 
       $('#popup_title').text(title);
       $('#popup_content').addClass(type);
@@ -109,7 +84,7 @@
       switch(type) {
         case 'alert':
           $('#popup_close').show();
-          $('#popup_close, .popup_x_button').click(function() {
+          $('#popup_overlay, #popup_close, .popup_x_button').click(function() {
             core.box_close();
             callback(true);
           });
@@ -125,7 +100,7 @@
           $('#popup_ok').click(function() {
             if( callback ) callback(true);
           });
-          $('#popup_cancel ,#popup_close, .popup_x_button').click(function() {
+          $('#popup_overlay, #popup_cancel ,#popup_close, .popup_x_button').click(function() {
             core.box_close();
             callback(false);
           });
@@ -145,7 +120,7 @@
               if(callback) callback(val);
             }
           });
-          $('#popup_cancel, .popup_x_button').click(function() {
+          $('#popup_overlay, #popup_cancel, .popup_x_button').click(function() {
             core.box_close();
             if(callback) callback(null);
           });
@@ -156,7 +131,7 @@
         break;
         case 'message':
           $('#popup_cancel, #popup_progress').show();
-          $('#popup_cancel ,#popup_close, .popup_x_button').focus().select().click(function(){
+          $('#popup_overlay, #popup_cancel ,#popup_close, .popup_x_button').focus().select().click(function(){
             core.box_close();
           });
         break;
@@ -168,14 +143,7 @@
           this._overlay('hide');
           $('body').append('<div id="popup_overlay"></div>');
           $('#popup_overlay').css({
-            position: 'absolute',
-            zIndex: 998,
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: $(document).height(),
-            background: this.overlayColor,
-            opacity: this.overlayOpacity
+            height: $(document).height()
           });
         break;
         case 'hide':
@@ -221,7 +189,7 @@
     },
     show_popup_info: function(text, type) {
       this._popup_info(type);
-      $('#popup_info').text(text).show();
+      $('#popup_info').text(text).show().delay(4000).fadeOut('slow');
     },
     hide_popup_info: function() {
       this.show_popup_info('');
@@ -331,14 +299,12 @@ function addWall(component, target_id){
 
 function doaddWall(result, statusText, xhr, $form){
 	$('.ajax-loader').hide();
-	$('.sess_messages').fadeOut();
 	if(statusText == 'success'){
 		if(result.error == false){
 			core.box_close();
 			wallPage(1);
 		} else {
-			$('#error_mess').html(result.text);
-			$('.sess_messages').fadeIn();
+			core.show_popup_info(result.text, 'error');
 			$('#popup_ok').prop('disabled', false);
 		}
 	} else {

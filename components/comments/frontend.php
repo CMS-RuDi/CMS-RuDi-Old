@@ -76,9 +76,11 @@ if ($do == 'view' && !$target && !$target_id){
 	$inDB->limitPage($page, $model->config['perpage']);
 
 	// Сами комментарии
-	$comments = $total ?
-				$model->getComments(!($is_moder || $myprofile)) :
-				array(); $inDB->resetConditions();
+	$comments = $total ? $model->getComments(!($is_moder || $myprofile)) : array();
+        
+        $inDB->resetConditions();
+        
+        if(!$comments && $page > 1){ cmsCore::error404(); } 
 
 	// пагинация
 	if(!$login){
@@ -310,7 +312,7 @@ if ($do=='add'){
 			$letter = cmsCore::getLanguageTextFile('newpostcomment');
 			$letter = str_replace('{sitename}', $inConf->sitename, $letter);
 			$letter = str_replace('{subj}', $target['subj'], $letter);
-			$letter = str_replace('{subjtitle}', $author['title'], $letter);
+			$letter = str_replace('{subjtitle}', stripslashes($comment['target_title']), $letter);
 			$letter = str_replace('{targetlink}', $targetlink, $letter);
 			$letter = str_replace('{date}', date('d/m/Y H:i:s'), $letter);
 			$letter = str_replace('{from}', $from_nick, $letter);

@@ -33,30 +33,30 @@ function forms(){
         // Если полей нет, 404
         if(!$form_fields) { cmsCore::error404(); }
 
-		$errors = array();
-        $attachment = '';
+        $errors = array();
+        $attachment = array();
 
         // Получаем данные формы
         // Если не переданы, назад
-		$form_input = cmsForm::getFieldsInputValues($form['id']);
-		if(!$form_input) {
+        $form_input = cmsForm::getFieldsInputValues($form['id']);
+        if (!$form_input) {
             $errors[] = $_LANG['FORM_ERROR'];
         }
 		// Проверяем значения формы
-		foreach ($form_input['errors'] as $field_error) {
-			if($field_error){
+        foreach ($form_input['errors'] as $field_error) {
+            if($field_error){
                 $errors[] = $field_error;
             }
-		}
-		// проверяем каптчу
-		if(!cmsCore::checkCaptchaCode(cmsCore::request('code', 'str'))) {
+        }
+        
+        // проверяем каптчу
+        if(!cmsCore::checkCaptchaCode(cmsCore::request('code', 'str'))) {
             $errors[] = $_LANG['ERR_CAPTCHA'];
         }
 
-		if($errors){
+        if($errors){
             if(cmsCore::isAjax()){
-                cmsCore::jsonOutput(array('error' => true,
-                                          'text' => end($errors)));
+                cmsCore::jsonOutput(array('error' => true, 'text' => end($errors)));
             } else {
                 foreach ($errors as $error) {
                     cmsCore::addSessionMessage($error, 'error');
@@ -69,20 +69,18 @@ function forms(){
 
         // Подготовим начало письма
         $mail_message  = '<h3>'.$_LANG['FORM'].': ' . $form['title'] . '</h3>';
-		// Добавляем заполненные поля в письмо
+        // Добавляем заполненные поля в письмо
         foreach ($form_fields as $field) {
-
             // Значение поля
             $value = $form_input['values'][$field['id']];
             if(!$value){ continue; }
 
-			if(is_string($value)){
-				$mail_message .= '<h5>'.$field['title'] . '</h5><p>'.$value.'</p>';
-			} elseif(is_array($value)) { // если массив, значит к форме прикреплен файл
+            if(is_string($value)){
+                $mail_message .= '<h5>'.$field['title'] . '</h5><p>'.$value.'</p>';
+            } elseif(is_array($value)) { // если массив, значит к форме прикреплен файл
 
                 if ($form['sendto']=='mail'){
-                    $attachment = !empty($value['url']) ?
-                                        PATH.$value['url'] : '';
+                    $attachment[] = !empty($value['url']) ? PATH.$value['url'] : ''; 
                 } elseif(!empty($value['url'])) {
                     $mail_message .= '<h5>'.$field['title'] . '</h5><p><a href="'.$value['url'].'">'.$value['name'].'</a></p>';
                 }
@@ -92,19 +90,20 @@ function forms(){
         }
 
         // Отправляем форму
-		if ($form['sendto']=='mail'){
-			cmsCore::mailText($form['email'], cmsConfig::getConfig('sitename').': '.$form['title'], $mail_message, $attachment);
-            // удаляем прикрепленный файл
-            @unlink($attachment);
-		} else {
-			cmsUser::sendMessage(-2, $form['user_id'], $mail_message);
-		}
+        if ($form['sendto']=='mail'){
+            cmsCore::mailText($form['email'], cmsConfig::getConfig('sitename').': '.$form['title'], $mail_message, $attachment);
+            // удаляем прикрепленные файлы 
+            foreach($attachment as $attach){
+                @unlink($attach);
+            }
+        } else {
+            cmsUser::sendMessage(-2, $form['user_id'], $mail_message);
+        }
 
-		cmsUser::sessionClearAll();
+        cmsUser::sessionClearAll();
 
         if(cmsCore::isAjax()){
-            cmsCore::jsonOutput(array('error' => false,
-                                      'text' => $_LANG['FORM_IS_SEND']));
+            cmsCore::jsonOutput(array('error' => false, 'text' => $_LANG['FORM_IS_SEND']));
         } else {
             cmsCore::addSessionMessage($_LANG['FORM_IS_SEND'], 'info');
             cmsCore::redirectBack();

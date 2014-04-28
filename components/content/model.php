@@ -331,32 +331,27 @@ class cms_model_content{
      * @return array
      */
     public function getArticle($id_or_link) {
-
-		if(is_numeric($id_or_link)){
-
-			$where = "con.id = '$id_or_link'";
-
-		} else {
-
-			$where = "con.seolink = '$id_or_link'";
-		}
-
-		$sql = "SELECT  con.*,
-						cat.title cat_title, cat.id cat_id, cat.NSLeft as leftkey, cat.NSRight as rightkey, cat.modgrp_id,
-						cat.showtags as showtags, cat.seolink as catseolink, cat.cost, u.nickname as author, u.login as user_login
-				FROM cms_content con
-				INNER JOIN cms_category cat ON cat.id = con.category_id
-				LEFT JOIN cms_users u ON u.id = con.user_id
-				WHERE {$where} LIMIT 1";
-
-		$result = $this->inDB->query($sql);
+        if(is_numeric($id_or_link)){
+            $where = "con.id = '$id_or_link'";
+        } else {
+            $where = "con.seolink = '$id_or_link'";
+        }
+        
+        $sql = "SELECT  con.*,
+                        cat.title cat_title, cat.id cat_id, cat.NSLeft as leftkey, cat.NSRight as rightkey, cat.modgrp_id,
+                        cat.showtags as showtags, cat.seolink as catseolink, cat.cost, u.nickname as author, u.login as user_login
+                        FROM cms_content con
+                        INNER JOIN cms_category cat ON cat.id = con.category_id
+                        LEFT JOIN cms_users u ON u.id = con.user_id
+                        WHERE {$where} LIMIT 1";
+        $result = $this->inDB->query($sql);
 
         if (!$this->inDB->num_rows($result)) { return false; }
 
         $article = $this->inDB->fetch_assoc($result);
+        $article['images'] = cmsCore::getUploadImages($article['id'], '', 'cms_content_images', 'content');
 
         return $article;
-
     }
 
 /* ==================================================================================================== */

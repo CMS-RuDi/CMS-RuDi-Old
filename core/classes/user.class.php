@@ -244,7 +244,7 @@ class cmsUser {
      */
     public function autoLogin(){
 
-        $user_id = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0;
+        $user_id = (int)(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0); 
 
         if (cmsCore::getCookie('userid') && !$user_id){
 
@@ -1832,15 +1832,13 @@ class cmsUser {
      * @param str $access_name
      * @return bool
      */
-    public static function registerGroupAccessType($access_type='', $access_name=''){
+    public static function registerGroupAccessType($access_type='', $access_name='', $hide_for_guest=0){
+        if(!$access_type || !$access_name) { return false; }
 
-		if(!$access_type || !$access_name) { return false; }
-
-        $sql  = "INSERT IGNORE INTO cms_user_groups_access (access_type, access_name)
-                 VALUES ('$access_type', '$access_name')";
+        $sql  = "INSERT IGNORE INTO cms_user_groups_access (access_type, access_name, hide_for_guest) 
+ 		    VALUES ('$access_type', '$access_name', '$hide_for_guest')";
 
         return cmsDatabase::getInstance()->query($sql);
-
     }
 
 // ============================================================================ //

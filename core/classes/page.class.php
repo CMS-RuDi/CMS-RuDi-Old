@@ -227,7 +227,7 @@ class cmsPage {
      * @return $this
      */
     public function setKeywords($keywords){
-        $this->page_keys = strip_tags($keywords);
+        $this->page_keys = trim(strip_tags($keywords));
         return $this;
     }
     
@@ -237,7 +237,7 @@ class cmsPage {
      * @return $this
      */
     public function setDescription($text){
-        $this->page_desc = strip_tags($text);
+        $this->page_desc = trim(strip_tags($text));
         return $this;
     }
     
@@ -663,7 +663,7 @@ class cmsPage {
             )
         );
 
-        if($p_toolbar['html']){ return $p_toolbar['html']; }
+        if($p_toolbar['html']){ return cmsCore::callEvent('GET_BBCODE_BUTTON', $p_toolbar['html']); }
 
         $inPage = self::getInstance();
 
@@ -711,6 +711,44 @@ class cmsPage {
         }
         $html .= '</div>';
         return $html;
+    }
+    
+    /**
+     * Подключает JS и CSS для Ajax загрузки файлов
+     */
+    public function initAjaxUpload($script = 'plupload', $options = array(), $files = false){
+        switch ($script) {
+            case 'plupload':
+                $this->addHeadJS('includes/jquery/plupload/plupload.full.min.js');
+                $this->addHeadCSS('includes/jqueryui/css/smoothness/jquery-ui.min.css');
+                if (file_exists(PATH .'/includes/jquery/plupload/langs/'. $this->site_cfg->lang .'.js')){
+                    $this->addHeadJS('includes/jquery/plupload/langs/'. $this->site_cfg->lang .'.js');
+                }
+                
+                $options = array_merge(
+                    array(
+                        'url' => '/core/ajax/imginsert.php',
+                        'del_url' => '/components/content/ajax/delArticleImg.php',
+                        'extensions' => 'jpg,gif,png',
+                        'max_file_size' => '10',
+                        
+                        'component' => 'content',
+                        'target' => '',
+                        'target_id' => '0',
+                        'is_new_method' => '1',
+                        'ses_id' => session_id()
+                    ),
+                    $options
+                );
+                
+                ob_start();
+                    self::includeTemplateFile('special/ajaxFileUpload.php', array('options' => $options, 'files' => $files));
+                return ob_get_clean();
+
+                break;
+        }
+
+        return false;
     }
     
     /**

@@ -13,10 +13,10 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function cpModuleHasConfig($module){
-    if (file_exists('modules/'.$module.'/backend.php')){ return true; }
-    if (file_exists('modules/'.$module.'/backend.xml')){ return true; }
-	return false;
+function cpModuleHasConfig($item){ 
+    if (file_exists('modules/'. $item['content'] .'/backend.php')){ return true; } 
+    if (file_exists('modules/'. $item['content'] .'/backend.xml')){ return true; } 
+    return false;
 }
 
 function applet_modules(){

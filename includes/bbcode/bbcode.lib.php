@@ -921,7 +921,7 @@ class bbcode {
           '#<a href="/go/url=([^"]+)"#',
           create_function(
               '$matches',
-              'return "<a href=\"/go/url=-".base64_encode($matches[1])."\"";'
+              'return "<a title=\"".htmlspecialchars($matches[1])."\" href=\"/go/url=-".base64_encode($matches[1])."\"";'
           ),
           $text
         );
@@ -1186,55 +1186,54 @@ class bbcode {
     }
     // Функция - обработчик тега [img]
     function img_2html($elem) {
-        $attr = 'alt=""';
+        $attr = 'alt="'.$this->cleanAttrValue(cmsCore::request('title')).'"';
         $src = '';
         foreach ($elem['val'] as $text) {
             if ('text'==$text['type']) { $src .= $text['str']; }
         }
         if (isset($elem['attrib']['align'])){
-            $align       = $this->cleanAttrValue($elem['attrib']['align']);
-            $div_style   = "float:{$align};overflow:hidden;";
-            $div_style  .= "margin-" .($align=='left' ? 'right' : 'left'). ":15px; margin-bottom:15px; ";
+            if(in_array($elem['attrib']['align'], array('left','right'))){ 
+                $div_style  = "float:{$elem['attrib']['align']};overflow:hidden;"; 
+                $div_style .= "margin-" .($elem['attrib']['align'] == 'left' ? 'right' : 'left'). ":15px; margin-bottom:15px; "; 
+            }
         }
 
-		$width = '';
-		$hegiht = '';
-		$zoom = false;
+        $width = '';
+        $hegiht = '';
+        $zoom = false;
 
-		$src = preg_replace ('/[^a-zA-ZА-Яф-я0-9\-_\.\/\:]/ui', '', $src);
-		$src = $this->cleanAttrValue(str_replace ('..', '.', $src));
+        $src = preg_replace ('/[^a-zа-я0-9\-_\.\/\:]/uis', '', $src);
+        $src = $this->cleanAttrValue(str_replace ('..', '.', $src));
 
-		if (!mb_strstr($src, 'http://')){
-
+        if (!mb_strstr($src, 'http://')){
             global $_LANG;
-
-			if(file_exists(PATH.$src)){
-				if (function_exists('getimagesize')){
-					$size = getimagesize(PATH.$src);
-					$width = $size[0];
-					$height = $size[1];
-					while ($width > 340 || $height > 340){
-						$width  = round($width*0.9);
-						$height = round($height*0.9);
-						$zoom   = true;
-					}
-				}
-				if (!$zoom){
-					return '<div class="bb_img" style="'.$div_style.'"><img src="'.$src.'" '.$attr.' /></div>';
-				} else {
-
-					$html = '<div class="forum_zoom" style="width:'.$width.'px">'."\n";
-						$html .= '<div><a href="'.$src.'" target="_blank"><img src="'.$src.'" '.$this->cleanAttrValue($attr).' width="'.$width.'" height="'.$height.'" border="0"/></a></div>'."\n";
-						$html .= '<div class="forum_zoom_text">'.$_LANG['IMAGE_IS_REDUCED_CLICK'].'</div>'."\n";
-					$html .= '</div>';
-					return $html;
-				}
-			} else {
-				return '<div class="forum_lostimg">'.$_LANG['FILE'].' "'.$src.'" '.$_LANG['NOT_FOUND'].'!</div>';
-			}
-		} else {
-			return '<div class="bb_img" style="'.$div_style.'"><img src="'.$src.'" '.$this->cleanAttrValue($attr).' /></div>';
-		}
+            
+            if(file_exists(PATH.$src)){
+                if (function_exists('getimagesize')){
+                    $size = getimagesize(PATH.$src);
+                    $width = $size[0];
+                    $height = $size[1];
+                    while ($width > 340 || $height > 340){
+                        $width  = round($width*0.9);
+                        $height = round($height*0.9);
+                        $zoom   = true;
+                    }
+                }
+                
+                if (!$zoom){
+                    return '<div class="bb_img" style="'.$div_style.'"><img src="'.$src.'" '.$attr.' /></div>';
+                }else{
+                    $html = '<div class="forum_zoom" style="width:'.$width.'px">'."\n";
+                    $html .= '<div style="'.$div_style.'"><a href="'.$src.'" target="_blank"><img src="'.$src.'" '.$attr.' width="'.$width.'" height="'.$height.'" /></a></div>'."\n";
+                    $html .= '</div>';
+                    return $html;
+                }
+            }else{
+                return '<div class="forum_lostimg">'.$_LANG['FILE'].' "'.$src.'" '.$_LANG['NOT_FOUND'].'!</div>';
+            }
+        }else{
+            return '<div class="bb_img" style="'.$div_style.'"><img src="'.$src.'" '.$attr.' /></div>';
+        }
     }
     // Функция - обработчик тега [quote]
     function quote_2html($elem) {
@@ -1297,8 +1296,7 @@ class bbcode {
             }
             $attr .= ' href="'.$this->cleanAttrValue($url).'"';
         }
-        $title = isset($elem['attrib']['title']) ? $elem['attrib']['title'] : '';
-        if ($title) { $attr .= ' title="'.$this->cleanAttrValue($title).'"'; }
+        $attr .= ' title="'.$this->cleanAttrValue($href).'"';
         $name = isset($elem['attrib']['name']) ? $elem['attrib']['name'] : '';
         if ($name) { $attr .= ' name="'.$this->cleanAttrValue($name).'"'; }
         $target = isset($elem['attrib']['target']) ? $elem['attrib']['target'] : '';

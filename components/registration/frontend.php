@@ -13,7 +13,8 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function registration(){
-
+    header('X-Frame-Options: DENY');
+    
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
     $inDB   = cmsDatabase::getInstance();
@@ -317,6 +318,10 @@ if ($do=='view'){
 
     $item = cmsUser::sessionGet('item');
     if($item){ cmsUser::sessionDel('item'); }
+    
+    if(empty($item['birthdate'])){ 
+        $item['birthdate'] = date('Y-m-d'); 
+    }
 
     $private_forms = array();
     if(isset($users_model->config['privforms'])){

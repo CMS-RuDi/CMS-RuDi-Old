@@ -116,6 +116,8 @@ if ($do=='view'){
     $content_list = $total ? $model->getArticlesList(!$is_editor) : array();
     $model->inDB->resetConditions();
     
+    if(!$content_list && $page > 1){ cmsCore::error404(); }
+    
     $pagebar = cmsPage::getPagebar($total, $page, $model->config['perpage'], $model->getCategoryURL(null, $cat['seolink'], 0, true));
 
     $template = ($cat['tpl'] ? $cat['tpl'] : 'com_content_view.tpl');
@@ -271,6 +273,8 @@ if ($do=='addarticle' || $do=='editarticle'){
         $item = cmsUser::sessionGet('article');
         if ($item){ cmsUser::sessionDel('article'); }
 
+        $item['images'] = cmsCore::getUploadImages(0, '', 'cms_content_images', 'content');
+        
         // Категории, в которые разрешено публиковать
         $pubcats = $model->getPublicCats();
         if(!$pubcats){
@@ -334,6 +338,10 @@ if ($do=='addarticle' || $do=='editarticle'){
         $autocomplete_js = $inPage->getAutocompleteJS('tagsearch', 'tags');
 
         $item = cmsCore::callEvent('PRE_EDIT_ARTICLE', (@$item ? $item : array()));
+        
+        if ($model->config['img_users'] && $model->config['img_on']){
+            $inPage->initAjaxUpload();
+        }
 
         cmsPage::initTemplate('components', 'com_content_edit')->
             assign('mod', $item)->
@@ -345,6 +353,15 @@ if ($do=='addarticle' || $do=='editarticle'){
             assign('is_billing', IS_BILLING)->
             assign('dynamic_cost', $dynamic_cost)->
             assign('autocomplete_js', $autocomplete_js)->
+            assign('ajaxUploader', $inPage->initAjaxUpload(
+                    'plupload',
+                    array(
+                        'component' => 'content',
+                        'target_id' => empty($item['id']) ? 0 : $item['id'],
+                        'del_url' => '/components/content/ajax/delArticleImg.php'
+                    ),
+                    empty($item['images']) ? false : $item['images']
+                ))->
             display('com_content_edit.tpl');
 
     }
@@ -427,6 +444,10 @@ if ($do=='addarticle' || $do=='editarticle'){
         $inUploadPhoto->filename      = $file;
         // Процесс загрузки фото
         $inUploadPhoto->uploadPhoto();
+        
+        
+        cmsCore::setIdUploadImage('', $do=='addarticle' ? $article_id : $article['id'], 'cms_content_images');
+        cmsCore::requestUploadImgTitles($do=='addarticle' ? $article_id : $item['id'], 'cms_content_images');
 
         // операции после добавления/редактирования статьи
         // добавление статьи
@@ -625,5 +646,5 @@ if ($do=='best'){
         display('com_content_rating.tpl');
 }
 
-} //function
+}
 ?>

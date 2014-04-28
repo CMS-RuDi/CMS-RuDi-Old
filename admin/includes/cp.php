@@ -594,18 +594,10 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
 						echo '<td width="110" class="'.$row_class.'" align="right" valign="middle"><div style="padding-right:8px">';
 						foreach($_actions as $key => $value){
 							if (isset($_actions[$key]['condition'])){
-                                if (($_actions[$key]['condition'] == 'cpComponentHasConfig') || ($_actions[$key]['condition'] == 'cpModuleHasConfig')) {
-                                    if ($_actions[$key]['condition'] == 'cpModuleHasConfig') {
-                                        $print = $_actions[$key]['condition']($item['content']);
-                                    } else {
-                                        $print = $_actions[$key]['condition']($item['link']);
-                                    }
-                                } else {
-                                    $print = $_actions[$key]['condition']($item['id']);
-                                }
-                            } else {
-                                $print = true;
-                            }
+                                                            $print = $_actions[$key]['condition']($item); 
+                                                        }else{
+                                                            $print = true;
+                                                        }
 							if ($print){
 								$icon   = $_actions[$key]['icon'];
 								$title  = $_actions[$key]['title'];

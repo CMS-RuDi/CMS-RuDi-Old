@@ -13,57 +13,6 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function setUsersRating(){
-
-    $inCore     = cmsCore::getInstance();
-    $inDB       = cmsDatabase::getInstance();
-
-    $target     = $inCore->request('target', 'str', '');
-    $item_id    = $inCore->request('item_id', 'int', 0);
-    $opt        = $inCore->request('opt', 'str', 'plus');
-
-    $comment_id     = $inCore->request('comment_id', 'int', 0);
-    $comment_vote   = $inCore->request('vote', 'int', 1);
-
-    if ($comment_id) { $target = 'comment'; $item_id = $comment_id; }
-
-    $table = '';
-
-    switch($target){
-        case 'blogpost':    $table = 'cms_blog_posts';  break;
-        case 'content':     $table = 'cms_content';     break;
-        case 'comment':     $table = 'cms_comments';    break;
-    }
-
-    if (!$table) { return false; }
-
-    $author_sql = "SELECT u.id as id
-                   FROM cms_users u, {$table} t
-                   WHERE t.id = {$item_id} AND t.user_id = u.id
-                   LIMIT 1";
-
-    $author_res = $inDB->query($author_sql);
-
-    if (!$inDB->num_rows($author_res)) { return false; }
-
-    $author = $inDB->fetch_assoc($author_res);
-
-    if ($comment_id){
-        $inc  = ($comment_vote>0 ? ('+'.$comment_vote*2) : ($comment_vote*2));
-    } else {
-        $inc  = ($opt=='plus' ? '+ 5' : '- 5');
-    }
-
-    $inDB->query("UPDATE cms_users SET rating = rating {$inc} WHERE id = {$author['id']}");
-
-}
-
-function cmsClearKarma($target, $item_id){
-    $inDB = cmsDatabase::getInstance();
-	$inDB->query("DELETE FROM cms_ratings WHERE target='$target' AND item_id = $item_id");
-	return;
-}
-
 function cmsKarma($target, $item_id){ //returns array with total votes and total points of karma
 
     if (!preg_match('/^([a-zA-Z0-9\_]+)$/ui', $target)) { return; }
@@ -88,16 +37,6 @@ function cmsAlreadyKarmed($target, $item_id, $user_id){
 function cmsAlreadyKarmedIP($target, $item_id, $ip){
     $inDB = cmsDatabase::getInstance();
 	return $inDB->rows_count('cms_ratings', "target='$target' AND item_id = $item_id AND ip = '$ip'");
-}
-
-function cmsAlreadyKarmedAny($target, $user_id){
-    $inDB = cmsDatabase::getInstance();
-	return $inDB->rows_count('cms_ratings', "target='$target' AND user_id = '$user_id'");
-}
-
-function cmsAlreadyKarmedAnyIP($target, $ip){
-    $inDB = cmsDatabase::getInstance();
-	return $inDB->rows_count('cms_ratings', "target='$target' AND ip = '$ip'");
 }
 
 function cmsSubmitKarma($target, $item_id, $points){

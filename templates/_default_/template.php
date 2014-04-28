@@ -109,7 +109,7 @@
 
                     <?php $messages = cmsCore::getSessionMessages(); ?>
                     <?php if ($messages) { ?>
-                    <div class="sess_messages">
+                    <div class="sess_messages" id="sess_messages">
                         <?php foreach($messages as $message){ ?>
                             <?php echo $message; ?>
                         <?php } ?>
@@ -146,10 +146,11 @@
     </div>
 
     <script type="text/javascript">
-        $(document).ready(function(){
+        $(function(){
+            $('#sess_messages').hide().fadeIn().delay(5000).fadeOut('slow');
             $('#topmenu .menu li').hover(
                 function() {
-                    $(this).find('ul:first').show();
+                    $(this).find('ul:first').fadeIn('fast');
                     $(this).find('a:first').addClass("hover");
                 },
                 function() {

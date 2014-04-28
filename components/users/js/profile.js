@@ -30,21 +30,19 @@ $(function(){
                         };
                     $('#send_msgform').ajaxSubmit(options);
                 } else {
-                    alert(LANG_CHOOSE_RECIPIENT);
+                    core.show_popup_info(LANG_CHOOSE_RECIPIENT, 'error');
                 }
 			});
 		},
 		doSendMess: function(result, statusText, xhr, $form){
 			$('.ajax-loader').hide();
-			$('.sess_messages').fadeOut();
 			if(statusText == 'success'){
 				if(result.error == false){
 					$('#popup_message').html(result.text);
 					$('#popup_ok, #popup_cancel').hide();
 					$('#popup_close').show();
 				} else {
-					$('#error_mess').html(result.text);
-					$('.sess_messages').fadeIn();
+					core.show_popup_info(result.text, 'error'); 
 					$('#popup_ok').prop('disabled', false);
 				}
 			} else {

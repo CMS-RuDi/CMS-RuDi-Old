@@ -116,6 +116,8 @@ if ($do=='forum'){
     $inDB->orderBy('t.pinned', 'DESC, t.'.$order_by.' '.$order_to);
     $inDB->limitPage($page, $model->config['pp_forum']);
     $threads = $model->getThreads();
+    
+    if(!$threads && $page > 1){ cmsCore::error404(); }
 
     cmsPage::initTemplate('components', 'com_forum_view')->
             assign('threads', $threads)->
@@ -165,6 +167,8 @@ if ($do=='thread'){
     $inDB->limitPage($page, $model->config['pp_thread']);
     $posts = $model->getPosts();
     if(!$posts){ cmsCore::error404(); }
+    
+    cmsCore::initAutoGrowText('#message');
 
     cmsPage::initTemplate('components', 'com_forum_view_thread')->
             assign('forum', $pcat)->
@@ -1105,6 +1109,8 @@ if ($do=='latest_posts'){
 	$inDB->limitPage($page, 15);
 
 	$actions = $inActions->getActionsLog();
+        
+        if(!$actions && $page > 1){ cmsCore::error404(); }
 
 	cmsPage::initTemplate('components', 'com_forum_actions')->
             assign('actions', $actions)->
@@ -1138,6 +1144,8 @@ if ($do=='latest_thread'){
 	$inDB->limitPage($page, 15);
 
 	$actions = $inActions->getActionsLog();
+        
+        if(!$actions && $page > 1){ cmsCore::error404(); }
 
 	cmsPage::initTemplate('components', 'com_forum_actions')->
             assign('actions', $actions)->

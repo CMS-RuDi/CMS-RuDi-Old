@@ -26,11 +26,6 @@ $( '.photo_thumb_img' ).each( function( idx ){
 	ss.attr( "rel", "gal" ).attr( "href", orig ).addClass( 'photobox' );
 });
 
-//статьи анонсы и основной текст
-$( '.con_text img, .con_desc img' ).not('a img:first-child').wrap( function(){
-	var ahref = $( '<a href="' + $( this ).attr( 'src' ) + '" />').colorbox({ transition: "none" });
-	return ahref;
-});
 //добавление класса вручную в шаблоне
 $( 'a.photobox' ).colorbox({ rel: 'gal', transition: "none", slideshow: true, width: "650px", height: "650px" });
 

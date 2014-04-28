@@ -331,6 +331,7 @@ CREATE TABLE `#__clubs` (
   `create_karma` int(11) NOT NULL,
   `is_vip` tinyint(1) NOT NULL DEFAULT '0',
   `join_cost` float NOT NULL,
+  `seolink` VARCHAR(200) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `pubdate` (`pubdate`),
   KEY `admin_id` (`admin_id`)
@@ -469,6 +470,19 @@ CREATE TABLE `#__content_access` (
   KEY `content_id` (`content_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `#__content_images`;
+CREATE TABLE `#__content_images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `target_id` int(11) NOT NULL DEFAULT '0',
+  `session_id` varchar(50) NOT NULL,
+  `fileurl` varchar(250) NOT NULL,
+  `target` varchar(25) NOT NULL DEFAULT '',
+  `title` varchar(256) NOT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `target_id` (`target_id`),
+  KEY `session_id` (`session_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 DROP TABLE IF EXISTS `#__cron_jobs`;
 CREATE TABLE `#__cron_jobs` (
@@ -537,7 +551,8 @@ INSERT INTO `#__event_hooks` (`id`, `event`, `plugin_id`) VALUES
 (39, 'DELETE_ARTICLE', '17'),
 (40, 'GET_ARTICLE', '17'),
 (41, 'ADD_ARTICLE_DONE', '17'),
-(42, 'UPDATE_ARTICLE', '17');
+(42, 'UPDATE_ARTICLE', '17'),
+(43, 'GET_ARTICLE', '18');
 
 DROP TABLE IF EXISTS `#__faq_cats`;
 CREATE TABLE `#__faq_cats` (
@@ -1027,7 +1042,8 @@ INSERT INTO `#__plugins` (`id`, `plugin`, `title`, `description`, `author`, `ver
 (15, 'p_morecontent', 'Похожие статьи', 'Добавляет в конец каждой статьи список похожих статей.', 'Maximov & InstantCMS Team', '1.10.3', 'plugin', 0, '---\nP_LIMIT: 5\nP_UNSORT: 1\n'),
 (14, 'p_hidetext', 'Скрытый текст', 'Скрывает содержимое тега [hide] от незарегистрированных', 'InstantCMS Team', '1.10.3', 'plugin', 1, '---\n'),
 (16, 'p_loginza', 'Авторизация Loginza', 'Позволяет посетителям авторизоваться на сайте, используя аккаунты популярных социальных сетей', 'InstantCMS Team', '1.10.3', 'plugin', 1, '---\nPL_PROVIDERS: >\n  vkontakte,facebook,mailruapi,google,yandex,openid,twitter,webmoney,rambler,flickr,mailru,loginza,myopenid,lastfm,verisign,aol,steam\nPL_LANG: ru\n'),
-(17, 'p_auto_forum', 'Автофорум', 'Создает тему на форуме для обсуждения статьи', 'InstantCMS Team', '1.10.3', '', 1, '---\nAF_DELETE_THREAD: 1\nAF_LINK_TREAD: 1\nAF_ADDTREADFORUM_ID: 1\nAF_NOCREATETREAD: 0\n');
+(17, 'p_auto_forum', 'Автофорум', 'Создает тему на форуме для обсуждения статьи', 'InstantCMS Team', '1.10.3', '', 1, '---\nAF_DELETE_THREAD: 1\nAF_LINK_TREAD: 1\nAF_ADDTREADFORUM_ID: 1\nAF_NOCREATETREAD: 0\n'),
+(18, 'p_content_imgs', 'Прикрепленные к статьям фотографии', 'Плагин добавляет в конце статьи карусель (слайдер) с прикрепленными фотографиями. Вставляет в текст статьи фотографии в тех местах где прописана конструкция вида {img#123}', 'DS Soft', '0.0.1', 'plugin', 1, '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n');
 
 DROP TABLE IF EXISTS `#__polls`;
 CREATE TABLE `#__polls` (
@@ -1061,8 +1077,9 @@ CREATE TABLE `#__ratings` (
   `user_id` int(11) NOT NULL DEFAULT '1',
   `pubdate` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `item_id` (`item_id`)
+  KEY `item_id` (`item_id`,`target`,`user_id`), 
+  KEY `ip` (`item_id`,`target`,`ip`), 
+  KEY `user_id` (`user_id`,`target`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
@@ -1074,8 +1091,7 @@ CREATE TABLE `#__ratings_total` (
   `total_rating` int(11) NOT NULL,
   `total_votes` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `item_id` (`item_id`),
-  KEY `target` (`target`,`item_id`)
+  KEY `item_id` (`item_id`,`target`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
@@ -1441,26 +1457,27 @@ CREATE TABLE IF NOT EXISTS `#__user_groups_access` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `access_type` varchar(60) NOT NULL,
   `access_name` varchar(100) NOT NULL,
+  `hide_for_guest` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `access_type` (`access_type`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `#__user_groups_access` (`id`, `access_type`, `access_name`) VALUES
-(1, 'comments/add', 'Добавление комментариев'),
-(2, 'comments/bbcode', 'Расширенный редактор комментариев (BBCode)'),
-(3, 'comments/delete', 'Удаление своих комментариев'),
-(4, 'comments/moderate', 'Модерация комментариев'),
-(5, 'comments/iscomments', 'Возможность отключать комментарии в своем блоге'),
-(6, 'forum/moderate', 'Модерация форума'),
-(7, 'content/add', 'Добавление статей на сайт'),
-(8, 'content/autoadd', 'Принимать статьи без модерации'),
-(9, 'content/delete', 'Удаление своих статей'),
-(10, 'board/add', 'Добавление объявлений'),
-(11, 'board/autoadd', 'Принимать объявления без модерации'),
-(12, 'board/moderate', 'Модерация доски объявлений'),
-(13, 'comments/add_published', 'Добавлять комментарии без модерации'),
-(14, 'forum/add_post', 'Отвечать в темах на форуме'),
-(15, 'forum/add_thread', 'Создавать новые темы на форуме');
+INSERT INTO `#__user_groups_access` (`id`, `access_type`, `access_name`, `hide_for_guest`) VALUES
+(1, 'comments/add', 'Добавление комментариев', 0),
+(2, 'comments/bbcode', 'Расширенный редактор комментариев (BBCode)', 0),
+(3, 'comments/delete', 'Удаление своих комментариев', 0),
+(4, 'comments/moderate', 'Модерация комментариев', 1),
+(5, 'comments/iscomments', 'Возможность отключать комментарии в своем блоге', 1),
+(6, 'forum/moderate', 'Модерация форума', 1),
+(7, 'content/add', 'Добавление статей на сайт', 0),
+(8, 'content/autoadd', 'Принимать статьи без модерации', 0),
+(9, 'content/delete', 'Удаление своих статей', 1),
+(10, 'board/add', 'Добавление объявлений', 0),
+(11, 'board/autoadd', 'Принимать объявления без модерации', 0),
+(12, 'board/moderate', 'Модерация доски объявлений', 1),
+(13, 'comments/add_published', 'Добавлять комментарии без модерации', 0),
+(14, 'forum/add_post', 'Отвечать в темах на форуме', 1),
+(15, 'forum/add_thread', 'Создавать новые темы на форуме', 1);
 
 DROP TABLE IF EXISTS `#__user_invites`;
 CREATE TABLE `#__user_invites` (

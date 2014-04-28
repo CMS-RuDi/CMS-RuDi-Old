@@ -13,24 +13,16 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function cpComponentHasConfig($component){
-
-	return file_exists('components/'.$component.'/backend.php');
-
+function cpComponentHasConfig($item){ 
+    return file_exists('components/'. $item['link'] .'/backend.php');
 }
 
-function cpComponentCanRemove($id){
+function cpComponentCanRemove($item){ 
+    if($item['system']) { return false; }
 
-    $inCore = cmsCore::getInstance();
+    global $adminAccess;
 
-    $com = $inCore->getComponent($id);
-
-	if($com['system']) { return false; }
-
-	global $adminAccess;
-
-	return cmsUser::isAdminCan('admin/com_'.$com['link'], $adminAccess);
-
+    return cmsUser::isAdminCan('admin/com_'.$item['link'], $adminAccess);
 }
 
 function applet_components(){

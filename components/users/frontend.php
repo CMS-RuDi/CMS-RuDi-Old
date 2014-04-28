@@ -13,7 +13,8 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function users(){
-
+    header('X-Frame-Options: DENY');
+    
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
     $inDB   = cmsDatabase::getInstance();
@@ -65,13 +66,10 @@ if ($do == 'view'){
 	$city    = cmsCore::getSearchVar('city');
 	$hobby   = cmsCore::getSearchVar('hobby');
 	$gender  = cmsCore::getSearchVar('gender');
-	$orderby = cmsCore::request('orderby', 'str', 'regdate');
-	$orderto = cmsCore::request('orderto', 'str', 'desc');
+	$orderby = cmsCore::request('orderby', array('karma', 'rating', 'regdate'), 'regdate');
+	$orderto = cmsCore::request('orderto', array('asc', 'desc'), 'desc');
 	$age_to  = (int)cmsCore::getSearchVar('ageto', 'all');
 	$age_fr  = (int)cmsCore::getSearchVar('agefrom', 'all');
-
-	if(!in_array($orderby, array('karma', 'rating'))) { $orderby = 'regdate'; }
-	if(!in_array($orderto, array('asc', 'desc'))) { $orderto = 'desc'; }
 
 	// Флаг о показе только онлайн пользователей
 	if (cmsCore::inRequest('online')) {
@@ -235,9 +233,25 @@ if ($do=='editprofile'){
 
 		$users['email'] = cmsCore::request('email', 'email');
 		if (!$users['email']) { cmsCore::addSessionMessage($_LANG['REALY_ADRESS_EMAIL'], 'error'); $errors = true; }
+                
 		if($usr['email'] != $users['email']){
 			$is_set_email = $inDB->get_field('cms_users', "email='{$users['email']}'", 'id');
-			if ($is_set_email) { cmsCore::addSessionMessage($_LANG['ADRESS_EMAIL_IS_BUSY'], 'error'); $errors = true; }
+                        
+			if ($is_set_email) { 
+                            cmsCore::addSessionMessage($_LANG['ADRESS_EMAIL_IS_BUSY'], 'error'); $errors = true; 
+                        }else{ 
+                            // формируем токен 
+                            $token = md5($usr['email'].uniqid().microtime()); 
+                            $inDB->insert('cms_users_activate', array('user_id'=>$inUser->id, 'pubdate'=>date("Y-m-d H:i:s"), 'code'=>$token)); 
+                            $codelink = HOST.'/users/change_email/'.$token.'/'.$users['email']; 
+                            // по старому адресу высылаем письмо с подтверждением 
+                            $letter = cmsCore::getLanguageTextFile('change_email'); 
+                            $letter = str_replace(array('{nickname}','{codelink}'), array($inUser->nickname, $codelink), $letter); 
+                            cmsCore::mailText($usr['email'], '', $letter); 
+                            cmsCore::addSessionMessage(sprintf($_LANG['YOU_CHANGE_EMAIL'], $usr['email']), 'info'); 
+                            // email не меняем 
+                            $users['email'] = $usr['email']; 
+                        } 
 		}
 
 		$profiles['showmail']     = cmsCore::request('showmail', 'int');
@@ -271,8 +285,8 @@ if ($do=='editprofile'){
 
 		if($errors) { cmsCore::redirectBack(); }
 
-		$inDB->update('cms_user_profiles', cmsCore::callEvent('UPDATE_USER_PROFILES', $profiles), $usr['pid']) ;
-		$inDB->update('cms_users', cmsCore::callEvent('UPDATE_USER_USERS', $users), $usr['id']) ;
+                $inDB->update('cms_user_profiles', cmsCore::callEvent('UPDATE_USER_PROFILES', array_merge(array('id'=>$usr['pid'], 'user_id'=>$usr['id']), $profiles)), $usr['pid']); 
+                $inDB->update('cms_users', cmsCore::callEvent('UPDATE_USER_USERS', array_merge(array('id'=>$usr['id']), $users)), $usr['id']); 
 
 		cmsCore::addSessionMessage($_LANG['PROFILE_SAVED'], 'info');
 		cmsCore::redirect(cmsUser::getProfileURL($usr['login']));
@@ -478,22 +492,22 @@ if ($do=='sendmessage'){
 
 	if(cmsCore::inRequest('gosend')){
 
-		if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+            // Кому отправляем
+            $usr = cmsUser::getShortUserData($id);
+            if (!$usr) { cmsCore::halt(); }
 
-        // Кому отправляем
-        $usr = cmsUser::getShortUserData($id);
-        if (!$usr) { cmsCore::halt(); }
+            $message = cmsCore::parseSmiles(cmsCore::request('message', 'html', ''), true);
 
-		$message = cmsCore::parseSmiles(cmsCore::request('message', 'html', ''), true);
+            if (mb_strlen($message)<2){
+                cmsCore::jsonOutput(array('error' => true, 'text' => $_LANG['ERR_SEND_MESS']));
+            }
+                    
+            if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
-		if (mb_strlen($message)<2){
-			cmsCore::jsonOutput(array('error' => true, 'text' => $_LANG['ERR_SEND_MESS']));
-		}
+            $output = cmsCore::callEvent('USER_SEND_MESSEDGE', array('text'=>$message, 'to_id'=>$id));
 
-        $output = cmsCore::callEvent('USER_SEND_MESSEDGE', array('text'=>$message, 'to_id'=>$id));
-
-        $message = $output['text'];
-        $id      = $output['to_id'];
+            $message = $output['text'];
+            $id      = $output['to_id'];
 
 		$send_to_group = cmsCore::request('send_to_group', 'int', 0);
 		$group_id      = cmsCore::request('group_id', 'int', 0);
@@ -1170,6 +1184,38 @@ if ($do=='invites'){
         cmsCore::redirect(cmsUser::getProfileURL($inUser->login));
 
     }
+
+}
+
+if ($do=='change_email'){
+    if(!$inUser->id){
+        cmsUser::goToLogin();
+    }
+
+    $email = cmsCore::request('email', 'email', '');
+    $token = cmsCore::request('token', 'str', '');
+
+    // не занят ли email
+    $is_email = $inDB->get_field('cms_users', "email='{$email}'", 'id');
+
+    if($is_email || !$email || !$token){
+        cmsCore::error404();
+    }
+
+    // проверяем токен
+    $valid_id = $inDB->get_field('cms_users_activate', "code='{$token}' AND user_id = '{$inUser->id}'", 'id');
+    if(!$valid_id){
+        cmsCore::error404();
+    }
+
+    $inDB->delete('cms_users_activate', "id = '{$valid_id}'");
+
+    // Сохраняем новый email
+    $inDB->update('cms_users', array('email'=>$email), $inUser->id);
+
+    cmsCore::addSessionMessage($_LANG['NEW_EMAIL_SAVED'], 'success');
+
+    cmsCore::redirect(cmsUser::getProfileURL($inUser->login));
 
 }
 

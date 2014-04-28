@@ -275,7 +275,7 @@ if ($pdo=='delphoto'){
             $inPage->setTitle($_LANG['DELETE_PHOTO']);
             $inPage->addPathway($usr['nickname'], cmsUser::getProfileURL($usr['login']));
             $inPage->addPathway($_LANG['PHOTOALBUMS'], '/users/'.$usr['id'].'/photoalbum.html');
-            $inPage->addPathway($_LANG['DELETE_PHOTO'], $_SERVER['REQUEST_URI']);
+            $inPage->addPathway($_LANG['DELETE_PHOTO']);
 
             $confirm['title']              = $_LANG['DELETING_PHOTO'];
             $confirm['text']               = "".$_LANG['REALLY_DELETE_PHOTO']." &laquo;".$photo['title']."&raquo;?";

@@ -57,14 +57,11 @@ function showResponseAdd(result, statusText, xhr, $form){
 }
 
 function showResponseEdit(result, statusText, xhr, $form){
-
-	$('#popup_progress').hide();
-	$('.sess_messages').fadeOut();
+	$('.ajax-loader').hide();
 
 	if(statusText == 'success'){
 		if(result.error == true){
-			$('#error_mess').html(result.text);
-			$('.sess_messages').fadeIn();
+			core.show_popup_info(result.text, 'error');
 			$('#popup_ok').prop('disabled', false);
 		} else {
 			core.box_close();
@@ -88,7 +85,7 @@ function editComment(comment_id, csrf_token){
 	});
 	$('#popup_ok').click(function(){
 		$('#popup_ok').prop('disabled', true);
-		$('#popup_progress').show();
+		$('.ajax-loader').show();
 		var options = {
 			success: showResponseEdit,
 			dataType: 'json'

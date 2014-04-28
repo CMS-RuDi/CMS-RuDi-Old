@@ -83,8 +83,8 @@ if ($do=='view'){
 
 	$total = $model->getClubsCount();
 
-    $clubs = $model->getClubs();
-	if(!$clubs){ cmsCore::error404(); }
+        $clubs = $model->getClubs();
+	if(!$clubs && $page > 1){ cmsCore::error404(); }
 
 	cmsPage::initTemplate('components', 'com_clubs_view')->
             assign('pagetitle', $pagetitle)->

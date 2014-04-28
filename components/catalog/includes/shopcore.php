@@ -19,7 +19,7 @@ function shopAddToCart($item_id, $itemscount=1){
     $inDB   = cmsDatabase::getInstance();
     $inUser = cmsUser::getInstance();
 
-	$user_id    = $inUser->id;
+    $user_id    = $inUser->id;
     $sid        = session_id();
     $can_many   = $inDB->get_field('cms_uc_items', "id={$item_id}", 'canmany');
     $in_cart    = shopIsInCart($item_id);
@@ -235,7 +235,7 @@ function shopOrder($cfg){
 
 	 	$inPage->setTitle($_LANG['CART_ORDERING']);
 		$inPage->addPathway($_LANG['CART'], '/catalog/viewcart.html');
-		$inPage->addPathway($_LANG['CART_ORDERING'], $_SERVER['REQUEST_URI']);
+		$inPage->addPathway($_LANG['CART_ORDERING']);
 
 		echo '<div class="con_heading">'.$_LANG['CART_ORDERING'].'</div>';
 

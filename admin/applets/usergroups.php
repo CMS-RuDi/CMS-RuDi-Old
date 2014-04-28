@@ -247,6 +247,9 @@ function applet_usergroups(){
                         $res = $inDB->query($sql);
 
                         while ($ga = $inDB->fetch_assoc($res)) {
+                            if($mod['alias']=='guest' && $ga['hide_for_guest']){
+                                continue;
+                            }
                     ?>
 						<tr>
 							<td width="16"><input type="checkbox" name="access[]" id="<?php echo str_replace('/', '_', $ga['access_type']); ?>" value="<?php echo $ga['access_type']; ?>" <?php if (isset($mod['access'])) { if (in_array($ga['access_type'], $mod['access'])) { echo 'checked="checked"'; } }?>></td>

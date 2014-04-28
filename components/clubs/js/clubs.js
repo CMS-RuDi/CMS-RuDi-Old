@@ -42,13 +42,11 @@ $(function(){
     },
     doBlogCat: function(result, statusText, xhr, $form){
 		$('.ajax-loader').hide();
-		$('.sess_messages').fadeOut();
 		if(statusText == 'success'){
 			if(result.error == false){
 				window.location.href = result.redirect;
 			} else {
-				$('#error_mess').html(result.text);
-				$('.sess_messages').fadeIn();
+				core.show_popup_info(result.text, 'error');
 				$('#popup_ok').prop('disabled', false);
 			}
 		} else {
@@ -104,7 +102,7 @@ $(function(){
 			$('#popup_ok').val(LANG_SAVE).show();
 			$('#popup_ok').click(function(){
 				$('#popup_ok').prop('disabled', true);
-				$('#popup_progress').show();
+				$('.ajax-loader').show();
 				var options = {
 					success: clubs.doeditPhoto
 				};
@@ -146,12 +144,12 @@ $(function(){
     renameAlbum: function(album_id) {
 		core.message(LANG_RENAME_ALBUM);
 		$('#popup_ok').val(LANG_SAVE).show();
-		$('#popup_message').html('<script type="text/javascript" src="/includes/jquery/jquery.form.js"></script><form action="/components/clubs/ajax/renamealbum.php" method="post" id="rename_album"><input type="hidden" name="album_id" value="'+album_id+'" /><table border="0" cellspacing="0" cellpadding="10" align="left"><tbody><tr><td width="180"><strong>'+LANG_ALBUM_TITLE+': </strong></td><td><input onkeydown="if(13==event.keyCode){return false;}" type="text" class="text-input" name="title" id="title" style="width:300px"/></td></tr></tbody></table><div class="sess_messages" style="display:none"><div class="message_info" id="error_mess"></div></div></form>');
+		$('#popup_message').html('<script type="text/javascript" src="/includes/jquery/jquery.form.js"></script><form action="/components/clubs/ajax/renamealbum.php" method="post" id="rename_album"><input type="hidden" name="album_id" value="'+album_id+'" /><table border="0" cellspacing="0" cellpadding="10" align="left"><tbody><tr><td width="180"><strong>'+LANG_ALBUM_TITLE+': </strong></td><td><input onkeydown="if(13==event.keyCode){return false;}" type="text" class="text-input" name="title" id="title" style="width:300px"/></td></tr></tbody></table></form>');
 		$('#title').focus();
 		$('#popup_progress').hide();
 		$('#popup_ok').click(function(){
 			$('#popup_ok').prop('disabled', true);
-			$('#popup_progress').show();
+			$('.ajax-loader').show();
 			var options = {
 				success: clubs.dorenameAlbum,
 				dataType: 'json'
@@ -160,12 +158,10 @@ $(function(){
 		});
     },
     dorenameAlbum: function(result, statusText, xhr, $form){
-		$('#popup_progress').hide();
-		$('.sess_messages').fadeOut();
+		$('.ajax-loader').hide();
 		if(statusText == 'success'){
 			if(result.error == true){
-				$('#error_mess').html(result.text);
-				$('.sess_messages').fadeIn();
+				core.show_popup_info(result.text, 'error');
 				$('#popup_ok').prop('disabled', false);
 			} else {
 				core.box_close();
@@ -193,7 +189,7 @@ $(function(){
 			$('#popup_ok').show();
 			$('#popup_ok').click(function(){
 				$('#popup_ok').prop('disabled', true);
-				$('#popup_progress').show();
+				$('.ajax-loader').show();
 				$.post('/clubs/'+club_id+'/join.html', {confirm: 1}, function(data){
 					if(data.error == false){
 						window.location.href = data.redirect;
@@ -214,7 +210,7 @@ $(function(){
 			$('#popup_ok').show();
 			$('#popup_ok').click(function(){
 				$('#popup_ok').prop('disabled', true);
-				$('#popup_progress').show();
+				$('.ajax-loader').show();
 				var options = {
 					success: clubs.dosendMessages,
 					dataType: 'json'
@@ -227,12 +223,10 @@ $(function(){
       }, 'json');
     },
     dosendMessages: function(result, statusText, xhr, $form){
-		$('#popup_progress').hide();
-		$('.sess_messages').fadeOut();
+		$('.ajax-loader').hide();
 		if(statusText == 'success'){
 			if(result.error == true){
-				$('#error_mess').html(result.text);
-				$('.sess_messages').fadeIn();
+				core.show_popup_info(result.text, 'error');
 				$('#popup_ok').prop('disabled', false);
 			} else {
 				core.alert(result.text);
@@ -244,12 +238,12 @@ $(function(){
     addAlbum: function(club_id) {
 		core.message(LANG_ADD_PHOTOALBUM);
 		$('#popup_ok').val(LANG_SAVE).show();
-		$('#popup_message').html('<script type="text/javascript" src="/includes/jquery/jquery.form.js"></script><form action="/components/clubs/ajax/createalbum.php" method="post" id="create_album"><input type="hidden" name="club_id" value="'+club_id+'" /><table border="0" cellspacing="0" cellpadding="10" align="left"><tbody><tr><td width="140"><strong>'+LANG_ALBUM_TITLE+': </strong></td><td><input onkeydown="if(13==event.keyCode){return false;}" type="text" class="text-input" name="title" id="title" style="width:300px"/></td></tr></tbody></table><div class="sess_messages" style="display:none"><div class="message_info" id="error_mess"></div></div></form>');
+		$('#popup_message').html('<script type="text/javascript" src="/includes/jquery/jquery.form.js"></script><form action="/components/clubs/ajax/createalbum.php" method="post" id="create_album"><input type="hidden" name="club_id" value="'+club_id+'" /><table border="0" cellspacing="0" cellpadding="10" align="left"><tbody><tr><td width="140"><strong>'+LANG_ALBUM_TITLE+': </strong></td><td><input onkeydown="if(13==event.keyCode){return false;}" type="text" class="text-input" name="title" id="title" style="width:300px"/></td></tr></tbody></table></form>');
 		$('#title').focus();
 		$('#popup_progress').hide();
 		$('#popup_ok').click(function(){
 			$('#popup_ok').prop('disabled', true);
-			$('#popup_progress').show();
+			$('.ajax-loader').show();
 			var options = {
 				success: clubs.doaddAlbum,
 				dataType: 'json'
@@ -258,8 +252,7 @@ $(function(){
 		});
     },
     doaddAlbum: function(result, statusText, xhr, $form){
-		$('#popup_progress').hide();
-		$('.sess_messages').fadeOut();
+		$('.ajax-loader').hide();
 		if(statusText == 'success'){
 			if(result.error == true){
 				$('#error_mess').html(result.text);
@@ -279,11 +272,10 @@ $(function(){
 			if(data.can_create == true){
 				$('#popup_ok').val(LANG_CREATE).show();
 			}
-			$('#popup_message').html(data.html);
-			$('#popup_progress').hide();
+			core.show_popup_info(result.text, 'error');
 			$('#popup_ok').click(function(){
 				$('#popup_ok').prop('disabled', true);
-				$('#popup_progress').show();
+				$('.ajax-loader').show();
 				var options = {
 					success: clubs.doCreate,
 					dataType: 'json'
@@ -296,12 +288,10 @@ $(function(){
       }, 'json');
     },
     doCreate: function(result, statusText, xhr, $form){
-		$('#popup_progress').hide();
-		$('.sess_messages').fadeOut();
+		$('.ajax-loader').hide();
 		if(statusText == 'success'){
 			if(result.error == true){
-				$('#error_mess').html(result.text);
-				$('.sess_messages').fadeIn();
+				core.show_popup_info(result.text, 'error');
 				$('#popup_ok').prop('disabled', false);
 			} else {
 				window.location.href = '/clubs/'+result.club_id;

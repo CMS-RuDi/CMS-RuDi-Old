@@ -90,9 +90,9 @@ $_LANG['CURRENCY']       = 'руб.';
 $_LANG['TITLE']                  = 'Название';
 $_LANG['DESCRIPTION']            = 'Описание';
 $_LANG['IMAGE']                  = 'Изображение';
+$_LANG['IMAGES']                 = 'Изображения';
 $_LANG['EDIT_INFO']              = 'Для редактирования у Вас осталось {min}';
 $_LANG['ON_MODERATE']            = 'На модерации';
-$_LANG['IMAGE_IS_REDUCED_CLICK'] = 'Изображение уменьшено. Щелкните, чтобы увидеть оригинал.';
 $_LANG['FILE']                   = 'Файл';
 $_LANG['NOT_FOUND']              = 'не найден';
 $_LANG['USER_IS_DELETE']         = 'Пользователь удален';
@@ -206,6 +206,7 @@ $_LANG['UPLOAD_ERR_EXTENSION']  = 'Загрузка файла была прер
 $_LANG['UPLOAD_IMG_IS_DISABLE'] = 'Загрузка изображений запрещена!';
 $_LANG['UPLOAD_IMG_LIMIT']      = 'Достигнут предел количества изображений!';
 $_LANG['UPLOAD_IMG']            = 'Загрузить фото';
+$_LANG['UPLOAD_IMGS']           = 'Загрузить фотографии';
 
 $_LANG['FILE_NOT_WRITABLE'] = 'Файл "<strong>%s</strong>" не доступен для записи! Установите права 777 на этот файл.';
 $_LANG['DIR_NOT_WRITABLE']  = 'Папка "<strong>%s</strong>" не доступна для записи! Установите права 777 на эту папку.';
@@ -273,4 +274,6 @@ $_LANG['CBOX_SLIDESHOWSTART'] = 'Запустить слайдшоу';
 $_LANG['FILE_SELECTED']  = 'Выбраны файлы: $file';
 $_LANG['FILE_DENIED']    = 'Вы не можете выбрать $ext файл.\nДанный тип файла не разрешен...';
 $_LANG['FILE_DUPLICATE'] = 'Этот файл уже был выбран:\n$file!';
+$_LANG['AD_FILE_TYPES']  = 'Доступные типы файлов';
+$_LANG['AJAX_FILE_UPLOAD_NOT_SUPPORTED'] = 'Ваш брузер не поддерживает Flash, Silverlight и HTML5 загрузку файлов.'
 ?>

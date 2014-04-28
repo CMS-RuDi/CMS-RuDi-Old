@@ -312,15 +312,19 @@ span.fast_cfg_link { padding:4px; }
 span.fast_cfg_link img{ border:none; }
 
 /**************************** Сообщения сессии ********************************/
+#sess_messages {
+    box-shadow: 0 0 3px #000;
+    position: fixed;
+    right: 2px;
+    top: 2px;
+    border-radius:0;
+}
 
 .sess_messages {
     padding:10px;
     background:#E0EAEF;
-    margin-bottom:15px;
-    display:block;
     clear:both;
     border-radius:8px;
-    -moz-border-radius:8px;
 }
 
 .sess_messages div{
@@ -1334,9 +1338,9 @@ a.new_messages_link:hover{ color:#F00; background:#Fff; font-weight:bold; paddin
     margin: 0;
     padding: 3px 0;
     width: 100%;
-	height:108px;
+	height:180px;
 	min-height:180px;
-	max-height:702px;
+	max-height:1000px;
 }
 .bb_tag_code{
     border:solid 1px silver;
@@ -1742,6 +1746,9 @@ a.new_messages_link:hover{ color:#F00; background:#Fff; font-weight:bold; paddin
 }
 .blog_entry_text{
     margin-bottom:15px;
+}
+#create_club td { 
+    padding: 5px 0; 
 }
 .club_blog_post{
     margin:5px 0;
@@ -2833,14 +2840,11 @@ background-color:#E0EAEF;
 	width:100%;
 	height:200px
 }
-.forum_zoom{
-	background-color:gray;padding:2px; position: relative;
-}
-.forum_zoom:hover .forum_zoom_text{
-	display: block;
-}
-.forum_zoom_text{
-    padding:2px; color:#FFFFFF; text-align:center; position: absolute; top: 0px; background: #444; opacity: 0.8; filter: alpha(opacity=80); font-size: 12px;display: none;
+.forum_zoom { 
+    opacity: 1.0; 
+} 
+.forum_zoom:hover { 
+    opacity: 0.9; 
 }
 .forum_lostimg{
 	padding:5px;
@@ -3806,66 +3810,57 @@ table.feed td.date strong { color:green; }
     width: 100%;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 999;
     text-align: left;
 }
-#popup_container .b {
-    background: transparent url('../images/core/b.png') repeat scroll 0 0;
-}
-#popup_container .tl {
-    background: transparent url('../images/core/tl.png') repeat scroll 0 0;
-}
-#popup_container .tr {
-    background: transparent url('../images/core/tr.png') repeat scroll 0 0;
-}
-#popup_container .bl {
-    background: transparent url('../images/core/bl.png') repeat scroll 0 0;
-}
-#popup_container .br {
-    background: transparent url('../images/core/br.png') repeat scroll 0 0;
-}
-#popup_container table {
-    border-collapse: collapse;
-    margin: auto;
-}
 #popup_container .body {
-    background: #fff;
-    width: 600px;
-}
-#popup_container .tl,
-#popup_container .tr,
-#popup_container .bl,
-#popup_container .br {
-    height: 10px;
-    overflow: hidden;
     padding: 0;
-    width: 10px;
+    margin: 0;
+}
+#popup_overlay {
+    position: absolute;
+    z-index: 998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #666;
+    opacity: 0.4;
+}
+#popup_container .popup_body {
+    background: #fff;
+    width: 650px;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px #666;
+    overflow: hidden;
+}
+.popup_body > div {
+    clear: both;
 }
 #popup_title,
 #note_title {
-    background: none repeat scroll 0 0 #396EA4;
-    border: 1px solid #396EA4;
-    color: #FFFFFF;
-    font-size: 13px;
-    font-weight: bold;
+    background: none repeat scroll 0 0 #45688E;
+    border-bottom: 1px solid #666;
+    color: #FFF;
+    font-size: 14px;
     line-height: 1;
     margin: 0;
-    padding: 6px;
-    text-shadow: 0 1px 0 #111111;
+    padding: 7px;
+    text-shadow: 0 1px 2px #333;
 }
 #popup_container .popup_x_button,
 #noteform .popup_x_button {
-    background: url('../images/core/boxicon.gif') repeat scroll -4px -2px #9AB5D1;
+    background: url("../images/core/close_btn.png") no-repeat center center;
     cursor: pointer;
     float: right;
-    height: 17px;
-    margin: 5px 7px 0;
-    padding: 0;
-    width: 17px;
+    height: 16px; 
+    margin: 3px 3px 0 0; 
+    opacity: 0.7; 
+    padding: 3px; 
+    width: 16px;
 }
 #popup_container .popup_x_button:hover,
 #noteform .popup_x_button:hover {
-    background-color: #fff;
+    opacity: 1.0;
 }
 #popup_progress {
     display: none;
@@ -3878,27 +3873,20 @@ table.feed td.date strong { color:green; }
     margin: 0;
 }
 #popup_message {
-    color: #111;
     font-size: 13px;
-    padding: 0 3px 0 3px;
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
-	overflow:hidden;
+    margin: 7px; 
 }
 #popup_message .box_message_content {
-    color: #111;
     font-size: 13px;
-    margin: 5px;
     padding: 5px;
 }
 #popup_panel, #note_panel {
     background: #f9f9f9;
-    border: 1px solid #aaa;
     border-top: 1px solid #ccc;
-    margin-top: 0px;
     padding: 3px;
     padding-right: 10px;
     text-align: right;
+    overflow: hidden;
 }
 #popup_prompt {
     margin: 0.5em 0

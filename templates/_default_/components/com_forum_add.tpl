@@ -24,7 +24,7 @@
 </div>
 {$smilies}
 <div class="cm_editor">
-    <textarea id="message" class="ajax_autogrowarea" name="message" rows="5">{$post_content}</textarea>
+    <textarea id="message" class="ajax_autogrowarea" name="message" rows="15">{$post_content}</textarea>
 </div>
 
 {if $cfg.fa_on && $is_allow_attach}

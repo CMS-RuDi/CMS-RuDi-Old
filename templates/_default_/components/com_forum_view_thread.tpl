@@ -167,7 +167,7 @@
                 <input type="hidden" name="gosend" value="1" />
                 <input type="hidden" name="csrf_token" value="{csrf_token}" />
                 <div class="cm_editor">
-                    <textarea id="message" name="message" rows="5"></textarea>
+                    <textarea id="message" name="message" rows="7"></textarea>
                 </div>
                 <div class="forum_fast_submit" style="float:right;padding:5px;"><input type="button" value="{$LANG.SEND}" onclick="$(this).prop('disabled', true);$('#msgform').submit();" /></div>
                 {if $is_admin || $is_moder || $thread.is_mythread}

@@ -217,7 +217,7 @@ if ($do=='sendquest'){
         if (IS_BILLING && $inUser->id){ cmsBilling::process('faq', 'add_quest'); }
 
 		$inPage->setTitle($_LANG['QUESTION_SEND']);
-		$inPage->addPathway($_LANG['QUESTION_SEND'], $_SERVER['REQUEST_URI']);
+		$inPage->addPathway($_LANG['QUESTION_SEND']);
 
         if (!$published){
 			echo '<div class="con_heading">'.$_LANG['QUESTION_SEND'].'</div>';

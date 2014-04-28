@@ -355,7 +355,7 @@ function getRegion($id){
                 <input name="sub_opt" type="hidden" value="<?php echo $sub_opt; ?>" />
                 <input name="item_id" type="hidden" value="<?php echo @$item['id']; ?>" />
                 <input name="save" type="submit" id="save" value="<?php echo $_LANG['SAVE']; ?>" />
-                <input name="back" type="button" id="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components&amp;do=config&amp;id=<?php echo $id;?>&opt=add';"/>
+                <input name="back" type="button" id="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components&amp;do=config&amp;id=<?php echo $id;?>';"/>
             </p>
         </form><?php
 

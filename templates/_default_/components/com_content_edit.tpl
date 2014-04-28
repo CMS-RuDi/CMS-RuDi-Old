@@ -2,7 +2,7 @@
 
 <form id="addform" name="addform" method="post" action="" enctype="multipart/form-data">
     <div class="bar" style="padding:15px 10px">
-    <table width="700" cellspacing="5" cellpadding="3" class="proptable">
+    <table width="100%" cellspacing="5" cellpadding="3" class="proptable">
         <tr>
             <td width="230" valign="top">
                 <strong>{$LANG.TITLE}:</strong>
@@ -73,6 +73,7 @@
         {/if}
     </table>
     </div>
+
 	<table width="100%" border="0">
 		<tr>
 			<td>
@@ -84,6 +85,24 @@
 			</td>
 		</tr>
 	</table>
+
+    <div class="bar" style="padding:10px 10px;margin-top: 10px;">
+    <table width="100%" cellspacing="5" cellpadding="3" class="proptable">
+        {if $cfg.img_users && $cfg.img_on && $ajaxUploader}
+            <tr valign="top">
+                <td width="230" style="padding-top:8px">
+                    <strong>{$LANG.IMAGES}:</strong>
+                    <div class="hinttext">
+                        {$LANG.IMAGES_INSERT_HINT_TEXT}
+                    </div>
+                </td>
+                <td>
+                    {$ajaxUploader}
+                </td>
+            </tr>
+        {/if}
+    </table>
+    </div>
 
     <script type="text/javascript">
         var LANG_SELECT_CAT = '{$LANG.SELECT_CAT}';

@@ -110,7 +110,7 @@ class cms_model_comments{
 
     public function getTargetAuthor($table, $target_id) {
 
-        $sql = "SELECT u.id id, u.email email, p.title title
+        $sql = "SELECT u.id, u.email
                 FROM cms_users u, {$table} p
                 WHERE p.user_id = u.id AND p.id = '{$target_id}' AND u.is_locked = 0 AND u.is_deleted = 0
                 LIMIT 1";

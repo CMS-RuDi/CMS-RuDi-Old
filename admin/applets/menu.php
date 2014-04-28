@@ -51,6 +51,11 @@ function cpMenutypeById($item){
 					 	break;
         case 'category': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_PARTITION'].'</a></span> - '.$inDB->get_field('cms_category', 'id='.$item['linkid'], 'title');
 					 	 break;
+        case 'video_cat': 
+            if(cmsCore::getInstance()->isComponentInstalled('video')){ 
+                $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_VIDEO_PARTITION'].'</a></span> - '.$inDB->get_field('cms_video_category', 'id='.$item['linkid'], 'title'); 
+            } 
+            break; 
         case 'uccat': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_CATEGORY'].'</a></span> - '.$inDB->get_field('cms_uc_cats', 'id='.$item['linkid'], 'title');
 					  break;
         case 'blog': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_BLOG'].'</a></span> - '.$inDB->get_field('cms_blogs', 'id='.$item['linkid'], 'title');
@@ -158,7 +163,7 @@ function applet_menu(){
 
 	if ($do == 'update'){
 
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $id = cmsCore::request('id', 'int', 0);
         if(!$id){ cmsCore::redirectBack(); }
@@ -213,7 +218,7 @@ function applet_menu(){
 
 	if ($do == 'submit'){
 
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $title     = cmsCore::request('title', 'str', '');
         $menu      = cmsCore::request('menu', 'str', '');
@@ -257,7 +262,7 @@ function applet_menu(){
 
 	if ($do == 'submitmenu'){
 
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
 		$sql = "SELECT ordering as max_o FROM cms_modules ORDER BY ordering DESC LIMIT 1";
 		$result = $inDB->query($sql) ;
@@ -534,6 +539,9 @@ function applet_menu(){
                         <select name="mode" id="linktype" style="width:100%" onchange="showMenuTarget()">
                             <option value="link" <?php if (@$mod['linktype']=='link' || !isset($mod['mode'])) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_LINK']; ?></option>
                             <option value="content" <?php if (@$mod['linktype']=='content') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_ARTICLE']; ?></option>
+                            <?php if($inCore->isComponentInstalled('video')){ ?> 
+                                <option value="video_cat" <?php if (@$mod['linktype']=='video_cat') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_VIDEO_PARTITION']; ?></option> 
+                            <?php } ?>
                             <option value="category" <?php if (@$mod['linktype']=='category') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_PARTITION']; ?></option>
                             <option value="component" <?php if (@$mod['linktype']=='component') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_COMPONENT']; ?></option>
                             <option value="blog" <?php if (@$mod['linktype']=='blog') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_BLOG']; ?></option>
@@ -567,6 +575,25 @@ function applet_menu(){
                             </select>
                         </div>
                     </div>
+                    
+                    <?php if($inCore->isComponentInstalled('video')){ ?> 
+                    <div id="t_video_cat" class="menu_target" style="display:<?php if ($mod['linktype']=='video_cat') { echo  'block'; } else { echo 'none'; } ?>"> 
+                        <div> 
+                    <strong><?php echo $_LANG['AD_CHECK_PARTITION']; ?></strong> 
+                        </div> 
+                        <div> 
+                            <select name="video_cat" id="video_cat" style="width:100%"> 
+                                    <?php 
+                                    if (@$mod['linktype']=='video_cat') { 
+                                        echo $inCore->getListItemsNS('cms_video_category', $mod['linkid']); 
+                                    } else { 
+                                        echo $inCore->getListItemsNS('cms_video_category'); 
+                                    } 
+                                ?> 
+                            </select> 
+                        </div> 
+                    </div> 
+                    <?php } ?>
 
                     <div id="t_category" class="menu_target" style="display:<?php if ($mod['linktype']=='category') { echo  'block'; } else { echo 'none'; } ?>">
                         <div>

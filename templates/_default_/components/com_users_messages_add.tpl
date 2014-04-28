@@ -1,11 +1,12 @@
 <script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
-<div style="margin:6px 0;">
+
 {if $is_reply_user}
-  <div class="usr_msgreply_source">
-    <div class="usr_msgreply_sourcetext">{$msg.message}</div>
-    <div class="usr_msgreply_author">{$LANG.ORIGINAL_MESS}: <a href="{profile_url login=$msg.login}">{$msg.nickname}</a>, {$msg.senddate}</div>
-  </div>
+    <div class="usr_msgreply_source">
+        <div class="usr_msgreply_sourcetext">{$msg.message}</div>
+        <div class="usr_msgreply_author">{$LANG.ORIGINAL_MESS}: <a href="{profile_url login=$msg.login}">{$msg.nickname}</a>, {$msg.senddate}</div>
+    </div>
 {/if}
+
 <form action="" method="POST" name="msgform" id="send_msgform">
     <input type="hidden" name="gosend" value="1" />
     <input type="hidden" name="csrf_token" value="{csrf_token}" />
@@ -50,9 +51,7 @@
     {/if}
     </div>
 </form>
-<div class="sess_messages" style="margin: 6px 0 0 0; display:none">
-  <div class="message_info" id="error_mess"></div>
-</div>
+
 {literal}
 <script type="text/javascript">
 $(document).ready(function(){
@@ -64,4 +63,3 @@ function changeFriendTo(){
 }
 </script>
 {/literal}
-</div>

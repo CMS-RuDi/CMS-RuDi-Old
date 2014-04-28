@@ -150,6 +150,19 @@
         $inDB->query("ALTER TABLE `cms_ratings_total` DROP INDEX `target`");
         $inDB->query("ALTER TABLE `cms_ratings_total` ADD INDEX `item_id` (`item_id`,`target`)");
         
+        $con_cfg = $inCore->loadComponentConfig('content');
+        $con_cfg['img_table'] = 'cms_content_images';
+        $con_cfg['imgs_big_w'] = 300;
+        $con_cfg['imgs_big_h'] = 300;
+        $con_cfg['imgs_medium_w'] = 200;
+        $con_cfg['imgs_medium_h'] = 200;
+        $con_cfg['imgs_small_w'] = 100;
+        $con_cfg['imgs_small_h'] = 100;
+        $con_cfg['resize_type'] = 'auto';
+        $con_cfg['mresize_type'] = 'auto';
+        $con_cfg['sresize_type'] = 'auto';
+        $inCore->saveComponentConfig('content', $con_cfg);
+        
         cmsDatabase::optimizeTables();
 
         echo '<div style="margin:15px 0px;font-weight:bold">Миграция завершена. Удалите папку /migrate/ прежде чем продолжить!</div>';

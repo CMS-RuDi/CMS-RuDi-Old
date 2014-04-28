@@ -15,7 +15,7 @@
             <ul>
                 {foreach item=image from=$images}
                     {if $slide_opt == 3}
-                        <li><a href="{$image.big_src}" class="photobox"><img src="{$image.medium_src}" alt="{if $image.title}{$image.title|escape:html}{else}{$title|escape:html} {$image.id}{/if}"></a></li>
+                        <li><a href="{$image.big_src}" class="photobox" title="{$image.title|escape:html|default:''}"><img src="{$image.medium_src}" alt="{if $image.title}{$image.title|escape:html}{else}{$title|escape:html} {$image.id}{/if}"></a></li>
                     {/if}
                     {if $slide_opt == 2}
                         <li><img src="{$image.big_src}" width="600" height="400" alt="{if $image.title}{$image.title|escape:html}{else}{$title|escape:html} {$image.id}{/if}"></li>

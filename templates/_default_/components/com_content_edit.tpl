@@ -86,24 +86,24 @@
 		</tr>
 	</table>
 
+    {if $cfg.img_users && $cfg.img_on && $ajaxUploader}
     <div class="bar" style="padding:10px 10px;margin-top: 10px;">
     <table width="100%" cellspacing="5" cellpadding="3" class="proptable">
-        {if $cfg.img_users && $cfg.img_on && $ajaxUploader}
-            <tr valign="top">
-                <td width="230" style="padding-top:8px">
-                    <strong>{$LANG.IMAGES}:</strong>
-                    <div class="hinttext">
-                        {$LANG.IMAGES_INSERT_HINT_TEXT}
-                    </div>
-                </td>
-                <td>
-                    {$ajaxUploader}
-                </td>
-            </tr>
-        {/if}
+        <tr valign="top">
+            <td width="230" style="padding-top:8px">
+                <strong>{$LANG.IMAGES}:</strong>
+                <div class="hinttext">
+                    {$LANG.IMAGES_INSERT_HINT_TEXT}
+                </div>
+            </td>
+            <td>
+                {$ajaxUploader}
+            </td>
+        </tr>
     </table>
     </div>
-
+    {/if}
+    
     <script type="text/javascript">
         var LANG_SELECT_CAT = '{$LANG.SELECT_CAT}';
         var LANG_REQ_TITLE  = '{$LANG.REQ_TITLE}';

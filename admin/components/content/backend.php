@@ -32,18 +32,22 @@ if($opt=='saveconfig'){
     $cfg['autokeys']    = cmsCore::request('autokeys', 'int', 0);
 
     $cfg['img_table'] = 'cms_content_images';
-    $cfg['img_big_w'] = cmsCore::request('img_big_w', 'int', 300);
-    $cfg['img_big_h'] = cmsCore::request('img_big_h', 'int', 300);
-    $cfg['img_medium_w'] = cmsCore::request('img_medium_w', 'int', 200);
-    $cfg['img_medium_h'] = cmsCore::request('img_medium_h', 'int', 200);
-    $cfg['img_small_w'] = cmsCore::request('img_small_w', 'int', 100);
-    $cfg['img_small_h'] = cmsCore::request('img_small_h', 'int', 100);
+    $cfg['imgs_big_w'] = cmsCore::request('imgs_big_w', 'int', 300);
+    $cfg['imgs_big_h'] = cmsCore::request('imgs_big_h', 'int', 300);
+    $cfg['imgs_medium_w'] = cmsCore::request('imgs_medium_w', 'int', 200);
+    $cfg['imgs_medium_h'] = cmsCore::request('imgs_medium_h', 'int', 200);
+    $cfg['imgs_small_w'] = cmsCore::request('imgs_small_w', 'int', 100);
+    $cfg['imgs_small_h'] = cmsCore::request('imgs_small_h', 'int', 100);
     $cfg['resize_type'] = cmsCore::request('resize_type', array('auto','exact','portrait','landscape','crop'), 'auto');
+    $cfg['mresize_type'] = cmsCore::request('mresize_type', array('auto','exact','portrait','landscape','crop'), 'auto');
+    $cfg['sresize_type'] = cmsCore::request('sresize_type', array('auto','exact','portrait','landscape','crop'), 'auto');
     $cfg['img_on'] = cmsCore::request('img_on', 'int', 0);
     
     $cfg['img_users']   = cmsCore::request('img_users', 'int', 1);
+    $cfg['img_big_w'] = cmsCore::request('img_big_w', 'int', 300);
+    $cfg['img_small_w'] = cmsCore::request('img_small_w', 'int', 100);
     $cfg['watermark']   = cmsCore::request('watermark', 'int', 0);
-    $cfg['watermark_only_big'] = cmsCore::request('watermark_only_big', 'int', 0);
+//    $cfg['watermark_only_big'] = cmsCore::request('watermark_only_big', 'int', 0);
     
     $cfg['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
     $cfg['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
@@ -128,37 +132,6 @@ $GLOBALS['cp_page_head'][] = jwHeader();
     {tab=<?php echo $_LANG['AD_PHOTO_ART']; ?>}
     <table width="550" border="0" cellpadding="10" cellspacing="0" class="proptable">
         <tr>
-            <td><strong><?php echo $_LANG['AD_PHOTO_BIG']; ?>:</strong></td>
-            <td>
-                <input class="uispin" name="img_big_w" type="text" id="img_big_w" value="<?php echo $cfg['img_big_w'];?>" size="5" /> x <input class="uispin" name="img_big_h" type="text" id="img_big_h" value="<?php echo $cfg['img_big_h'];?>" size="5" />
-            </td>
-        </tr>
-        <tr>
-            <td><strong><?php echo $_LANG['AD_PHOTO_MEDIUM']; ?>:</strong></td>
-            <td>
-                <input class="uispin" name="img_medium_w" type="text" id="img_medium_w" value="<?php echo $cfg['img_medium_w'];?>" size="5" /> x <input class="uispin" name="img_medium_h" type="text" id="img_medium_h" value="<?php echo $cfg['img_medium_h'];?>" size="5" />
-            </td>
-        </tr>
-        <tr>
-            <td><strong><?php echo $_LANG['AD_PHOTO_SMALL']; ?>:</strong></td>
-            <td width="120">
-                <input class="uispin" name="img_small_w" type="text" id="img_small_w" value="<?php echo $cfg['img_small_w'];?>" size="5" /> x <input class="uispin" name="img_small_h" type="text" id="img_small_h" value="<?php echo $cfg['img_small_h'];?>" size="5" />
-            </td>
-        </tr>
-        
-        <tr>
-            <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
-            <td>
-                <select name="resize_type" style="width: 200px;">
-                    <option value="auto"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
-                    <option value="exact"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
-                    <option value="portrait"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
-                    <option value="landscape"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
-                    <option value="crop"><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
-                </select>
-            </td>
-        </tr>
-        <tr>
             <td>
                 <strong><?php echo $_LANG['AD_ALLOW_USERS_TO']; ?>:</strong><br/>
                 <span class="hinttext"><?php echo $_LANG['AD_ALLOW_USERS_TO_HINT']; ?></span>
@@ -169,6 +142,19 @@ $GLOBALS['cp_page_head'][] = jwHeader();
             </td>
         </tr>
         <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_BIG']; ?>:</strong></td>
+            <td>
+                <input class="uispin" name="img_big_w" type="text" id="img_big_w" value="<?php echo $cfg['img_big_w'];?>" size="5" />
+            </td>
+        </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_SMALL']; ?>:</strong></td>
+            <td width="120">
+                <input class="uispin" name="img_small_w" type="text" id="img_small_w" value="<?php echo $cfg['img_small_w'];?>" size="5" />
+            </td>
+        </tr>
+        
+        <tr style="border-top: 1px #cccccc solid;">
             <td>
                 <strong><?php echo $_LANG['AD_ALLOW_USERS_TO_MULTI']; ?>:</strong><br/>
                 <span class="hinttext"><?php echo $_LANG['AD_ALLOW_USERS_TO_MULTI_HINT']; ?></span>
@@ -178,6 +164,61 @@ $GLOBALS['cp_page_head'][] = jwHeader();
                 <label><input name="img_on" type="radio" value="0" <?php if (!$cfg['img_on']) { echo 'checked="checked"'; } ?>/> <?php echo $_LANG['NO']; ?> </label>
             </td>
         </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_BIG']; ?>:</strong></td>
+            <td>
+                <input class="uispin" name="imgs_big_w" type="text" id="imgs_big_w" value="<?php echo $cfg['imgs_big_w'];?>" size="5" /> x <input class="uispin" name="imgs_big_h" type="text" id="imgs_big_h" value="<?php echo $cfg['imgs_big_h'];?>" size="5" />
+            </td>
+        </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
+            <td>
+                <select name="resize_type" style="width: 200px;">
+                    <option value="auto" <?php if ($model->config['resize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
+                    <option value="exact" <?php if ($model->config['resize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
+                    <option value="portrait" <?php if ($model->config['resize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
+                    <option value="landscape" <?php if ($model->config['resize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
+                    <option value="crop" <?php if ($model->config['resize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_MEDIUM']; ?>:</strong></td>
+            <td>
+                <input class="uispin" name="imgs_medium_w" type="text" id="imgs_medium_w" value="<?php echo $cfg['imgs_medium_w'];?>" size="5" /> x <input class="uispin" name="imgs_medium_h" type="text" id="imgs_medium_h" value="<?php echo $cfg['imgs_medium_h'];?>" size="5" />
+            </td>
+        </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
+            <td>
+                <select name="mresize_type" style="width: 200px;">
+                    <option value="auto" <?php if ($model->config['mresize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
+                    <option value="exact" <?php if ($model->config['mresize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
+                    <option value="portrait" <?php if ($model->config['mresize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
+                    <option value="landscape" <?php if ($model->config['mresize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
+                    <option value="crop" <?php if ($model->config['mresize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_SMALL']; ?>:</strong></td>
+            <td width="120">
+                <input class="uispin" name="imgs_small_w" type="text" id="imgs_small_w" value="<?php echo $cfg['imgs_small_w'];?>" size="5" /> x <input class="uispin" name="imgs_small_h" type="text" id="imgs_small_h" value="<?php echo $cfg['imgs_small_h'];?>" size="5" />
+            </td>
+        </tr>
+        <tr>
+            <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
+            <td>
+                <select name="sresize_type" style="width: 200px;">
+                    <option value="auto" <?php if ($model->config['sresize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
+                    <option value="exact" <?php if ($model->config['sresize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
+                    <option value="portrait" <?php if ($model->config['sresize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
+                    <option value="landscape" <?php if ($model->config['sresize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
+                    <option value="crop" <?php if ($model->config['sresize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
+                </select>
+            </td>
+        </tr>
+        
         <tr>
            <td><strong><?php echo $_LANG['AD_ENABLE_WATERMARK']; ?></strong><br />
 		   <span class="hinttext"><?php echo $_LANG['AD_WATERMARK_HINT']; ?> "<a href="/images/watermark.png" target="_blank">/images/watermark.png</a>"</span></td>

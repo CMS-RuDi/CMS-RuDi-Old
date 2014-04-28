@@ -40,10 +40,12 @@
             'watermark' => 1,
             'img_w' => 600, // Будет удалено в скором времени
             'img_h' => 600, // Будет удалено в скором времени
-            'img_big_w' => 600,
-            'img_big_h' => 600,
-            'img_medium_w' => 300,
-            'img_medium_h' => 300,
+            'imgs_big_w' => 600,
+            'imgs_big_h' => 600,
+            'imgs_medium_w' => 300,
+            'imgs_medium_h' => 300,
+            'imgs_small_w' => 100,
+            'imgs_small_h' => 100,
             'resize_type' => 'auto',
             'img_table' => 'cms_upload_images'
         ),
@@ -125,6 +127,12 @@
         
         //Выставляем правило по которому будут изменяться размеры изображения
         $image->resize_type = $cfg['resize_type'];
+        if (!empty($cfg['mresize_type'])){
+            $image->mresize_type = $cfg['mresize_type'];
+        }
+        if (!empty($cfg['sresize_type'])){
+            $image->sresize_type = $cfg['sresize_type'];
+        }
         
         //Выставляем пути сохранения изображения
         $image->big_dir = PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f .'/';
@@ -132,21 +140,21 @@
         $image->small_dir = PATH .'/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f .'/';
         
         //Выставляем размеры большого изображения
-        if (!empty($cfg['img_big_w']) || !empty($cfg['img_big_h'])){
-            $image->new_bw = $cfg['img_big_w'];
-            $image->new_bh = $cfg['img_big_h'];
+        if (!empty($cfg['imgs_big_w']) || !empty($cfg['imgs_big_h'])){
+            $image->new_bw = $cfg['imgs_big_w'];
+            $image->new_bh = $cfg['imgs_big_h'];
         }
         
         //Выставляем размеры средней копии изображения
-        if (!empty($cfg['img_medium_w']) || !empty($cfg['img_medium_h'])){
-            $image->new_mw = $cfg['img_medium_w'];
-            $image->new_mh = $cfg['img_medium_h'];
+        if (!empty($cfg['imgs_medium_w']) || !empty($cfg['imgs_medium_h'])){
+            $image->new_mw = $cfg['imgs_medium_w'];
+            $image->new_mh = $cfg['imgs_medium_h'];
         }
         
         //Выставляем размеры маленькой копии изображения
-        if (!empty($cfg['img_small_w']) || !empty($cfg['img_small_h'])){
-            $image->new_sw = $cfg['img_small_w'];
-            $image->new_sh = $cfg['img_small_h'];
+        if (!empty($cfg['imgs_small_w']) || !empty($cfg['imgs_small_h'])){
+            $image->new_sw = $cfg['imgs_small_w'];
+            $image->new_sh = $cfg['imgs_small_h'];
         }
         
         $tmp_file_name = $component .'_'. md5(microtime(true)) .'.tmp';

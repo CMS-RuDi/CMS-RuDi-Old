@@ -113,16 +113,16 @@ function applet_content(){
 
     }
 
-	if ($do == 'show'){
-		if (!isset($_REQUEST['item'])){
-			if ($id >= 0){ dbShow('cms_content', $id);  }
-			echo '1'; exit;
-		} else {
-			dbShowList('cms_content', cmsCore::request('item', 'array_int'));
-			cmsCore::redirectBack();
-		}
+    if ($do == 'show'){
+        if (!isset($_REQUEST['item'])){
+            if ($id >= 0){ dbShow('cms_content', $id);  }
+            echo '1'; exit;
+        } else {
+            dbShowList('cms_content', cmsCore::request('item', 'array_int'));
+            cmsCore::redirectBack();
+        }
 
-	}
+    }
 
 	if ($do == 'hide'){
 		if (!isset($_REQUEST['item'])){

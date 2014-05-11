@@ -275,5 +275,7 @@ $_LANG['FILE_SELECTED']  = 'Выбраны файлы: $file';
 $_LANG['FILE_DENIED']    = 'Вы не можете выбрать $ext файл.\nДанный тип файла не разрешен...';
 $_LANG['FILE_DUPLICATE'] = 'Этот файл уже был выбран:\n$file!';
 $_LANG['AD_FILE_TYPES']  = 'Доступные типы файлов';
-$_LANG['AJAX_FILE_UPLOAD_NOT_SUPPORTED'] = 'Ваш брузер не поддерживает Flash, Silverlight и HTML5 загрузку файлов.'
-?>
+
+$_LANG['AJAX_FILE_UPLOAD_NOT_SUPPORTED'] = 'Ваш браузер не поддерживает Flash, Silverlight и HTML5 загрузку файлов.';
+$_LANG['MODEL_NOT_FOUND'] = 'Критическая ошибка. Класс модели компонента "%s" не обнаружен.';
+$_LANG['CLASS_NOT_FOUND'] = 'Критическая ошибка. Класс "%s" не обнаружен.';

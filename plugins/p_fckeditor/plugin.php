@@ -33,17 +33,13 @@ class p_fckeditor extends cmsPlugin {
 // ==================================================================== //
 
     public function install(){
-
         return parent::install();
-
     }
 
 // ==================================================================== //
 
     public function upgrade(){
-
         return parent::upgrade();
-
     }
 
 // ==================================================================== //
@@ -51,8 +47,8 @@ class p_fckeditor extends cmsPlugin {
     public function execute($event='', $item=array()){
 
         parent::execute();
-
-        $inUser = cmsUser::getInstance();
+        
+        cmsCore::c('page')->addHead('<script type="text/javascript">function wysiwygInsertHtml(html, name){var oEditor = FCKeditorAPI.GetInstance(name); if (oEditor.EditMode == FCK_EDITMODE_WYSIWYG ){ oEditor.InsertHtml(html); }else{ alert("EDITOR ERROR");}}</script>');
 
         cmsCore::includeFile('plugins/p_fckeditor/fckeditor/fckeditor.php');
 
@@ -61,14 +57,14 @@ class p_fckeditor extends cmsPlugin {
         $oFCKeditor->Height     = $item['height'];
         $oFCKeditor->Width      = $item['width'];
 
-        $oFCKeditor->ToolbarSet = ($inUser->is_admin ? 'Admin' : 'Basic');
+        $oFCKeditor->ToolbarSet = (cmsCore::c('user')->is_admin ? 'Admin' : 'Basic');
 
         $oFCKeditor->Value      = $item['text'];
 
         $oFCKeditor->Config['DefaultLanguage']    = cmsConfig::getConfig('lang');
         $oFCKeditor->Config['AutoDetectLanguage'] = false;
 
-        if (!$inUser->is_admin){
+        if (!cmsCore::c('user')->is_admin){
             $oFCKeditor->Config['ImageBrowser'] = false;
             $oFCKeditor->Config['LinkUpload']   = false;
             $oFCKeditor->Config['LinkBrowser']  = false;

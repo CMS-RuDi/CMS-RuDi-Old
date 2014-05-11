@@ -1,9 +1,9 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.2                                //
-//                            http://cmsrudi.ru/                              //
-//              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
+//                             CMS RuDi v1.0.0                                //
+//                         http://www.cmsrudi.ru/                             //
+//              Copyright (c) 2013 DS-Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
@@ -11,47 +11,39 @@
 /**
  * Класс обертка для методов CURL
  * 
- * @author DS Soft <support@ds-soft.ru>
- * @version 1.2.0
+ * @author DS-Soft <support@ds-soft.ru>
+ * @version 1.2.3
  */
 class miniCurl{
+    private static $instance;
+
     public static $Server = false;
     
     private $key = '';
     private $ch=null;
     
+    private $result_encoding = '';
+    private $current_url = '';
     public $error = '';
     public $info = '';
     public $config = array();
     public $cookies = array();
-    
-    private $result_encoding = '';
-    private $current_url = '';
-    
-    public $header = false;
-    
     private $result = '';
     
+    
+    public $header = false;
     public $result_headers = array();
     public $meta_tags = array();
     public $result_head = '';
     public $result_body = '';
+    public $postdata;
     
     public function __construct($cfg=array()){
         if (!function_exists('curl_setopt') || !function_exists('curl_init')){
             return self::echoError('Библиотека CURL не установлена');
         }
-        $this->config = array_merge(self::getDefaultConfig(), $cfg);
-        $this->ch = curl_init();
-        if (!$this->ch){
-            $this->error = curl_error($this->ch);
-            return;
-        }
-        $this->set_option(CURLOPT_HEADER, $this->config['header']);
-        $this->set_option(CURLOPT_RETURNTRANSFER, $this->config['return_transfer']);
-        $this->set_option(CURLOPT_FOLLOWLOCATION, $this->config['follow_location']);
-        $this->set_option(CURLOPT_CONNECTTIMEOUT, $this->config['connect_timeout']);
-        $this->set_option(CURLOPT_USERAGENT, $this->config['user_agent']);
+        
+        $this->reInit($cfg);
     }
     
     public function __destruct(){
@@ -61,11 +53,21 @@ class miniCurl{
         }
     }
     
+    public static function getInstance($cfg=array()) {
+        if (empty(self::$instance)){
+            self::$instance = new self($cfg);
+        }else if (!empty($cfg)){
+            self::getInstance()->reInit($cfg);
+        }
+        return $instance;
+    }
+    
     public function reInit($cfg=array()){
         if ($this->ch){
             curl_close($this->ch);
             $this->ch = null;
         }
+        
         $this->error = '';
         $this->info = '';
         $this->cookies = array();
@@ -78,27 +80,32 @@ class miniCurl{
         $this->result_head = '';
         $this->result_body = '';
         $this->config = array_merge(self::getDefaultConfig(), $cfg);
+        
         $this->ch = curl_init();
         if (!$this->ch){
             $this->error = curl_error($this->ch);
             return;
         }
-        $this->set_option(CURLOPT_HEADER, $this->config['header']);
-        $this->set_option(CURLOPT_RETURNTRANSFER, $this->config['return_transfer']);
+
+        $this->set_option(CURLOPT_USERAGENT,      $this->config['user_agent']);
         $this->set_option(CURLOPT_FOLLOWLOCATION, $this->config['follow_location']);
+        $this->set_option(CURLOPT_HEADER,         $this->config['header']);
+        $this->set_option(CURLOPT_HTTP_VERSION,   $this->config['http_version']);
+        $this->set_option(CURLOPT_RETURNTRANSFER, $this->config['return_transfer']);
         $this->set_option(CURLOPT_CONNECTTIMEOUT, $this->config['connect_timeout']);
-        $this->set_option(CURLOPT_USERAGENT, $this->config['user_agent']);
+        $this->set_option(CURLOPT_AUTOREFERER,    $this->config['auto_referer']);
     }
     
     private static function getDefaultConfig(){
         return array(
-            'header' => 1,
-            'return_transfer' => 1,
-            'follow_location' => 1,
+            'header' => true,
+            'return_transfer' => true,
+            'follow_location' => true,
+            'auto_referer' => true,
             'connect_timeout' => 60,
-            'user_agent' => 'Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20100101 Firefox/12.0',
-            'verify_host' => 0,
-            'verify_peer' => 0,
+            'user_agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:25.0) Gecko/20100101 Firefox/25.0',
+            'verify_host' => false,
+            'verify_peer' => false,
             'meta' => false,
             'encoding' => false,
             'default_encoding' => 'utf-8',
@@ -106,7 +113,8 @@ class miniCurl{
             'proxy_type' => CURLPROXY_HTTP,
             'proxy_user' => '',
             'proxy_password' => '',
-            'externalIp' => false
+            'externalIp' => false,
+            'http_version' => CURL_HTTP_VERSION_1_1
         );
     }
     
@@ -153,12 +161,41 @@ class miniCurl{
         return false;
     }
     
+    private function getPostRawData($post_data=false){
+        $multipart = false; $raw_data = array();
+        
+        if (!empty($post_data)){
+            if (is_array($post_data)){
+                foreach ($post_data as $k=>$v){
+                    if (mb_substr($v, 0, 1) == '@'){
+                        $multipart = true;
+                        break;
+                    }
+                    $raw_data[] = $k .'='. urlencode($v);
+                }
+            }else{
+                return $post_data;
+            }
+        }else{
+            return '';
+        }
+        
+        return $multipart === false ? implode('&', $raw_data) : $post_data;
+    }
+    
+    public function getCurrentUrl(){
+        return $this->current_url;
+    }
+    
     public function get($url, $header = ''){
         $this->current_url = $url;
-        if (!$this->current_url) return self::echoError('Не указан URL');
+        if (!$this->current_url){ 
+            return self::echoError('Не указан URL');
+        }
         $this->header = $header;
         $this->set_option(CURLOPT_URL, $this->current_url);
-        $this->set_option(CURLOPT_POST, 0);
+        $this->set_option(CURLOPT_POST, false);
+        $this->set_option(CURLOPT_HTTPGET, true);
         $this->https();
         return $this->exec();
     }
@@ -171,6 +208,13 @@ class miniCurl{
     public function jsonGet($url, $assoc=false, $header = array()){
         if ($this->get($url, $header)){
             return json_decode($this->result_body, $assoc);
+        }
+        return false;
+    }
+    
+    public function xmlGet($url, $header = array()){
+        if ($this->get($url, $header)){
+            return simplexml_load_string($this->result_body);
         }
         return false;
     }
@@ -196,13 +240,19 @@ class miniCurl{
         return false;
     }
 
-    public function post($url, $postdata = array('bla' => 'bla'), $header = ''){
+    public function post($url, $postdata = null, $header = ''){
         $this->current_url = $url;
-        if (!$this->current_url) return self::echoError('Не указан URL');
+        $this->postdata = $this->getPostRawData($postdata);
+        
+        if (empty($this->current_url)){
+            return self::echoError('Не указан URL');
+        }
+        
         $this->header = $header;
         $this->set_option(CURLOPT_URL, $this->current_url);
-        $this->set_option(CURLOPT_POST, 1);
-        $this->set_option(CURLOPT_POSTFIELDS, $postdata);
+        $this->set_option(CURLOPT_POST, true);
+        $this->set_option(CURLOPT_POSTFIELDS, $this->postdata);
+        
         $this->https();
         return $this->exec();
     }
@@ -212,29 +262,56 @@ class miniCurl{
         return $this->post($url, $postdata, $header);
     }
     
-    public function jsonPost($url, $assoc=false, $postdata = null, $header = array()){
+    public function jsonPost($url, $assoc = false, $postdata = null, $header = array()){
         if ($this->post($url, $postdata, $header)){
             return json_decode($this->result_body, $assoc);
         }
         return false;
     }
     
-    public function put($url, $postdata = array('bla' => 'bla'), $header = ''){
-        $this->current_url	= $url;
-        if (!$this->current_url) return self::echoError('Не указан URL');
+    public function xmlPost($url, $postdata = null, $header = array()){
+        if ($this->post($url, $postdata, $header)){
+            return simplexml_load_string($this->result_body);
+        }
+        return false;
+    }
+    
+    public function put($url, $file = false, $data = null, $header = ''){
+        $this->current_url = $url;
+        
+        if (!$this->current_url){
+            return self::echoError('Не указан URL');
+        }
+
+        $this->set_option(CURLOPT_POST, false);
+        $this->set_option(CURLOPT_POSTFIELDS, $data);
+        
         $this->header = $header;
-        $this->set_option(CURLOPT_URL, $this->url);
-        $this->set_option(CURLOPT_CUSTOMREQUEST, 'PUT');
-        $this->set_option(CURLOPT_POSTFIELDS, $postdata);
+        $this->set_option(CURLOPT_URL, $this->current_url);
+        $this->set_option(CURLOPT_PUT, true);
+
+        if (!empty($file) && file_exists($file)){
+            $fp = fopen($file, 'r');
+
+            $this->set_option(CURLOPT_INFILE, $fp);
+            $this->set_option(CURLOPT_INFILESIZE, filesize($file));
+            $this->set_option(CURLOPT_UPLOAD, true);
+        }
+
         return $this->exec();
     }
     
     public function delete($url, $header = ''){
         $this->current_url = $url;
-        if (!$this->current_url) return self::echoError('Не указан URL');
+        
+        if (!$this->current_url){
+            return self::echoError('Не указан URL');
+        }
+        
         $this->header = $header;
         $this->set_option(CURLOPT_URL, $this->current_url);
         $this->set_option(CURLOPT_CUSTOMREQUEST, 'DELETE');
+        
         return $this->exec();
     }
     
@@ -242,6 +319,7 @@ class miniCurl{
         if ($this->header){
             $this->set_option(CURLOPT_HTTPHEADER, $this->header);
         }
+        
         if ($this->cookies){
             $cookies = array();
             foreach ($this->cookies as $k => $v){
@@ -249,38 +327,44 @@ class miniCurl{
             }
             $this->set_option(CURLOPT_COOKIE, implode('; ', $cookies));
         }
+        
         $this->setProxy();
         $this->setInterface();
         
         $this->result = curl_exec($this->ch);
+        
         if ($this->result == false){
             $this->error = curl_error($this->ch);
             return false;
         }
+        
         $this->info = curl_getinfo($this->ch);
         $this->processHeaders();
         $this->processBody();
+        
         return true;
     }
     
     private function processHeaders(){
-        $this->result_headers = array();
-        $this->result_headers[0] = substr($this->result,0,$this->info['header_size']);
-        $headers = explode("\r\n",$this->result_headers[0]);
-        foreach ($headers as $header) {
-            if (strpos($header,":") !== false) {
-                list($key,$value) = explode(":",$header,2);
-                $key = trim($key);
-                $key = strtolower($key);
-                switch ($key) {
-                    case 'set-cookie':
-                        $this->processCookies($value);
-                        break;
-                    case 'content-type':
-                        if ($this->config['encoding'] === true) $this->processContentType($value);
-                        break;
+        if ($this->config['header']){
+            $this->result_headers = array();
+            $this->result_headers[0] = substr($this->result,0,$this->info['header_size']);
+            $headers = explode("\r\n",$this->result_headers[0]);
+            foreach ($headers as $header) {
+                if (strpos($header,":") !== false) {
+                    list($key,$value) = explode(":",$header,2);
+                    $key = trim($key);
+                    $key = strtolower($key);
+                    switch ($key) {
+                        case 'set-cookie':
+                            $this->processCookies($value);
+                            break;
+                        case 'content-type':
+                            if ($this->config['encoding'] === true) $this->processContentType($value);
+                            break;
+                    }
+                    $this->result_headers[$key] = trim($value);
                 }
-                $this->result_headers[$key] = $value;
             }
         }
     }
@@ -319,7 +403,11 @@ class miniCurl{
             $this->result_head = $html[1];
             $this->result_body = $html[2];
         }else{
-            $this->result_body = substr($this->result, $this->info['header_size']);
+            if ($this->config['header']){
+                $this->result_body = substr($this->result, $this->info['header_size']);
+            }else{
+                $this->result_body = $this->result;
+            }
         }
         if (!$this->result_encoding and $this->config['encoding'] === true){
             if (preg_match("#<meta\b[^<>]*?\bcontent=['\"]?text/html;\s*charset=([^>\s\"']+)['\"]?#is", (empty($this->result_head) ? $this->result_body : $this->result_head), $match)) {
@@ -459,9 +547,9 @@ class miniCurl{
     }
 }
 
-//if (miniCurl::$Server === true and !empty($_POST['request'])){
-//    $inCurl = new miniCurl();
-//    $inCurl->startServer();
-//}
+if (miniCurl::$Server === true and !empty($_POST['request'])){
+    $inCurl = new miniCurl();
+    $inCurl->startServer();
+}
 
 ?>

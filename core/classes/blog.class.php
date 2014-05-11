@@ -710,34 +710,34 @@ class cmsBlogs {
 		// Парсим по отдельности части текста, если есть тег [cut
         if (mb_strstr($item['content'], '[cut')){
             $msg_to    = $this->getPostShort($item['content']);
-			$msg_to    = cmsCore::parseSmiles($msg_to, true);
-			$msg_after = $this->getPostShort($item['content'], false, true);
-			$msg_after = cmsCore::parseSmiles($msg_after, true);
-			$cut       = $this->getPostCut($item['content']);
-			$item['content_html'] = $msg_to . $cut . $msg_after;
+            $msg_to    = cmsCore::parseSmiles($msg_to, true);
+            $msg_after = $this->getPostShort($item['content'], false, true);
+            $msg_after = cmsCore::parseSmiles($msg_after, true);
+            $cut       = $this->getPostCut($item['content']);
+            $item['content_html'] = $msg_to . $cut . $msg_after;
         } else {
-        	$item['content_html']   = cmsCore::parseSmiles($item['content'], true);
-		}
+            $item['content_html']   = cmsCore::parseSmiles($item['content'], true);
+        }
 		// Экранируем специальные символы
         $item['content']      = $this->inDB->escape_string($item['content']);
         $item['content_html'] = $this->inDB->escape_string($item['content_html']);
 
-		$post_id = $this->inDB->insert('cms_blog_posts', $item);
+        $post_id = $this->inDB->insert('cms_blog_posts', $item);
 
-		if(!$post_id) { return false; }
+        if(!$post_id) { return false; }
 
         cmsInsertTags($item['tags'], $this->getTarget('tags'), $post_id);
 
-		$item['id']      = $post_id;
-		$item['seolink'] = $this->generatePostSeoLink($item);
+        $item['id']      = $post_id;
+        $item['seolink'] = $this->generatePostSeoLink($item);
 
-		$this->inDB->query("UPDATE cms_blog_posts SET seolink='{$item['seolink']}' WHERE id = '{$post_id}'");
+        $this->inDB->query("UPDATE cms_blog_posts SET seolink='{$item['seolink']}' WHERE id = '{$post_id}'");
 
-		if ($item['published']){
-			cmsUser::checkAwards($item['user_id']);
-		}
+        if ($item['published']){
+                cmsUser::checkAwards($item['user_id']);
+        }
 
-		cmsCore::setIdUploadImage('post', $post_id);
+        cmsCore::setIdUploadImage('post', $post_id, 'blogs');
 
         return array('id'=>$post_id, 'seolink'=>$item['seolink']);
 
@@ -795,11 +795,11 @@ class cmsBlogs {
 
         cmsCore::callEvent('DELETE_POST', $post_id);
 
-		$post = $this->getPost($post_id);
-		if (!$post){ return false; }
+        $post = $this->getPost($post_id);
+        if (!$post){ return false; }
 
-		// пересчитываем рейтинг блога
-		$this->inDB->query("UPDATE cms_blogs SET rating = rating - ({$post['rating']}) WHERE id = '{$post['blog_id']}'");
+        // пересчитываем рейтинг блога
+        $this->inDB->query("UPDATE cms_blogs SET rating = rating - ({$post['rating']}) WHERE id = '{$post['blog_id']}'");
 
         $this->inDB->delete('cms_blog_posts', "id = '$post_id'", 1);
 
@@ -809,9 +809,9 @@ class cmsBlogs {
         cmsClearTags($this->getTarget('tags'), $post_id);
 
         cmsCore::deleteUploadImages($post_id, 'post');
-		cmsActions::removeObjectLog($this->getTarget('actions_post'), $post_id);
+        cmsActions::removeObjectLog($this->getTarget('actions_post'), $post_id);
 
-		return true;
+        return true;
 
     }
 

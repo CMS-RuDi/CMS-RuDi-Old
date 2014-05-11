@@ -14,7 +14,7 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
-define('CMS_RUDI_V', '0.0.2');
+define('CMS_RUDI_V', '0.0.3');
 
 define('CORE_VERSION', '1.10.3');
 define('CORE_BUILD', '2');
@@ -50,33 +50,41 @@ class cmsCore {
     protected        $template;
 
     public           $single_run_plugins = array('wysiwyg');
+    
+    private static $models = array();
+    private static $classes = array();
+    private static $classes_name = array(
+        'actions' => 'cmsActions',   'blog'         => 'cmsBlogs',      'config'       => 'cmsConfig',
+        'cron'    => 'cmsCron',      'curl'         => 'miniCurl',      'db'           => 'cmsDatabase',
+        'formgen' => 'cmsFormGen',   'gif_resize'   => 'gifresizer',    'idna_convert' => 'idna_convert',
+        'images'  => 'rudi_graphics','jevix'        => 'Jevix',         'page'         => 'cmsPage',
+        'photo'   => 'cmsPhoto',     'upload_photo' => 'cmsUploadPhoto','user'         => 'cmsUser'
+    );
 
     protected function __construct($install_mode=false) {
-
         // проверяем для совместимости
         if(!defined('HOST')){
             define('HOST', '//' . self::getHost());
         }
 
         if ($install_mode){ return; }
-
-        //подключим базу и конфиг
-        self::loadClass('db');
-        self::loadClass('config');
+        
+        // загружаем класс плагинов
         self::loadClass('plugin');
 
-        $inConf = cmsConfig::getInstance();
-
         //проверяем был ли переопределен язык через сессию
-        if (isset($_SESSION['lang'])) { $inConf->lang = $_SESSION['lang']; }
-		self::loadLanguage('lang');
+        if (isset($_SESSION['lang'])) {
+            self::c('config')->lang = $_SESSION['lang'];
+        }else{
+            self::loadLanguage('lang');
+        }
 
         //проверяем был ли переопределен шаблон через сессию
-        if (isset($_SESSION['template'])) { $inConf->template = $_SESSION['template']; }
+        if (isset($_SESSION['template'])) { self::c('config')->template = $_SESSION['template']; }
 
-        define('TEMPLATE', $inConf->template);
-        define('TEMPLATE_DIR', PATH.'/templates/'.$inConf->template.'/');
-        define('DEFAULT_TEMPLATE_DIR', PATH.'/templates/_default_/');
+        define('TEMPLATE', self::c('config')->template);
+        define('TEMPLATE_DIR', PATH.'/templates/'. self::c('config')->template .'/');
+        define('DEFAULT_TEMPLATE_DIR', PATH .'/templates/_default_/');
 
         // определяем контекст использования
         self::detectContext();
@@ -129,13 +137,7 @@ class cmsCore {
 
         // если интернационализованный домен
         if(mb_strpos($_SERVER['HTTP_HOST'], 'xn--') !== false){
-
-            self::loadClass('idna_convert');
-
-            $IDN = new idna_convert();
-
-            return $IDN->decode($_SERVER['HTTP_HOST']);
-
+            return self::c('idna_convert')->decode($_SERVER['HTTP_HOST']);
         }
 
         return $_SERVER['HTTP_HOST'];
@@ -175,9 +177,9 @@ class cmsCore {
 
         global $_LANG;
 
-        $langfile = PATH.'/languages/'.cmsConfig::getConfig('lang').'/'.$file.'.php';
+        $langfile = PATH .'/languages/'. self::c('config')->lang .'/'. $file .'.php';
 
-        if (!file_exists($langfile)){ $langfile = PATH.'/languages/ru/'.$file.'.php'; }
+        if (!file_exists($langfile)){ $langfile = PATH .'/languages/ru/'. $file .'.php'; }
         if (!file_exists($langfile)){ return false; }
 
         include_once($langfile);
@@ -191,16 +193,14 @@ class cmsCore {
      * @return string
      */
     public static function getLanguageTextFile($file){
-
-        $letter_file = PATH.'/languages/'.cmsConfig::getConfig('lang').'/letters/'.$file.'.txt';
+        $letter_file = PATH .'/languages/'. self::c('config')->lang .'/letters/'. $file .'.txt';
         if (!file_exists($letter_file)){
-            $letter_file = PATH.'/languages/ru/letters/'.$file.'.txt';
+            $letter_file = PATH .'/languages/ru/letters/'. $file .'.txt';
         }
 
         if (!file_exists($letter_file)) { return false; }
 
         return file_get_contents($letter_file);
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,17 +210,21 @@ class cmsCore {
      * @return string
      */
     public static function arrayToYaml($input_array) {
-
+        $array = array();
+        
         self::includeFile('includes/spyc/spyc.php');
-
-        if($input_array){
-            foreach ($input_array as $key => $value) {
-                $array[str_replace(array('[',']'), '', $key)] = $value;
+        
+        if (!empty($input_array)){
+            if(is_array($input_array)){
+                foreach ($input_array as $key => $value) {
+                    $array[str_replace(array('[',']'), '', $key)] = $value;
+                }
+            }else{
+                $array[] = $input_array;
             }
-        } else { $array = array(); }
+        }
 
         return Spyc::YAMLDump($array,2,40);
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,11 +235,8 @@ class cmsCore {
      * @return array
      */
     public static function yamlToArray($yaml) {
-
         self::includeFile('includes/spyc/spyc.php');
-
         return Spyc::YAMLLoad($yaml);
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,16 +246,15 @@ class cmsCore {
      * @return array
      */
     public function getAllPlugins() {
+        // если уже получали, возвращаемся
+        if($this->plugins && is_array($this->plugins)) { return $this->plugins; }
 
-		// если уже получали, возвращаемся
-		if($this->plugins && is_array($this->plugins)) { return $this->plugins; }
-
-		// Получаем список компонентов
-		$this->plugins = cmsDatabase::getInstance()->get_table('cms_plugins p, cms_event_hooks e', 'p.published = 1 AND e.plugin_id = p.id', 'p.id, p.plugin, p.config, e.event');
-		if (!$this->plugins){ $this->plugins = array(); }
+        // Получаем список компонентов
+        $this->plugins = self::c('db')->get_table('cms_plugins p, cms_event_hooks e', 'p.published = 1 AND e.plugin_id = p.id', 'p.id, p.plugin, p.config, e.event');
+        
+        if (!$this->plugins){ $this->plugins = array(); }
 
         return $this->plugins;
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +265,6 @@ class cmsCore {
      * @return mixed
      */
     public static function callEvent($event, $item){
-
         //получаем все активные плагины, привязанные к указанному событию
         $plugins = self::getInstance()->getEventPlugins($event);
 
@@ -281,18 +280,17 @@ class cmsCore {
                 $item = $plugin->execute($event, $item);
                 self::getInstance()->unloadPlugin($plugin);
 
-				if(isset($plugin->info['type'])){
-					if (in_array($plugin->info['type'], self::getInstance()->single_run_plugins)) {
-						return $item;
-					}
-				}
+                if(isset($plugin->info['type'])){
+                    if (in_array($plugin->info['type'], self::getInstance()->single_run_plugins)) {
+                            return $item;
+                    }
+                }
             }
 
         }
 
         //возращаем $item обратно
         return $item;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -303,17 +301,15 @@ class cmsCore {
      * @return array
      */
     public function getEventPlugins($event) {
-
         $plugins_list = array();
 
-		foreach ($this->plugins as $plugin){
-		   if($plugin['event'] == $event){
-			  $plugins_list[] = $plugin['plugin'];
-		   }
-		}
+        foreach ($this->plugins as $plugin){
+            if($plugin['event'] == $event){
+                $plugins_list[] = $plugin['plugin'];
+            }
+        }
 
         return $plugins_list;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,16 +319,14 @@ class cmsCore {
      * @return array
      */
     public function getAllComponents() {
+        // если уже получали, возвращаемся
+        if($this->components && is_array($this->components)) { return $this->components; }
 
-		// если уже получали, возвращаемся
-		if($this->components && is_array($this->components)) { return $this->components; }
-
-		// Получаем список компонентов
-		$this->components = cmsDatabase::getInstance()->get_table('cms_components', '1=1 ORDER BY title', 'id, title, link, config, internal, published, version, system');
-		if (!$this->components){ die('kernel panic'); }
+        // Получаем список компонентов
+        $this->components = self::c('db')->get_table('cms_components', '1=1 ORDER BY title', 'id, title, link, config, internal, published, version, system');
+        if (!$this->components){ die('kernel panic'); }
 
         return $this->components;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,17 +337,15 @@ class cmsCore {
      * @return bool
      */
     public function isComponentEnable($component){
-
         $enable = false;
 
-		foreach ($this->components as $inst_component){
-		   if($inst_component['link'] == $component){
-			  $enable = (bool)$inst_component['published']; break;
-		   }
-		}
+        foreach ($this->components as $inst_component){
+            if($inst_component['link'] == $component){
+                $enable = (bool)$inst_component['published']; break;
+            }
+        }
 
         return $enable;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,17 +356,15 @@ class cmsCore {
      * @return array
      */
     public function getComponent($component_id){
+        $c = array();
 
-		$c = array();
-
-		foreach ($this->components as $inst_component){
-		   if($inst_component['id'] == $component_id){
-			  $c = $inst_component; break;
-		   }
-		}
+        foreach ($this->components as $inst_component){
+            if($inst_component['id'] == $component_id){
+                $c = $inst_component; break;
+            }
+        }
 
         return $c;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -385,18 +375,16 @@ class cmsCore {
      * @return float
      */
     public function loadPluginConfig($plugin_name){
+        $config = array();
 
-		$config = array();
-
-		foreach ($this->plugins as $plugin){
-		   if($plugin['plugin'] == $plugin_name){
-			  $config = self::yamlToArray($plugin['config']);
-			  break;
-		   }
-		}
+        foreach ($this->plugins as $plugin){
+            if($plugin['plugin'] == $plugin_name){
+                $config = self::yamlToArray($plugin['config']);
+                break;
+            }
+        }
 
         return $config;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -408,22 +396,16 @@ class cmsCore {
      * @return bool
      */
     public function savePluginConfig($plugin_name, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
         //конвертируем массив настроек в YAML
-		$config_yaml = $inDB->escape_string(self::arrayToYaml($config));
+        $config_yaml = self::c('db')->escape_string(self::arrayToYaml($config));
 
         //обновляем плагин в базе
-        $update_query  = "UPDATE cms_plugins
-                          SET config='{$config_yaml}'
-                          WHERE plugin = '{$plugin_name}'";
-
-        $inDB->query($update_query);
+        self::c('db')->query("UPDATE cms_plugins
+                                SET config='". $config_yaml ."'
+                                WHERE plugin = '". $plugin_name ."'");
 
         //настройки успешно сохранены
         return true;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -519,18 +501,20 @@ class cmsCore {
     ////////////////////////////////////////////////////////////////////////////
     public static function insertEditor($name, $text='', $height='350', $width='500', $toolbar='') {
         global $_LANG;
-        $editor = self::callEvent('INSERT_WYSIWYG', array(
-                                                        'name'=>$name,
-                                                        'text'=>$text,
-                                                        'toolbar'=>$toolbar,
-                                                        'height'=>$height,
-                                                        'width'=>$width
-                                                    ));
+        $editor = self::callEvent(
+            'INSERT_WYSIWYG',
+            array(
+                'name'=>$name,
+                'text'=>$text,
+                'toolbar'=>$toolbar,
+                'height'=>$height,
+                'width'=>$width
+            )
+        );
 
         if (!is_array($editor)){ echo $editor; return; }
 
         echo $_LANG['INSERT_WYSIWYG_ERROR'];
-
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -587,7 +571,6 @@ class cmsCore {
      * Возвращает массив сообщений сохраненных в сессии
      */
     public static function getSessionMessages(){
-
         if (isset($_SESSION['core_message'])){
             $messages = $_SESSION['core_message'];
         } else {
@@ -596,7 +579,6 @@ class cmsCore {
 
         self::clearSessionMessages();
         return $messages;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -617,7 +599,6 @@ class cmsCore {
      * @return string
      */
     private function detectURI(){
-
         $request_uri = ltrim(urldecode(trim($_SERVER['REQUEST_URI'])), '/');
         if (!$request_uri) { return; }
 
@@ -630,7 +611,6 @@ class cmsCore {
         $pos_que  = mb_strpos($request_uri, '?');
         // если есть и это не go/url= и load/url=
         if ($pos_que !== false && (mb_strpos($request_uri, '/url=') === false)){
-
             // получаем строку запроса
             $query_data = array();
             $query_str  = mb_substr($request_uri, $pos_que+1);
@@ -668,8 +648,8 @@ class cmsCore {
 
         $found = false;
 
-		// Запоминаем реальный uri
-		$this->real_uri = $uri;
+        // Запоминаем реальный uri
+        $this->real_uri = $uri;
 
         if ($rules){
             //перебираем правила
@@ -715,7 +695,6 @@ class cmsCore {
         }
 
         return $uri;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -727,9 +706,8 @@ class cmsCore {
      * @return string $component
      */
     private function detectComponent(){
-
         //главная страница
-        if (!$this->uri) { return cmsConfig::getConfig('homecom'); }
+        if (!$this->uri) { return self::c('config')->homecom; }
 
         //определяем, есть ли слэши в адресе
         $first_slash_pos = mb_strpos($this->uri, '/');
@@ -750,11 +728,10 @@ class cmsCore {
             return $component;
         } else {
             //если компонент не существует, считаем что это content
-            $this->uri = cmsConfig::getConfig('com_without_name_in_url').'/'.$this->uri;
+            $this->uri = self::c('config')->com_without_name_in_url .'/'. $this->uri;
             $this->url_without_com_name = true;
-            return cmsConfig::getConfig('com_without_name_in_url');
+            return self::c('config')->com_without_name_in_url;
         }
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -767,70 +744,68 @@ class cmsCore {
      * @return boolean
      */
     private function parseComponentRoute(){
-
-		//если uri нет, все равно возвращаем истину - для опции "компонент на главной"
+        //если uri нет, все равно возвращаем истину - для опции "компонент на главной"
         if (!$this->uri) { return true; }
 
-		// если uri совпадает с названием компонента, возвращаем истину
-		if($this->uri == $this->component) { return true; }
+        // если uri совпадает с названием компонента, возвращаем истину
+        if($this->uri == $this->component) { return true; }
 
         //подключаем список маршрутов компонента
-        if(!self::includeFile('components/'.$this->component.'/router.php')){ return false; }
+        if(!self::includeFile('components/'. $this->component .'/router.php')){ return false; }
 
-        $routes = call_user_func('routes_'.$this->component);
-		$routes = self::callEvent('GET_ROUTE_'.mb_strtoupper($this->component), $routes);
-		// Флаг удачного перебора
-		$is_found = false;
+        $routes = call_user_func('routes_'. $this->component);
+        $routes = self::callEvent('GET_ROUTE_'. mb_strtoupper($this->component), $routes);
+        
+        // Флаг удачного перебора
+        $is_found = false;
+        
         //перебираем все маршруты
-		if($routes){
-			foreach($routes as $route){
+        if($routes){
+            foreach($routes as $route){
 
-				//сравниваем шаблон маршрута с текущим URI
-				preg_match($route['_uri'], $this->uri, $matches);
+                //сравниваем шаблон маршрута с текущим URI
+                preg_match($route['_uri'], $this->uri, $matches);
 
-				//Если найдено совпадение
-				if ($matches){
+                //Если найдено совпадение
+                if ($matches){
 
-					//удаляем шаблон из параметров маршрута, чтобы не мешал при переборе
-					unset($route['_uri']);
+                    //удаляем шаблон из параметров маршрута, чтобы не мешал при переборе
+                    unset($route['_uri']);
 
-					//перебираем параметры маршрута в виде ключ=>значение
-					foreach($route as $key=>$value){
-						if (is_integer($key)){
-							//Если ключ - целое число, то значением является сегмент URI
-							$_REQUEST[$value] = $matches[$key];
-						} else {
-							//иначе, значение берется из маршрута
-							$_REQUEST[$key]   = $value;
-						}
-					}
-					// совпадение есть
-					$is_found = true;
-					//раз найдено совпадение, прерываем цикл
-					break;
+                    //перебираем параметры маршрута в виде ключ=>значение
+                    foreach($route as $key=>$value){
+                        if (is_integer($key)){
+                            //Если ключ - целое число, то значением является сегмент URI
+                            $_REQUEST[$value] = $matches[$key];
+                        } else {
+                            //иначе, значение берется из маршрута
+                            $_REQUEST[$key]   = $value;
+                        }
+                    }
+                    // совпадение есть
+                    $is_found = true;
+                    //раз найдено совпадение, прерываем цикл
+                    break;
 
-				}
+                }
 
-			}
-		}
+            }
+        }
 
-		// Если в маршруте нет совпадений
-		if(!$is_found) { return false; }
+        // Если в маршруте нет совпадений
+        if(!$is_found) { return false; }
 
         return true;
-
     }
 
     /**
      * Узнаем действие компонента
      */
     private function detectAction(){
-
-		$do = preg_replace('/[^a-z_]/iu', '', self::request('do', 'str', 'view'));
-		$this->do = $do ? $do : 'view';
+        $do = preg_replace('/[^a-z_]/iu', '', self::request('do', 'str', 'view'));
+        $this->do = $do ? $do : 'view';
 
         return true;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -839,14 +814,11 @@ class cmsCore {
      * Генерирует тело страницы, вызывая нужный компонент
      */
     public function proceedBody(){
-
-        $inPage = cmsPage::getInstance();
-
         ob_start();
 
         // Подключим jquery и общий js файл
-        $inPage->addHeadJS('includes/jquery/jquery.js');
-        $inPage->addHeadJS('core/js/common.js');
+        self::c('page')->addHeadJS('includes/jquery/jquery.js');
+        self::c('page')->addHeadJS('core/js/common.js');
 
         //проверяем что компонент указан
         if (!$this->component) { return false; }
@@ -865,21 +837,20 @@ class cmsCore {
         // Успешность выполнения должна определяться в методе execute плагина
         // Он должен вернуть true
         if(!cmsCore::callEvent(mb_strtoupper('get_'.$this->component.'_action_'.$this->do), false)){
-
+            
             self::loadModel($this->component);
 
-            require('components/'.$this->component.'/frontend.php');
+            require('components/'. $this->component .'/frontend.php');
 
             call_user_func($this->component);
 
         }
 
-        if(self::isAjax()){ cmsCore::halt(cmsCore::callEvent('AFTER_COMPONENT_'.mb_strtoupper($this->component), ob_get_clean())); }
+        if(self::isAjax()){ cmsCore::halt(cmsCore::callEvent('AFTER_COMPONENT_'. mb_strtoupper($this->component), ob_get_clean())); }
 
-        $inPage->page_body = cmsCore::callEvent('AFTER_COMPONENT_'.mb_strtoupper($this->component), ob_get_clean());
+        self::c('page')->page_body = cmsCore::callEvent('AFTER_COMPONENT_'. mb_strtoupper($this->component), ob_get_clean());
 
         return true;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -888,18 +859,16 @@ class cmsCore {
      * @return str
      */
     public function getComponentTitle() {
-
         // Заголовок меню
         $menutitle = $this->menuTitle();
         // Название компонента
-		foreach ($this->components as $inst_component){
-		   if($inst_component['link'] == $this->component){
-			  $component_title = $inst_component['title']; break;
-		   }
-		}
+        foreach ($this->components as $inst_component){
+            if($inst_component['link'] == $this->component){
+                $component_title = $inst_component['title']; break;
+            }
+        }
 
         return ($menutitle && $this->isMenuIdStrict()) ? $menutitle : $component_title;
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -926,12 +895,10 @@ class cmsCore {
      * @return object NS
      */
     public static function nestedSetsInit($table){
-
         self::includeFile('includes/nestedsets.php');
         $ns = new CCelkoNastedSet();
         $ns->TableName  = $table;
         return $ns;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -941,7 +908,7 @@ class cmsCore {
      * @return bool
      */
     public static function isSplash(){
-        if (cmsConfig::getConfig('splash')){
+        if (self::c('config')->splash){
             return !(self::getCookie('splash') || isset($_SESSION['splash']));
         } else { return false; }
     }
@@ -983,8 +950,18 @@ class cmsCore {
      * @param string $var
      * @return bool
      */
-    public static function inRequest($var){
-        return isset($_REQUEST[$var]);
+    public static function inRequest($var, $r = 'request'){
+        switch ($r){
+            case 'post':
+                return isset($_POST[$var]);
+            break;
+            case 'get':
+                return isset($_GET[$var]);
+            break;
+            default:
+                return isset($_REQUEST[$var]);
+            break;
+        }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1078,26 +1055,24 @@ class cmsCore {
      * @return str
      */
     public static function getSearchVar($search = '', $default='') {
+        $value = self::strClear(mb_strtolower(urldecode(self::request($search, 'html'))));
 
-		$value = self::strClear(mb_strtolower(urldecode(self::request($search, 'html'))));
+        $com = self::getInstance()->component;
 
-		$com = self::getInstance()->component;
+        if ($value) {
+            if($value == 'all'){
+                cmsUser::sessionDel($com.'_'.$search);
+                $value = '';
+            } else {
+                cmsUser::sessionPut($com.'_'.$search, $value);
+            }
+        } elseif(cmsUser::sessionGet($com.'_'.$search)) {
+            $value = cmsUser::sessionGet($com.'_'.$search);
+        } else {
+            $value = $default;
+        }
 
-		if ($value) {
-			if($value == 'all'){
-				cmsUser::sessionDel($com.'_'.$search);
-				$value = '';
-			} else {
-				cmsUser::sessionPut($com.'_'.$search, $value);
-			}
-		} elseif(cmsUser::sessionGet($com.'_'.$search)) {
-			$value = cmsUser::sessionGet($com.'_'.$search);
-		} else {
-			$value = $default;
-		}
-
-		return $value;
-
+        return $value;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1218,17 +1193,15 @@ class cmsCore {
      * @return array
      */
     public function loadModuleConfig($module_id){
-
         if (isset($this->module_configs[$module_id])) { return $this->module_configs[$module_id]; }
 
-        $config_yaml = cmsDatabase::getInstance()->get_field('cms_modules', "id='{$module_id}'", 'config');
+        $config_yaml = self::c('db')->get_field('cms_modules', "id='{$module_id}'", 'config');
 
         $config = self::yamlToArray($config_yaml);
 
         $this->cacheModuleConfig($module_id, $config);
 
         return $config;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1240,22 +1213,18 @@ class cmsCore {
      * @return bool
      */
     public function saveModuleConfig($module_id, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
         //конвертируем массив настроек в YAML
-		$config_yaml = $inDB->escape_string(self::arrayToYaml($config));
+        $config_yaml = self::c('db')->escape_string(self::arrayToYaml($config));
 
         //обновляем модуль в базе
         $update_query  = "UPDATE cms_modules
-                          SET config='{$config_yaml}'
-                          WHERE id = '{$module_id}'";
+                          SET config='". $config_yaml ."'
+                          WHERE id = '". $module_id ."'";
 
-        $inDB->query($update_query);
+        self::c('db')->query($update_query);
 
         //настройки успешно сохранены
         return true;
-
     }
 
     /**
@@ -1277,32 +1246,30 @@ class cmsCore {
      * @return float
      */
     public function loadComponentConfig($component){
-
         if (isset($this->component_configs[$component])) { return $this->component_configs[$component]; }
 
-		$config = array();
+        $config = array();
 
-		foreach ($this->components as $inst_component){
-			if($inst_component['link'] == $component){
-				$config = self::yamlToArray($inst_component['config']);
-				// проверяем настройки по умолчанию в модели
+        foreach ($this->components as $inst_component){
+            if($inst_component['link'] == $component){
+                $config = self::yamlToArray($inst_component['config']);
+                // проверяем настройки по умолчанию в модели
                 $is_model_loaded = true;
-				if(!class_exists('cms_model_'.$component)){
-					$is_model_loaded = self::loadModel($component);
-				}
-				if($is_model_loaded && method_exists('cms_model_'.$component, 'getDefaultConfig')){
-					$default_cfg = call_user_func(array('cms_model_'.$component, 'getDefaultConfig'));
-					$config = array_merge($default_cfg, $config);
-				}
-				$config['component_enabled'] = $inst_component['published'];
-				break;
-			}
-		}
+                if(!class_exists('cms_model_'.$component)){
+                    $is_model_loaded = self::loadModel($component);
+                }
+                if($is_model_loaded && method_exists('cms_model_'.$component, 'getDefaultConfig')){
+                    $default_cfg = call_user_func(array('cms_model_'.$component, 'getDefaultConfig'));
+                    $config = array_merge($default_cfg, $config);
+                }
+                $config['component_enabled'] = $inst_component['published'];
+                break;
+            }
+        }
 
         $this->cacheComponentConfig($component, $config);
 
         return $config;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1314,19 +1281,15 @@ class cmsCore {
      * @return bool
      */
     public function saveComponentConfig($component, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
         //конвертируем массив настроек в YAML
-		$config_yaml = $inDB->escape_string(self::arrayToYaml($config));
+        $config_yaml = self::c('db')->escape_string(self::arrayToYaml($config));
 
         //обновляем плагин в базе
         $update_query  = "UPDATE cms_components
-                          SET config='{$config_yaml}'
-                          WHERE link = '{$component}'";
+                          SET config='". $config_yaml ."'
+                          WHERE link = '". $component ."'";
 
-        return $inDB->query($update_query);
-
+        return self::c('db')->query($update_query);
     }
 
     /**
@@ -1349,15 +1312,13 @@ class cmsCore {
      * @return array or false
      */
     public static function getFilters(){
-
         if(isset(self::$filters)) { return self::$filters; }
 
-        $inDB   = cmsDatabase::getInstance();
         $sql    = "SELECT * FROM cms_filters WHERE published = 1 ORDER BY id ASC";
-        $result = $inDB->query($sql);
+        $result = self::c('db')->query($sql);
         $filters = array();
-        if($inDB->num_rows($result)){
-            while($f = $inDB->fetch_assoc($result)){
+        if(self::c('db')->num_rows($result)){
+            while($f = self::c('db')->fetch_assoc($result)){
                 $filters[$f['id']] = $f;
             }
         }
@@ -1365,7 +1326,6 @@ class cmsCore {
         self::$filters = $filters;
 
         return $filters;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1395,15 +1355,11 @@ class cmsCore {
      * @return int
      */
     public static function fileDownloadCount($fileurl){
-
-        $inDB = cmsDatabase::getInstance();
-
-        $fileurl = $inDB->escape_string($fileurl);
-
-		$hits = $inDB->get_field('cms_downloads', "fileurl = '{$fileurl}'", 'hits');
-
-		return $hits ? $hits : 0;
-
+        $fileurl = self::c('db')->escape_string($fileurl);
+        
+        $hits = self::c('db')->get_field('cms_downloads', "fileurl = '". $fileurl ."'", 'hits');
+        
+        return $hits ? $hits : 0;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1453,19 +1409,17 @@ class cmsCore {
      * в случае остутствия у группы доступа к текущему пункту меню
      */
     public function checkMenuAccess(){
-        $inPage = cmsPage::getInstance();
-        
         if (!$this->menu_item) { return true; }
         
         $access_list = $this->menu_item['access_list'];
         
         if (!self::checkContentAccess($access_list)) {
-            $inPage->addHeadJS('includes/jquery/jquery.js');
-            $inPage->addHeadJS('core/js/common.js');
+            self::c('page')->addHeadJS('includes/jquery/jquery.js');
+            self::c('page')->addHeadJS('core/js/common.js');
             
             ob_start();
-            cmsPage::includeTemplateFile('special/accessdenied.php');
-            $inPage->page_body = ob_get_clean();
+                cmsPage::includeTemplateFile('special/accessdenied.php');
+            self::c('page')->page_body = ob_get_clean();
             
             return false;
         }else{
@@ -1618,20 +1572,16 @@ class cmsCore {
      * Загружает всю структуру меню
      */
     private function loadMenuStruct(){
-
         if (is_array($this->menu_struct)){ return; }
 
-        $inDB = cmsDatabase::getInstance();
+        $result = self::c('db')->query("SELECT * FROM cms_menu ORDER BY id ASC");
+        if (!self::c('db')->num_rows($result)){ return; }
 
-        $result = $inDB->query("SELECT * FROM cms_menu ORDER BY id ASC");
-        if (!$inDB->num_rows($result)){ return; }
-
-        while ($item = $inDB->fetch_assoc($result)){
+        while ($item = self::c('db')->fetch_assoc($result)){
             $this->menu_struct[$item['id']] = $item;
         }
 
         return;
-
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1656,16 +1606,15 @@ class cmsCore {
      * @return html
      */
     public static function getListItems($table, $selected=0, $order_by='id', $order_to='ASC', $where='', $id_field='id', $title_field='title'){
-        $inDB = cmsDatabase::getInstance();
         $html = '';
         $sql  = "SELECT {$id_field}, {$title_field} FROM {$table} \n";
         if ($where){
             $sql .= "WHERE {$where} \n";
         }
         $sql .= "ORDER BY {$order_by} {$order_to}";
-        $result = $inDB->query($sql) ;
+        $result = self::c('db')->query($sql) ;
 
-        while($item = $inDB->fetch_assoc($result)){
+        while($item = self::c('db')->fetch_assoc($result)){
             if (@$selected==$item[$id_field]){
                 $s = 'selected="selected"';
             } else {
@@ -1688,20 +1637,19 @@ class cmsCore {
      * @return html
      */
     public function getListItemsNS($table, $selected=0, $differ='', $need_field='', $rootid=0, $no_padding=false){
-        $inDB = cmsDatabase::getInstance();
         $html = '';
         $nested_sets = $this->nestedSetsInit($table);
 
         $lookup = "parent_id=0 AND NSDiffer='{$differ}'";
 
-        if(!$rootid) { $rootid = $inDB->get_field($table, $lookup, 'id'); }
+        if(!$rootid) { $rootid = self::c('db')->get_field($table, $lookup, 'id'); }
 
         if(!$rootid) { return; }
 
         $rs_rows = $nested_sets->SelectSubNodes($rootid);
 
         if ($rs_rows){
-            while($node = $inDB->fetch_assoc($rs_rows)){
+            while($node = self::c('db')->fetch_assoc($rs_rows)){
                 if (!$need_field || $node[$need_field]){
                     if (@$selected==$node['id']){
                         $s = 'selected="selected"';
@@ -1757,16 +1705,14 @@ class cmsCore {
      * @return boolean
      */
     public static function registerRatingsTarget($target, $component, $target_title, $is_user_affect=true, $user_weight=1, $target_table='') {
-
         $is_user_affect = (int)$is_user_affect;
 
         $sql  = "INSERT IGNORE INTO cms_rating_targets (target, component, is_user_affect, user_weight, target_table, target_title)
                  VALUES ('$target', '$component', '$is_user_affect', '$user_weight', '$target_table', '$target_title')";
 
-        cmsDatabase::getInstance()->query($sql);
+        self::c('db')->query($sql);
 
         return true;
-
     }
 
     /**
@@ -1776,17 +1722,9 @@ class cmsCore {
      * @return boolean
      */
     public static function deleteRatings($target, $item_id){
-
-        $inDB = cmsDatabase::getInstance();
-
-        $sql  = "DELETE FROM cms_ratings WHERE target='{$target}' AND item_id='{$item_id}'";
-        $inDB->query($sql);
-
-        $sql  = "DELETE FROM cms_ratings_total WHERE target='{$target}' AND item_id='{$item_id}'";
-        $inDB->query($sql);
-
+        self::c('db')->query("DELETE FROM cms_ratings WHERE target='". $target ."' AND item_id='". $item_id ."'");
+        self::c('db')->query("DELETE FROM cms_ratings_total WHERE target='". $target ."' AND item_id='". $item_id ."'");
         return true;
-
     }
 
 
@@ -1813,20 +1751,16 @@ class cmsCore {
      * @param string $title - название цели в родительном падеже (например "вашей статьи")
      */
     public static function registerCommentsTarget($target, $component, $title, $target_table, $subj) {
-
         $sql  = "INSERT IGNORE INTO cms_comment_targets (target, component, title, target_table, subj)
                  VALUES ('$target', '$component', '$title', '$target_table', '$subj')";
 
-        cmsDatabase::getInstance()->query($sql);
+        self::c('db')->query($sql);
 
         return true;
-
     }
 
     public static function getCommentsTargets() {
-
-        return cmsDatabase::getInstance()->get_table('cms_comment_targets', 'id>0', '*');
-
+        return self::c('db')->get_table('cms_comment_targets', 'id>0', '*');
     }
 
     /**
@@ -1836,22 +1770,19 @@ class cmsCore {
      * @return boolean
      */
     public static function deleteComments($target, $target_id){
-
-        $inDB = cmsDatabase::getInstance();
-
-		$comments = $inDB->get_table('cms_comments', "target='{$target}' AND target_id='{$target_id}'", 'id');
+        $comments = self::c('db')->get_table('cms_comments', "target='". $target ."' AND target_id='". $target_id ."'", 'id');
+        
         if (!$comments){ return false; }
 
-		self::loadClass('actions');
+        self::loadClass('actions');
 
-		foreach($comments as $comment){
-			cmsActions::removeObjectLog('add_comment', $comment['id']);
-		}
+        foreach($comments as $comment){
+            cmsActions::removeObjectLog('add_comment', $comment['id']);
+        }
 
-		$inDB->delete('cms_comments', "target='{$target}' AND target_id='{$target_id}'");;
+        self::c('db')->delete('cms_comments', "target='". $target ."' AND target_id='". $target_id ."'");;
 
         return true;
-
     }
 
     /**
@@ -1861,13 +1792,11 @@ class cmsCore {
      * @return int
      */
     public static function getCommentsCount($target, $target_id){
-
         if (self::getInstance()->isComponentInstalled('comments')){
 
-	        return cmsDatabase::getInstance()->rows_count('cms_comments', "target = '$target' AND target_id = '$target_id' AND published = 1");
+            return self::c('db')->rows_count('cms_comments', "target = '$target' AND target_id = '$target_id' AND published = 1");
 
         } else { return 0; }
-
     }
 
     // UTILS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1892,7 +1821,7 @@ class cmsCore {
     }
 
     public function isModuleInstalled($module) {
-        return (bool)cmsDatabase::getInstance()->rows_count('cms_modules', "content='{$module}' AND user=0", 1);
+        return (bool)self::c('db')->rows_count('cms_modules', "content='{$module}' AND user=0", 1);
     }
 
     // DATE METHODS /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1911,61 +1840,62 @@ class cmsCore {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     static function dateFormat($date, $is_full_m = true, $is_time=false, $is_now_time = true){
-
-        $inConf = cmsConfig::getInstance();
-
         global $_LANG;
 
-		// формируем входную $date с учетом смещения
-        $date = date('Y-m-d H:i:s', strtotime($date)+($inConf->timediff*3600));
+        // формируем входную $date с учетом смещения
+        $date = date('Y-m-d H:i:s', strtotime($date)+(self::c('config')->timediff*3600));
 
-		// сегодняшняя дата
-		$today     = date('Y-m-d', strtotime(date('Y-m-d H:i:s'))+($inConf->timediff*3600));
-		// вчерашняя дата
-		$yesterday = date('Y-m-d', strtotime(date('Y-m-d H:i:s'))-(86400)+($inConf->timediff*3600));
+        // сегодняшняя дата
+        $today     = date('Y-m-d', strtotime(date('Y-m-d H:i:s'))+(self::c('config')->timediff*3600));
+        // вчерашняя дата
+        $yesterday = date('Y-m-d', strtotime(date('Y-m-d H:i:s'))-(86400)+(self::c('config')->timediff*3600));
 
-		// получаем значение даты и времени
-		list($day, $time) = explode(' ', $date);
-		switch( $day ) {
+        // получаем значение даты и времени
+        list($day, $time) = explode(' ', $date);
+        switch( $day ) {
             // Если дата совпадает с сегодняшней
             case $today:
-                    $result = $_LANG['TODAY'];
-                    if ($is_now_time && $time) {
-                        list($h, $m, $s)  = explode(':', $time);
-                        $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
-                    }
-                    break;
+                $result = $_LANG['TODAY'];
+                if ($is_now_time && $time) {
+                    list($h, $m, $s)  = explode(':', $time);
+                    $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
+                }
+                break;
             //Если дата совпадает со вчерашней
             case $yesterday:
-                    $result = $_LANG['YESTERDAY'];
-                    if ($is_now_time && $time) {
-                        list($h, $m, $s)  = explode(':', $time);
-                        $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
-                    }
-                    break;
-			default: {
-				// Разделяем отображение даты на составляющие
-				list($y, $m, $d)  = explode('-', $day);
+                $result = $_LANG['YESTERDAY'];
+                if ($is_now_time && $time) {
+                    list($h, $m, $s)  = explode(':', $time);
+                    $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
+                }
+                break;
+            default: {
+                // Разделяем отображение даты на составляющие
+                list($y, $m, $d)  = explode('-', $day);
+                
                 // Замена числового обозначения месяца на словесное (склоненное в падеже)
                 if ($is_full_m){
                     $m = $_LANG['MONTH_'.$m];
                 }else{
                     $m = $_LANG['MONTH_'.$m.'_SHORT'];
                 }
-				// Замена чисел 01 02 на 1 2
+                
+                // Замена чисел 01 02 на 1 2
                 $d = sprintf("%2d", $d);
-				// Формирование окончательного результата
-				$result = $d.' '.$m.' '.$y;
-				if( $is_time && $time)   {
-					// Получаем отдельные составляющие времени
-					// Секунды нас не интересуют
-					list($h, $m, $s)  = explode(':', $time);
-					$result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
-				}
-			}
-		}
+                
+                // Формирование окончательного результата
+                $result = $d.' '.$m.' '.$y;
+                if( $is_time && $time)   {
+                    // Получаем отдельные составляющие времени
+                    // Секунды нас не интересуют
+                    list($h, $m, $s)  = explode(':', $time);
+                    $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
+                }
+            }
+        }
+        
         return $result;
-	}
+    }
 
     /**
      * Возвращает день недели по дате
@@ -1987,9 +1917,8 @@ class cmsCore {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static function initAutoGrowText($element_id){
-        $inPage = cmsPage::getInstance();
-        $inPage->addHeadJS('includes/jquery/autogrow/jquery.autogrow.js');
-        $inPage->addHead('<script type="text/javascript">$(document).ready (function() {$(\''.$element_id.'\').autogrow(); });</script>');
+        self::c('page')->addHeadJS('includes/jquery/autogrow/jquery.autogrow.js');
+        self::c('page')->addHead('<script type="text/javascript">$(document).ready (function() {$(\''.$element_id.'\').autogrow(); });</script>');
         return true;
     }
 
@@ -2000,17 +1929,13 @@ class cmsCore {
      * @return bool
      */
     public static function checkUserAccess($content_type, $content_id){
+        if (self::c('user')->is_admin) { return true; }
 
-        $inUser = cmsUser::getInstance();
+        $access = self::c('db')->get_table('cms_content_access', "content_type = '". $content_type ."' AND content_id = '". $content_id ."'", 'group_id');
 
-		if ($inUser->is_admin) { return true; }
+        if (!$access || !is_array($access)) { return true; }
 
-		$access = cmsDatabase::getInstance()->get_table('cms_content_access', "content_type = '$content_type' AND content_id = '$content_id'", 'group_id');
-
-		if (!$access || !is_array($access)) { return true; }
-
-		return in_array(array('group_id' => $inUser->group_id), $access);
-
+        return in_array(array('group_id' => self::c('user')->group_id), $access);
     }
     /**
      * Устанавливает права доступа
@@ -2023,7 +1948,7 @@ class cmsCore {
         self::clearAccess($id, $content_type);
 
         foreach ($showfor_list as $key=>$value){
-            cmsDatabase::getInstance()->insert('cms_content_access', array('content_id'=>$id, 'content_type'=>$content_type, 'group_id'=>$value));
+            self::c('db')->insert('cms_content_access', array('content_id'=>$id, 'content_type'=>$content_type, 'group_id'=>$value));
         }
 
         return true;
@@ -2033,25 +1958,19 @@ class cmsCore {
      * @return bool
      */
     public static function clearAccess($id, $content_type){
-
-        return cmsDatabase::getInstance()->delete('cms_content_access', "content_id = '$id' AND content_type = '$content_type'");
-
+        return self::c('db')->delete('cms_content_access', "content_id = '$id' AND content_type = '$content_type'");
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static function checkAccessByIp($allow_ips = ''){
+        if(!self::c('user')->ip) { return false; }
 
-		$inUser = cmsUser::getInstance();
+        $allow_ips = str_replace(' ', '', $allow_ips);
+        if (!$allow_ips) { return true; }
+        $allow_ips = explode(',', $allow_ips);
 
-		if(!$inUser->ip) { return false; }
-
-		$allow_ips = str_replace(' ', '', $allow_ips);
-		if (!$allow_ips) { return true; }
-		$allow_ips = explode(',', $allow_ips);
-
-		return in_array($inUser->ip, $allow_ips);
-
+        return in_array(self::c('user')->ip, $allow_ips);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2062,20 +1981,16 @@ class cmsCore {
      * @return bool
      */
     public static function checkContentAccess($access_list){
+        // если $access_list пуста, то считаем что доступ для всех
+        if (!$access_list) { return true; }
 
-		$inUser = cmsUser::getInstance();
-
-		// если $access_list пуста, то считаем что доступ для всех
-		if (!$access_list) { return true; }
-
-		// администраторам всегда показываем модуль
-		if ($inUser->is_admin) { return true; }
+        // администраторам всегда показываем модуль
+        if (self::c('user')->is_admin) { return true; }
 
         // можем передавать как YAML так и сформированный массив
         $access_list = is_array($access_list) ? $access_list : self::yamlToArray($access_list);
 
-		return in_array($inUser->group_id, $access_list);
-
+        return in_array(self::c('user')->group_id, $access_list);
     }
 
     // SECURITY /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2098,7 +2013,7 @@ class cmsCore {
         $string = (@get_magic_quotes_gpc()) ? stripslashes($string) : $string;
         $string = rtrim($string, ' \\');
         if ($strip_tags) {
-            $string = cmsDatabase::getInstance()->escape_string(strip_tags($string));
+            $string = self::c('db')->escape_string(strip_tags($string));
         }
         return $string;
 
@@ -2121,8 +2036,8 @@ class cmsCore {
      */
     public static function badTagClear($string){
 
-		$my_domen_regexp = str_replace('.', '\.', HOST);
-		$my_domen_regexp = str_replace('/', '\/', $my_domen_regexp);
+        $my_domen_regexp = str_replace('.', '\.', HOST);
+        $my_domen_regexp = str_replace('/', '\/', $my_domen_regexp);
 
         $bad_tags = array (
             "'<script[^>]*?>.*?</script>'siu",
@@ -2142,60 +2057,66 @@ class cmsCore {
      * @param string $text
      * @return string
      */
-    public static function htmlCleanUp($text){
+    public static function htmlCleanUp($text, $allowTags='', $TagCutWithContent=''){
+        
+        if(!isset(self::$classes['jevix'])){
+            // Устанавливаем разрешённые теги. (Все не разрешенные теги считаются запрещенными.)
+            self::c('jevix')->cfgAllowTags(empty($allowTags) ? explode(',', self::c('config')->JevixAllowTags) : $allowTags);
+            
+            // Устанавливаем коротие теги. (не имеющие закрывающего тега)
+            self::c('jevix')->cfgSetTagShort(array('br','img', 'hr', 'input'));
+            // Устанавливаем преформатированные теги. (в них все будет заменятся на HTML сущности)
+            self::c('jevix')->cfgSetTagPreformatted(array('code','video'));
+            
+            // Устанавливаем теги, которые необходимо вырезать из текста вместе с контентом.
+            self::c('jevix')->cfgSetTagCutWithContent(empty($TagCutWithContent) ? explode(',', self::c('config')->JevixTagCutWithContent) : $TagCutWithContent);
+            
+            // Устанавливаем разрешённые параметры тегов. Также можно устанавливать допустимые значения этих параметров.
+            self::c('jevix')->cfgAllowTagParams('input', array('type'=>'#text', 'style', 'onclick' => '#text', 'value' => '#text'));
+            self::c('jevix')->cfgAllowTagParams('a', array('class' => '#text', 'title', 'href', 'style', 'rel' => '#text', 'name' => '#text'));
+            self::c('jevix')->cfgAllowTagParams('img', array('src' => '#text', 'style', 'alt' => '#text', 'title', 'align' => array('right', 'left', 'center'), 'width' => '#int', 'height' => '#int', 'hspace' => '#int', 'vspace' => '#int'));
+            self::c('jevix')->cfgAllowTagParams('div', array('class' => '#text', 'style','align' => array('right', 'left', 'center')));
+            self::c('jevix')->cfgAllowTagParams('object', array('width' => '#int', 'height' => '#int', 'data' => '#text'));
+            self::c('jevix')->cfgAllowTagParams('param', array('name' => '#text', 'value' => '#text'));
+            self::c('jevix')->cfgAllowTagParams('embed', array('src' => '#image','type' => '#text','allowscriptaccess' => '#text','allowFullScreen' => '#text','width' => '#int','height' => '#int','flashvars'=> '#text','wmode'=> '#text'));
+            self::c('jevix')->cfgAllowTagParams('acronym', array('title'));
+            self::c('jevix')->cfgAllowTagParams('abbr', array('title'));
+            self::c('jevix')->cfgAllowTagParams('span', array('style'));
+            self::c('jevix')->cfgAllowTagParams('li', array('style'));
+            self::c('jevix')->cfgAllowTagParams('p', array('style'));
+            self::c('jevix')->cfgAllowTagParams('table', array('width'=>'#int', 'class' => '#text', 'cellpadding'=>'#int', 'cellspacing'=>'#int', 'align',  'border'=>'#int'));
+            self::c('jevix')->cfgAllowTagParams('caption', array('class' => '#text','style'));
+            self::c('jevix')->cfgAllowTagParams('th', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
+            self::c('jevix')->cfgAllowTagParams('tr', array('class' => '#text','style'));
+            self::c('jevix')->cfgAllowTagParams('td', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
+            self::c('jevix')->cfgAllowTagParams('iframe', array('width' => '#int', 'frameborder' => '#int', 'allowfullscreen' => '#int', 'height' => '#int', 'src' => array('#domain'=>array('youtube.com','vimeo.com','vk.com', self::getHost()))));
+            
+            // Устанавливаем параметры тегов являющиеся обязательными. Без них вырезает тег оставляя содержимое.
+            self::c('jevix')->cfgSetTagParamsRequired('img', 'src');
+            
+            // Устанавливаем теги которые может содержать тег контейнер
+            self::c('jevix')->cfgSetTagChilds('ul',array('li'),false,true);
+            self::c('jevix')->cfgSetTagChilds('ol',array('li'),false,true);
+            self::c('jevix')->cfgSetTagChilds('object','param',false,true);
+            self::c('jevix')->cfgSetTagChilds('object','embed',false,false);
+            
+            // Если нужно оставлять пустые не короткие теги
+            self::c('jevix')->cfgSetTagIsEmpty(array('param','embed','a','iframe'));
+            self::c('jevix')->cfgSetTagParamDefault('embed','wmode','opaque',true);
+            
+            // Устанавливаем автозамену
+            self::c('jevix')->cfgSetAutoReplace(array('+/-', '(c)', '(с)', '(r)', '(C)', '(С)', '(R)'), array('±', '©', '©', '®', '©', '©', '®'));
+            // выключаем режим замены переноса строк на тег <br/>
+            self::c('jevix')->cfgSetAutoBrMode(false);
+            // выключаем режим автоматического определения ссылок
+            self::c('jevix')->cfgSetAutoLinkMode(false);
+            
+            // Отключаем типографирование в определенном теге
+            self::c('jevix')->cfgSetTagNoTypography('code','video','object','iframe');
+        }
 
-		if(!isset(self::$jevix)){
-			self::loadClass('jevix');
-			self::$jevix = new Jevix();
-			// Устанавливаем разрешённые теги. (Все не разрешенные теги считаются запрещенными.)
-			self::$jevix->cfgAllowTags(array('p','a','img','i','b','u','s','strike','video','em','strong','nobr','li','ol','ul','div','abbr','sup','sub','acronym','h1','h2','h3','h4','h5','h6','br','hr','pre','code','object','param','embed','blockquote','iframe','span','input','table','caption','th','tr','td'));
-			// Устанавливаем коротие теги. (не имеющие закрывающего тега)
-			self::$jevix->cfgSetTagShort(array('br','img', 'hr', 'input'));
-			// Устанавливаем преформатированные теги. (в них все будет заменятся на HTML сущности)
-			self::$jevix->cfgSetTagPreformatted(array('code','video'));
-			// Устанавливаем теги, которые необходимо вырезать из текста вместе с контентом.
-			self::$jevix->cfgSetTagCutWithContent(array('script', 'style', 'meta'));
-			// Устанавливаем разрешённые параметры тегов. Также можно устанавливать допустимые значения этих параметров.
-			self::$jevix->cfgAllowTagParams('input', array('type'=>'#text', 'style', 'onclick' => '#text', 'value' => '#text'));
-			self::$jevix->cfgAllowTagParams('a', array('class' => '#text', 'title', 'href', 'style', 'rel' => '#text', 'name' => '#text'));
-			self::$jevix->cfgAllowTagParams('img', array('src' => '#text', 'style', 'alt' => '#text', 'title', 'align' => array('right', 'left', 'center'), 'width' => '#int', 'height' => '#int', 'hspace' => '#int', 'vspace' => '#int'));
-			self::$jevix->cfgAllowTagParams('div', array('class' => '#text', 'style','align' => array('right', 'left', 'center')));
-			self::$jevix->cfgAllowTagParams('object', array('width' => '#int', 'height' => '#int', 'data' => '#text'));
-			self::$jevix->cfgAllowTagParams('param', array('name' => '#text', 'value' => '#text'));
-			self::$jevix->cfgAllowTagParams('embed', array('src' => '#image','type' => '#text','allowscriptaccess' => '#text','allowFullScreen' => '#text','width' => '#int','height' => '#int','flashvars'=> '#text','wmode'=> '#text'));
-			self::$jevix->cfgAllowTagParams('acronym', array('title'));
-			self::$jevix->cfgAllowTagParams('abbr', array('title'));
-			self::$jevix->cfgAllowTagParams('span', array('style'));
-			self::$jevix->cfgAllowTagParams('li', array('style'));
-			self::$jevix->cfgAllowTagParams('p', array('style'));
-			self::$jevix->cfgAllowTagParams('table', array('width'=>'#int', 'class' => '#text', 'cellpadding'=>'#int', 'cellspacing'=>'#int', 'align',  'border'=>'#int'));
-			self::$jevix->cfgAllowTagParams('caption', array('class' => '#text','style'));
-			self::$jevix->cfgAllowTagParams('th', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
-			self::$jevix->cfgAllowTagParams('tr', array('class' => '#text','style'));
-			self::$jevix->cfgAllowTagParams('td', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
-			self::$jevix->cfgAllowTagParams('iframe', array('width' => '#int', 'frameborder' => '#int', 'allowfullscreen' => '#int', 'height' => '#int', 'src' => array('#domain'=>array('youtube.com','vimeo.com','vk.com', self::getHost()))));
-			// Устанавливаем параметры тегов являющиеся обязательными. Без них вырезает тег оставляя содержимое.
-			self::$jevix->cfgSetTagParamsRequired('img', 'src');
-			// Устанавливаем теги которые может содержать тег контейнер
-			self::$jevix->cfgSetTagChilds('ul',array('li'),false,true);
-			self::$jevix->cfgSetTagChilds('ol',array('li'),false,true);
-			self::$jevix->cfgSetTagChilds('object','param',false,true);
-			self::$jevix->cfgSetTagChilds('object','embed',false,false);
-			// Если нужно оставлять пустые не короткие теги
-			self::$jevix->cfgSetTagIsEmpty(array('param','embed','a','iframe'));
-			self::$jevix->cfgSetTagParamDefault('embed','wmode','opaque',true);
-			// Устанавливаем автозамену
-			self::$jevix->cfgSetAutoReplace(array('+/-', '(c)', '(с)', '(r)', '(C)', '(С)', '(R)'), array('±', '©', '©', '®', '©', '©', '®'));
-			// выключаем режим замены переноса строк на тег <br/>
-			self::$jevix->cfgSetAutoBrMode(false);
-			// выключаем режим автоматического определения ссылок
-			self::$jevix->cfgSetAutoLinkMode(false);
-			// Отключаем типографирование в определенном теге
-			self::$jevix->cfgSetTagNoTypography('code','video','object','iframe');
-		}
-
-        return self::$jevix->parse($text,$errors);
-
+        return self::c('jevix')->parse($text,$errors);
+        
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2301,33 +2222,29 @@ class cmsCore {
      * и формирует предустановки
      */
     private static function initMailSystem(){
-
-        $inConf = cmsConfig::getInstance();
-
         self::includeFile('includes/phpmailer/class.phpmailer.php');
 
         $mailer = new PHPMailer();
         $mailer->CharSet = 'UTF-8';
-        $mailer->SetFrom($inConf->sitemail,
-                            ($inConf->sitemail_name ?
-                                $inConf->sitemail_name : $inConf->sitename));
+        $mailer->SetFrom(self::c('config')->sitemail,
+                            (self::c('config')->sitemail_name ?
+                                self::c('config')->sitemail_name : self::c('config')->sitename));
 
-        if ($inConf->mailer == 'smtp') {
+        if (self::c('config')->mailer == 'smtp') {
             $mailer->IsSMTP();
-            $mailer->Host          = $inConf->smtphost;
-            $mailer->Port          = $inConf->smtpport;
-            $mailer->SMTPAuth      = (bool)$inConf->smtpauth;
+            $mailer->Host          = self::c('config')->smtphost;
+            $mailer->Port          = self::c('config')->smtpport;
+            $mailer->SMTPAuth      = (bool)self::c('config')->smtpauth;
             $mailer->SMTPKeepAlive = true;
-            $mailer->Username      = $inConf->smtpuser;
-            $mailer->Password      = $inConf->smtppass;
-            $mailer->SMTPSecure    = $inConf->smtpsecure;
+            $mailer->Username      = self::c('config')->smtpuser;
+            $mailer->Password      = self::c('config')->smtppass;
+            $mailer->SMTPSecure    = self::c('config')->smtpsecure;
         }
-        if ($inConf->mailer == 'sendmail') {
+        if (self::c('config')->mailer == 'sendmail') {
             $mailer->IsSendmail();
         }
 
         return $mailer;
-
     }
     
     
@@ -2337,15 +2254,17 @@ class cmsCore {
      * Добавляет запись о загружаемом изображении
      * @return bool
      */
-    public static function registerUploadImages($target_id, $target, $fileurl, $component, $table='cms_upload_images'){
-        return cmsDatabase::getInstance()->insert(
-            $table,
+    public static function registerUploadImages($target_id, $target, $fileurl, $component, $user_id=false){
+        return self::c('db')->insert(
+            'cms_upload_images',
             array(
                 'target_id' => $target_id,
                 'session_id' => session_id(),
                 'fileurl' => $fileurl,
                 'component' => $component,
-                'target' => $target
+                'target' => $target,
+                'user_id' => (empty($user_id) ? self::c('user')->id : $user_id),
+                'pubdate' => date('Y-m-d H:i:s')
             )
         );
     }
@@ -2354,31 +2273,31 @@ class cmsCore {
      * Устанавливает ID места назначения к загруженному изображению
      * @return bool
      */
-    public static function setIdUploadImage($target, $target_id, $table='cms_upload_images'){
-        return cmsDatabase::getInstance()->query("UPDATE ". $table ." SET target_id = '". $target_id ."' WHERE session_id = '". session_id() ."' AND target = '". $target ."' AND target_id = 0");
+    public static function setIdUploadImage($target, $target_id, $component){
+        return self::c('db')->query("UPDATE `cms_upload_images` SET `target_id` = '". $target_id ."' WHERE `session_id` = '". session_id() ."' AND `target` = '". $target ."' AND `component` = '". $component ."' AND target_id = 0");
     }
     
     /**
      * Возвращает количество загруженных изображений для текущей сессии данного места назначения
      * @return int
      */
-    public static function getTargetCount($target_id=0, $target=false, $table='cms_upload_images'){
-        if ($table !== 'cms_upload_images'){
-            return cmsDatabase::getInstance()->rows_count($table, "target_id = '". (int)$target_id ."'". ($target_id == 0 ? " AND session_id = '". session_id() ."'" : '') . ($target === false ? '' : " AND target = '". $target ."'"));
-        }
-        return cmsDatabase::getInstance()->rows_count($table, "target_id = '". (int)$target_id ."' AND session_id = '". session_id() ."'". ($target === false ? '' : " AND target = '". $target ."'"));
+    public static function getTargetCount($target_id=0, $target='', $component=''){
+        return self::c('db')->rows_count('cms_upload_images', "`target_id` = '". (int)$target_id ."' AND `session_id` = '". session_id() ."' AND `target` = '". $target ."'". (!empty($component) ? " AND `component` = '". $component ."'" : ""));
     }
     
-    public static function getUploadImages($target_id=0, $target=false, $table='cms_upload_images', $component='content'){
-        $inDB = cmsDatabase::getInstance();
-        $rs = $inDB->query("SELECT * FROM ". $table ." WHERE target_id = '". $target_id ."'". ($target_id == 0 ? " AND session_id = '". session_id() ."'" : '') . ($target === false ? '' : " AND target='". $target ."'") ." ORDER BY id ASC");
+    public static function getUploadImages($target_id=0, $target=false, $component=''){
+        $rs = self::c('db')->query("SELECT * FROM `cms_upload_images` WHERE `target_id` = '". $target_id ."'". ($target_id == 0 ? " AND `session_id` = '". session_id() ."'" : '') . ($target === false ? '' : " AND `target` = '". $target ."'") ." ". (!empty($component) ? " AND `component` = '". $component ."'" : "") ." ORDER BY id ASC");
         
-        if ($inDB->num_rows($rs)){
+        if (self::c('db')->num_rows($rs)){
             $items = array();
-            while($item = $inDB->fetch_assoc($rs)){
-                $item['small_src'] = '/upload/'. $component .'/small/'. $item['fileurl'];
-                $item['medium_src'] = '/upload/'. $component .'/medium/'. $item['fileurl'];
-                $item['big_src'] = '/upload/'. $component .'/big/'. $item['fileurl'];
+            while($item = self::c('db')->fetch_assoc($rs)){
+                if (!mb_substr($item['fileurl'], 0, 7) != '/upload'){
+                    $item['small_src'] = '/upload/'. $component .'/small/'. $item['fileurl'];
+                    $item['medium_src'] = '/upload/'. $component .'/medium/'. $item['fileurl'];
+                    $item['big_src'] = '/upload/'. $component .'/big/'. $item['fileurl'];
+                }else{
+                    $item['big_src'] = $item['medium_src'] = $item['small_src'] = $item['fileurl'];
+                }
                 $items[$item['id']] = $item;
             }
             return $items;
@@ -2391,35 +2310,41 @@ class cmsCore {
      * Удаляет все изображения места их назначения
      * @return bool
      */
-    public static function deleteUploadImages($target_id, $target, $table='cms_upload_images', $component='content'){
-        $inDB = cmsDatabase::getInstance();
+    public static function deleteUploadImages($target_id, $target, $component=''){
+        $rs = self::c('db')->query("SELECT * FROM `cms_upload_images` WHERE `target_id` = '". $target_id ."' AND `target` = '". $target ."'". (!empty($component) ? " AND `component` = '". $component ."'" : ""));
         
-        $rs = $inDB->query("SELECT * FROM ". $table ." WHERE target_id = '". $target_id ."' AND target='". $target ."'");
-        
-        if ($inDB->num_rows($rs)){
-        
-            if ($table !== 'cms_upload_images'){
-                while($file = $inDB->fetch_assoc($rs)){
-                    if (file_exists(PATH .'/upload/'. $component .'/small/'. $file['fileurl'])){
-                        unlink(PATH .'/upload/'. $component .'/small/'. $file['fileurl']);
-                    }
-                    if (file_exists(PATH .'/upload/'. $component .'/medium/'. $file['fileurl'])){
-                        unlink(PATH .'/upload/'. $component .'/medium/'. $file['fileurl']);
-                    }
-                    if (file_exists(PATH .'/upload/'. $component .'/big/'. $file['fileurl'])){
-                        unlink(PATH .'/upload/'. $component .'/big/'. $file['fileurl']);
-                    }
-                }
-            }else{
-                while($file = $inDB->fetch_assoc($rs)){
-                    $filename = PATH.$file['fileurl'];
-                    if (file_exists($filename)){ unlink($filename); }
-                }
+        if (self::c('db')->num_rows($rs)){
+
+            while($file = self::c('db')->fetch_assoc($rs)){
+                self::deleteUploadImage($file['fileurl'], $component);
+                
             }
 
-            $inDB->query("DELETE FROM ". $table ." WHERE target_id = '". $target_id ."' AND target='". $target ."'");
+            self::c('db')->query("DELETE FROM `cms_upload_images` WHERE `target_id` = '". $target_id ."' AND `target` = '". $target ."'". (!empty($component) ? " AND `component` = '". $component ."'" : ""));
         }
         return true;
+    }
+    
+    public static function deleteUploadImage($fileurl, $component){
+        if (!mb_substr($fileurl, 0, 7) != '/upload'){
+
+            if (file_exists(PATH .'/upload/'. $component .'/small/'. $fileurl)){
+                unlink(PATH .'/upload/'. $component .'/small/'. $fileurl);
+            }
+            if (file_exists(PATH .'/upload/'. $component .'/medium/'. $fileurl)){
+                unlink(PATH .'/upload/'. $component .'/medium/'. $fileurl);
+            }
+            if (file_exists(PATH .'/upload/'. $component .'/big/'. $fileurl)){
+                unlink(PATH .'/upload/'. $component .'/big/'. $fileurl);
+            }
+
+        }else{
+
+            if (file_exists(PATH . $fileurl)){
+                unlink(PATH . $fileurl);
+            }
+
+        }
     }
     
     /**
@@ -2428,7 +2353,7 @@ class cmsCore {
      * @param string $table
      * @return boolean
      */
-    public static function requestUploadImgTitles($target_id, $table){
+    public static function requestUploadImgTitles($target_id, $component){
         $data = array();
         
         $titles = self::request('ajax_file_title', 'array_str');
@@ -2449,13 +2374,18 @@ class cmsCore {
         }
         
         if (!empty($data)){
-            $inDB = cmsDatabase::getInstance();
             foreach ($data as $k=>$v){
-                $inDB->query("UPDATE ". $table ." SET title='". (empty($data[$k]['title']) ? '' : $inDB->escape_string($data[$k]['title'])) ."', description='". (empty($data[$k]['description']) ? '' : $inDB->escape_string($data[$k]['description'])) ."' WHERE id='". $k ."' AND target_id='". $target_id ."'");
+                self::c('db')->query("UPDATE `cms_upload_images` SET title='". (empty($data[$k]['title']) ? '' : self::c('db')->escape_string($data[$k]['title'])) ."', description='". (empty($data[$k]['description']) ? '' : self::c('db')->escape_string($data[$k]['description'])) ."' WHERE `id` = '". $k ."' AND `target_id` = '". $target_id ."' AND `component` = '". $component ."' AND `user_id` != 0");
             }
         }
         
         return true;
+    }
+    
+    public static function updateComImages($target_id, $component, $target, $table, $field){
+        $images = self::getUploadImages($target_id, $target, $component);
+        $images = json_encode($images);
+        self::c('db')->query("UPDATE `". $table ."` SET `". $field ."` = '". self::c('db')->escape_string($images) ."' WHERE `id` = '". $target_id ."'");
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2493,7 +2423,7 @@ class cmsCore {
      */
     public static function isCached($target, $target_id, $cachetime=1, $cacheint='MINUTES'){
         $where = "target='$target' AND target_id='$target_id' AND cachedate >= DATE_SUB(NOW(), INTERVAL $cachetime $cacheint)";
-        $cachefile = cmsDatabase::getInstance()->get_field('cms_cache', $where, 'cachefile');
+        $cachefile = self::c('db')->get_field('cms_cache', $where, 'cachefile');
 
         if ($cachefile){
 
@@ -2522,22 +2452,20 @@ class cmsCore {
      * @return html
      */
     public static function getCache($target, $target_id){
+        $cachefile = self::c('db')->get_field('cms_cache', "target='$target' AND target_id='$target_id'", 'cachefile');
 
-		$cachefile = cmsDatabase::getInstance()->get_field('cms_cache', "target='$target' AND target_id='$target_id'", 'cachefile');
+        if($cachefile){
 
-		if($cachefile){
+            $cachefile = PATH.'/cache/'.$cachefile;
 
-			$cachefile = PATH.'/cache/'.$cachefile;
+            if (file_exists($cachefile)){
+                $cache = file_get_contents($cachefile);
+                return $cache;
+            }
 
-			if (file_exists($cachefile)){
-				$cache = file_get_contents($cachefile);
-				return $cache;
-			}
-
-		}
+        }
 
         return false;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2556,7 +2484,7 @@ class cmsCore {
         $sql = "INSERT DELAYED INTO cms_cache (target, target_id, cachedate, cachefile)
                 VALUES ('$target', $target_id, NOW(), '$filename')";
 
-        cmsDatabase::getInstance()->query($sql);
+        self::c('db')->query($sql);
 
         $filename = PATH.'/cache/'.$filename;
 
@@ -2576,9 +2504,9 @@ class cmsCore {
      */
     public static function deleteCache($target, $target_id){
 
-        cmsDatabase::getInstance()->query("DELETE FROM cms_cache WHERE target='$target' AND target_id='$target_id'");
+        self::c('db')->query("DELETE FROM cms_cache WHERE target='$target' AND target_id='". $target_id ."'");
 
-        $oldcache = PATH.'/cache/'.md5($target.$target_id).'.html';
+        $oldcache = PATH .'/cache/'. md5($target.$target_id) .'.html';
 
         if (file_exists($oldcache)) { @unlink($oldcache); }
 
@@ -2620,7 +2548,7 @@ class cmsCore {
 
         if(!$is_cyr){
             $string = preg_replace(
-                array('/([а]+?)/iu','/([б]+?)/iu','/([в]+?)/iu','/([г]+?)/iu','/([д]+?)/iu','/([е]+?)/iu','/([ё]+?)/iu','/([ж]+?)/iu','/([з]+?)/iu','/([и]+?)/iu','/([й]+?)/iu','/([к]+?)/iu','/([л]+?)/iu','/([м]+?)/iu','/([н]+?)/iu','/([о]+?)/iu','/([п]+?)/iu','/([р]+?)/iu','/([с]+?)/iu','/([т]+?)/iu','/([у]+?)/iu','/([ф]+?)/iu','/([х]+?)/iu','/([ц]+?)/iu','/([ч]+?)/iu','/([ш]+?)/iu','/([щ]+?)/iu','/([ъ]+?)/iu','/([ы]+?)/iu','/([ь]+?)/iu','/([э]+?)/iu','/([ю]+?)/iu','/([я]+?)/iu'),
+                array('/([а]{1})/iu','/([б]{1})/iu','/([в]{1})/iu','/([г]{1})/iu','/([д]{1})/iu','/([е]{1})/iu','/([ё]{1})/iu','/([ж]{1})/iu','/([з]{1})/iu','/([и]{1})/iu','/([й]{1})/iu','/([к]{1})/iu','/([л]{1})/iu','/([м]{1})/iu','/([н]{1})/iu','/([о]{1})/iu','/([п]{1})/iu','/([р]{1})/iu','/([с]{1})/iu','/([т]{1})/iu','/([у]{1})/iu','/([ф]{1})/iu','/([х]{1})/iu','/([ц]{1})/iu','/([ч]{1})/iu','/([ш]{1})/iu','/([щ]{1})/iu','/([ъ]{1})/iu','/([ы]{1})/iu','/([ь]{1})/iu','/([э]{1})/iu','/([ю]{1})/iu','/([я]{1})/iu'),
                 array('a','b','v','g','d','e','yo','zh','z','i','i','k','l','m','n','o','p','r','s',
                     't','u','f','h','c','ch','sh','sch','','y','','ye','yu','ja'),
                 $string
@@ -2644,31 +2572,27 @@ class cmsCore {
      * @return str
      */
     public static function generateCatSeoLink($category, $table, $is_cyr = false, $differ=''){
-
-		$inDB = cmsDatabase::getInstance();
-
         $seolink = '';
 
-		$cat = $inDB->getNsCategory($table, $category['id']);
-		if(!$cat) { return $seolink;}
+        $cat = self::c('db')->getNsCategory($table, $category['id']);
+        if(!$cat) { return $seolink;}
 
-		$path_list = $inDB->getNsCategoryPath($table, $cat['NSLeft'], $cat['NSRight'], 'id, title, NSLevel, seolink, url', $differ);
+        $path_list = self::c('db')->getNsCategoryPath($table, $cat['NSLeft'], $cat['NSRight'], 'id, title, NSLevel, seolink, url', $differ);
         if (!$path_list){ return $seolink; }
 
-		$path_list[count($path_list)-1] = array_merge($path_list[count($path_list)-1], $category);
+        $path_list[count($path_list)-1] = array_merge($path_list[count($path_list)-1], $category);
 
-		foreach($path_list as $pcat){
-			$seolink .= self::strToURL((@$pcat['url'] ? $pcat['url'] : $pcat['title']), $is_cyr) . '/';
-		}
+        foreach($path_list as $pcat){
+                $seolink .= self::strToURL((@$pcat['url'] ? $pcat['url'] : $pcat['title']), $is_cyr) . '/';
+        }
 
-		$seolink = rtrim($seolink, '/');
+        $seolink = rtrim($seolink, '/');
 
-        $is_exists = $inDB->rows_count($table, "seolink='{$seolink}' AND id <> {$category['id']}");
+        $is_exists = self::c('db')->rows_count($table, "seolink='{$seolink}' AND id <> {$category['id']}");
 
         if ($is_exists) { $seolink .= '-' . $cat['id']; }
 
         return $seolink;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2745,6 +2669,52 @@ class cmsCore {
 // DS Soft Edited
     
     /**
+     * Возвращает объект класса, модели компонента
+     * @global array $_LANG
+     * @param string $component
+     * @return \Component Model Class Object
+     */
+    public static function m($component){
+        if (empty(self::$models[$component])){
+            if (self::loadModel($component)){
+                self::loadLanguage('components/'.$component);
+                $model = 'cms_model_'.$component;
+                self::$models[$component] = new $model();
+            }else{
+                global $_LANG;
+                cmsCore::halt(sprintf($_LANG['MODEL_NOT_FOUND'], $component));
+            }
+        }
+        
+        return self::$models[$component];
+    }
+    
+    /**
+     * Возвращает объект класса
+     * @global array $_LANG
+     * @param string $class
+     * @param array $args
+     * @return \CMS Class Object
+     */
+    public static function c($class, $arg1=NULL, $arg2=null, $arg3=null){
+        if (empty(self::$classes[$class])){
+            if (self::loadClass($class)){
+                if (isset(self::$classes_name[$class])){
+                    $class_name = self::$classes_name[$class];
+                    self::$classes[$class] = $class_name::getInstance($arg1, $arg2, $arg3);
+                }else{
+                    return true;
+                }
+            }else{
+                global $_LANG;
+                cmsCore::halt(sprintf($_LANG['CLASS_NOT_FOUND'], $class));
+            }
+        }
+        
+        return self::$classes[$class];
+    }
+    
+    /**
      * Возвращает объект класса miniCurl
      * @param array $cfg
      * @return \miniCurl
@@ -2793,38 +2763,33 @@ function icms_substr_replace($str, $replacement, $offset, $length = NULL){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////   ====== DEPRECATED =========    ///////////////////////////////////////////
 function dbRowsCount($table, $where){
-    $inDB = cmsDatabase::getInstance();
-    return $inDB->rows_count($table, $where);
+    return cmsCore::c('db')->rows_count($table, $where);
 }
 
 function dbGetField($table, $where, $field){
-    $inDB = cmsDatabase::getInstance();
-    return $inDB->get_field($table, $where, $field);
+    return cmsCore::c('db')->get_field($table, $where, $field);
 }
 
 function dbGetFields($table, $where, $fields, $order='id ASC'){
-    $inDB = cmsDatabase::getInstance();
-    return $inDB->get_fields($table, $where, $fields, $order);
+    return cmsCore::c('db')->get_fields($table, $where, $fields, $order);
 }
 
 function dbGetTable($table, $where='', $fields='*'){
-    $inDB = cmsDatabase::getInstance();
-    return $inDB->get_table($table, $where, $fields);
+    return cmsCore::c('db')->get_table($table, $where, $fields);
 }
 
 function dbLastId($table){
-    $inDB = cmsDatabase::getInstance();
-    return $inDB->get_last_id($table);
+    return cmsCore::c('db')->get_last_id($table);
 }
 
 function dbDeleteNS($table, $id){
-    cmsDatabase::getInstance()->deleteNS($table, $id);
+    cmsCore::c('db')->deleteNS($table, $id);
 }
 
 function dbDeleteListNS($table, $list){
     if (is_array($list)){
         foreach($list as $key => $value){
-            cmsDatabase::getInstance()->deleteNS($table, $value);
+            cmsCore::c('db')->deleteNS($table, $value);
         }
     }
 }
@@ -2837,27 +2802,27 @@ function dbDeleteListNS($table, $list){
 //
 
 function cmsPrintSitename(){
-    cmsPage::getInstance()->printSitename();
+    cmsCore::c('page')->printSitename();
 }
 
 function cmsPrintHead(){
-    cmsPage::getInstance()->printHead();
+    cmsCore::c('page')->printHead();
 }
 
 function cmsPathway($separator){
-    cmsPage::getInstance()->printPathway($separator);
+    cmsCore::c('page')->printPathway($separator);
 }
 
 function cmsBody(){
-    cmsPage::getInstance()->printBody();
+    cmsCore::c('page')->printBody();
 }
 
 function cmsCountModules($position){
-    return cmsPage::getInstance()->countModules($position);
+    return cmsCore::c('page')->countModules($position);
 }
 
 function cmsModule($position){
-    cmsPage::getInstance()->printModules($position);
+    cmsCore::c('page')->printModules($position);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

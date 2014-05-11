@@ -2075,9 +2075,9 @@ class cmsUser {
 
         $inUser = self::getInstance();
 
-		if($inUser->is_admin) { return true; }
+        if($inUser->is_admin) { return true; }
 
-		return in_array($access_type, $inUser->access);
+        return in_array($access_type, $inUser->access);
 
     }
 

@@ -30,6 +30,10 @@ class cmsFormGen {
         $this->parseParams();
 
     }
+    
+    public function getInstance($xml_file, $default_cfg){
+        return new self($xml_file, $default_cfg);
+    }
 
 //============================================================================//
 //============================================================================//
@@ -120,7 +124,6 @@ class cmsFormGen {
 //============================================================================//
 
     public function getHTML(){
-
         ob_start();
 
             global $tpl_data;

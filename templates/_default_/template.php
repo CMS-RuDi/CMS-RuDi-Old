@@ -41,7 +41,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <?php $this->printHead(); ?>
-    <?php if($inUser->is_admin){ ?>
+    <?php if(cmsCore::c('user')->is_admin){ ?>
         <script src="/admin/js/modconfig.js" type="text/javascript"></script>
         <script src="/templates/<?php echo TEMPLATE; ?>/js/nyromodal.js" type="text/javascript"></script>
         <link href="/templates/<?php echo TEMPLATE; ?>/css/modconfig.css" rel="stylesheet" type="text/css" />

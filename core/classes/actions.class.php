@@ -15,7 +15,7 @@ class cmsActions {
 
     private static $instance;
 
-	private static $defaultLogArray = array('pubdate'=>'','user_id'=>'','object'=>'','object_url'=>'','object_id'=>'','target'=>'','target_url'=>'','target_id'=>'','description'=>'','is_friends_only'=>'','is_users_only'=>'');
+    private static $defaultLogArray = array('pubdate'=>'','user_id'=>'','object'=>'','object_url'=>'','object_id'=>'','target'=>'','target_url'=>'','target_id'=>'','description'=>'','is_friends_only'=>'','is_users_only'=>'');
 
     private $show_targets = true;
     private $only_friends = false;

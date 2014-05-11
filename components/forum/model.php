@@ -660,7 +660,7 @@ class cms_model_forum{
         $post_id = $this->inDB->insert('cms_forum_posts', cmsCore::callEvent('ADD_FORUM_POST', $post));
 
         // регистрируем загруженные изображения
-        cmsCore::setIdUploadImage('post', $post_id);
+        cmsCore::setIdUploadImage('post', $post_id, 'forum');
 
         return $post_id;
 
@@ -670,7 +670,7 @@ class cms_model_forum{
 
         cmsCore::callEvent('UPDATE_FORUM_POST', $post_id);
 
-        cmsCore::setIdUploadImage('post', $post_id);
+        cmsCore::setIdUploadImage('post', $post_id, 'forum');
 
         return $this->inDB->update('cms_forum_posts', $post, $post_id);
 

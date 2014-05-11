@@ -18,17 +18,17 @@ class cmsConfig {
 
     private function __construct(){
 
-		mb_internal_encoding("UTF-8");
+        mb_internal_encoding("UTF-8");
 
-		self::$config = self::getDefaultConfig();
+        self::$config = self::getDefaultConfig();
 
-		date_default_timezone_set(self::$config['timezone']);
+        date_default_timezone_set(self::$config['timezone']);
 
-		setlocale(LC_ALL, "ru_RU.UTF-8");
+        setlocale(LC_ALL, "ru_RU.UTF-8");
 
         return true;
 
-	}
+    }
 
     private function __clone() {}
 
@@ -61,45 +61,49 @@ class cmsConfig {
      */
     public static function getDefaultConfig() {
 
-        $d_cfg = array('sitename'=>'',
-                'title_and_sitename'=>1,
-                'title_and_page'=>1,
-                'hometitle'=>'',
-                'homecom'=>'',
-                'siteoff'=>0,
-                'debug'=>0,
-                'offtext'=>'',
-                'keywords'=>'',
-                'metadesc'=>'',
-                'lang'=>'ru',
-                'is_change_lang'=>0,
-                'sitemail'=>'',
-                'sitemail_name'=>'',
-                'wmark'=>'watermark.png',
-                'template'=>'_default_',
-                'com_without_name_in_url'=>'content',
-                'splash'=>0,
-                'slight'=>1,
-                'db_host'=>'',
-                'db_base'=>'',
-                'db_user'=>'',
-                'db_pass'=>'',
-                'db_prefix'=>'cms',
-                'show_pw'=>1,
-                'last_item_pw'=>1,
-                'index_pw'=>0,
-                'fastcfg'=>1,
-                'mailer'=>'mail',
-                'smtpsecure'=>'',
-                'smtpauth'=>0,
-                'smtpuser'=>'',
-                'smtppass'=>'',
-                'smtphost'=>'localhost',
-                'smtpport'=>25,
-                'timezone'=>'Europe/Moscow',
-                'timediff'=>'',
-                'user_stats'=>1,
-                'allow_ip'=>'');
+        $d_cfg = array(
+            'sitename'=>'',
+            'title_and_sitename'=>1,
+            'title_and_page'=>1,
+            'hometitle'=>'',
+            'homecom'=>'',
+            'siteoff'=>0,
+            'debug'=>0,
+            'offtext'=>'',
+            'keywords'=>'',
+            'metadesc'=>'',
+            'lang'=>'ru',
+            'is_change_lang'=>0,
+            'sitemail'=>'',
+            'sitemail_name'=>'',
+            'wmark'=>'watermark.png',
+            'template'=>'_default_',
+            'com_without_name_in_url'=>'content',
+            'splash'=>0,
+            'slight'=>1,
+            'db_host'=>'',
+            'db_base'=>'',
+            'db_user'=>'',
+            'db_pass'=>'',
+            'db_prefix'=>'cms',
+            'show_pw'=>1,
+            'last_item_pw'=>1,
+            'index_pw'=>0,
+            'fastcfg'=>1,
+            'mailer'=>'mail',
+            'smtpsecure'=>'',
+            'smtpauth'=>0,
+            'smtpuser'=>'',
+            'smtppass'=>'',
+            'smtphost'=>'localhost',
+            'smtpport'=>25,
+            'timezone'=>'Europe/Moscow',
+            'timediff'=>'',
+            'user_stats'=>1,
+            'allow_ip'=>'',
+            'JevixAllowTags'=>'p,a,img,i,b,u,s,strike,video,em,strong,nobr,li,ol,ul,div,abbr,sup,sub,acronym,h1,h2,h3,h4,h5,h6,br,hr,pre,code,object,param,embed,blockquote,iframe,span,input,table,caption,th,tr,td,figure,figcaption',
+            'JevixTagCutWithContent'=>'script,style,meta'
+        );
 
         $f = PATH.'/includes/config.inc.php';
         if (file_exists($f)){ require($f); } else { $_CFG = array(); }
@@ -124,15 +128,15 @@ class cmsConfig {
      */
     public static function getConfig($value = '') {
 
-		if($value){
+        if($value){
             if(isset(self::$config[$value])){
                 return self::$config[$value];
             } else {
                 return null;
             }
-		} else {
-			return self::$config;
-		}
+        } else {
+            return self::$config;
+        }
 
     }
 

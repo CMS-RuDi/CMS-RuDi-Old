@@ -479,6 +479,7 @@ CREATE TABLE `#__content` (
   `pagetitle` varchar(255) NOT NULL,
   `url` varchar(100) NOT NULL,
   `tpl` varchar(50) NOT NULL DEFAULT 'com_content_read.tpl',
+  `images` longtext NOT NULL,
   PRIMARY KEY (`id`),
   KEY `seolink` (`seolink`),
   KEY `category_id` (`category_id`),
@@ -1435,9 +1436,14 @@ CREATE TABLE `#__upload_images` (
   `fileurl` varchar(250) NOT NULL,
   `target` varchar(25) NOT NULL DEFAULT 'forum',
   `component` varchar(32) NOT NULL,
+  `title` varchar(256) NOT NULL,
+  `description` VARCHAR(1024) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `pubdate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `target_id` (`target_id`),
-  KEY `session_id` (`session_id`)
+  KEY `session_id` (`session_id`),
+  KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `#__users`;

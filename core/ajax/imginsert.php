@@ -10,10 +10,6 @@
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
-    function echoErrorAndExit($error){
-        cmsCore::jsonOutput(array('error' => $error, 'msg' => ''), false);
-    }
-
     // при ajaxfileupload HTTP_X_REQUESTED_WITH не передается, устанавливем его - костыль :-) см. /core/ajax/ajax_core.php
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     if (!empty($_REQUEST['ses_id'])){
@@ -24,7 +20,7 @@
     include(PATH.'/core/ajax/ajax_core.php');
 
     // загружать могут только авторизованные
-    if (!$inUser->id) {	cmsCore::halt(); }
+    if (!cmsCore::c('user')->id){ cmsCore::halt(); }
 
     // Получаем компонент, с которого идет загрузка
     $component = cmsCore::request('component', 'str', '');
@@ -33,6 +29,17 @@
     if(!$inCore->isComponentInstalled($component)) { cmsCore::halt(); }
     
     // Загружаем конфигурацию компонента
+    $cfg = $inCore->loadComponentConfig($component);
+    
+    /* Будет удален в скором времени */
+    if (!isset($cfg['imgs_big_w']) && isset($cfg['img_w'])){
+        $cfg['imgs_big_w'] = $cfg['img_w'];
+    }
+    if (!isset($cfg['imgs_big_h']) && isset($cfg['img_h'])){
+        $cfg['imgs_big_h'] = $cfg['img_h'];
+    }
+    /* ============================= */
+    
     $cfg = array_merge(
         array(
             'img_max' => 50,
@@ -46,10 +53,9 @@
             'imgs_medium_h' => 300,
             'imgs_small_w' => 100,
             'imgs_small_h' => 100,
-            'resize_type' => 'auto',
-            'img_table' => 'cms_upload_images'
+            'resize_type' => 'auto'
         ),
-        $inCore->loadComponentConfig($component)
+        $cfg
     );
     
     // проверяем не выключен ли он
@@ -62,129 +68,114 @@
     $target = cmsCore::request('target', 'str', '');
     
     // Разрешена ли загрузка
-    if (!$cfg['img_on']){ echoErrorAndExit($_LANG['UPLOAD_IMG_IS_DISABLE']); }
+    if (!$cfg['img_on']){
+        cmsCore::jsonOutput(array('error' => $_LANG['UPLOAD_IMG_IS_DISABLE'], 'msg' => ''), false);
+    }
+    
+    // Если в модели компонента есть метод checkAccessAddImage передаем ему 
+    // параметры $target_id и $target для проверки прав пользователя на загрузку
+    // изображения
+    if (method_exists(cmsCore::m($component), 'checkAccessAddImage')){
+        if (!cmsCore::m($component)->checkAccessAddImage($target_id, $target)){
+            cmsCore::jsonOutput(array('error' => $_LANG['UPLOAD_IMG_IS_DISABLE'], 'msg' => ''), false);
+        }
+    }
 
     // Не превышен ли лимит
-    if (cmsCore::getTargetCount($target_id) >= $cfg['img_max']){ echoErrorAndExit($_LANG['UPLOAD_IMG_LIMIT']); }
-    
-    if (!cmsCore::inRequest('is_new_method')){
-        
-    // Будет удалено в скором времени, после того как везде будет внедрен новый класс обработки изображений
-        // Подготавливаем класс загрузки фото
-        cmsCore::loadClass('upload_photo');
-        $inUploadPhoto = cmsUploadPhoto::getInstance();
-        $inUploadPhoto->upload_dir    = PATH .'/upload/';
-        $inUploadPhoto->dir_medium    = $component .'/';
-        $inUploadPhoto->medium_size_w = $cfg['img_w'];
-        $inUploadPhoto->medium_size_h = $cfg['img_h'];
-        $inUploadPhoto->is_watermark  = $cfg['watermark'];
-        $inUploadPhoto->only_medium   = true;
-        $inUploadPhoto->input_name    = 'attach_img';
-        // загружаем фото
-        $file = $inUploadPhoto->uploadPhoto();
-
-        if (!$file){ echoErrorAndExit(cmsCore::uploadError()); }
-
-        $fileurl = '/upload/'. $component .'/'. $file['filename'];
-
-        cmsCore::registerUploadImages($target_id, $target, $fileurl, $component);
-
-        cmsCore::jsonOutput(array('error' => '', 'msg' => $fileurl), false);
-        
-    }else{
-        
-        $ym = date('Y-m');
-        $d = date('d');
-        $f = mb_substr(md5(microtime(true)), 0, 2);
-        
-        //Создаем необходимую структуру папок
-        if(!is_dir(PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f)){
-            if (!mkdir(PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f, 0777, true)){
-                echoErrorAndExit(str_replace('%s', '/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f, $_LANG['DIR_NOT_WRITABLE']));
-            }
-        }
-        
-        if(!is_dir(PATH .'/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f)){
-            if (!mkdir(PATH .'/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f, 0777, true)){
-                echoErrorAndExit(str_replace('%s', '/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f, $_LANG['DIR_NOT_WRITABLE']));
-            }
-        }
-        
-        if(!is_dir(PATH .'/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f)){
-            if (!mkdir(PATH .'/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f, 0777, true)){
-                echoErrorAndExit(str_replace('%s', '/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f, $_LANG['DIR_NOT_WRITABLE']));
-            }
-        }
-        //----------------------------------------------------------------------
-        
-        //Подключаем и инициализируем класс обработки изображений
-        cmsCore::loadClass('images');
-        $image = rudi_graphics::getInstance();
-        
-        //Выставляем опции отвечающие за нанесение водяного знака
-        $image->watermark = $cfg['watermark'];
-        $image->mwatermark = $cfg['watermark'];
-        
-        //Выставляем правило по которому будут изменяться размеры изображения
-        $image->resize_type = $cfg['resize_type'];
-        if (!empty($cfg['mresize_type'])){
-            $image->mresize_type = $cfg['mresize_type'];
-        }
-        if (!empty($cfg['sresize_type'])){
-            $image->sresize_type = $cfg['sresize_type'];
-        }
-        
-        //Выставляем пути сохранения изображения
-        $image->big_dir = PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f .'/';
-        $image->medium_dir = PATH .'/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f .'/';
-        $image->small_dir = PATH .'/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f .'/';
-        
-        //Выставляем размеры большого изображения
-        if (!empty($cfg['imgs_big_w']) || !empty($cfg['imgs_big_h'])){
-            $image->new_bw = $cfg['imgs_big_w'];
-            $image->new_bh = $cfg['imgs_big_h'];
-        }
-        
-        //Выставляем размеры средней копии изображения
-        if (!empty($cfg['imgs_medium_w']) || !empty($cfg['imgs_medium_h'])){
-            $image->new_mw = $cfg['imgs_medium_w'];
-            $image->new_mh = $cfg['imgs_medium_h'];
-        }
-        
-        //Выставляем размеры маленькой копии изображения
-        if (!empty($cfg['imgs_small_w']) || !empty($cfg['imgs_small_h'])){
-            $image->new_sw = $cfg['imgs_small_w'];
-            $image->new_sh = $cfg['imgs_small_h'];
-        }
-        
-        $tmp_file_name = $component .'_'. md5(microtime(true)) .'.tmp';
-        
-        if (!cmsCore::moveUploadedFile(
-            $_FILES['file']['tmp_name'],
-            PATH .'/cache/'. $tmp_file_name,
-            $_FILES['file']['error']
-        )){
-            echoErrorAndExit(cmsCore::uploadError());
-        }
-
-        $file_name = $image->resize(PATH .'/cache/'. $tmp_file_name);
-        
-        unlink(PATH .'/cache/'. $tmp_file_name);
-        
-        if (!$file_name){ echoErrorAndExit(cmsCore::uploadError()); }
-
-        $fileurl = $ym .'/'. $d .'/'. $f .'/'. $file_name;
-
-        $file_id = cmsCore::registerUploadImages($target_id, $target, $fileurl, $component, $cfg['img_table']);
-
-        cmsCore::jsonOutput(
-            array(
-                'small_src' => '/upload/'. $component .'/small/'. $fileurl,
-                'medium_src' => '/upload/'. $component .'/medium/'. $fileurl,
-                'big_src' => '/upload/'. $component .'/big/'. $fileurl,
-                'id' => $file_id
-            ),
-            false
-        );
+    if (cmsCore::getTargetCount($target_id, $target, $component) >= $cfg['img_max']){
+        cmsCore::jsonOutput(array('error' => $_LANG['UPLOAD_IMG_LIMIT'], 'msg' => ''), false);
     }
+        
+    $ym = date('Y-m');
+    $d = date('d');
+    $f = mb_substr(md5(microtime(true)), 0, 2);
+
+    //Создаем необходимую структуру папок
+    if(!is_dir(PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f)){
+        if (!mkdir(PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f, 0777, true)){
+            cmsCore::jsonOutput(array('error' => sprintf($_LANG['DIR_NOT_WRITABLE'], '/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f), 'msg' => ''), false);
+        }
+    }
+
+    if(!is_dir(PATH .'/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f)){
+        if (!mkdir(PATH .'/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f, 0777, true)){
+            cmsCore::jsonOutput(array('error' => sprintf($_LANG['DIR_NOT_WRITABLE'], '/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f), 'msg' => ''), false);
+        }
+    }
+
+    if(!is_dir(PATH .'/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f)){
+        if (!mkdir(PATH .'/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f, 0777, true)){
+            cmsCore::jsonOutput(array('error' => sprintf($_LANG['DIR_NOT_WRITABLE'], '/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f), 'msg' => ''), false);
+        }
+    }
+    //----------------------------------------------------------------------
+
+    //Выставляем опции отвечающие за нанесение водяного знака
+    cmsCore::c('images')->watermark = $cfg['watermark'];
+    cmsCore::c('images')->mwatermark = $cfg['watermark'];
+
+    //Выставляем правило по которому будут изменяться размеры изображения
+    cmsCore::c('images')->resize_type = $cfg['resize_type'];
+    if (!empty($cfg['mresize_type'])){
+        cmsCore::c('images')->mresize_type = $cfg['mresize_type'];
+    }
+    if (!empty($cfg['sresize_type'])){
+        cmsCore::c('images')->sresize_type = $cfg['sresize_type'];
+    }
+
+    //Выставляем пути сохранения изображения
+    cmsCore::c('images')->big_dir    = PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f .'/';
+    cmsCore::c('images')->medium_dir = PATH .'/upload/'. $component .'/medium/'. $ym .'/'. $d .'/'. $f .'/';
+    cmsCore::c('images')->small_dir  = PATH .'/upload/'. $component .'/small/'. $ym .'/'. $d .'/'. $f .'/';
+
+    //Выставляем размеры большого изображения
+    if (!empty($cfg['imgs_big_w']) || !empty($cfg['imgs_big_h'])){
+        cmsCore::c('images')->new_bw = $cfg['imgs_big_w'];
+        cmsCore::c('images')->new_bh = $cfg['imgs_big_h'];
+    }
+
+    //Выставляем размеры средней копии изображения
+    if (!empty($cfg['imgs_medium_w']) || !empty($cfg['imgs_medium_h'])){
+        cmsCore::c('images')->new_mw = $cfg['imgs_medium_w'];
+        cmsCore::c('images')->new_mh = $cfg['imgs_medium_h'];
+    }
+
+    //Выставляем размеры маленькой копии изображения
+    if (!empty($cfg['imgs_small_w']) || !empty($cfg['imgs_small_h'])){
+        cmsCore::c('images')->new_sw = $cfg['imgs_small_w'];
+        cmsCore::c('images')->new_sh = $cfg['imgs_small_h'];
+    }
+
+    $tmp_file_name = $component .'_'. md5(microtime(true)) .'.tmp';
+
+    if (!cmsCore::moveUploadedFile(
+        $_FILES['file']['tmp_name'],
+        PATH .'/cache/'. $tmp_file_name,
+        $_FILES['file']['error']
+    )){
+        cmsCore::jsonOutput(array('error' => cmsCore::uploadError(), 'msg' => ''), false);
+    }
+
+    $file_name = cmsCore::c('images')->resize(PATH .'/cache/'. $tmp_file_name);
+
+    unlink(PATH .'/cache/'. $tmp_file_name);
+
+    if (!$file_name){
+        cmsCore::jsonOutput(array('error' => cmsCore::uploadError(), 'msg' => ''), false);
+    }
+
+    $fileurl = $ym .'/'. $d .'/'. $f .'/'. $file_name;
+
+    $file_id = cmsCore::registerUploadImages($target_id, $target, $fileurl, $component);
+
+    cmsCore::jsonOutput(
+        array(
+            'small_src' => '/upload/'. $component .'/small/'. $fileurl,
+            'medium_src' => '/upload/'. $component .'/medium/'. $fileurl,
+            'big_src' => '/upload/'. $component .'/big/'. $fileurl,
+            'id' => $file_id,
+            'msg' => '/upload/'. $component .'/big/'. $fileurl // Будет удалено в скором времени
+        ),
+        false
+    );
 ?>

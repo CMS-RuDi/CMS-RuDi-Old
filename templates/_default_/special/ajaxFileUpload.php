@@ -3,13 +3,22 @@
     <?php foreach ($files as $file){ ?>
 
         <div class="ajax_file" id="ajax_file<?php echo $file['id']; ?>">
+            <div class="ajax_img_tmb">
+                <img src="<?php echo $file['small_src']; ?>" />
+                <?php if ($options['insertEditor']){ ?>
+                <div class="ajax_insertEditor">
+                    <a href="#" title="small" onclick="ajaxInsertImg('<?php echo $file['small_src']; ?>'); return false;">S</a>
+                    <a href="#" title="medium" onclick="ajaxInsertImg('<?php echo $file['medium_src']; ?>'); return false;">M</a>
+                    <a href="#" title="big" onclick="ajaxInsertImg('<?php echo $file['big_src']; ?>'); return false;">B</a>
+                </div>
+                <?php } ?>
+            </div>
+            
             <div class="ajax_file_id">#<?php echo $file['id']; ?></div>
             
             <div class="ajax_del_action">
                 <a href="#" onclick="deleteAjaxFile(<?php echo $file['id']; ?>); return false;" title="<?php echo $_LANG['DELETE']; ?>"></a>
             </div>
-            
-            <div> <img src="<?php echo $file['small_src']; ?>" /> </div>
             
             <div>
                 <input type="text" name="ajax_file_title[<?php echo $file['id']; ?>]" value="<?php echo $file['title']; ?>" placeholder="<?php echo $_LANG['TITLE']; ?>" />
@@ -75,6 +84,21 @@
     .ajax_file input, .ajax_file textarea{
         width:98%;
     }
+    .ajax_img_tmb{
+        position: relative;
+    }
+    .ajax_insertEditor{
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+    }
+    .ajax_insertEditor a{
+        display: inline-block;
+        margin-right: 5px;
+        background-color: #000000;
+        padding: 0px 5px 0px 5px;
+        color: #ffffff;
+    }
 </style>
 
 <script type="text/javascript">
@@ -93,7 +117,6 @@
             "component"    : "<?php echo $options['component']; ?>",
             "target"       : "<?php echo $options['target']; ?>",
             "target_id"    : "<?php echo $options['target_id']; ?>",
-            "is_new_method": "<?php echo $options['is_new_method']; ?>",
             "ses_id"       : "<?php echo $options['ses_id']; ?>"
         },
         
@@ -123,7 +146,7 @@
                 if (response.error){
                     alert(response.error);
                 }else{
-                    $('#files_list').append('<div class="ajax_file" id="ajax_file'+ response.id +'"><div class="ajax_file_id">#'+ response.id +'</div><div class="ajax_del_action"><a href="#" onclick="deleteAjaxFile('+ response.id +'); return false;" title="<?php echo $_LANG['DELETE']; ?>"></a></div><img src="'+ response.small_src +'" /><br/><input type="text" name="ajax_file_title['+ response.id +']" value="" placeholder="<?php echo $_LANG['TITLE']; ?>" /><br/><textarea name="ajax_file_description['+ response.id +']" placeholder="<?php echo $_LANG['DESCRIPTION']; ?>"></textarea></div>');
+                    $('#files_list').append('<div class="ajax_file" id="ajax_file'+ response.id +'"><div class="ajax_img_tmb"><img src="'+ response.small_src +'" /><?php if ($options['insertEditor']){ ?><div class="ajax_insertEditor"><a href="#" title="small" onclick="ajaxInsertImg(\''+ response.small_src +'\'); return false;">S</a><a href="#" title="medium" onclick="ajaxInsertImg(\''+ response.medium_src +'\'); return false;">M</a><a href="#" title="big" onclick="ajaxInsertImg(\''+ response.big_src +'\'); return false;">B</a></div><?php } ?></div><div class="ajax_file_id">#'+ response.id +'</div><div class="ajax_del_action"><a href="#" onclick="deleteAjaxFile('+ response.id +'); return false;" title="<?php echo $_LANG['DELETE']; ?>"></a></div><div><input type="text" name="ajax_file_title['+ response.id +']" value="" placeholder="<?php echo $_LANG['TITLE']; ?>" /></div><div><textarea name="ajax_file_description['+ response.id +']" placeholder="<?php echo $_LANG['DESCRIPTION']; ?>"></textarea></div></div>');
                 }
                 $('#'+file.id).hide("slow", function() {
                     $(this).remove();
@@ -153,4 +176,10 @@
             }
         );
     }
+    <?php if ($options['insertEditor']){ ?>
+    function ajaxInsertImg(src){
+        wysiwygInsertHtml('<img src="'+ src +'" alt="" />', '<?php echo $options['insertEditor']; ?>');
+        return false;
+    }
+    <?php } ?>
 </script>

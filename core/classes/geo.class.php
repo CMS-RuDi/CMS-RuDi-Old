@@ -83,15 +83,14 @@ class cmsgeo {
      * @return array
      */
     private function getData() {
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url.$this->ip);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'InstantCMS');
-        $out = simplexml_load_string(curl_exec($ch));
+        
+        $out = cmsCore::c('curl', array(
+            array(
+                'header' => 0,
+                'connect_timeout' => 2,
+                'user_agent' => 'InstantCMS'
+            )
+        ))->xmlGet($this->url.$this->ip);
 
         foreach ($out->ip[0] as $key=>$value) {
             $data[$key] = (string)$value;

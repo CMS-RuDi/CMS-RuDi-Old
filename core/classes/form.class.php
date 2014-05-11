@@ -12,16 +12,15 @@
 /******************************************************************************/
 
 class cmsForm {
-
     private $kinds       = array('text','link','textarea','checkbox','radiogroup','list','menu','file');
     public  $values      = array();
     public  $form        = array();
     public  $form_fields = array();
     private $form_id;
-	public  $is_admin;
+    public  $is_admin;
 
-	private static $cached_form_data   = array();
-	private static $cached_form_fields = array();
+    private static $cached_form_data   = array();
+    private static $cached_form_fields = array();
 
     private function __construct($form_id, $values = array(), $is_admin = false) {
 
@@ -29,10 +28,10 @@ class cmsForm {
         $this->values   = $values;
         $this->is_admin = $is_admin;
 
-		cmsCore::loadLanguage('components/forms');
+        cmsCore::loadLanguage('components/forms');
 
-		$this->loadFormData();
-		$this->form_fields = $this->getFormFields($this->form_id);
+        $this->loadFormData();
+        $this->form_fields = $this->getFormFields($this->form_id);
 
     }
 
@@ -220,14 +219,14 @@ class cmsForm {
      */
 	public static function getFieldsValues($form_id, $values = array()){
 
-		$formObj = new self($form_id,$values);
+            $formObj = new self($form_id,$values);
 
-		if(!$formObj->form || !$formObj->form_fields) { return array(); }
+            if(!$formObj->form || !$formObj->form_fields) { return array(); }
 
-        // Формируем значения полей формы
-        foreach ($formObj->form_fields as $key => $field) {
-            $formObj->form_fields[$key]['field'] = $formObj->getFormFieldValue($field);
-        }
+            // Формируем значения полей формы
+            foreach ($formObj->form_fields as $key => $field) {
+                $formObj->form_fields[$key]['field'] = $formObj->getFormFieldValue($field);
+            }
 
 		return $formObj->form_fields;
 

@@ -44,7 +44,7 @@
                 $(this).removeClass('inactive');
             })
             .jcarouselControl({
-                target: '-=2'
+                target: '-=1'
             });
 
         $('.next-stage')
@@ -55,7 +55,7 @@
                 $(this).removeClass('inactive');
             })
             .jcarouselControl({
-                target: '+=2'
+                target: '+=1'
             });
 
         // Setup controls for the navigation carousel

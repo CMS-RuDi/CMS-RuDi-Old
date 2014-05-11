@@ -85,11 +85,11 @@ class cms_model_comments{
 
         $item = cmsCore::callEvent('ADD_COMMENT', $item);
 
-		$item['target_title'] = $this->inDB->escape_string($item['target_title']);
+        $item['target_title'] = $this->inDB->escape_string($item['target_title']);
 
         $comment_id = $this->inDB->insert('cms_comments', $item);
 
-		cmsCore::setIdUploadImage('comment', $comment_id);
+        cmsCore::setIdUploadImage('comment', $comment_id, 'comments');
 
         return $comment_id;
 

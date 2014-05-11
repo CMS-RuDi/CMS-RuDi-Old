@@ -4235,3 +4235,64 @@ span.ajax-loader {
     margin: 0;
     padding: 1px 0;
 }
+
+/* CKEditor styles */
+blockquote{
+    font-style: italic;
+    font-family: Georgia, Times, "Times New Roman", serif;
+    padding: 2px 0;
+    border-style: solid;
+    border-color: #ccc;
+    border-width: 0;
+    padding-left: 20px;
+    padding-right: 8px;
+    border-left-width: 5px;
+}
+
+hr{
+    border: 0px;
+    border-top: 1px solid #ccc;
+}
+
+img.right{
+    border: 1px solid #ccc;
+    float: right;
+    margin-left: 15px;
+    padding: 5px;
+}
+
+img.left{
+    border: 1px solid #ccc;
+    float: left;
+    margin-right: 15px;
+    padding: 5px;
+}
+
+pre{
+    white-space: pre-wrap; /* CSS 2.1 */
+    word-wrap: break-word; /* IE7 */
+}
+
+.marker{
+    background-color: Yellow;
+}
+
+span[lang]{
+   font-style: italic;
+}
+
+figure{
+    text-align: center;
+    border: solid 1px #ccc;
+    border-radius: 2px;
+    background: rgba(0,0,0,0.05);
+    padding: 10px;
+    margin: 10px 20px;
+    display: inline-block;
+}
+
+figure > figcaption{
+    text-align: center;
+    display: block; /* For IE8 */
+}
+/* End CKEditor styles */

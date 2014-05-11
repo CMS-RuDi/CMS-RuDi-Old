@@ -102,7 +102,7 @@ if($do == 'add'){
 	if($wall_id){
 
 		// регистрируем загруженные фотографии к записи
-		cmsCore::setIdUploadImage('wall', $wall_id);
+		cmsCore::setIdUploadImage('wall', $wall_id, $component);
 
 		cmsCore::jsonOutput(array('error' => false, 'html'  => $_LANG['WALL_MESG_ADD']));
 

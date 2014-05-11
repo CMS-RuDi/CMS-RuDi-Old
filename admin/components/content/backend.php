@@ -174,11 +174,11 @@ $GLOBALS['cp_page_head'][] = jwHeader();
             <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
             <td>
                 <select name="resize_type" style="width: 200px;">
-                    <option value="auto" <?php if ($model->config['resize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
-                    <option value="exact" <?php if ($model->config['resize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
-                    <option value="portrait" <?php if ($model->config['resize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
-                    <option value="landscape" <?php if ($model->config['resize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
-                    <option value="crop" <?php if ($model->config['resize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
+                    <option value="auto" <?php if ($cfg['resize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
+                    <option value="exact" <?php if ($cfg['resize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
+                    <option value="portrait" <?php if ($cfg['resize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
+                    <option value="landscape" <?php if ($cfg['resize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
+                    <option value="crop" <?php if ($cfg['resize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
                 </select>
             </td>
         </tr>
@@ -192,11 +192,11 @@ $GLOBALS['cp_page_head'][] = jwHeader();
             <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
             <td>
                 <select name="mresize_type" style="width: 200px;">
-                    <option value="auto" <?php if ($model->config['mresize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
-                    <option value="exact" <?php if ($model->config['mresize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
-                    <option value="portrait" <?php if ($model->config['mresize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
-                    <option value="landscape" <?php if ($model->config['mresize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
-                    <option value="crop" <?php if ($model->config['mresize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
+                    <option value="auto" <?php if ($cfg['mresize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
+                    <option value="exact" <?php if ($cfg['mresize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
+                    <option value="portrait" <?php if ($cfg['mresize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
+                    <option value="landscape" <?php if ($cfg['mresize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
+                    <option value="crop" <?php if ($cfg['mresize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
                 </select>
             </td>
         </tr>
@@ -210,11 +210,11 @@ $GLOBALS['cp_page_head'][] = jwHeader();
             <td><strong><?php echo $_LANG['AD_PHOTO_RESIZE_TYPE']; ?>:</strong></td>
             <td>
                 <select name="sresize_type" style="width: 200px;">
-                    <option value="auto" <?php if ($model->config['sresize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
-                    <option value="exact" <?php if ($model->config['sresize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
-                    <option value="portrait" <?php if ($model->config['sresize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
-                    <option value="landscape" <?php if ($model->config['sresize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
-                    <option value="crop" <?php if ($model->config['sresize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
+                    <option value="auto" <?php if ($cfg['sresize_type'] == 'auto'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_AUTO']; ?></option>
+                    <option value="exact" <?php if ($cfg['sresize_type'] == 'exact'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_EXACT']; ?></option>
+                    <option value="portrait" <?php if ($cfg['sresize_type'] == 'portrait'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_PORTRAIT']; ?></option>
+                    <option value="landscape" <?php if ($cfg['sresize_type'] == 'landscape'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_LANDSCAPE']; ?></option>
+                    <option value="crop" <?php if ($cfg['sresize_type'] == 'crop'){ echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PHOTO_RESIZE_VAL_CROP']; ?></option>
                 </select>
             </td>
         </tr>

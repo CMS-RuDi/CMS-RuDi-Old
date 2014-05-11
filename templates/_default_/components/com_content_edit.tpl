@@ -86,7 +86,7 @@
 		</tr>
 	</table>
 
-    {if $cfg.img_users && $cfg.img_on && $ajaxUploader}
+    {if $cfg.img_on && $ajaxUploader}
     <div class="bar" style="padding:10px 10px;margin-top: 10px;">
     <table width="100%" cellspacing="5" cellpadding="3" class="proptable">
         <tr valign="top">

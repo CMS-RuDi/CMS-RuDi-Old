@@ -83,7 +83,7 @@ function files(){
         }
         // кириллические домены
         $url_host = parse_url($url, PHP_URL_HOST);
-        if(preg_match('/^[а-яё]+/iu', $url_host)){
+        if (preg_match('/^[а-яё]+/iu', $url_host)){
 
             cmsCore::loadClass('idna_convert');
 

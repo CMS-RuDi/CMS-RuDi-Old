@@ -728,15 +728,15 @@ class cmsPage {
                 $options = array_merge(
                     array(
                         'url' => '/core/ajax/imginsert.php',
-                        'del_url' => '/components/content/ajax/delArticleImg.php',
+                        'del_url' => '/core/ajax/imgdelete.php',
                         'extensions' => 'jpg,gif,png',
                         'max_file_size' => '10',
                         
                         'component' => 'content',
                         'target' => '',
                         'target_id' => '0',
-                        'is_new_method' => '1',
-                        'ses_id' => session_id()
+                        'ses_id' => session_id(),
+                        'insertEditor' => false
                     ),
                     $options
                 );

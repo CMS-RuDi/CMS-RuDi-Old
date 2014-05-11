@@ -9,7 +9,7 @@
 */ 
 
 class gifresizer {
-
+    private $instance;
     public $temp_dir = "/cache/frames";
     private $pointer = 0;
     private $index = 0;
@@ -27,7 +27,12 @@ class gifresizer {
     private $decoding = false;
     
     public function __construct(){}
-
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self;
+        }
+        return self::$instance;
+    }
     /** 
     * Public part of the class
     * 

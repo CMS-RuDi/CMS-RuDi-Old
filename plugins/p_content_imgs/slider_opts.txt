@@ -1,2 +1,0 @@
-jCarousel
-    1: 

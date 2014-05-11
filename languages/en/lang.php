@@ -268,3 +268,7 @@ $_LANG['CBOX_SLIDESHOWSTART'] = 'Start slideshow';
 $_LANG['FILE_SELECTED']  = 'The files selected: $file';
 $_LANG['FILE_DENIED']    = 'You cannot choose $ext file.\nThis file type is not allowed...';
 $_LANG['FILE_DUPLICATE'] = 'This file has already been selected:\n$file!';
+
+$_LANG['AJAX_FILE_UPLOAD_NOT_SUPPORTED'] = 'Your browser does not support Flash, Silverlight and HTML5 downloading files.';
+$_LANG['MODEL_NOT_FOUND'] = 'Fatal Error. Class component model "%s" not found.';
+$_LANG['CLASS_NOT_FOUND'] = 'Fatal Error. Класс "%s" not found.';

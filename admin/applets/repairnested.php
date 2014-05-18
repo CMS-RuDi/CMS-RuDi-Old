@@ -14,22 +14,20 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function checkNestedSet($table){
-
-	$inDB   = cmsDatabase::getInstance();
 	$differ = $table['differ'];
 	$table	= $table['name'];
 	$errors = array();
 
 	//step 1
 		$sql = "SELECT id FROM $table WHERE NSLeft >= NSRight AND NSDiffer = '$differ'";
-		$res = $inDB->query($sql);
-		if (!$inDB->errno()) { $errors[] = ($inDB->num_rows($res)>0); } else { $errors[] = true; }
+		$res = cmsCore::c('db')->query($sql);
+		if (!cmsCore::c('db')->errno()) { $errors[] = (cmsCore::c('db')->num_rows($res)>0); } else { $errors[] = true; }
 
 	//step 2 and 3
 		$sql = "SELECT COUNT(id) as rows, MIN(NSLeft) as min_left, MAX(NSRight) as max_right FROM $table WHERE NSDiffer = '$differ'";
-		$res = $inDB->query($sql);
-		if (!$inDB->errno()) {
-			$data = $inDB->fetch_assoc($res);
+		$res = cmsCore::c('db')->query($sql);
+		if (!cmsCore::c('db')->errno()) {
+			$data = cmsCore::c('db')->fetch_assoc($res);
 			$errors[] = ($data['min_left'] != 1);
 			$errors[] = ($data['max_right'] != 2*$data['rows']);
 		} else { $errors[] = true; }
@@ -38,15 +36,15 @@ function checkNestedSet($table){
 		$sql = "SELECT id, NSRight, NSLeft
 				FROM $table
 				WHERE MOD((NSRight-NSLeft), 2) = 0 AND NSDiffer = '$differ'";
-		$res = $inDB->query($sql);
-		if (!$inDB->errno()) { $errors[] = ($inDB->num_rows($res)>0); } else { $errors[] = true; }
+		$res = cmsCore::c('db')->query($sql);
+		if (!cmsCore::c('db')->errno()) { $errors[] = (cmsCore::c('db')->num_rows($res)>0); } else { $errors[] = true; }
 
 	//step 5
 		$sql = "SELECT id
 				FROM $table
 				WHERE MOD((NSLeft-NSLevel+2), 2) = 0 AND NSDiffer = '$differ'";
-		$res = $inDB->query($sql);
-		if (!$inDB->errno()) { $errors[] = ($inDB->num_rows($res)>0); } else { $errors[] = true; }
+		$res = cmsCore::c('db')->query($sql);
+		if (!cmsCore::c('db')->errno()) { $errors[] = (cmsCore::c('db')->num_rows($res)>0); } else { $errors[] = true; }
 
 	//step 6
 		$sql = "SELECT 	t1.id,
@@ -57,8 +55,8 @@ function checkNestedSet($table){
 						AND t1.NSDiffer = '$differ' AND t2.NSDiffer = '$differ' AND t3.NSDiffer = '$differ'
 				GROUP BY t1.id
 				HAVING max_right <> SQRT(4 * rep + 1) + 1";
-		$res = $inDB->query($sql);
-		if (!$inDB->errno()) { $errors[] = ($inDB->num_rows($res)>0); } else { $errors[] = true; }
+		$res = cmsCore::c('db')->query($sql);
+		if (!cmsCore::c('db')->errno()) { $errors[] = (cmsCore::c('db')->num_rows($res)>0); } else { $errors[] = true; }
 
 		return (in_array(true, $errors));
 
@@ -67,26 +65,23 @@ function checkNestedSet($table){
 // ===================================================================================================================================== //
 
 function repairNestedSet($table){
-
-	$inDB   = cmsDatabase::getInstance();
-
 	global $_LANG;
 
 	$differ = $table['differ'];
 	$title  = $table['title'];
 	$table	= $table['name'];
 
-	$root_id = $inDB->getNsRootCatId($table, $differ);
+	$root_id = cmsCore::c('db')->getNsRootCatId($table, $differ);
 
 	$sql = "SELECT id
 			FROM $table
 			WHERE NSDiffer = '$differ' AND NSLevel > 0
 			ORDER BY NSLeft";
-	$res = $inDB->query($sql);
+	$res = cmsCore::c('db')->query($sql);
 
-	if (!$inDB->errno()){
+	if (!cmsCore::c('db')->errno()){
 
-		$items_count = $inDB->num_rows($res);
+		$items_count = cmsCore::c('db')->num_rows($res);
 		$max_right	 = ($items_count+1) * 2;
 		//fix root node
 		$sql = "UPDATE $table
@@ -96,11 +91,11 @@ function repairNestedSet($table){
 					NSLevel = 0,
 					ordering = 1
 				WHERE id = $root_id";
-		$inDB->query($sql);
+		cmsCore::c('db')->query($sql);
 		//fix child nodes
 		$pos = 0;
 		$ord = 1;
-		while ($item = $inDB->fetch_assoc($res)){
+		while ($item = cmsCore::c('db')->fetch_assoc($res)){
 
 			$level = 1;
 			$left  = $pos + 2;
@@ -113,7 +108,7 @@ function repairNestedSet($table){
 						NSLevel = $level,
 						ordering = $ord
 					WHERE id=".$item['id'];
-			$inDB->query($sql);
+			cmsCore::c('db')->query($sql);
 			$pos+=2; $ord++;
 
 		}
@@ -184,12 +179,12 @@ function applet_repairnested(){
 		}
 	}
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_CHECKING_TREES'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_CHECKING_TREES']);
 
 	cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
 	cpAddPathway($_LANG['AD_CHECKING_TREES'], 'index.php?view=repairnested');
 
-	$GLOBALS['cp_page_head'][] = '<script type="text/javascript" src="/admin/js/repair.js"></script>';
+        cmsCore::c('page')->addHeadJS('admin/js/repair.js');
 
 	$errors_found = false;
 

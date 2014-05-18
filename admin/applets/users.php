@@ -42,8 +42,6 @@ function getIpLink($ip){
 function applet_users(){
 
     $inCore = cmsCore::getInstance();
-    $inUser = cmsUser::getInstance();
-    $inDB   = cmsDatabase::getInstance();
 	cmsCore::loadClass('actions');
     cmsCore::loadModel('users');
     $model = new cms_model_users();
@@ -55,7 +53,7 @@ function applet_users(){
 	global $adminAccess;
 	if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_USERS'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_USERS']);
  	cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
 
     $do = cmsCore::request('do', 'str', 'list');
@@ -105,7 +103,7 @@ function applet_users(){
                      SET rating = {$rating}
                      WHERE id = '{$user_id}'";
 
-        $inDB->query($user_sql);
+        cmsCore::c('db')->query($user_sql);
 
 		cmsCore::redirectBack();
 
@@ -118,13 +116,13 @@ function applet_users(){
 
         foreach($user_ids as $user_id){
 
-			$code = $inDB->get_field('cms_users_activate', "user_id = '$user_id'", 'code');
+			$code = cmsCore::c('db')->get_field('cms_users_activate', "user_id = '$user_id'", 'code');
 
 			$sql = "UPDATE cms_users SET is_locked = 0 WHERE id = '$user_id'";
-			$inDB->query($sql);
+			cmsCore::c('db')->query($sql);
 
 			$sql = "DELETE FROM cms_users_activate WHERE code = '$code'";
-			$inDB->query($sql);
+			cmsCore::c('db')->query($sql);
 
 			cmsCore::callEvent('USER_ACTIVATED', $user_id);
 
@@ -203,7 +201,7 @@ function applet_users(){
 
         // проверяем есть ли такой пользователь
         if ($do == 'submit'){
-            $user_exist = $inDB->get_fields('cms_users', "(login LIKE '{$items['login']}' OR email LIKE '{$items['email']}') AND is_deleted = 0", 'login');
+            $user_exist = cmsCore::c('db')->get_fields('cms_users', "(login LIKE '{$items['login']}' OR email LIKE '{$items['email']}') AND is_deleted = 0", 'login');
             if($user_exist){
                 if($user_exist['login'] == $items['login']){
                     cmsCore::addSessionMessage($_LANG['LOGIN'].' "'.$items['login'].'" '.$_LANG['IS_BUSY'], 'error'); $errors = true;
@@ -224,10 +222,10 @@ function applet_users(){
             $items['logdate']  = date('Y-m-d H:i:s');
             $items['password'] = md5($items['password']);
 
-            $items['user_id'] = $inDB->insert('cms_users', $items);
+            $items['user_id'] = cmsCore::c('db')->insert('cms_users', $items);
             if(!$items['user_id']){ cmsCore::error404(); }
 
-            $inDB->insert('cms_user_profiles', $items);
+            cmsCore::c('db')->insert('cms_user_profiles', $items);
 
             cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
             cmsCore::redirect('?view=users');
@@ -235,7 +233,7 @@ function applet_users(){
         } else {
 
             // главного админа может редактировать только он сам
-            if($id == 1 && $inUser->id != $id){
+            if($id == 1 && cmsCore::c('user')->id != $id){
                 cmsCore::error404();
             }
             if($id == 1) {
@@ -249,7 +247,7 @@ function applet_users(){
                 $items['password'] = md5($items['password']);
             }
 
-            $inDB->update('cms_users', $items, $id);
+            cmsCore::c('db')->update('cms_users', $items, $id);
 
             cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
             if (empty($_SESSION['editlist'])){
@@ -288,7 +286,7 @@ function applet_users(){
                { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
             } else { $item_id = cmsCore::request('id', 'int', 0); }
 
-            $mod = $inDB->get_fields('cms_users', "id = '$item_id'", '*');
+            $mod = cmsCore::c('db')->get_fields('cms_users', "id = '$item_id'", '*');
             if(!$mod){ cmsCore::error404(); }
 
             echo '<h3>'.$_LANG['AD_USER_EDIT'].' '.$ostatok.'</h3>';
@@ -299,7 +297,7 @@ function applet_users(){
             if($mod){ cmsUser::sessionDel('items'); }
             cpAddPathway($_LANG['AD_USER_ADD']);
         }
-        $GLOBALS['cp_page_head'][] = '<script type="text/javascript" src="/components/registration/js/check.js"></script>';
+        cmsCore::c('page')->addHeadJS('components/registration/js/check.js');
 	?>
       <form action="index.php?view=users" method="post" enctype="multipart/form-data" name="addform" id="addform">
         <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />

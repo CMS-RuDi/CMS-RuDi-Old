@@ -15,24 +15,24 @@ class cmsUploadPhoto {
 
     private static $instance;
 
-	public $upload_dir    = '';			// директория загрузки
-	public $filename      = '';	        // имя файла
-	public $small_size_w  = 96;	    	// ширина миниатюры
-	public $small_size_h  = '';			// высота миниатюры
-	public $medium_size_w = 480;		// ширина среднего изображения
-	public $medium_size_h = '';			// высота среднего изображения
-	public $thumbsqr      = true;		// квадратное изображение, да по умолчанию
-	public $is_watermark  = true;		// накладывать ватермарк, да по умолчанию
-	public $is_saveorig   = 0;			// сохранять оригинал фото, нет по умолчанию
-	public $dir_small     = 'small/';	// директория загрузки миниатюры
-	public $dir_medium    = 'medium/';	// директория загрузки среднего изображения
-	public $only_medium   = false;		// загружать только среднее изображение, нет по умолчанию
-	public $input_name    = 'Filedata';	// название поля загрузки файла
+    public $upload_dir    = '';		// директория загрузки
+    public $filename      = '';	        // имя файла
+    public $small_size_w  = 96;	    	// ширина миниатюры
+    public $small_size_h  = '';		// высота миниатюры
+    public $medium_size_w = 480;	// ширина среднего изображения
+    public $medium_size_h = '';		// высота среднего изображения
+    public $thumbsqr      = true;	// квадратное изображение, да по умолчанию
+    public $is_watermark  = true;	// накладывать ватермарк, да по умолчанию
+    public $is_saveorig   = 0;		// сохранять оригинал фото, нет по умолчанию
+    public $dir_small     = 'small/';	// директория загрузки миниатюры
+    public $dir_medium    = 'medium/';	// директория загрузки среднего изображения
+    public $only_medium   = false;	// загружать только среднее изображение, нет по умолчанию
+    public $input_name    = 'Filedata';	// название поля загрузки файла
 
 // ============================================================================ //
 // ============================================================================ //
 
-	private function __construct(){}
+    private function __construct(){}
 
     private function __clone() {}
 

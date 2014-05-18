@@ -131,6 +131,7 @@
             FilesAdded: function(up, files) {
                 plupload.each(files, function(file) {
                     $('#fileslist').append('<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>');
+                    $('#fileslist').scrollTop(document.getElementById('fileslist').scrollHeight);
                     //document.getElementById('fileslist').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>';
                 });
                 uploader.start();

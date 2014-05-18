@@ -15,8 +15,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function createMenuItem($menu, $id, $title){
     $inCore = cmsCore::getInstance();
-	$inDB 	= cmsDatabase::getInstance();
-	$rootid = $inDB->get_field('cms_menu', 'parent_id=0', 'id');
+	$rootid = cmsCore::c('db')->get_field('cms_menu', 'parent_id=0', 'id');
 
 	$ns     = $inCore->nestedSetsInit('cms_menu');
 	$myid   = $ns->AddNode($rootid);
@@ -36,15 +35,13 @@ function createMenuItem($menu, $id, $title){
 				iconurl=''
 			WHERE id = '$myid'";
 
-	$inDB->query($sql);
+	cmsCore::c('db')->query($sql);
 	return true;
 }
 
 function applet_content(){
 
     $inCore = cmsCore::getInstance();
-    $inUser = cmsUser::getInstance();
-	$inDB 	= cmsDatabase::getInstance();
 
 	global $_LANG;
 
@@ -57,14 +54,14 @@ function applet_content(){
     cmsCore::loadModel('content');
     $model = new cms_model_content();
 
-    $GLOBALS['cp_page_title'] = $_LANG['AD_ARTICLES'];
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES']);
     cpAddPathway($_LANG['AD_ARTICLES'], 'index.php?view=tree');
 
 	$do = cmsCore::request('do', 'str', 'add');
 	$id = cmsCore::request('id', 'int', -1);
 
 	if ($do == 'arhive_on'){
-		$inDB->query("UPDATE cms_content SET is_arhive = 1 WHERE id = '$id'");
+		cmsCore::c('db')->query("UPDATE cms_content SET is_arhive = 1 WHERE id = '$id'");
 		cmsCore::addSessionMessage($_LANG['AD_ARTICLES_TO_ARHIVE'], 'success');
 		cmsCore::redirectBack();
 	}
@@ -89,7 +86,7 @@ function applet_content(){
 
         if ($items && $to_cat_id){
 
-			$last_ordering = (int)$inDB->get_field('cms_content', "category_id = '{$to_cat_id}' ORDER BY ordering DESC", 'ordering');
+			$last_ordering = (int)cmsCore::c('db')->get_field('cms_content', "category_id = '{$to_cat_id}' ORDER BY ordering DESC", 'ordering');
 
 			foreach($items as $item_id){
 				$article = $model->getArticle($item_id);
@@ -99,7 +96,7 @@ function applet_content(){
                 $model->updateArticle($article['id'], array('category_id'=>$to_cat_id,
                                                             'ordering'=>$last_ordering,
                                                             'url'=>$article['url'],
-                                                            'title'=>$inDB->escape_string($article['title']),
+                                                            'title'=>cmsCore::c('db')->escape_string($article['title']),
                                                             'id'=>$article['id'],
                                                             'user_id'=>$article['user_id']));
 
@@ -158,9 +155,9 @@ function applet_content(){
 			$article['url']         = cmsCore::request('url', 'str');
 			$article['showtitle']   = cmsCore::request('showtitle', 'int', 0);
 			$article['description'] = cmsCore::request('description', 'html', '');
-			$article['description'] = $inDB->escape_string($article['description']);
+			$article['description'] = cmsCore::c('db')->escape_string($article['description']);
 			$article['content']     = cmsCore::request('content', 'html', '');
-			$article['content']    	= $inDB->escape_string($article['content']);
+			$article['content']    	= cmsCore::c('db')->escape_string($article['content']);
 			$article['published']   = cmsCore::request('published', 'int', 0);
 
 			$article['showdate']    = cmsCore::request('showdate', 'int', 0);
@@ -180,7 +177,7 @@ function applet_content(){
             $olddate                = cmsCore::request('olddate', 'str', '');
 			$pubdate                = cmsCore::request('pubdate', 'str', '');
 
-            $article['user_id']     = cmsCore::request('user_id', 'int', $inUser->id);
+            $article['user_id']     = cmsCore::request('user_id', 'int', cmsCore::c('user')->id);
 
 			$article['tpl'] 		= cmsCore::request('tpl', 'str', 'com_content_read.tpl');
 
@@ -252,9 +249,9 @@ function applet_content(){
         $article['url']         = cmsCore::request('url', 'str');
         $article['showtitle']   = cmsCore::request('showtitle', 'int', 0);
 		$article['description'] = cmsCore::request('description', 'html', '');
-		$article['description'] = $inDB->escape_string($article['description']);
+		$article['description'] = cmsCore::c('db')->escape_string($article['description']);
 		$article['content']     = cmsCore::request('content', 'html', '');
-		$article['content']    	= $inDB->escape_string($article['content']);
+		$article['content']    	= cmsCore::c('db')->escape_string($article['content']);
 
         $article['published']   = cmsCore::request('published', 'int', 0);
 
@@ -275,7 +272,7 @@ function applet_content(){
         $date                   = explode('.', $article['pubdate']);
 		$article['pubdate']     = $date[2] . '-' . $date[1] . '-' . $date[0] . ' ' .date('H:i');
 
-		$article['user_id']     = cmsCore::request('user_id', 'int', $inUser->id);
+		$article['user_id']     = cmsCore::request('user_id', 'int', cmsCore::c('user')->id);
 
 		$article['tpl'] 		= cmsCore::request('tpl', 'str', 'com_content_read.tpl');
 
@@ -333,7 +330,7 @@ function applet_content(){
    if ($do == 'add' || $do == 'edit'){
 
 	   	require('../includes/jwtabs.php');
-		$GLOBALS['cp_page_head'][] = jwHeader();
+		cmsCore::c('page')->addHead(jwHeader());
 
  		$toolmenu = array();
 		$toolmenu[0]['icon'] = 'save.gif';
@@ -369,9 +366,9 @@ function applet_content(){
 			 $sql = "SELECT *, (TO_DAYS(enddate) - TO_DAYS(CURDATE())) as daysleft, DATE_FORMAT(pubdate, '%d.%m.%Y') as pubdate, DATE_FORMAT(enddate, '%d.%m.%Y') as enddate
 					 FROM cms_content
 					 WHERE id = $id LIMIT 1";
-			 $result = $inDB->query($sql) ;
-			 if ($inDB->num_rows($result)){
-				$mod = $inDB->fetch_assoc($result);
+			 $result = cmsCore::c('db')->query($sql) ;
+			 if (cmsCore::c('db')->num_rows($result)){
+				$mod = cmsCore::c('db')->fetch_assoc($result);
 			 }
 
 			 echo '<h3>'.$_LANG['AD_EDIT_ARTICLE'].$ostatok.'</h3>';
@@ -524,7 +521,7 @@ function applet_content(){
                               if (isset($mod['user_id'])) {
                                     echo $inCore->getListItems('cms_users', $mod['user_id'], 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname');
                               } else {
-                                    echo $inCore->getListItems('cms_users', $inUser->id, 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname');
+                                    echo $inCore->getListItems('cms_users', cmsCore::c('user')->id, 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname');
                               }
                           ?>
                         </select>
@@ -637,7 +634,7 @@ function applet_content(){
                             <td width="20">
                                 <?php
                                     $sql    = "SELECT * FROM cms_user_groups";
-                                    $result = $inDB->query($sql) ;
+                                    $result = cmsCore::c('db')->query($sql) ;
 
                                     $style  = 'disabled="disabled"';
                                     $public = 'checked="checked"';
@@ -645,13 +642,13 @@ function applet_content(){
                                     if ($do == 'edit'){
 
                                         $sql2 = "SELECT * FROM cms_content_access WHERE content_id = ".$mod['id']." AND content_type = 'material'";
-                                        $result2 = $inDB->query($sql2);
+                                        $result2 = cmsCore::c('db')->query($sql2);
                                         $ord = array();
 
-                                        if ($inDB->num_rows($result2)){
+                                        if (cmsCore::c('db')->num_rows($result2)){
                                             $public = '';
                                             $style = '';
-                                            while ($r = $inDB->fetch_assoc($result2)){
+                                            while ($r = cmsCore::c('db')->fetch_assoc($result2)){
                                                 $ord[] = $r['group_id'];
                                             }
                                         }
@@ -679,8 +676,8 @@ function applet_content(){
                             <?php
                                 echo '<select style="width: 99%" name="showfor[]" id="showin" size="6" multiple="multiple" '.$style.'>';
 
-                                if ($inDB->num_rows($result)){
-                                    while ($item = $inDB->fetch_assoc($result)){
+                                if (cmsCore::c('db')->num_rows($result)){
+                                    while ($item = cmsCore::c('db')->fetch_assoc($result)){
                                         echo '<option value="'.$item['id'].'"';
                                         if ($do=='edit'){
                                             if (inArray($ord, $item['id'])){

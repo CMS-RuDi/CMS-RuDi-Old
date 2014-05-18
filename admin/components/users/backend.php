@@ -251,10 +251,10 @@ cpCheckWritable('/images/users/photos/medium', 'folder'); ?>
                             <?php
 
                             $sql = "SELECT * FROM cms_forms";
-                            $rs = $inDB->query($sql);
+                            $rs = cmsCore::c('db')->query($sql);
 
-                            if ($inDB->num_rows($rs)){
-                                while($f = $inDB->fetch_assoc($rs)){
+                            if (cmsCore::c('db')->num_rows($rs)){
+                                while($f = cmsCore::c('db')->fetch_assoc($rs)){
                                     if (in_array($f['id'], $model->config['privforms'])) { $selected='selected="selected"'; } else { $selected = ''; }
                                     echo '<option value="'.$f['id'].'" '.$selected.'>'.$f['title'].'</option>';
                                 }

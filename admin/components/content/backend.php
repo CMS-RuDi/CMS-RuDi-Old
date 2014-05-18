@@ -31,7 +31,11 @@ if($opt=='saveconfig'){
     $cfg['pt_hide']     = cmsCore::request('pt_hide', 'int', 0);
     $cfg['autokeys']    = cmsCore::request('autokeys', 'int', 0);
 
-    $cfg['img_table'] = 'cms_content_images';
+    // Настройки изображений
+    $cfg['imgs_quality'] = cmsCore::request('imgs_quality', 'int', 80);
+    if ($cfg['imgs_quality'] <= 0 || $cfg['imgs_quality'] > 100){
+        $cfg['imgs_quality'] = 80;
+    }
     $cfg['imgs_big_w'] = cmsCore::request('imgs_big_w', 'int', 300);
     $cfg['imgs_big_h'] = cmsCore::request('imgs_big_h', 'int', 300);
     $cfg['imgs_medium_w'] = cmsCore::request('imgs_medium_w', 'int', 200);
@@ -42,12 +46,13 @@ if($opt=='saveconfig'){
     $cfg['mresize_type'] = cmsCore::request('mresize_type', array('auto','exact','portrait','landscape','crop'), 'auto');
     $cfg['sresize_type'] = cmsCore::request('sresize_type', array('auto','exact','portrait','landscape','crop'), 'auto');
     $cfg['img_on'] = cmsCore::request('img_on', 'int', 0);
+    //=======================
     
     $cfg['img_users']   = cmsCore::request('img_users', 'int', 1);
     $cfg['img_big_w'] = cmsCore::request('img_big_w', 'int', 300);
     $cfg['img_small_w'] = cmsCore::request('img_small_w', 'int', 100);
     $cfg['watermark']   = cmsCore::request('watermark', 'int', 0);
-//    $cfg['watermark_only_big'] = cmsCore::request('watermark_only_big', 'int', 0);
+    $cfg['watermark_only_big'] = cmsCore::request('watermark_only_big', 'int', 0);
     
     $cfg['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
     $cfg['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
@@ -61,7 +66,7 @@ if($opt=='saveconfig'){
 }
 
 require('../includes/jwtabs.php');
-$GLOBALS['cp_page_head'][] = jwHeader();
+cmsCore::c('page')->addHead(jwHeader());
 
 ?>
 
@@ -153,7 +158,17 @@ $GLOBALS['cp_page_head'][] = jwHeader();
                 <input class="uispin" name="img_small_w" type="text" id="img_small_w" value="<?php echo $cfg['img_small_w'];?>" size="5" />
             </td>
         </tr>
-        
+        <tr>
+           <td><strong><?php echo $_LANG['AD_ENABLE_WATERMARK']; ?></strong><br />
+		   <span class="hinttext"><?php echo $_LANG['AD_WATERMARK_HINT']; ?> "<a href="/images/watermark.png" target="_blank">/images/watermark.png</a>"</span></td>
+           <td width="260">
+               <label><input name="watermark" type="radio" value="1" <?php if ($cfg['watermark']) { echo 'checked="checked"'; } ?> /> <?php echo $_LANG['YES']; ?> </label>
+               <label><input name="watermark" type="radio" value="0"  <?php if (!$cfg['watermark']) { echo 'checked="checked"'; } ?> /> <?php echo $_LANG['NO']; ?> </label>
+           </td>
+        </tr>
+    </table>
+    
+    <table width="550" border="0" cellpadding="10" cellspacing="0" class="proptable">
         <tr style="border-top: 1px #cccccc solid;">
             <td>
                 <strong><?php echo $_LANG['AD_ALLOW_USERS_TO_MULTI']; ?>:</strong><br/>
@@ -218,13 +233,24 @@ $GLOBALS['cp_page_head'][] = jwHeader();
                 </select>
             </td>
         </tr>
-        
         <tr>
-           <td><strong><?php echo $_LANG['AD_ENABLE_WATERMARK']; ?></strong><br />
-		   <span class="hinttext"><?php echo $_LANG['AD_WATERMARK_HINT']; ?> "<a href="/images/watermark.png" target="_blank">/images/watermark.png</a>"</span></td>
+            <td>
+                <strong><?php echo $_LANG['AD_IMG_QUALITY']; ?></strong>
+            </td>
+            <td>
+                <input type="text" name="imgs_quality" value="<?php echo $cfg['imgs_quality']; ?>" style="width: 200px;" />
+            </td>
+        </tr>
+        <tr>
+           <td>
+               <strong><?php echo $_LANG['AD_WATERMARK_ONLY_BIG']; ?></strong>
+               <div class="hinttext">
+                   <?php echo $_LANG['AD_WATERMARK_ONLY_BIG_HINT']; ?>
+               </div>
+           </td>
            <td width="260">
-               <label><input name="watermark" type="radio" value="1" <?php if ($cfg['watermark']) { echo 'checked="checked"'; } ?> /> <?php echo $_LANG['YES']; ?> </label>
-               <label><input name="watermark" type="radio" value="0"  <?php if (!$cfg['watermark']) { echo 'checked="checked"'; } ?> /> <?php echo $_LANG['NO']; ?> </label>
+               <label><input name="watermark_only_big" type="radio" value="1" <?php if ($cfg['watermark_only_big']) { echo 'checked="checked"'; } ?> /> <?php echo $_LANG['YES']; ?> </label>
+               <label><input name="watermark_only_big" type="radio" value="0"  <?php if (!$cfg['watermark_only_big']) { echo 'checked="checked"'; } ?> /> <?php echo $_LANG['NO']; ?> </label>
            </td>
         </tr>
     </table>

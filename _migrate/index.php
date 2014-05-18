@@ -31,8 +31,8 @@
     // принудительно включаем дебаг
     cmsCore::c('config')->debug = 1;
 
-    $version_prev = 'CMS Rudi 0.0.2 или Instant CMS v1.10.3';
-    $version_next = 'CMS Rudi 0.0.3';
+    $version_prev = 'CMS Rudi 0.0.3 или Instant CMS v1.10.3';
+    $version_next = 'CMS Rudi 0.0.4';
 
 // ========================================================================== //
 // ========================================================================== //
@@ -81,7 +81,7 @@
   </style>
 <div id="wrapper" class="migrate">
 <?php
-    echo "<h2>Миграция базы данных InstantCMS {$version_prev} &rarr; {$version_next}</h2>";
+    echo "<h2>Миграция InstantCMS {$version_prev} &rarr; {$version_next}</h2>";
 
     if(!cmsCore::inRequest('go')){
         echo '<h3><a href="/migrate/index.php?go=1">начать миграцию...</a></h3>';
@@ -105,7 +105,9 @@
             array( 'table' => 'cms_category', 'name' => 'pagetitle', 'type' => 'VARCHAR(255)' ),
             array( 'table' => 'cms_category', 'name' => 'meta_desc', 'type' => 'VARCHAR(1024)' ),
             array( 'table' => 'cms_category', 'name' => 'meta_keys', 'type' => 'VARCHAR(1024)' ),
+            
             array( 'table' => 'cms_content', 'name' => 'images', 'type' => 'longtext' ),
+            array( 'table' => 'cms_content', 'name' => 'slidecfg', 'type' => 'varchar(64)' ),
             
             array( 'table' => 'cms_upload_images', 'name' => 'title', 'type' => 'VARCHAR(255)' ),
             array( 'table' => 'cms_upload_images', 'name' => 'description', 'type' => 'VARCHAR(1024)' ),
@@ -118,7 +120,7 @@
         
         if (!empty($CREATE_FIELDS)){
             foreach ($CREATE_FIELDS as $create_field){
-                if (!cmsCore::c('db')->isFieldExists($create_field['name'])){
+                if (!cmsCore::c('db')->isFieldExists($create_field['table'], $create_field['name'])){
                     cmsCore::c('db')->query("ALTER TABLE `". $create_field['table'] ."` ADD `". $create_field['name'] ."` ". $create_field['type'] ." NOT NULL". (isset($create_field['default']) ? " DEFAULT ". $create_field['default'] : ""));
                     echo '<p>Поле "'. $create_field['name'] .'" добавлено в таблицу "'. $create_field['table'] .'";</p>';
                 }
@@ -210,6 +212,8 @@
                     'resize_type'   => 'auto',
                     'mresize_type'  => 'auto',
                     'sresize_type'  => 'auto',
+                    'watermark_only_big' => 0,
+                    'imgs_quality' => 80
                 )
             )
         );
@@ -233,11 +237,47 @@
         
         cmsDatabase::optimizeTables();
         
+        echo '<h3><a href="/migrate/index.php?go=2">Шаг 2. Перенос изображений статей...</a></h3>';
+    }
+// ========================================================================== //
+    if ($step == 2){
+        $dir_m = PATH .'/images/photos/medium';
+        $dir_s = PATH .'/images/photos/small';
+        
+        $new_dir_m = PATH .'/images/content/medium';
+        $new_dir_s = PATH .'/images/content/small';
+        
+        $pdir = opendir($dir_m);
 
+        while ($nextfile = readdir($pdir)){
+            if (
+                    ($nextfile != '.') &&
+                    ($nextfile != '..') &&
+                    !is_dir($dir_m .'/'. $nextfile) &&
+                    (preg_match('#article([0-9]+)#is', $nextfile, $match)))
+            {
+                if (cmsCore::c('db')->get_field('cms_content', "id='". $match[1] ."'", 'id')){
+                    
+                    $id = ceil($match[1]/100);
+                    
+                    mkdir($new_dir_m .'/'. $id, 0777, true);
+                    mkdir($new_dir_s .'/'. $id, 0777, true);
+                    
+                    copy($dir_m .'/'. $nextfile, $new_dir_m .'/'. $id .'/'. $nextfile);
+                    copy($dir_s .'/'. $nextfile, $new_dir_s .'/'. $id .'/'. $nextfile);
+                    
+                }
+                
+                unlink($dir_m .'/'. $nextfile);
+                unlink($dir_s .'/'. $nextfile);
+            }
+        }
+        
+        echo '<p>Все фотографии статей перенесены в новое местоположение;</p>';
+        
         echo '<div style="margin:15px 0px;font-weight:bold">Миграция завершена. Удалите папку /migrate/ прежде чем продолжить!</div>';
         echo '<div class="nextlink"><a href="/">Перейти на сайт</a></div>';
     }
-// ========================================================================== //
 // ========================================================================== //
 
     echo '</div></body></html>';

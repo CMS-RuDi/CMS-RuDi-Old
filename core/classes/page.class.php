@@ -122,7 +122,7 @@ class cmsPage {
      * @return $this
      */
     public function addHead($tag){
-            if (!in_array($tag, $this->page_head)){
+        if (!in_array($tag, $this->page_head)){
             if($this->is_ajax) { echo $tag; } else { $this->page_head[] = $tag; }
         }
         return $this;
@@ -140,7 +140,7 @@ class cmsPage {
 
         if (!in_array($src, $this->page_js)){
             $this->page_js[] = $src;
-            if($this->is_ajax){ echo '<script type="text/javascript" src="'. $src .'"></script>'; }
+            if ($this->is_ajax){ echo '<script type="text/javascript" src="'. $src .'"></script>'; }
         }
 
         return $this;
@@ -158,7 +158,7 @@ class cmsPage {
 
         if (!in_array($src, $this->page_css)){
             $this->page_css[] = $src;
-            if($this->is_ajax){ echo '<link href="'. $src .'" rel="stylesheet" type="text/css" />'; }
+            if ($this->is_ajax){ echo '<link href="'. $src .'" rel="stylesheet" type="text/css" />'; }
         }
 
         return $this;
@@ -207,6 +207,26 @@ class cmsPage {
     }
     
     /**
+     * Устанавливает заголовок страницы в админке
+     * @param string
+     * @return $this
+     */
+    public function setAdminTitle($title=''){
+        if (defined('VALID_CMS_ADMIN')){
+            global $_LANG;
+            
+            $title = strip_tags($title);
+            
+            $this->title = $_LANG['AD_ADMIN_PANEL'] .' v '. CORE_VERSION;
+            
+            if (!empty($title)){
+                $this->title = $title .' - '. $this->title ;
+            }
+        }
+        return $this;
+    }
+    
+    /**
      * Устанавливает заголовок страницы
      * @param string
      * @return $this
@@ -247,6 +267,39 @@ class cmsPage {
      */
     public static function printSitename(){
         echo cmsConfig::getConfig('sitename');
+    }
+    
+    /**
+     * Печатает головную область страницы в админке
+     */
+    public function printAdminHead(){
+        if (defined('VALID_CMS_ADMIN')){
+            self::displayLangJS(array('AD_NO_SELECT_OBJECTS','AD_SWITCH_EDITOR','CANCEL','CONTINUE','CLOSE','ATTENTION'));
+            
+            // Заголовок страницы
+            echo '<title>', htmlspecialchars($this->title), '</title>',"\n";
+
+            //Ключевые слова
+            echo '<meta name="keywords" content="', htmlspecialchars($this->site_cfg->keywords), '" />',"\n";
+
+            //Описание
+            echo '<meta name="description" content="',htmlspecialchars($this->site_cfg->metadesc),'" />',"\n";
+
+            //Генератор
+            echo '<meta name="generator" content="InstantCMS - www.instantcms.ru"/>',"\n";
+
+            //CSS
+            $this->page_css = cmsCore::callEvent('PRINT_ADMIN_PAGE_CSS', $this->page_css);
+            foreach ($this->page_css as $value){ echo '<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n"; }
+
+            //JS
+            $this->page_js = cmsCore::callEvent('PRINT_ADMIN_PAGE_JS', $this->page_js);
+            foreach ($this->page_js as $value){ echo '<script type="text/javascript" src="'. $value .'"></script>',"\n"; }
+
+            //Оставшиеся теги
+            $this->page_head = cmsCore::callEvent('PRINT_ADMIN_PAGE_HEAD', $this->page_head);
+            foreach($this->page_head as $value) { echo $value,"\n"; }
+        }
     }
     
     /**

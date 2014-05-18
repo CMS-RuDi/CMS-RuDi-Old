@@ -14,21 +14,16 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
  function getCountUsers($id) {
-
-     $inDB = cmsDatabase::getInstance();
-     $count = $inDB->rows_count('cms_users', "group_id = '$id'");
+     $count = cmsCore::c('db')->rows_count('cms_users', "group_id = '$id'");
      return '<a href="?view=users&filter[group_id]='.$id.'">'.$count.'</a>';
 }
 
 function applet_usergroups(){
-
-	$inDB = cmsDatabase::getInstance();
-
 	global $_LANG;
 	global $adminAccess;
 	if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_USERS_GROUP'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_USERS_GROUP']);
  	cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
  	cpAddPathway($_LANG['AD_USERS_GROUP'], 'index.php?view=usergroups');
 
@@ -85,13 +80,13 @@ function applet_usergroups(){
 
         if($do == 'submit') {
 
-            $inDB->insert('cms_user_groups', $items);
+            cmsCore::c('db')->insert('cms_user_groups', $items);
             cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
             cmsCore::redirect('index.php?view=usergroups');
 
         } else {
 
-            $inDB->update('cms_user_groups', $items, $id);
+            cmsCore::c('db')->update('cms_user_groups', $items, $id);
             cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
             if (empty($_SESSION['editlist'])){
                 cmsCore::redirect('index.php?view=usergroups');
@@ -130,7 +125,7 @@ function applet_usergroups(){
                { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
             } else { $item_id = cmsCore::request('id', 'int', 0); }
 
-            $mod = $inDB->get_fields('cms_user_groups', "id = '$item_id'", '*');
+            $mod = cmsCore::c('db')->get_fields('cms_user_groups', "id = '$item_id'", '*');
             if(!$mod){ cmsCore::error404(); }
 
             echo '<h3>'.$_LANG['AD_EDIT_GROUP'].' '.$ostatok.'</h3>';
@@ -219,9 +214,9 @@ function applet_usergroups(){
 
 						<?php
 							$sql = "SELECT * FROM cms_components WHERE config <> '' ORDER BY title";
-							$res = $inDB->query($sql);
+							$res = cmsCore::c('db')->query($sql);
 
-							while ($com = $inDB->fetch_assoc($res)) {
+							while ($com = cmsCore::c('db')->fetch_assoc($res)) {
 						?>
 						<tr>
 							<td width="16"><input type="checkbox" name="access[]" id="admin_com_<?php echo $com['link']; ?>" value="admin/com_<?php echo $com['link']; ?>" <?php if (isset($mod['access'])) { if (in_array('admin/com_'.$com['link'], $mod['access'])) { echo 'checked="checked"'; } }?> /></td>
@@ -244,9 +239,9 @@ function applet_usergroups(){
 
 					<?php
                         $sql = "SELECT * FROM cms_user_groups_access ORDER BY access_type";
-                        $res = $inDB->query($sql);
+                        $res = cmsCore::c('db')->query($sql);
 
-                        while ($ga = $inDB->fetch_assoc($res)) {
+                        while ($ga = cmsCore::c('db')->fetch_assoc($res)) {
                             if($mod['alias']=='guest' && $ga['hide_for_guest']){
                                 continue;
                             }

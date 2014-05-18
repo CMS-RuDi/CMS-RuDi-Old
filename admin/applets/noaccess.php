@@ -17,7 +17,7 @@ function applet_noaccess(){
 
     global $_LANG;
 
-    $GLOBALS['cp_page_title'] = $_LANG['ACCESS_DENIED'];
+    cmsCore::c('page')->setAdminTitle($_LANG['ACCESS_DENIED']);
  	cpAddPathway($_LANG['ACCESS_DENIED'], 'index.php?view=noaccess');
 
     echo '<h3>'.$_LANG['ACCESS_DENIED'].'</h3>';

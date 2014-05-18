@@ -13,10 +13,9 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 
 function cpPriceInput($item){
-	$inDB = cmsDatabase::getInstance();
 	$sql = "SELECT view_type FROM cms_uc_cats WHERE id = '{$item['category_id']}'";
-	$rs = $inDB->query($sql) ;
-	$show = $inDB->fetch_assoc($rs);
+	$rs = cmsCore::c('db')->query($sql) ;
+	$show = cmsCore::c('db')->fetch_assoc($rs);
 
 	if ($show['view_type'] == 'shop'){
 		$price = number_format($item['price'], 2, '.', '');
@@ -37,7 +36,7 @@ $opt = cmsCore::request('opt', 'str', 'list_cats');
 define('IS_BILLING', $inCore->isComponentInstalled('billing'));
 if (IS_BILLING) { cmsCore::loadClass('billing'); }
 
-$GLOBALS['cp_page_head'][] = '<script type="text/javascript" src="/admin/components/catalog/js/common.js"></script>';
+cmsCore::c('page')->addHeadJS('admin/components/catalog/js/common.js');
 
 echo '<script>';
 echo cmsPage::getLangJS('AD_HOW_MANY_COPY');
@@ -139,8 +138,8 @@ if ($opt == 'go_import_xls'){
             }
         }
 
-        $item['fieldsdata'] = $inDB->escape_string(cmsCore::arrayToYaml($fields));
-        $item['title']      = $inDB->escape_string($title);
+        $item['fieldsdata'] = cmsCore::c('db')->escape_string(cmsCore::arrayToYaml($fields));
+        $item['title']      = cmsCore::c('db')->escape_string($title);
 
         if ($item['title'] && $item['fieldsdata']){
 
@@ -169,7 +168,7 @@ if ($opt=='saveprices'){
             $price = str_replace(',', '.', $price);
             $price = number_format($price, 2, '.', '');
             $sql = "UPDATE cms_uc_items SET price='$price' WHERE id = $id";
-            $inDB->query($sql);
+            cmsCore::c('db')->query($sql);
         }
     }
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
@@ -183,13 +182,13 @@ if ($opt == 'show_item'){
     if (!isset($_REQUEST['item'])){
         if (isset($_REQUEST['item_id'])){
             dbShow('cms_uc_items', $_REQUEST['item_id']);
-            $inDB->query('UPDATE cms_uc_items SET on_moderate = 0 WHERE id='.(int)$_REQUEST['item_id']);
+            cmsCore::c('db')->query('UPDATE cms_uc_items SET on_moderate = 0 WHERE id='.(int)$_REQUEST['item_id']);
         }
         echo '1'; exit;
     } else {
         dbShowList('cms_uc_items', $_REQUEST['item']);
         foreach($_REQUEST['item'] as $k=>$id){
-            $inDB->query('UPDATE cms_uc_items SET on_moderate = 0 WHERE id='.(int)$id);
+            cmsCore::c('db')->query('UPDATE cms_uc_items SET on_moderate = 0 WHERE id='.(int)$id);
         }
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
         cmsCore::redirectBack();
@@ -267,14 +266,14 @@ if($opt == 'delete_discount'){
 if ($opt == 'show_cat'){
     $item_id = cmsCore::request('item_id', 'int');
     $sql = "UPDATE cms_uc_cats SET published = 1 WHERE id = '$item_id'";
-    $inDB->query($sql) ;
+    cmsCore::c('db')->query($sql) ;
     echo '1'; exit;
 }
 
 if ($opt == 'hide_cat'){
     $item_id = cmsCore::request('item_id', 'int');
     $sql = "UPDATE cms_uc_cats SET published = 0 WHERE id = '$item_id'";
-    $inDB->query($sql) ;
+    cmsCore::c('db')->query($sql) ;
     echo '1'; exit;
 }
 
@@ -288,7 +287,7 @@ if ($opt == 'submit_cat' || $opt == 'update_cat'){
     $cat['parent_id']      = cmsCore::request('parent_id', 'int');
     $cat['title']          = cmsCore::request('title', 'str', $_LANG['AD_UNTITLED']);
     $cat['description']    = cmsCore::request('description', 'html');
-    $cat['description']    = $inDB->escape_string($cat['description']);
+    $cat['description']    = cmsCore::c('db')->escape_string($cat['description']);
     $cat['published']      = cmsCore::request('published', 'int');
     $cat['view_type']      = cmsCore::request('view_type', 'str');
     $cat['fields_show']    = cmsCore::request('fieldsshow', 'int');
@@ -309,7 +308,7 @@ if ($opt == 'submit_cat' || $opt == 'update_cat'){
     if (!is_numeric($cat['cost'])) { $cat['cost'] = ''; }
 
     if (cmsCore::request('copy_parent_struct')){
-        $fstruct = $inDB->get_field('cms_uc_cats', "id='{$cat['parent_id']}'", 'fieldsstruct');
+        $fstruct = cmsCore::c('db')->get_field('cms_uc_cats', "id='{$cat['parent_id']}'", 'fieldsstruct');
     } else {
         $fstruct = cmsCore::request('fstruct', 'array', array());
         foreach ($fstruct as $key=>$value) {
@@ -320,11 +319,11 @@ if ($opt == 'submit_cat' || $opt == 'update_cat'){
         }
         $fstruct = cmsCore::arrayToYaml($fstruct);
     }
-    $cat['fieldsstruct'] = $inDB->escape_string($fstruct);
+    $cat['fieldsstruct'] = cmsCore::c('db')->escape_string($fstruct);
 
     if ($opt == 'submit_cat'){
 
-        $cat_id = $inDB->addNsCategory('cms_uc_cats', cmsCore::callEvent('ADD_CATALOG_CAT', $cat));
+        $cat_id = cmsCore::c('db')->addNsCategory('cms_uc_cats', cmsCore::callEvent('ADD_CATALOG_CAT', $cat));
 
     } else {
 
@@ -385,7 +384,7 @@ if ($opt == 'list_cats'){
 
 if ($opt == 'list_items'){
 
-    $GLOBALS['cp_page_head'][] = '<script type="text/javascript" src="/admin/components/catalog/js/common.js"></script>';
+    cmsCore::c('page')->addHeadJS('admin/components/catalog/js/common.js');
     cpAddPathway($_LANG['AD_ITEMS']);
 
     if (cmsCore::inRequest('on_moderate')){
@@ -476,11 +475,11 @@ if ($opt == 'add_item'){
             FROM cms_uc_cats
             WHERE parent_id > 0
             ORDER BY NSLeft";
-    $result = $inDB->query($sql);
+    $result = cmsCore::c('db')->query($sql);
 
-    if ($inDB->num_rows($result)){
+    if (cmsCore::c('db')->num_rows($result)){
         echo '<div style="padding:10px">';
-            while ($cat = $inDB->fetch_assoc($result)){
+            while ($cat = cmsCore::c('db')->fetch_assoc($result)){
                 echo '<div style="padding:2px;padding-left:18px;margin-left:'.(($cat['NSLevel']-1)*15).'px;background:url(/admin/images/icons/hmenu/cats.png) no-repeat">
                           <a href="/catalog/'.$cat['id'].'/add.html">'.$cat['title'].'</a>
                       </div>';
@@ -496,14 +495,14 @@ if ($opt == 'add_item'){
 if ($opt == 'add_cat' || $opt == 'edit_cat'){
 
     require('../includes/jwtabs.php');
-    $GLOBALS['cp_page_head'][] = jwHeader();
+    cmsCore::c('page')->addHead(jwHeader());
 
     if ($opt=='add_cat'){
         echo '<h3>'.$_LANG['AD_NEW_CAT'].'</h3>';
         cpAddPathway($_LANG['AD_NEW_CAT']);
     } else {
         $item_id = cmsCore::request('item_id', 'int', 0);
-        $mod = $inDB->get_fields('cms_uc_cats', "id = '$item_id'", '*');
+        $mod = cmsCore::c('db')->get_fields('cms_uc_cats', "id = '$item_id'", '*');
         if(!$mod){ cmsCore::error404(); }
         $fstruct = cmsCore::yamlToArray($mod['fieldsstruct']);
         echo '<h3>'.$_LANG['AD_CAT_BOARD'].': '.$mod['title'].'</h3>';
@@ -634,7 +633,7 @@ if ($opt == 'add_cat' || $opt == 'edit_cat'){
 
                 <div style="margin-top:7px">
                     <select name="parent_id" size="8" id="parent_id" style="width:99%;height:200px">
-                        <?php $rootid = $inDB->get_field('cms_uc_cats', 'parent_id=0', 'id'); ?>
+                        <?php $rootid = cmsCore::c('db')->get_field('cms_uc_cats', 'parent_id=0', 'id'); ?>
                         <option value="<?php echo $rootid; ?>" <?php if (@$mod['parent_id']==$rootid || !isset($mod['parent_id'])) { echo 'selected'; }?>><?php echo $_LANG['AD_CATALOG_ROOT'];?></option>
                         <?php
                             if (isset($mod['parent_id'])){
@@ -764,11 +763,11 @@ if ($opt == 'add_cat' || $opt == 'edit_cat'){
                                 if ($opt == 'edit_cat'){
 
                                     $sql2 = "SELECT * FROM cms_uc_cats_access WHERE cat_id = ".$mod['id'];
-                                    $result2 = $inDB->query($sql2);
+                                    $result2 = cmsCore::c('db')->query($sql2);
                                     $ord = array();
 
-                                    if ($inDB->num_rows($result2)){
-                                        while ($r = $inDB->fetch_assoc($result2)){
+                                    if (cmsCore::c('db')->num_rows($result2)){
+                                        while ($r = cmsCore::c('db')->fetch_assoc($result2)){
                                             $ord[] = $r['group_id'];
                                         }
                                     }
@@ -797,10 +796,10 @@ if ($opt == 'add_cat' || $opt == 'edit_cat'){
                             echo '<select style="width: 99%" name="showfor[]" id="showin" size="6" multiple="multiple" '.(@$mod['is_public']?'':'disabled="disabled"').'>';
 
                             $sql    = "SELECT * FROM cms_user_groups";
-                            $result = $inDB->query($sql) ;
+                            $result = cmsCore::c('db')->query($sql) ;
 
-                            if ($inDB->num_rows($result)){
-                                while ($item = $inDB->fetch_assoc($result)){
+                            if (cmsCore::c('db')->num_rows($result)){
+                                while ($item = cmsCore::c('db')->fetch_assoc($result)){
                                     if($item['alias'] != 'guest'){
                                         echo '<option value="'.$item['id'].'"';
                                         if ($opt=='edit_cat'){
@@ -875,7 +874,7 @@ if ($opt == 'add_discount' || $opt == 'edit_discount'){
         cpAddPathway($_LANG['AD_COEFFICIENT_ADD']);
     } else {
         $item_id = cmsCore::request('item_id', 'int', 0);
-        $mod = $inDB->get_fields('cms_uc_discount', "id = '$item_id'", '*');
+        $mod = cmsCore::c('db')->get_fields('cms_uc_discount', "id = '$item_id'", '*');
         if(!$mod){ cmsCore::error404(); }
 
         echo '<h3>'.$mod['title'].'</h3>';
@@ -1084,7 +1083,7 @@ if ($opt == 'import_xls'){
     if (cmsCore::inRequest('cat_id')){
 
         $cat_id = cmsCore::request('cat_id', 'int', 0);
-        $cat = $inDB->get_fields('cms_uc_cats', "id = '$cat_id'", '*');
+        $cat = cmsCore::c('db')->get_fields('cms_uc_cats', "id = '$cat_id'", '*');
         if(!$cat){ cmsCore::error404(); }
         $fstruct = cmsCore::yamlToArray($cat['fieldsstruct']);
 
@@ -1256,11 +1255,11 @@ if ($opt == 'import_xls'){
                 FROM cms_uc_cats
                 WHERE parent_id > 0
                 ORDER BY NSLeft";
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        if ($inDB->num_rows($result)){
+        if (cmsCore::c('db')->num_rows($result)){
             echo '<div style="padding:10px">';
-                while ($cat = $inDB->fetch_assoc($result)){
+                while ($cat = cmsCore::c('db')->fetch_assoc($result)){
                     echo '<div style="padding:2px;padding-left:18px;margin-left:'.(($cat['NSLevel']-1)*15).'px;background:url(/admin/images/icons/hmenu/cats.png) no-repeat">
                               <a href="?view=components&do=config&id='.$id.'&opt=import_xls&cat_id='.$cat['id'].'">'.$cat['title'].'</a>
                           </div>';

@@ -11,9 +11,9 @@
                 </h2>
                 {if $article.showdesc}
                     <div class="con_desc">
-                        {if $article.image}
+                        {if $article.image_small}
                             <div class="con_image">
-                                <img src="/images/photos/small/{$article.image}" border="0" alt="{$article.title|escape:'html'}"/>
+                                <img src="{$article.image_small}" border="0" alt="{$article.title|escape:'html'}"/>
                             </div>
                         {/if}
                         {$article.description}

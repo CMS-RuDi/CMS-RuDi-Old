@@ -278,4 +278,5 @@ $_LANG['AD_FILE_TYPES']  = 'Доступные типы файлов';
 
 $_LANG['AJAX_FILE_UPLOAD_NOT_SUPPORTED'] = 'Ваш браузер не поддерживает Flash, Silverlight и HTML5 загрузку файлов.';
 $_LANG['MODEL_NOT_FOUND'] = 'Критическая ошибка. Класс модели компонента "%s" не обнаружен.';
-$_LANG['CLASS_NOT_FOUND'] = 'Критическая ошибка. Класс "%s" не обнаружен.';
+$_LANG['CLASS_NOT_FOUND'] = 'Критическая ошибка. Класс "/core/classes/%s.class.php" не обнаружен.';
+$_LANG['CLASS_METHOD_NOT_FOUND'] = 'Критическая ошибка. Метод "%s" в классе "%s" из файла "/core/classes/%s.class.php" отсутствует.';

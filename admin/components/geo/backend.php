@@ -75,7 +75,7 @@ function getRegion($id){
         $ids = cmsCore::request('ids', 'array_int', array());
 
         foreach ($ord as $id=>$ordering){
-            $inDB->query("UPDATE cms_geo_countries SET ordering = '$ordering' WHERE id = '{$ids[$id]}'");
+            cmsCore::c('db')->query("UPDATE cms_geo_countries SET ordering = '$ordering' WHERE id = '{$ids[$id]}'");
         }
 
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
@@ -219,9 +219,9 @@ function getRegion($id){
         $items = cmsCore::getArrayFromRequest($types);
 
         if($opt == 'do_add'){
-            $inDB->insert($table, $items);
+            cmsCore::c('db')->insert($table, $items);
         } else {
-            $inDB->update($table, $items, $item_id);
+            cmsCore::c('db')->update($table, $items, $item_id);
         }
 
 		cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
@@ -242,7 +242,7 @@ function getRegion($id){
         $table = ($sub_opt == 'country') ? 'cms_geo_countries' : ($sub_opt == 'region' ? 'cms_geo_regions' : 'cms_geo_cities');
         $redirect = ($sub_opt == 'country') ? 'countries' : ($sub_opt == 'region' ? 'regions' : 'cities');
 
-        $inDB->delete($table, "id='$item_id'", 1);
+        cmsCore::c('db')->delete($table, "id='$item_id'", 1);
 
 		cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
 
@@ -261,7 +261,7 @@ function getRegion($id){
 
             $table = ($sub_opt == 'country') ? 'cms_geo_countries' : ($sub_opt == 'region' ? 'cms_geo_regions' : 'cms_geo_cities');
 
-            $item = $inDB->get_fields($table, "id='$item_id'", '*');
+            $item = cmsCore::c('db')->get_fields($table, "id='$item_id'", '*');
             if(!$item){ cmsCore::error404(); }
             cpAddPathway($_LANG['EDIT'].' '.mb_strtolower($_LANG['AD_'.mb_strtoupper($sub_opt)]));
         } elseif($sub_opt) {
@@ -295,7 +295,7 @@ function getRegion($id){
                 </tr>
                 <?php if($sub_opt == 'country'){
                     if(!isset($item['ordering'])){
-                        $item['ordering'] = 1 + $inDB->get_field('cms_geo_countries', "1=1 ORDER BY ordering DESC", 'ordering');
+                        $item['ordering'] = 1 + cmsCore::c('db')->get_field('cms_geo_countries', "1=1 ORDER BY ordering DESC", 'ordering');
                     }
                     ?>
                 <tr>

@@ -100,7 +100,7 @@ if ($opt == 'submit'){
     if (!cmsCore::validateForm()) { cmsCore::error404(); }
 
     $title 			= cmsCore::request('title', 'str', 'NO_TITLE');
-    $description    = $inDB->escape_string(cmsCore::request('description', 'html', ''));
+    $description    = cmsCore::c('db')->escape_string(cmsCore::request('description', 'html', ''));
     $published 		= cmsCore::request('published', 'int');
     $admin_id 		= cmsCore::request('admin_id', 'int');
     $clubtype		= cmsCore::request('clubtype', 'str');
@@ -138,7 +138,7 @@ if ($opt == 'update'){
 	$item_id = cmsCore::request('item_id', 'int', 0);
 
 	$new_club['title'] 			= cmsCore::request('title', 'str', 'NO_TITLE');
-	$new_club['description']    = $inDB->escape_string(cmsCore::request('description', 'html', ''));
+	$new_club['description']    = cmsCore::c('db')->escape_string(cmsCore::request('description', 'html', ''));
 	$new_club['published'] 		= cmsCore::request('published', 'int');
 	$new_club['admin_id'] 		= cmsCore::request('admin_id', 'int');
 	$new_club['clubtype']		= cmsCore::request('clubtype', 'str');
@@ -228,11 +228,11 @@ if ($opt == 'add' || $opt == 'edit'){
     }
 
     if(!isset($mod['maxsize'])) { $mod['maxsize'] = 0; }
-    if(!isset($mod['admin_id'])) { $mod['admin_id'] = $inUser->id; }
+    if(!isset($mod['admin_id'])) { $mod['admin_id'] = cmsCore::c('user')->id; }
     if(!isset($mod['clubtype'])) { $mod['clubtype'] = 'public'; }
 
     require('../includes/jwtabs.php');
-    $GLOBALS['cp_page_head'][] = jwHeader();
+    cmsCore::c('page')->addHead(jwHeader());
 
     ob_start(); ?>
 
@@ -354,9 +354,7 @@ if ($opt == 'add' || $opt == 'edit'){
 }
 
 if ($opt=='config') {
-
-	$GLOBALS['cp_page_head'][] = '<script type="text/javascript" src="/includes/jquery/tabs/jquery.ui.min.js"></script>';
-	$GLOBALS['cp_page_head'][] = '<link href="/includes/jquery/tabs/tabs.css" rel="stylesheet" type="text/css" />';
+        cmsCore::c('page')->addHeadCSS('includes/jquery/tabs/tabs.css');
 
     cpAddPathway($_LANG['AD_SETTINGS']);
 

@@ -16,11 +16,10 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 function applet_arhive(){
 
     $inCore = cmsCore::getInstance();
-    $inDB   = cmsDatabase::getInstance();
 
 	global $_LANG;
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_ARTICLES_ARCHIVE'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES_ARCHIVE']);
 
 	$cfg = $inCore->loadComponentConfig('content');
 	$cfg_arhive = $inCore->loadComponentConfig('arhive');
@@ -115,7 +114,7 @@ function applet_arhive(){
 	if ($do == 'arhive_off'){
 		if(isset($_REQUEST['id'])) {
 			$sql = "UPDATE cms_content SET is_arhive = 0 WHERE id = '$id'";
-			$inDB->query($sql) ;
+			cmsCore::c('db')->query($sql) ;
             cmsCore::redirect('?view=arhive');
 		}
 	}

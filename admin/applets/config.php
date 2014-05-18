@@ -17,14 +17,12 @@ function applet_config(){
 
     // получаем оригинальный конфиг
     $config = cmsConfig::getDefaultConfig();
-    $inPage = cmsPage::getInstance();
-    $inDB   = cmsDatabase::getInstance();
 
 	global $_LANG;
 	global $adminAccess;
 	if (!cmsUser::isAdminCan('admin/config', $adminAccess)) { cpAccessDenied(); }
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_SITE_SETTING'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_SITE_SETTING']);
 
 	cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
 
@@ -299,7 +297,7 @@ function applet_config(){
                             foreach ($templates as $template) {
                                 echo '<option value="'.$template.'" '.($config['template'] == $template ? 'selected="selected"': '').'>'.$template.'</option>';
                             }
-                            $tpl_info = $inPage->getCurrentTplInfo();
+                            $tpl_info = cmsCore::c('page')->getCurrentTplInfo();
                             ?>
                         </select>
                             <?php if(file_exists(PATH.'/templates/'.TEMPLATE.'/positions.jpg')){ ?>
@@ -364,9 +362,9 @@ function applet_config(){
 					</td>
 					<td width="350">
                         <?php
-                        $result = $inDB->query("SELECT (sum(data_length)+sum(index_length))/1024/1024 as size FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = '{$config['db_base']}'", true);
-                        if(!$inDB->error()){
-                            $s = $inDB->fetch_assoc($result);
+                        $result = cmsCore::c('db')->query("SELECT (sum(data_length)+sum(index_length))/1024/1024 as size FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = '{$config['db_base']}'", true);
+                        if(!cmsCore::c('db')->error()){
+                            $s = cmsCore::c('db')->fetch_assoc($result);
                             echo round($s['size'], 2).' '.$_LANG['SIZE_MB'];
                         } else {
                             echo $_LANG['AD_DB_SIZE_ERROR'];

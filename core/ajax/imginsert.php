@@ -44,7 +44,6 @@
         array(
             'img_max' => 50,
             'img_on' => 1,
-            'watermark' => 1,
             'img_w' => 600, // Будет удалено в скором времени
             'img_h' => 600, // Будет удалено в скором времени
             'imgs_big_w' => 600,
@@ -53,7 +52,12 @@
             'imgs_medium_h' => 300,
             'imgs_small_w' => 100,
             'imgs_small_h' => 100,
-            'resize_type' => 'auto'
+            'resize_type' => 'auto',
+            'mresize_type' => 'auto',
+            'sresize_type' => 'auto',
+            'imgs_quality' => 80,
+            'watermark' => 1,
+            'watermark_only_big' => false
         ),
         $cfg
     );
@@ -82,7 +86,7 @@
     }
 
     // Не превышен ли лимит
-    if (cmsCore::getTargetCount($target_id, $target, $component) >= $cfg['img_max']){
+    if (cmsCore::getTargetCount($target_id, $target, $component) >= $cfg['img_max'] && !cmsCore::c('user')->is_admin){
         cmsCore::jsonOutput(array('error' => $_LANG['UPLOAD_IMG_LIMIT'], 'msg' => ''), false);
     }
         
@@ -111,17 +115,15 @@
     //----------------------------------------------------------------------
 
     //Выставляем опции отвечающие за нанесение водяного знака
-    cmsCore::c('images')->watermark = $cfg['watermark'];
-    cmsCore::c('images')->mwatermark = $cfg['watermark'];
+    cmsCore::c('images')->watermark  = $cfg['watermark'];
+    if (empty($cfg['watermark_only_big'])){
+        cmsCore::c('images')->mwatermark = $cfg['watermark'];
+    }
 
     //Выставляем правило по которому будут изменяться размеры изображения
-    cmsCore::c('images')->resize_type = $cfg['resize_type'];
-    if (!empty($cfg['mresize_type'])){
-        cmsCore::c('images')->mresize_type = $cfg['mresize_type'];
-    }
-    if (!empty($cfg['sresize_type'])){
-        cmsCore::c('images')->sresize_type = $cfg['sresize_type'];
-    }
+    cmsCore::c('images')->resize_type  = $cfg['resize_type'];
+    cmsCore::c('images')->mresize_type = $cfg['mresize_type'];
+    cmsCore::c('images')->sresize_type = $cfg['sresize_type'];
 
     //Выставляем пути сохранения изображения
     cmsCore::c('images')->big_dir    = PATH .'/upload/'. $component .'/big/'. $ym .'/'. $d .'/'. $f .'/';
@@ -145,6 +147,10 @@
         cmsCore::c('images')->new_sw = $cfg['imgs_small_w'];
         cmsCore::c('images')->new_sh = $cfg['imgs_small_h'];
     }
+    
+    //Выставляем качество итогового изображения
+    cmsCore::c('images')->quality = $cfg['imgs_quality'];
+    
 
     $tmp_file_name = $component .'_'. md5(microtime(true)) .'.tmp';
 

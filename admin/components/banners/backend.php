@@ -102,17 +102,17 @@ if ($opt == 'submit' || $opt == 'update'){
 
                 $sql = "INSERT INTO cms_banners (position, typeimg, fileurl, hits, clicks, maxhits, maxuser, user_id, pubdate, title, link, published)
                         VALUES ('$position', '$typeimg', '$filename', 0, 0, '$maxhits', '$maxuser', 1, NOW(), '$title', '$link', '$published')";
-                $inDB->query($sql);
+                cmsCore::c('db')->query($sql);
 
                 cmsCore::redirect('?view=components&do=config&opt=list&id='.$id);
 
             } else {
 
-                $fileurl = $inDB->get_field('cms_banners', "id = '$item_id'", 'fileurl');
+                $fileurl = cmsCore::c('db')->get_field('cms_banners', "id = '$item_id'", 'fileurl');
                 @unlink($uploaddir.$fileurl);
 
                 $sql = "UPDATE cms_banners SET fileurl = '$filename' WHERE id = '$item_id'";
-                $inDB->query($sql) ;
+                cmsCore::c('db')->query($sql) ;
 
             }
 
@@ -140,7 +140,7 @@ if ($opt == 'submit' || $opt == 'update'){
                     link = '$link'
                 WHERE id = '$item_id'";
 
-        $inDB->query($sql);
+        cmsCore::c('db')->query($sql);
 
         if (!isset($_SESSION['editlist']) || @sizeof($_SESSION['editlist'])==0){
             cmsCore::redirect('?view=components&do=config&opt=list&id='.$id);
@@ -156,12 +156,12 @@ if($opt == 'delete'){
 
     $item_id = cmsCore::request('item_id', 'int', 0);
 
-    $fileurl = $inDB->get_field('cms_banners', "id = '$item_id'", 'fileurl');
+    $fileurl = cmsCore::c('db')->get_field('cms_banners', "id = '$item_id'", 'fileurl');
     if(!$fileurl){ cmsCore::error404(); }
     @unlink($uploaddir.$fileurl);
 
-    $inDB->query("DELETE FROM cms_banners WHERE id = '$item_id'");
-    $inDB->query("DELETE FROM cms_banner_hits WHERE banner_id = '$item_id'");
+    cmsCore::c('db')->query("DELETE FROM cms_banners WHERE id = '$item_id'");
+    cmsCore::c('db')->query("DELETE FROM cms_banner_hits WHERE banner_id = '$item_id'");
 
     cmsCore::redirectBack();
 

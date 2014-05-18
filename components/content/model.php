@@ -265,8 +265,14 @@ class cms_model_content{
             $article['comments'] = cmsCore::getCommentsCount('article', $article['id']);
             $article['url']      = $this->getArticleURL(null, $article['seolink']);
             $article['cat_url']  = $this->getCategoryURL(null, $article['catseolink']);
-            $article['image']    = (file_exists(PATH.'/images/photos/small/article'.$article['id'].'.jpg') ? 'article'.$article['id'].'.jpg' : '');
+            
+            if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')){
+                $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
+                $article['image_small'] = '/images/content/small/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
+            }
+            
             if (!empty($article['images'])){ $article['images'] = json_decode($article['images'], true); }
+            
             $articles[] = $article;
         }
 
@@ -341,6 +347,12 @@ class cms_model_content{
         if (!cmsCore::c('db')->num_rows($result)) { return false; }
 
         $article = cmsCore::c('db')->fetch_assoc($result);
+        
+        if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')){
+            $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
+            $article['image_small'] = '/images/content/small/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
+        }
+        
         if (!empty($article['images'])){
             $article['images'] = json_decode($article['images'], true);
         }
@@ -511,11 +523,10 @@ class cms_model_content{
 
         cmsActions::removeObjectLog('add_article', $id);
 
-        @unlink(PATH.'/images/photos/small/article'.$id.'.jpg');
-        @unlink(PATH.'/images/photos/medium/article'.$id.'.jpg');
+        @unlink(PATH .'/images/content/medium/'. ceil($id/100) .'/article'. $id .'.jpg');
+        @unlink(PATH .'/images/content/small/'. ceil($id/100) .'/article'. $id .'.jpg');
         
         cmsCore::deleteUploadImages($id, '', 'content');
-
         cmsCore::deleteRatings('content', $id);
         cmsCore::deleteComments('article', $id);
 
@@ -561,6 +572,8 @@ class cms_model_content{
 
             cmsInsertTags($article['tags'], 'content', $article['id']);
 
+            cmsCore::callEvent('ADD_ARTICLE_SUCCESS', $article);
+            
             if ($article['published']) { cmsCore::callEvent('ADD_ARTICLE_DONE', $article); }
             
             
@@ -572,6 +585,31 @@ class cms_model_content{
         return $article['id'] ? $article['id'] : false;
     }
 
+    public function uploadArticeImage($id, $delete=false){
+        if ($delete){
+            @unlink(PATH .'/images/content/small/'. ceil($id/100). '/article'. $id .'.jpg');
+            @unlink(PATH .'/images/content/medium/'. ceil($id/100). '/article'. $id .'.jpg');
+        }
+        
+        
+        cmsCore::c('images')->filename    = 'article'. $id .'.jpg';
+        
+        cmsCore::c('images')->mwatermark  = $this->config['watermark'];
+        
+        cmsCore::c('images')->big_dir     = PATH .'/images/content/';
+        cmsCore::c('images')->medium_dir  = 'medium/'. ceil($id/100) .'/';
+        cmsCore::c('images')->small_dir   = 'small/'. ceil($id/100) .'/';
+        
+        cmsCore::c('images')->new_mw      = $this->config['img_big_w'];
+        cmsCore::c('images')->new_mh      = $this->config['img_big_w'];
+        cmsCore::c('images')->new_sw      = $this->config['img_small_w'];
+        cmsCore::c('images')->new_sh      = $this->config['img_small_w'];
+        
+        cmsCore::c('images')->resize_type = $this->config['img_sqr'] ? 'exact' : 'auto';
+        
+        cmsCore::c('images')->resize('picture', true);
+    }
+    
     /* ==================================================================================================== */
 /* ==================================================================================================== */
     /**

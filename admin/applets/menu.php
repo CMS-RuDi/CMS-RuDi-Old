@@ -37,7 +37,6 @@ function iconList(){
 
 function cpMenutypeById($item){
     global $_LANG;
-    $inDB   = cmsDatabase::getInstance();
 
 	$html   = '';
 	$maxlen = 35;
@@ -45,22 +44,22 @@ function cpMenutypeById($item){
 	switch($item['linktype']){
         case 'link': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_LINK'].'</a></span> - '.$item['linkid'];
 				     break;
-        case 'component': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_COMPONENT'].'</a></span> - '.$inDB->get_field('cms_components', "link='".$item['linkid']."'", 'title');
+        case 'component': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_COMPONENT'].'</a></span> - '.cmsCore::c('db')->get_field('cms_components', "link='".$item['linkid']."'", 'title');
 					 	  break;
-        case 'content': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_ARTICLE'].'</a></span> - '.$inDB->get_field('cms_content', 'id='.$item['linkid'], 'title');
+        case 'content': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_ARTICLE'].'</a></span> - '.cmsCore::c('db')->get_field('cms_content', 'id='.$item['linkid'], 'title');
 					 	break;
-        case 'category': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_PARTITION'].'</a></span> - '.$inDB->get_field('cms_category', 'id='.$item['linkid'], 'title');
+        case 'category': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_PARTITION'].'</a></span> - '.cmsCore::c('db')->get_field('cms_category', 'id='.$item['linkid'], 'title');
 					 	 break;
         case 'video_cat': 
             if(cmsCore::getInstance()->isComponentInstalled('video')){ 
-                $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_VIDEO_PARTITION'].'</a></span> - '.$inDB->get_field('cms_video_category', 'id='.$item['linkid'], 'title'); 
+                $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_VIDEO_PARTITION'].'</a></span> - '.cmsCore::c('db')->get_field('cms_video_category', 'id='.$item['linkid'], 'title'); 
             } 
             break; 
-        case 'uccat': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_CATEGORY'].'</a></span> - '.$inDB->get_field('cms_uc_cats', 'id='.$item['linkid'], 'title');
+        case 'uccat': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_CATEGORY'].'</a></span> - '.cmsCore::c('db')->get_field('cms_uc_cats', 'id='.$item['linkid'], 'title');
 					  break;
-        case 'blog': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_BLOG'].'</a></span> - '.$inDB->get_field('cms_blogs', 'id='.$item['linkid'], 'title');
+        case 'blog': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_BLOG'].'</a></span> - '.cmsCore::c('db')->get_field('cms_blogs', 'id='.$item['linkid'], 'title');
 				     break;
-        case 'photoalbum': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_ALBUM'].'</a></span> - '.$inDB->get_field('cms_photo_albums', 'id='.$item['linkid'], 'title');
+        case 'photoalbum': $html = '<span id="menutype"><a target="_blank" href="'.$item['link'].'">'.$_LANG['AD_TYPE_ALBUM'].'</a></span> - '.cmsCore::c('db')->get_field('cms_photo_albums', 'id='.$item['linkid'], 'title');
 					 	   break;
 	}
 	$clear = strip_tags($html);
@@ -72,14 +71,13 @@ function cpMenutypeById($item){
 function applet_menu(){
 
     $inCore = cmsCore::getInstance();
-	$inDB   = cmsDatabase::getInstance();
 
 	global $_LANG;
 	global $adminAccess;
 
 	if (!cmsUser::isAdminCan('admin/menu', $adminAccess)) { cpAccessDenied(); }
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_MENU'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_MENU']);
  	cpAddPathway($_LANG['AD_MENU'], 'index.php?view=menu');
 
 	$do = cmsCore::request('do', 'str', 'list');
@@ -120,12 +118,12 @@ function applet_menu(){
     }
 
 	if ($do == 'move_up'){
-        $inDB->moveNsCategory('cms_menu', $id, 'up');
+        cmsCore::c('db')->moveNsCategory('cms_menu', $id, 'up');
 		cmsCore::redirectBack();
 	}
 
 	if ($do == 'move_down'){
-		$inDB->moveNsCategory('cms_menu', $id, 'down');;
+		cmsCore::c('db')->moveNsCategory('cms_menu', $id, 'down');;
 		cmsCore::redirectBack();
 	}
 
@@ -153,9 +151,9 @@ function applet_menu(){
 
 	if ($do == 'delete'){
 		if (!isset($_REQUEST['item'])){
-			if ($id >= 0){ dbDeleteNS('cms_menu', $id);  }
+                    if ($id >= 0){ cmsCore::c('db')->deleteNS('cms_menu', $id); }
 		} else {
-			dbDeleteListNS('cms_menu', $_REQUEST['item']);
+                    cmsCore::c('db')->deleteListNS('cms_menu', $_REQUEST['item']);
 		}
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
 		cmsCore::redirectBack();
@@ -204,7 +202,7 @@ function applet_menu(){
                     iconurl='$iconurl'
                 WHERE id = '$id'
                 LIMIT 1";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
 
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
 
@@ -252,7 +250,7 @@ function applet_menu(){
 					iconurl='$iconurl'
 				WHERE id = '$myid'";
 
-		$inDB->query($sql);
+		cmsCore::c('db')->query($sql);
 
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
 
@@ -265,8 +263,8 @@ function applet_menu(){
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
 		$sql = "SELECT ordering as max_o FROM cms_modules ORDER BY ordering DESC LIMIT 1";
-		$result = $inDB->query($sql) ;
-		$row = $inDB->fetch_assoc($result);
+		$result = cmsCore::c('db')->query($sql) ;
+		$row = cmsCore::c('db')->fetch_assoc($result);
 		$maxorder = $row['max_o'] + 1;
 
         $menu       = cmsCore::request('menu', 'str', '');
@@ -285,9 +283,9 @@ function applet_menu(){
 		$sql = "INSERT INTO cms_modules (position, name, title, is_external, content, ordering, showtitle, published, user, config, css_prefix, access_list)
                 VALUES ('$position', '{$_LANG['AD_MENU']}', '$title', 1, 'mod_menu', $maxorder, 1, $published, 0, '$cfg_str', '$css_prefix', '$access_list')";
 
-		$inDB->query($sql) ;
+		cmsCore::c('db')->query($sql) ;
 
-		$newid = $inDB->get_last_id('cms_modules');
+		$newid = cmsCore::c('db')->get_last_id('cms_modules');
 
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
 
@@ -296,7 +294,7 @@ function applet_menu(){
 	}
 
     if ($do == 'addmenu' || $do == 'add' || $do == 'edit'){
-        $GLOBALS['cp_page_head'][] = '<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>';
+        cmsCore::c('page')->addHeadJS('admin/js/menu.js');
         echo '<script>';
         echo cmsPage::getLangJS('AD_SPECIFY_LINK_MENU');
         echo '</script>';
@@ -304,7 +302,7 @@ function applet_menu(){
 
     if ($do == 'addmenu'){
 
-        $GLOBALS['cp_page_title'] = $_LANG['AD_MENU_ADD'];
+        cmsCore::c('page')->setAdminTitle($_LANG['AD_MENU_ADD']);
         cpAddPathway($_LANG['AD_MENU_ADD']);
 
         $menu_list = cpGetList('menu');
@@ -463,7 +461,7 @@ function applet_menu(){
     if ($do == 'add' || $do == 'edit'){
 
         require('../includes/jwtabs.php');
-        $GLOBALS['cp_page_head'][] = jwHeader();
+        cmsCore::c('page')->addHead(jwHeader());
 
         $menu_list = cpGetList('menu');
 
@@ -487,7 +485,7 @@ function applet_menu(){
                { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
             } else { $item_id = cmsCore::request('id', 'int', 0); }
 
-            $mod = $inDB->get_fields('cms_menu', "id = '$item_id'", '*');
+            $mod = cmsCore::c('db')->get_fields('cms_menu', "id = '$item_id'", '*');
             if(!$mod){ cmsCore::error404(); }
 
             cpAddPathway($_LANG['AD_MENU_POINT_EDIT'].$ostatok.' "'.$mod['title'].'"');
@@ -519,7 +517,7 @@ function applet_menu(){
                     <div><strong><?php echo $_LANG['AD_PARENT_POINT']; ?></strong></div>
                     <div>
                         <?php
-                            $rootid = $inDB->get_field('cms_menu', 'parent_id=0', 'id');
+                            $rootid = cmsCore::c('db')->get_field('cms_menu', 'parent_id=0', 'id');
                         ?>
                         <select name="parent_id" size="10" id="parent_id" style="width:100%">
                             <option value="<?php echo $rootid?>" <?php if (@$mod['parent_id']==$rootid || !isset($mod['parent_id'])) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_MENU_ROOT']; ?></option>

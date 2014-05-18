@@ -12,46 +12,40 @@
 /******************************************************************************/
 
 function mod_bestcontent($module_id, $cfg){
+    
+    $cfg = array_merge(
+        array(
+            'shownum' => 5,
+            'subs' => 1,
+            'cat_id' => 1
+        ),
+        $cfg
+    );
+    
+    cmsCore::c('db')->where("con.canrate = 1");
 
-	$inDB = cmsDatabase::getInstance();
+    if($cfg['cat_id']){
+        if (!$cfg['subs']){
+            //выбираем из категории
+            cmsCore::m('content')->whereCatIs($cfg['cat_id']);
+        } else {
+            //выбираем из категории и подкатегорий
+            $rootcat = cmsCore::c('db')->getNsCategory('cms_category', $cfg['cat_id']);
+            if(!$rootcat) { return false; }
+            cmsCore::m('content')->whereThisAndNestedCats($rootcat['NSLeft'], $rootcat['NSRight']);
+        }
+    }
 
-	cmsCore::loadModel('content');
-	$model = new cms_model_content();
+    cmsCore::c('db')->orderBy('con.rating', 'DESC');
+    cmsCore::c('db')->limitPage(1, $cfg['shownum']);
 
-	if (!isset($cfg['shownum'])){ $cfg['shownum'] = 5; }
-	if (!isset($cfg['subs'])) { $cfg['subs'] = 1; }
-	if (!isset($cfg['cat_id'])) { $cfg['cat_id'] = 1; }
+    $content_list = cmsCore::m('content')->getArticlesList();
 
-	$inDB->where("con.canrate = 1");
+    cmsPage::initTemplate('modules', 'mod_bestcontent')->
+        assign('articles', $content_list)->
+        assign('cfg', $cfg)->
+        display('mod_bestcontent.tpl');
 
-	if($cfg['cat_id']){
-
-		if (!$cfg['subs']){
-
-			//выбираем из категории
-			$model->whereCatIs($cfg['cat_id']);
-
-		} else {
-
-			//выбираем из категории и подкатегорий
-			$rootcat = $inDB->getNsCategory('cms_category', $cfg['cat_id']);
-			if(!$rootcat) { return false; }
-			$model->whereThisAndNestedCats($rootcat['NSLeft'], $rootcat['NSRight']);
-
-		}
-
-	}
-
-	$inDB->orderBy('con.rating', 'DESC');
-	$inDB->limitPage(1, $cfg['shownum']);
-
-	$content_list = $model->getArticlesList();
-
-	cmsPage::initTemplate('modules', 'mod_bestcontent')->
-            assign('articles', $content_list)->
-            assign('cfg', $cfg)->display('mod_bestcontent.tpl');
-
-	return true;
-
+    return true;
 }
 ?>

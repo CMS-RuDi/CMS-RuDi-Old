@@ -16,18 +16,17 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 function newContent($table, $where=''){
 	$inDB   = cmsDatabase::getInstance();
     if ($where) { $where = ' AND '.$where; }
-    $new = $inDB->get_field($table, "DATE_FORMAT(pubdate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y'){$where}", 'COUNT(id)');
+    $new = cmsCore::c('db')->get_field($table, "DATE_FORMAT(pubdate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y'){$where}", 'COUNT(id)');
     return $new;
 }
 
 function applet_main(){
 
     $inCore = cmsCore::getInstance();
-	$inDB   = cmsDatabase::getInstance();
 
 	global $_LANG;
 
-	$GLOBALS['cp_page_title'] = $_LANG['PATH_HOME'];
+	cmsCore::c('page')->setAdminTitle($_LANG['PATH_HOME']);
 
 ?>
 
@@ -111,19 +110,19 @@ function applet_main(){
 		  <table width="100%" border="0" align="center" cellpadding="5" cellspacing="0">
             <tr>
               <td width="16"><img src="images/icons/hmenu/users.png" width="16" height="16" /></td>
-              <td><a href="index.php?view=users"><?php echo $_LANG['AD_FROM_USERS']; ?></a> &mdash; <?php echo $inDB->rows_count('cms_users', 'is_deleted=0'); ?></td>
+              <td><a href="index.php?view=users"><?php echo $_LANG['AD_FROM_USERS']; ?></a> &mdash; <?php echo cmsCore::c('db')->rows_count('cms_users', 'is_deleted=0'); ?></td>
             </tr>
             <tr>
               <td><img src="images/icons/hmenu/users.png" width="16" height="16" /></td>
-              <td><?php echo $_LANG['AD_NEW_USERS_TODAY']; ?> &mdash; <?php echo (int)$inDB->get_field('cms_users', "DATE_FORMAT(regdate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y') AND is_deleted = 0", 'COUNT(id)'); ?></td>
+              <td><?php echo $_LANG['AD_NEW_USERS_TODAY']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "DATE_FORMAT(regdate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y') AND is_deleted = 0", 'COUNT(id)'); ?></td>
             </tr>
             <tr>
               <td><img src="images/icons/hmenu/users.png" width="16" height="16" /></td>
-              <td><?php echo $_LANG['AD_NEW_USERS_THEES_WEEK']; ?> &mdash; <?php echo (int)$inDB->get_field('cms_users', "regdate >= DATE_SUB(NOW(), INTERVAL 7 DAY)", 'COUNT(id)'); ?></td>
+              <td><?php echo $_LANG['AD_NEW_USERS_THEES_WEEK']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "regdate >= DATE_SUB(NOW(), INTERVAL 7 DAY)", 'COUNT(id)'); ?></td>
             </tr>
             <tr>
               <td><img src="images/icons/hmenu/users.png" width="16" height="16" /></td>
-              <td><?php echo $_LANG['AD_NEW_USERS_THEES_MONTH']; ?> &mdash; <?php echo (int)$inDB->get_field('cms_users', "regdate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)", 'COUNT(id)'); ?></td>
+              <td><?php echo $_LANG['AD_NEW_USERS_THEES_MONTH']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "regdate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)", 'COUNT(id)'); ?></td>
             </tr>
           </table>
 		</div>
@@ -163,9 +162,9 @@ function applet_main(){
       <tr>
         <td height="100" valign="top">
         <?php
-			$new_quests 	= $inDB->rows_count('cms_faq_quests', 'published=0');
-			$new_content 	= $inDB->rows_count('cms_content', 'published=0');
-			$new_catalog 	= $inDB->rows_count('cms_uc_items', 'on_moderate=1');
+			$new_quests 	= cmsCore::c('db')->rows_count('cms_faq_quests', 'published=0');
+			$new_content 	= cmsCore::c('db')->rows_count('cms_content', 'published=0');
+			$new_catalog 	= cmsCore::c('db')->rows_count('cms_uc_items', 'on_moderate=1');
 		?>
         <?php if ($new_quests || $new_content || $new_catalog){ ?>
             <div class="small_box">
@@ -226,7 +225,7 @@ function applet_main(){
                 <td></td>
                 <td></td>
                 <td><img src="/admin/images/icons/config.png" width="16" height="16" /></td>
-                <td><a href="index.php?view=components&amp;do=config&amp;id=<?php echo $inDB->get_field('cms_components', "link='rssfeed'", 'id'); ?>" id="rss_link"><?php echo $_LANG['AD_RSS_TUNING']; ?></a></td>
+                <td><a href="index.php?view=components&amp;do=config&amp;id=<?php echo cmsCore::c('db')->get_field('cms_components', "link='rssfeed'", 'id'); ?>" id="rss_link"><?php echo $_LANG['AD_RSS_TUNING']; ?></a></td>
               </tr>
             </table>
             </div>

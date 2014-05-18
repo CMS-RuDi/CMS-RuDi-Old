@@ -14,10 +14,14 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 class cms_model_arhive{
+    public $config;
+    public $year;
+    public $month;
+    public $day;
+    
+    public function __construct(){
+        $this->config = cmsCore::getInstance()->loadComponentConfig('arhive');
 
-	public function __construct(){
-		$this->config = cmsCore::getInstance()->loadComponentConfig('arhive');
-        $this->inDB   = cmsDatabase::getInstance();
         cmsCore::loadLanguage('components/arhive');
         $this->year  = cmsCore::request('y', 'int', 'all');
         $this->month = sprintf("%02d", cmsCore::request('m', 'int', 'all'));
@@ -31,105 +35,96 @@ class cms_model_arhive{
      * @return array
      */
     public static function getDefaultConfig() {
-
         $cfg = array (
-				  'source' => 'arhive'
-				);
+            'source' => 'arhive'
+        );
 
         return $cfg;
-
     }
 /* ==================================================================================================== */
     private function setSqlParams() {
 
         if ($this->config['source'] != 'both'){
             if ($this->config['source']=='arhive'){
-                $this->inDB->where("con.is_arhive = 1");
+                cmsCore::c('db')->where("con.is_arhive = 1");
             } else {
-                $this->inDB->where("con.is_arhive = 0");
+                cmsCore::c('db')->where("con.is_arhive = 0");
             }
         }
 
-        $this->inDB->where("con.published = 1 AND con.pubdate <= '".date("Y-m-d H:i:s")."'");
-        $this->inDB->groupBy("DATE_FORMAT(con.pubdate, '%M, %Y')");
-        $this->inDB->orderBy('con.pubdate', 'DESC');
-        $this->inDB->select = "DATE_FORMAT(con.pubdate, '%Y') as year, DATE_FORMAT(con.pubdate, '%m') as month, COUNT( con.id ) as num";
+        cmsCore::c('db')->where("con.published = 1 AND con.pubdate <= '". date("Y-m-d H:i:s") ."'");
+        cmsCore::c('db')->groupBy("DATE_FORMAT(con.pubdate, '%M, %Y')");
+        cmsCore::c('db')->orderBy('con.pubdate', 'DESC');
+        cmsCore::c('db')->select = "DATE_FORMAT(con.pubdate, '%Y') as year, DATE_FORMAT(con.pubdate, '%m') as month, COUNT( con.id ) as num";
 
     }
 /* ==================================================================================================== */
     public function whereYearIs() {
         if(is_numeric($this->year)){
-            $this->inDB->where("DATE_FORMAT(con.pubdate, '%Y') LIKE '{$this->year}'");
+            cmsCore::c('db')->where("DATE_FORMAT(con.pubdate, '%Y') LIKE '{$this->year}'");
         }
     }
     public function whereMonthIs() {
         if(is_numeric($this->year) && is_numeric($this->month)){
             $date_str = $this->year.'-'.$this->month;
-            $this->inDB->where("DATE_FORMAT(con.pubdate, '%Y-%m') LIKE '{$date_str}'");
+            cmsCore::c('db')->where("DATE_FORMAT(con.pubdate, '%Y-%m') LIKE '{$date_str}'");
         }
     }
     public function whereDayIs() {
         if(is_numeric($this->day) && is_numeric($this->year) && is_numeric($this->month)){
             $date_str = $this->year.'-'.$this->month.'-'.$this->day;
-            $this->inDB->where("DATE_FORMAT(con.pubdate, '%Y-%m-%d') LIKE '{$date_str}'");
+            cmsCore::c('db')->where("DATE_FORMAT(con.pubdate, '%Y-%m-%d') LIKE '{$date_str}'");
         }
     }
     public function whereThisAndNestedCats($cat_id) {
         if(!@$cat_id){ return false; }
-        $rootcat = $this->inDB->get_fields('cms_category', "id='{$cat_id}'", 'NSLeft, NSRight');
+        $rootcat = cmsCore::c('db')->get_fields('cms_category', "id='{$cat_id}'", 'NSLeft, NSRight');
         if(!$rootcat) { return false; }
-        $this->inDB->where("cat.NSLeft >= '{$rootcat['NSLeft']}' AND cat.NSRight <= '{$rootcat['NSRight']}' AND cat.parent_id > 0");
-        $this->inDB->addJoin('INNER JOIN cms_category cat ON cat.id = con.category_id');
+        cmsCore::c('db')->where("cat.NSLeft >= '{$rootcat['NSLeft']}' AND cat.NSRight <= '{$rootcat['NSRight']}' AND cat.parent_id > 0");
+        cmsCore::c('db')->addJoin('INNER JOIN cms_category cat ON cat.id = con.category_id');
     }
     public function setArtticleSql() {
 
-        $this->inDB->select   = "con.*, DATE_FORMAT(con.pubdate, '%Y') as year, DATE_FORMAT(con.pubdate, '%m') as month, DATE_FORMAT(con.pubdate, '%d') as day, cat.title cat_title, cat.showdesc, cat.seolink as cat_seolink";
-        $this->inDB->group_by = '';
-        $this->inDB->addJoin('INNER JOIN cms_category cat ON cat.id = con.category_id');
+        cmsCore::c('db')->select   = "con.*, DATE_FORMAT(con.pubdate, '%Y') as year, DATE_FORMAT(con.pubdate, '%m') as month, DATE_FORMAT(con.pubdate, '%d') as day, cat.title cat_title, cat.showdesc, cat.seolink as cat_seolink";
+        cmsCore::c('db')->group_by = '';
+        cmsCore::c('db')->addJoin('INNER JOIN cms_category cat ON cat.id = con.category_id');
 
     }
 /* ==================================================================================================== */
 
-	public function getArhiveContent(){
-
-        $sql = "SELECT {$this->inDB->select}
+    public function getArhiveContent(){
+        $sql = "SELECT {cmsCore::c('db')->select}
                 FROM cms_content con
-				{$this->inDB->join}
-                WHERE 1=1 {$this->inDB->where}
-                {$this->inDB->group_by}
-                {$this->inDB->order_by}\n";
+				{cmsCore::c('db')->join}
+                WHERE 1=1 {cmsCore::c('db')->where}
+                {cmsCore::c('db')->group_by}
+                {cmsCore::c('db')->order_by}\n";
 
-        if ($this->inDB->limit){
-            $sql .= "LIMIT {$this->inDB->limit}";
+        if (cmsCore::c('db')->limit){
+            $sql .= "LIMIT {cmsCore::c('db')->limit}";
         }
 
-        $result = $this->inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        $this->inDB->resetConditions();
+        cmsCore::c('db')->resetConditions();
 
-        if (!$this->inDB->num_rows($result)) { return array(); }
+        if (!cmsCore::c('db')->num_rows($result)) { return array(); }
 
-        cmsCore::loadModel('content');
-        $content_model = new cms_model_content();
-
-        while ($item = $this->inDB->fetch_assoc($result)){
-
+        while ($item = cmsCore::c('db')->fetch_assoc($result)){
             if(!isset($item['seolink'])){
                 $item['fmonth'] = cmsCore::intMonthToStr($item['month']);
             } else {
-                $item['url']          = $content_model->getArticleURL(0, $item['seolink']);
-                $item['category_url'] = $content_model->getCategoryURL(0, $item['cat_seolink']);
-				$item['fpubdate']     = cmsCore::dateFormat($item['pubdate']);
+                $item['url']          = cmsCore::m('content')->getArticleURL(0, $item['seolink']);
+                $item['category_url'] = cmsCore::m('content')->getCategoryURL(0, $item['cat_seolink']);
+                $item['fpubdate']     = cmsCore::dateFormat($item['pubdate']);
             }
             $item['image'] = (file_exists(PATH.'/images/photos/small/article'.$item['id'].'.jpg') ?
                                 'article'.$item['id'].'.jpg' : '');
 
             $content[] = $item;
-
         }
 
         return cmsCore::callEvent('GET_ARHIVE', $content);
-
     }
 
 /* ==================================================================================================== */

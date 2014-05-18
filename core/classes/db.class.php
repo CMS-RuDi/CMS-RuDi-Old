@@ -479,6 +479,14 @@ class cmsDatabase {
     public function deleteNS($table, $id, $differ='') {
         return cmsCore::getInstance()->nestedSetsInit($table)->DeleteNode($id, $differ);;
     }
+    
+    public function deleteListNS($table, $list, $differ='') {
+        if (is_array($list)){
+            foreach($list as $key => $value){
+                $this->deleteNS($table, $value, $differ);
+            }
+        }
+    }
 
 // ============================================================================ //
 // ============================================================================ //

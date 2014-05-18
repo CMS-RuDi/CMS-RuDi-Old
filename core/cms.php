@@ -14,7 +14,7 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
-define('CMS_RUDI_V', '0.0.3');
+define('CMS_RUDI_V', '0.0.4');
 
 define('CORE_VERSION', '1.10.3');
 define('CORE_BUILD', '2');
@@ -54,11 +54,12 @@ class cmsCore {
     private static $models = array();
     private static $classes = array();
     private static $classes_name = array(
-        'actions' => 'cmsActions',   'blog'         => 'cmsBlogs',      'config'       => 'cmsConfig',
-        'cron'    => 'cmsCron',      'curl'         => 'miniCurl',      'db'           => 'cmsDatabase',
-        'formgen' => 'cmsFormGen',   'gif_resize'   => 'gifresizer',    'idna_convert' => 'idna_convert',
-        'images'  => 'rudi_graphics','jevix'        => 'Jevix',         'page'         => 'cmsPage',
-        'photo'   => 'cmsPhoto',     'upload_photo' => 'cmsUploadPhoto','user'         => 'cmsUser'
+        'actions'      => 'cmsActions',     'blog'         => 'cmsBlogs',     'config' => 'cmsConfig',
+        'cron'         => 'cmsCron',        'curl'         => 'miniCurl',     'db'     => 'cmsDatabase',
+        'form'         => 'cmsForm',        'formgen'      => 'cmsFormGen',   'geo'    => 'cmsgeo',
+        'gif_resize'   => 'gifresizer',     'idna_convert' => 'idna_convert', 'images' => 'rudi_graphics',
+        'jevix'        => 'Jevix',          'page'         => 'cmsPage',      'photo'  => 'cmsPhoto',
+        'upload_photo' => 'cmsUploadPhoto', 'user'         => 'cmsUser'
     );
 
     protected function __construct($install_mode=false) {
@@ -2384,7 +2385,7 @@ class cmsCore {
     
     public static function updateComImages($target_id, $component, $target, $table, $field){
         $images = self::getUploadImages($target_id, $target, $component);
-        $images = json_encode($images);
+        $images = preg_replace('#(\\\u[0-9]{1})#is','\\\\\1',json_encode($images));
         self::c('db')->query("UPDATE `". $table ."` SET `". $field ."` = '". self::c('db')->escape_string($images) ."' WHERE `id` = '". $target_id ."'");
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2665,8 +2666,6 @@ class cmsCore {
         }
         self::halt(json_encode($data));
     }
-
-// DS Soft Edited
     
     /**
      * Возвращает объект класса, модели компонента
@@ -2692,36 +2691,36 @@ class cmsCore {
     /**
      * Возвращает объект класса
      * @global array $_LANG
-     * @param string $class
-     * @param array $args
+     * @param string $class название файла до .class.php
+     * @param array $args массив аргументов которые нужно передать методу инициализации класса getInstance или __construct
+     * @param boolean $reInit определяет нужно ли переинициализировать объект класса
      * @return \CMS Class Object
      */
-    public static function c($class, $arg1=NULL, $arg2=null, $arg3=null){
+    public static function c($class, $args=array(), $reInit=false){
         if (empty(self::$classes[$class])){
-            if (self::loadClass($class)){
-                if (isset(self::$classes_name[$class])){
-                    $class_name = self::$classes_name[$class];
-                    self::$classes[$class] = $class_name::getInstance($arg1, $arg2, $arg3);
+            if (isset(self::$classes_name[$class]) && self::loadClass($class)){
+                if (!is_array($args) || empty($args[0])){
+                    $args = array($args);
+                }
+                if (method_exists(self::$classes_name[$class], 'getInstance')){
+                    self::$classes[$class] = call_user_func_array(array(self::$classes_name[$class], 'getInstance'), $args);
+                }else if (method_exists(self::$classes_name[$class], '__construct')){
+                    self::$classes[$class] = call_user_func_array(array(self::$classes_name[$class], '__construct'), $args);
                 }else{
-                    return true;
+                    self::$classes[$class] = new self::$classes_name[$class]();
                 }
             }else{
                 global $_LANG;
                 cmsCore::halt(sprintf($_LANG['CLASS_NOT_FOUND'], $class));
             }
+        }else{
+            if ($reInit === true){
+                unset(self::$classes[$class]);
+                return self::c($class, $args);
+            }
         }
         
         return self::$classes[$class];
-    }
-    
-    /**
-     * Возвращает объект класса miniCurl
-     * @param array $cfg
-     * @return \miniCurl
-     */
-    public static function initCurl($cfg=array()){
-        self::loadClass('curl');
-        return new miniCurl($cfg);
     }
 
     /**
@@ -2741,7 +2740,7 @@ class cmsCore {
         
         return $default;
     }
-// End DS Soft Edited
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 } //cmsCore
 
@@ -2760,72 +2759,5 @@ function icms_substr_replace($str, $replacement, $offset, $length = NULL){
     return implode('', $str_array[0]);
 
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////   ====== DEPRECATED =========    ///////////////////////////////////////////
-function dbRowsCount($table, $where){
-    return cmsCore::c('db')->rows_count($table, $where);
-}
-
-function dbGetField($table, $where, $field){
-    return cmsCore::c('db')->get_field($table, $where, $field);
-}
-
-function dbGetFields($table, $where, $fields, $order='id ASC'){
-    return cmsCore::c('db')->get_fields($table, $where, $fields, $order);
-}
-
-function dbGetTable($table, $where='', $fields='*'){
-    return cmsCore::c('db')->get_table($table, $where, $fields);
-}
-
-function dbLastId($table){
-    return cmsCore::c('db')->get_last_id($table);
-}
-
-function dbDeleteNS($table, $id){
-    cmsCore::c('db')->deleteNS($table, $id);
-}
-
-function dbDeleteListNS($table, $list){
-    if (is_array($list)){
-        foreach($list as $key => $value){
-            cmsCore::c('db')->deleteNS($table, $value);
-        }
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//Функции ниже оставлены для совместимости со старыми шаблонами
-//В версии 1.10.4 они будут убраны
-//
-
-function cmsPrintSitename(){
-    cmsCore::c('page')->printSitename();
-}
-
-function cmsPrintHead(){
-    cmsCore::c('page')->printHead();
-}
-
-function cmsPathway($separator){
-    cmsCore::c('page')->printPathway($separator);
-}
-
-function cmsBody(){
-    cmsCore::c('page')->printBody();
-}
-
-function cmsCountModules($position){
-    return cmsCore::c('page')->countModules($position);
-}
-
-function cmsModule($position){
-    cmsCore::c('page')->printModules($position);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ?>

@@ -329,13 +329,13 @@ if ($opt == 'config') {
 
 if ($opt == 'show_cat'){
     $item_id = cmsCore::request('item_id', 'int', 0);
-    $inDB->query("UPDATE cms_board_cats SET published = 1 WHERE id = '$item_id'") ;
+    cmsCore::c('db')->query("UPDATE cms_board_cats SET published = 1 WHERE id = '$item_id'") ;
     echo '1'; exit;
 }
 
 if ($opt == 'hide_cat'){
     $item_id = cmsCore::request('item_id', 'int', 0);
-    $inDB->query("UPDATE cms_board_cats SET published = 0 WHERE id = '$item_id'") ;
+    cmsCore::c('db')->query("UPDATE cms_board_cats SET published = 0 WHERE id = '$item_id'") ;
     echo '1'; exit;
 }
 
@@ -369,12 +369,12 @@ if ($opt == 'submit_cat' || $opt == 'update_cat'){
         $item['icon'] = uploadCategoryIcon();
         $item['pubdate'] = date("Y-m-d H:i:s");
 
-        $inDB->addNsCategory('cms_board_cats', $item);
+        cmsCore::c('db')->addNsCategory('cms_board_cats', $item);
 
     } else {
 
         $item_id = cmsCore::request('item_id', 'int', 0);
-        $mod = $inDB->get_fields('cms_board_cats', "id = '$item_id'", '*');
+        $mod = cmsCore::c('db')->get_fields('cms_board_cats', "id = '$item_id'", '*');
         if(!$mod){ cmsCore::error404(); }
         $mod['icon'] = ($mod['icon'] == 'folder_grey.png') ? '' : $mod['icon'];
         $icon = uploadCategoryIcon($mod['icon']);
@@ -384,7 +384,7 @@ if ($opt == 'submit_cat' || $opt == 'update_cat'){
             cmsCore::nestedSetsInit('cms_board_cats')->MoveNode($item_id, $item['parent_id']);
         }
 
-        $inDB->update('cms_board_cats', $item, $item_id);
+        cmsCore::c('db')->update('cms_board_cats', $item, $item_id);
 
     }
 
@@ -398,14 +398,14 @@ if($opt == 'delete_cat'){
     $item_id = cmsCore::request('item_id', 'int', 0);
 
     $sql = "SELECT id FROM cms_board_items WHERE category_id = '$item_id'";
-    $result = $inDB->query($sql);
-    if ($inDB->num_rows($result)){
-        while($photo = $inDB->fetch_assoc($result)){
+    $result = cmsCore::c('db')->query($sql);
+    if (cmsCore::c('db')->num_rows($result)){
+        while($photo = cmsCore::c('db')->fetch_assoc($result)){
             $model->deleteRecord($photo['id']);
         }
     }
-    $f_icon = $inDB->get_field('cms_board_cats', "id = '$item_id'", 'icon');
-    $inDB->deleteNS('cms_board_cats', $item_id);
+    $f_icon = cmsCore::c('db')->get_field('cms_board_cats', "id = '$item_id'", 'icon');
+    cmsCore::c('db')->deleteNS('cms_board_cats', $item_id);
     if(file_exists(PATH.'/upload/board/cat_icons/'.$f_icon)){
         @chmod(PATH.'/upload/board/cat_icons/'.$f_icon, 0777);
         @unlink(PATH.'/upload/board/cat_icons/'.$f_icon);
@@ -457,7 +457,7 @@ if ($opt == 'add_cat' || $opt == 'edit_cat'){
 
         $item_id = cmsCore::request('item_id', 'int', 0);
 
-        $mod = $inDB->get_fields('cms_board_cats', "id = '$item_id'", '*');
+        $mod = cmsCore::c('db')->get_fields('cms_board_cats', "id = '$item_id'", '*');
         if(!$mod){ cmsCore::error404(); }
 
         echo '<h3>'.$_LANG['AD_CAT_EDIT'].'</h3>';
@@ -491,7 +491,7 @@ if ($opt == 'add_cat' || $opt == 'edit_cat'){
             <td valign="top"><strong><?php echo $_LANG['AD_CAT_PARENT'];?></strong></td>
             <td valign="top"><select name="parent_id" id="parent_id" style="width:250px">
                 <?php  //FIND BOARD ROOT
-                    $rootid = $inDB->get_field('cms_board_cats', 'parent_id=0', 'id');
+                    $rootid = cmsCore::c('db')->get_field('cms_board_cats', 'parent_id=0', 'id');
                 ?>
                 <option value="<?php echo $rootid?>" <?php if (@$mod['parent_id']==$rootid || !isset($mod['parent_id'])) { echo 'selected'; }?>><?php echo $_LANG['AD_CAT_ROOT'];?></option>
                 <?php
@@ -518,10 +518,10 @@ if ($opt == 'add_cat' || $opt == 'edit_cat'){
                     <option value="" <?php if (@!$mod['form_id']) { echo 'selected'; }?>><?php echo $_LANG['AD_DONT_ATTACH'];?></option>
                     <?php
                     $sql = "SELECT id, title FROM cms_forms";
-                    $rs = $inDB->query($sql);
+                    $rs = cmsCore::c('db')->query($sql);
 
-                    if ($inDB->num_rows($rs)){
-                        while($f = $inDB->fetch_assoc($rs)){
+                    if (cmsCore::c('db')->num_rows($rs)){
+                        while($f = cmsCore::c('db')->fetch_assoc($rs)){
                             if ($f['id']==$mod['form_id']) { $selected='selected="selected"'; } else { $selected = ''; }
                             echo '<option value="'.$f['id'].'" '.$selected.'>'.$f['title'].'</option>';
                         }

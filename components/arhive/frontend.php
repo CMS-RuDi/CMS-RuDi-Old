@@ -13,70 +13,64 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function arhive(){
-
-    global $_LANG;
-
-    $model = new cms_model_arhive();
-
     $inCore = cmsCore::getInstance();
-    $inPage = cmsPage::getInstance();
-
+    
+    global $_LANG;
+    
     $pagetitle = $inCore->getComponentTitle();
 
-    $do = $inCore->do;
-
-	$inPage->setTitle($pagetitle);
-	$inPage->addPathway($pagetitle, '/arhive');
+    cmsCore::c('page')->setTitle($pagetitle);
+    cmsCore::c('page')->addPathway($pagetitle, '/arhive');
 
  //======================================================================================================//
 
-	if ($do == 'view' || $do == 'y'){
+    if ($inCore->do == 'view' || $inCore->do == 'y'){
 
-        if($do == 'y'){
-            $pagetitle = $_LANG['ARCHIVE_MATERIALS_FROM'].$model->year.$_LANG['ARHIVE_YEAR'];
-            $inPage->addPathway($model->year, '/arhive/'.$model->year);
-            $inPage->setTitle($pagetitle);
-            $model->whereYearIs();
+        if($inCore->do == 'y'){
+            $pagetitle = $_LANG['ARCHIVE_MATERIALS_FROM'] . cmsCore::m('arhive')->year . $_LANG['ARHIVE_YEAR'];
+            cmsCore::c('page')->addPathway(cmsCore::m('arhive')->year, '/arhive/'. cmsCore::m('arhive')->year);
+            cmsCore::c('page')->setTitle($pagetitle);
+            cmsCore::m('arhive')->whereYearIs();
         }
 
-        $items = $model->getArhiveContent();
+        $items = cmsCore::m('arhive')->getArhiveContent();
 
         cmsPage::initTemplate('components', 'com_arhive_dates')->
-                assign('pagetitle', $pagetitle)->
-                assign('items', $items)->
-                assign('do', $do)->
-                display('com_arhive_dates.tpl');
+            assign('pagetitle', $pagetitle)->
+            assign('items', $items)->
+            assign('do', $inCore->do)->
+            display('com_arhive_dates.tpl');
 
-	}
+    }
 
 //======================================================================================================//
 
-	if ($do == 'ymd' || $do == 'ym'){
+    if ($inCore->do == 'ymd' || $inCore->do == 'ym'){
+        $month_name = cmsCore::intMonthToStr(cmsCore::m('arhive')->month);
+        
+        cmsCore::c('page')->addPathway(cmsCore::m('arhive')->year, '/arhive/'. cmsCore::m('arhive')->year);
+        cmsCore::c('page')->addPathway($month_name, '/arhive/'. cmsCore::m('arhive')->year .'/'. cmsCore::m('arhive')->month);
 
-        $month_name = cmsCore::intMonthToStr($model->month);
-        $inPage->addPathway($model->year, '/arhive/'.$model->year);
-        $inPage->addPathway($month_name, '/arhive/'.$model->year.'/'.$model->month);
-
-        if($do == 'ymd'){
-            $inPage->addPathway($model->day, '/arhive/'.$model->year.'/'.$model->month.'/'.$model->day);
-            $pagetitle = $_LANG['ARCHIVE_MATERIALS_FROM'].$model->day.' '
-                            .$_LANG['MONTH_'.$model->month].' '.$model->year.$_LANG['ARHIVE_YEARS'];
-            $model->whereDayIs();
+        if($inCore->do == 'ymd'){
+            cmsCore::c('page')->addPathway(cmsCore::m('arhive')->day, '/arhive/'. cmsCore::m('arhive')->year .'/'. cmsCore::m('arhive')->month .'/'. cmsCore::m('arhive')->day);
+            $pagetitle = $_LANG['ARCHIVE_MATERIALS_FROM'].cmsCore::m('arhive')->day .' '
+                            .$_LANG['MONTH_'. cmsCore::m('arhive')->month] .' '. cmsCore::m('arhive')->year . $_LANG['ARHIVE_YEARS'];
+            cmsCore::m('arhive')->whereDayIs();
         } else {
-            $pagetitle = $_LANG['ARCHIVE_MATERIALS_FROM'].$month_name.' '.$model->year.$_LANG['ARHIVE_YEARS'];
-            $model->whereMonthIs();
+            $pagetitle = $_LANG['ARCHIVE_MATERIALS_FROM'] . $month_name .' '. cmsCore::m('arhive')->year . $_LANG['ARHIVE_YEARS'];
+            cmsCore::m('arhive')->whereMonthIs();
         }
 
-        $inPage->setTitle($pagetitle);
+        cmsCore::c('page')->setTitle($pagetitle);
 
-        $model->setArtticleSql();
+        cmsCore::m('arhive')->setArtticleSql();
 
-        $items = $model->getArhiveContent();
+        $items = cmsCore::m('arhive')->getArhiveContent();
 
         cmsPage::initTemplate('components', 'com_arhive_list')->
-                assign('pagetitle', $pagetitle)->
-                assign('items', $items)->
-                display('com_arhive_list.tpl');
+            assign('pagetitle', $pagetitle)->
+            assign('items', $items)->
+            display('com_arhive_list.tpl');
 
     }
 

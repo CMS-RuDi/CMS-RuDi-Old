@@ -67,27 +67,14 @@ function cpWhoOnline(){
 
 /////////////////////////// PAGE GENERATION ////////////////////////////////////////////////////////////////
 function cpHead(){
-    global $_LANG;
-	if ($GLOBALS['cp_page_title']){
-		echo '<title>'.$GLOBALS['cp_page_title'].' - '.$_LANG['AD_ADMIN_PANEL'].' v '.CORE_VERSION.'</title>'."\n";
-	} else {
-		echo '<title>'.$_LANG['AD_ADMIN_PANEL'].'</title>'."\n";
-	}
-
-	echo '<script type="text/javascript" src="js/common.js"></script>' ."\n";
-    echo cmsPage::displayLangJS(array('AD_NO_SELECT_OBJECTS','AD_SWITCH_EDITOR','CANCEL','CONTINUE','CLOSE','ATTENTION'));
-    if (@$GLOBALS['cp_jquery']){
-        echo '<script language="JavaScript" type="text/javascript" src="'.$GLOBALS['cp_jquery'].'"></script>' ."\n";
-    } else {
-        echo '<script language="JavaScript" type="text/javascript" src="/includes/jquery/jquery.js"></script>' ."\n";
+    cmsCore::c('page')->printAdminHead();
+    
+    foreach($GLOBALS['cp_page_head'] as $key=>$value) {
+        echo $value,"\n";
+        unset ($GLOBALS['cp_page_head'][$key]);
     }
 
-	foreach($GLOBALS['cp_page_head'] as $key=>$value) {
-		echo $GLOBALS['cp_page_head'][$key] ."\n";
-		unset ($GLOBALS['cp_page_head'][$key]);
-	}
-
-	return;
+    return;
 }
 
 function cpMenu(){
@@ -95,7 +82,6 @@ function cpMenu(){
 	global $adminAccess;
 
     $inCore = cmsCore::getInstance();
-    $inUser = cmsUser::getInstance();
 
     ob_start(); ?>
 	<div id="hmenu">
@@ -164,7 +150,7 @@ function cpMenu(){
 
                         }
 
-                        if ($total_count != $showed_count && $inUser->id == 1){
+                        if ($total_count != $showed_count && cmsCore::c('user')->id == 1){
 
                     ?>
                         <li><a class="list" href="index.php?view=components"><?php echo $_LANG['AD_SHOW_ALL']; ?>...</a></li>
@@ -246,27 +232,26 @@ function cpToolMenu($toolmenu_list){
 }
 
 function cpProceedBody(){
+    ob_start();
+    
+    $file = $GLOBALS['applet'] .'.php';
 
-	ob_start();
-
-	$file = $GLOBALS['applet'] . '.php';
-
-    if (!file_exists(PATH.'/admin/applets/'.$file)){
+    if (!file_exists(PATH .'/admin/applets/'. $file)){
         cmsCore::error404();
     }
 
-    cmsCore::loadLanguage('admin/applets/applet_'.$GLOBALS['applet']);
-	include('applets/'.$file);
+    cmsCore::loadLanguage('admin/applets/applet_'. $GLOBALS['applet']);
+    
+    include('applets/'. $file);
 
-	call_user_func('applet_'.$GLOBALS['applet']);
+    call_user_func('applet_'. $GLOBALS['applet']);
 
-	$GLOBALS['cp_page_body'] = ob_get_clean();
-
+    $GLOBALS['cp_page_body'] = ob_get_clean();
 }
 
 function cpBody(){
-	echo $GLOBALS['cp_page_body'];
-	return;
+    echo $GLOBALS['cp_page_body'];
+    return;
 }
 
 //////////////////////////////////////////////// PATHWAY ///////////////////////////////////////////////////////
@@ -350,9 +335,7 @@ function cpAddParam($query, $param, $value){
 }
 
 function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
-
     global $_LANG;
-    $inDB = cmsDatabase::getInstance();
 
 	$perpage = 22;
 
@@ -424,16 +407,16 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
 
     $page = cmsCore::request('page', 'int', 1);
 
-	$total_rs = $inDB->query($sql);
-	$total = $inDB->num_rows($total_rs);
+	$total_rs = cmsCore::c('db')->query($sql);
+	$total = cmsCore::c('db')->num_rows($total_rs);
 
 	$sql .= " LIMIT ".($page-1)*$perpage.", $perpage";
 
-	$result = $inDB->query($sql);
+	$result = cmsCore::c('db')->query($sql);
 
 	$_SESSION['filter_table'] = $table;
 
-	if ($inDB->error()) {
+	if (cmsCore::c('db')->error()) {
 		unset($_SESSION['filter']);
         cmsCore::redirect('/admin/index.php?'.$_SERVER['QUERY_STRING']);
 	}
@@ -472,7 +455,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
 		echo '</div>';
 	}
 
-	if ($inDB->num_rows($result)){
+	if (cmsCore::c('db')->num_rows($result)){
 
 		//DRAW LIST TABLE
 		echo '<form name="selform" action="index.php?view='.$GLOBALS['applet'].'&do=saveorder" method="post">';
@@ -493,7 +476,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
 			echo '</thead><tbody>'."\n";
 			//TABLE BODY
 			$r = 0;
-			while ($item = $inDB->fetch_assoc($result)){
+			while ($item = cmsCore::c('db')->fetch_assoc($result)){
 				$r++;
 				if ($r % 2) { $row_class = 'lt_row1'; } else { $row_class = 'lt_row2'; }
 				echo '<tr id="lt_row2">'."\n";
@@ -641,39 +624,30 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
 //////////////////////////////////////// LIST TABLE PROCESSORS ///////////////////////////////////////////////////////////////////
 
 function cpForumCatById($id){
+	$result = cmsCore::c('db')->query("SELECT title FROM cms_forum_cats WHERE id = $id") ;
 
-    $inDB = cmsDatabase::getInstance();
-
-	$result = $inDB->query("SELECT title FROM cms_forum_cats WHERE id = $id") ;
-
-	if ($inDB->num_rows($result)) {
-		$cat = $inDB->fetch_assoc($result);
+	if (cmsCore::c('db')->num_rows($result)) {
+		$cat = cmsCore::c('db')->fetch_assoc($result);
 		return '<a href="index.php?view=components&do=config&id='.(int)$_REQUEST['id'].'&opt=edit_cat&item_id='.$id.'">'.$cat['title'].'</a> ('.$id.')';
 	} else { return '--'; }
 
 }
 
 function cpFaqCatById($id){
+	$result = cmsCore::c('db')->query("SELECT title FROM cms_faq_cats WHERE id = $id") ;
 
-    $inDB = cmsDatabase::getInstance();
-
-	$result = $inDB->query("SELECT title FROM cms_faq_cats WHERE id = $id") ;
-
-	if ($inDB->num_rows($result)) {
-		$cat = $inDB->fetch_assoc($result);
+	if (cmsCore::c('db')->num_rows($result)) {
+		$cat = cmsCore::c('db')->fetch_assoc($result);
 		return '<a href="index.php?view=components&do=config&id='.(int)$_REQUEST['id'].'&opt=edit_cat&item_id='.$id.'">'.$cat['title'].'</a>';
 	} else { return '--'; }
 
 }
 
 function cpCatalogCatById($id){
+	$result = cmsCore::c('db')->query("SELECT title, parent_id FROM cms_uc_cats WHERE id = $id") ;
 
-    $inDB = cmsDatabase::getInstance();
-
-	$result = $inDB->query("SELECT title, parent_id FROM cms_uc_cats WHERE id = $id") ;
-
-	if ($inDB->num_rows($result)) {
-		$cat = $inDB->fetch_assoc($result);
+	if (cmsCore::c('db')->num_rows($result)) {
+		$cat = cmsCore::c('db')->fetch_assoc($result);
         if ($cat['parent_id']){
             return '<a href="index.php?view=components&do=config&id='.(int)$_REQUEST['id'].'&opt=edit_cat&item_id='.$id.'">'.$cat['title'].'</a> ('.$id.')';
         } else {
@@ -684,13 +658,10 @@ function cpCatalogCatById($id){
 }
 
 function cpBoardCatById($id){
+	$result = cmsCore::c('db')->query("SELECT title FROM cms_board_cats WHERE id = $id") ;
 
-    $inDB = cmsDatabase::getInstance();
-
-	$result = $inDB->query("SELECT title FROM cms_board_cats WHERE id = $id") ;
-
-	if ($inDB->num_rows($result)) {
-		$cat = $inDB->fetch_assoc($result);
+	if (cmsCore::c('db')->num_rows($result)) {
+		$cat = cmsCore::c('db')->fetch_assoc($result);
 		return '<a href="index.php?view=components&do=config&id='.(int)$_REQUEST['id'].'&opt=edit_cat&item_id='.$id.'">'.$cat['title'].'</a> ('.$id.')';
 	} else { return '--'; }
 
@@ -710,13 +681,10 @@ function cpGroupById($id){
 }
 
 function cpCatById($id){
+	$result = cmsCore::c('db')->query("SELECT title, parent_id FROM cms_category WHERE id = $id") ;
 
-    $inDB = cmsDatabase::getInstance();
-
-	$result = $inDB->query("SELECT title, parent_id FROM cms_category WHERE id = $id") ;
-
-	if ($inDB->num_rows($result)) {
-		$cat = $inDB->fetch_assoc($result);
+	if (cmsCore::c('db')->num_rows($result)) {
+		$cat = cmsCore::c('db')->fetch_assoc($result);
         if ($cat['parent_id']){
             return '<a href="index.php?view=cats&do=edit&id='.$id.'">'.$cat['title'].'</a> ('.$id.')';
         } else {
@@ -727,18 +695,16 @@ function cpCatById($id){
 }
 
 function cpModuleById($id){
-    $inDB = cmsDatabase::getInstance();
 	$sql = "SELECT content FROM cms_modules WHERE id = $id AND is_external = 1";
-	$result = $inDB->query($sql);
-	if ($inDB->num_rows($result)) { $mod = $inDB->fetch_assoc($result); return $mod['content']; }
+	$result = cmsCore::c('db')->query($sql);
+	if (cmsCore::c('db')->num_rows($result)) { $mod = cmsCore::c('db')->fetch_assoc($result); return $mod['content']; }
 	else { return false; }
 }
 
 function cpModuleTitleById($id){
-    $inDB = cmsDatabase::getInstance();
 	$sql = "SELECT name FROM cms_modules WHERE id = $id";
-	$result = $inDB->query($sql);
-	if ($inDB->num_rows($result)) { $mod = $inDB->fetch_assoc($result); return $mod['name']; }
+	$result = cmsCore::c('db')->query($sql);
+	if (cmsCore::c('db')->num_rows($result)) { $mod = cmsCore::c('db')->fetch_assoc($result); return $mod['name']; }
 	else { return false; }
 }
 
@@ -750,11 +716,10 @@ function cpTemplateById($template_id){
 
 function cpUserNick($user_id=0){
     global $_LANG;
-    $inDB = cmsDatabase::getInstance();
 	if ($user_id){
 		$sql = "SELECT nickname FROM cms_users WHERE id = $user_id";
-		$result = $inDB->query($sql);
-		if ($inDB->num_rows($result)) { $usr = $inDB->fetch_assoc($result); return $usr['nickname']; }
+		$result = cmsCore::c('db')->query($sql);
+		if (cmsCore::c('db')->num_rows($result)) { $usr = cmsCore::c('db')->fetch_assoc($result); return $usr['nickname']; }
 		else { return false; }
 	} else {
 		return '<em style="color:gray">'.$_LANG['AD_NOT_DEFINED'].'</em>';
@@ -768,32 +733,28 @@ function cpYesNo($option){
 
 //////////////////////////////////////////////// DATABASE //////////////////////////////////////////////////////////
 function dbMoveUp($table, $id, $current_ord){
-    $inDB = cmsDatabase::getInstance();
     $id = (int)$id;
     $current_ord = (int)$current_ord;
 	$sql = "UPDATE $table SET ordering = ordering + 1 WHERE ordering = ($current_ord-1) LIMIT 1";
-	$inDB->query($sql) ;
+	cmsCore::c('db')->query($sql) ;
 	$sql = "UPDATE $table SET ordering = ordering - 1 WHERE id = $id LIMIT 1";
-	$inDB->query($sql) ;
+	cmsCore::c('db')->query($sql) ;
 }
 function dbMoveDown($table, $id, $current_ord){
-    $inDB = cmsDatabase::getInstance();
     $id = (int)$id;
     $current_ord = (int)$current_ord;
 	$sql = "UPDATE $table SET ordering = ordering - 1 WHERE ordering = ($current_ord+1) LIMIT 1";
-	$inDB->query($sql) ;
+	cmsCore::c('db')->query($sql) ;
 	$sql = "UPDATE $table SET ordering = ordering + 1 WHERE id = $id LIMIT 1";
-	$inDB->query($sql) ;
+	cmsCore::c('db')->query($sql) ;
 }
 
 function dbShow($table, $id){
-    $inDB = cmsDatabase::getInstance();
     $id = (int)$id;
 	$sql = "UPDATE $table SET published = 1 WHERE id = $id";
-	$inDB->query($sql) ;
+	cmsCore::c('db')->query($sql) ;
 }
 function dbShowList($table, $list){
-    $inDB = cmsDatabase::getInstance();
 	if (is_array($list)){
 		$sql = "UPDATE $table SET published = 1 WHERE ";
 		$item = 0;
@@ -803,18 +764,16 @@ function dbShowList($table, $list){
 			if ($item<sizeof($list)) { $sql .= ' OR '; }
 		}
 		$sql .= ' LIMIT '.sizeof($list);
-		$inDB->query($sql) ;
+		cmsCore::c('db')->query($sql) ;
 	}
 }
 
 function dbHide($table, $id){
-    $inDB = cmsDatabase::getInstance();
     $id = (int)$id;
 	$sql = "UPDATE $table SET published = 0 WHERE id = $id";
-	$inDB->query($sql) ;
+	cmsCore::c('db')->query($sql) ;
 }
 function dbHideList($table, $list){
-    $inDB = cmsDatabase::getInstance();
 	if (is_array($list)){
 		$sql = "UPDATE $table SET published = 0 WHERE ";
 		$item = 0;
@@ -824,28 +783,26 @@ function dbHideList($table, $list){
 			if ($item<sizeof($list)) { $sql .= ' OR '; }
 		}
 		$sql .= ' LIMIT '.sizeof($list);
-		$inDB->query($sql) ;
+		cmsCore::c('db')->query($sql) ;
 	}
 }
 
 function dbDelete($table, $id){
     $inCore = cmsCore::getInstance();
-    $inDB = cmsDatabase::getInstance();
     $id = (int)$id;
 	$sql = "DELETE FROM $table WHERE id = $id LIMIT 1";
-	$inDB->query($sql) ;
+	cmsCore::c('db')->query($sql) ;
 	if ($table=='cms_content'){
 		cmsClearTags('content', $id);
         $inCore->deleteRatings('content', $id);
         $inCore->deleteComments('article', $id);
-		$inDB->query("DELETE FROM cms_tags WHERE target='content' AND item_id=$id");
+		cmsCore::c('db')->query("DELETE FROM cms_tags WHERE target='content' AND item_id=$id");
 	}
 	if ($table=='cms_modules'){
-		$inDB->query("DELETE FROM cms_modules_bind WHERE module_id=$id");
+		cmsCore::c('db')->query("DELETE FROM cms_modules_bind WHERE module_id=$id");
 	}
 }
 function dbDeleteList($table, $list){
-    $inDB = cmsDatabase::getInstance();
 	if (is_array($list)){
 		$sql = "DELETE FROM $table WHERE ";
 		$item = 0;
@@ -856,16 +813,16 @@ function dbDeleteList($table, $list){
 			if ($item<sizeof($list)) { $sql .= ' OR '; }
 			if ($table=='cms_content'){
 				cmsClearTags('content', $value);
-				$inDB->query("DELETE FROM cms_comments WHERE target='article' AND target_id=$value");
-				$inDB->query("DELETE FROM cms_ratings WHERE target='content' AND item_id=$value");
-				$inDB->query("DELETE FROM cms_tags WHERE target='content' AND item_id=$value");
+				cmsCore::c('db')->query("DELETE FROM cms_comments WHERE target='article' AND target_id=$value");
+				cmsCore::c('db')->query("DELETE FROM cms_ratings WHERE target='content' AND item_id=$value");
+				cmsCore::c('db')->query("DELETE FROM cms_tags WHERE target='content' AND item_id=$value");
 			}
 			if ($table=='cms_modules'){
-				$inDB->query("DELETE FROM cms_modules_bind WHERE module_id=$value");
+				cmsCore::c('db')->query("DELETE FROM cms_modules_bind WHERE module_id=$value");
 			}
 		}
 		$sql .= ' LIMIT '.sizeof($list);
-		$inDB->query($sql) ;
+		cmsCore::c('db')->query($sql) ;
 	}
 }
 
@@ -1016,12 +973,11 @@ function cpGetList($listtype, $field_name='title'){
 	}
 
 	//...или записи из таблицы
-    $inDB = cmsDatabase::getInstance();
 	$sql  = "SELECT id, {$field_name} FROM $listtype ORDER BY {$field_name} ASC";
-	$result = $inDB->query($sql) ;
+	$result = cmsCore::c('db')->query($sql) ;
 
-	if ($inDB->num_rows($result)>0) {
-		while($item = $inDB->fetch_assoc($result)){
+	if (cmsCore::c('db')->num_rows($result)>0) {
+		while($item = cmsCore::c('db')->fetch_assoc($result)){
 			$next = sizeof($list);
 			$list[$next]['title'] = $item[$field_name];
 			$list[$next]['id'] = $item['id'];
@@ -1033,23 +989,20 @@ function cpGetList($listtype, $field_name='title'){
 }
 
 function getFullAwardsList(){
-
-    $inDB = cmsDatabase::getInstance();
-
     $awards = array();
 
-    $rs = $inDB->query("SELECT title FROM cms_user_awards GROUP BY title");
+    $rs = cmsCore::c('db')->query("SELECT title FROM cms_user_awards GROUP BY title");
 
-    if ($inDB->num_rows($rs)){
-        while($aw = $inDB->fetch_assoc($rs)){
+    if (cmsCore::c('db')->num_rows($rs)){
+        while($aw = cmsCore::c('db')->fetch_assoc($rs)){
             $awards[] = $aw;
         }
     }
 
-    $rs = $inDB->query("SELECT title FROM cms_user_autoawards GROUP BY title");
+    $rs = cmsCore::c('db')->query("SELECT title FROM cms_user_autoawards GROUP BY title");
 
-    if ($inDB->num_rows($rs)){
-        while($aw = $inDB->fetch_assoc($rs)){
+    if (cmsCore::c('db')->num_rows($rs)){
+        while($aw = cmsCore::c('db')->fetch_assoc($rs)){
             if (!in_array(array('title' => $aw['title']), $awards)) {
                 $awards[] = $aw;
             }

@@ -57,7 +57,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
         $items = cmsCore::getArrayFromRequest($types);
 
-		$inDB->insert('cms_polls', $items);
+		cmsCore::c('db')->insert('cms_polls', $items);
 
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
 
@@ -85,7 +85,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
         $is_clear      = cmsCore::request('is_clear', 'int');
 
         if($is_clear){
-            $inDB->delete('cms_polls_log', "poll_id = '$poll_id'");
+            cmsCore::c('db')->delete('cms_polls_log', "poll_id = '$poll_id'");
         }
 
 		$answers = array();
@@ -103,7 +103,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 		$item['answers'] = cmsCore::arrayToYaml($answers);
 
-        $inDB->update('cms_polls', $item, $poll_id);
+        cmsCore::c('db')->update('cms_polls', $item, $poll_id);
 
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
 

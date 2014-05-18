@@ -12,28 +12,22 @@ if (!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 //                                                                            //
 /* * **************************************************************************/
 function autoOrder($form_id) {
-
-    $inDB = cmsDatabase::getInstance();
-
     $sql = "SELECT * FROM cms_form_fields WHERE form_id = '$form_id' ORDER BY ordering";
-    $rs  = $inDB->query($sql);
+    $rs  = cmsCore::c('db')->query($sql);
 
-    if ($inDB->num_rows($rs)) {
+    if (cmsCore::c('db')->num_rows($rs)) {
         $ord = 1;
-        while ($item = $inDB->fetch_assoc($rs)) {
-            $inDB->query("UPDATE cms_form_fields SET ordering = $ord WHERE id= '{$item['id']}'");
+        while ($item = cmsCore::c('db')->fetch_assoc($rs)) {
+            cmsCore::c('db')->query("UPDATE cms_form_fields SET ordering = $ord WHERE id= '{$item['id']}'");
             $ord += 1;
         }
     }
     return true;
 }
 function moveField($id, $form_id, $dir) {
-
-    $inDB = cmsDatabase::getInstance();
-
     $sign = $dir>0 ? '+' : '-';
 
-    $current = $inDB->get_field('cms_form_fields', "id='{$id}'", 'ordering');
+    $current = cmsCore::c('db')->get_field('cms_form_fields', "id='{$id}'", 'ordering');
     if($current === false){ return false; }
 
     if ($dir>0){
@@ -42,7 +36,7 @@ function moveField($id, $form_id, $dir) {
                 SET ordering = ordering-1
                 WHERE form_id='{$form_id}' AND ordering = ({$current}+1)
                 LIMIT 1";
-        $inDB->query($sql);
+        cmsCore::c('db')->query($sql);
     }
     if ($dir<0){
 
@@ -52,13 +46,13 @@ function moveField($id, $form_id, $dir) {
                 SET ordering = ordering+1
                 WHERE form_id='{$form_id}' AND ordering = ({$current}-1)
                 LIMIT 1";
-        $inDB->query($sql);
+        cmsCore::c('db')->query($sql);
     }
 
     $sql    = "UPDATE cms_form_fields
                SET ordering = ordering {$sign} 1
                WHERE id='{$id}'";
-    $inDB->query($sql);
+    cmsCore::c('db')->query($sql);
 
     return true;
 
@@ -66,8 +60,8 @@ function moveField($id, $form_id, $dir) {
 
 require('../includes/jwtabs.php');
 
-$GLOBALS['cp_page_head'][] = '<script language="JavaScript" type="text/javascript" src="js/forms.js"></script>';
-$GLOBALS['cp_page_head'][] = jwHeader();
+cmsCore::c('page')->addHeadJS('admin/js/forms.js');
+cmsCore::c('page')->addHead(jwHeader());
 
 $opt = cmsCore::request('opt', 'str', 'list');
 
@@ -100,7 +94,7 @@ if ($opt == 'del_field') {
     $item_id = cmsCore::request('item_id', 'int');
     $form_id = cmsCore::request('form_id', 'int');
 
-    $inDB->delete('cms_form_fields', "id = '{$item_id}'", 1);
+    cmsCore::c('db')->delete('cms_form_fields', "id = '{$item_id}'", 1);
 
     autoOrder($form_id);
 
@@ -180,15 +174,15 @@ if (in_array($opt, array('add_field', 'update_field'))) {
             break;
     }
 
-    $item['config'] = $inDB->escape_string(cmsCore::arrayToYaml($item['config']));
+    $item['config'] = cmsCore::c('db')->escape_string(cmsCore::arrayToYaml($item['config']));
 
     if($opt == 'add_field'){
 
-        $inDB->insert('cms_form_fields', cmsCore::callEvent('ADD_FORM_FIELD', $item));
+        cmsCore::c('db')->insert('cms_form_fields', cmsCore::callEvent('ADD_FORM_FIELD', $item));
 
     } else {
 
-        $inDB->update('cms_form_fields', cmsCore::callEvent('UPDATE_FORM_FIELD', $item), cmsCore::request('field_id', 'int'));
+        cmsCore::c('db')->update('cms_form_fields', cmsCore::callEvent('UPDATE_FORM_FIELD', $item), cmsCore::request('field_id', 'int'));
 
     }
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS']);
@@ -200,7 +194,7 @@ if (in_array($opt, array('submit', 'update'))) {
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $item['title']       = cmsCore::request('title', 'str', $_LANG['AD_FORM_UNTITLED']);
-    $item['description'] = $inDB->escape_string(cmsCore::request('description', 'html', ''));
+    $item['description'] = cmsCore::c('db')->escape_string(cmsCore::request('description', 'html', ''));
 
     $item['sendto']  = cmsCore::request('sendto', 'str', '');
     $item['email']   = cmsCore::request('email', 'email', '');
@@ -212,14 +206,14 @@ if (in_array($opt, array('submit', 'update'))) {
 
     if($opt == 'submit'){
 
-        $form_id = $inDB->insert('cms_forms', cmsCore::callEvent('ADD_FORM', $item));
+        $form_id = cmsCore::c('db')->insert('cms_forms', cmsCore::callEvent('ADD_FORM', $item));
         cmsCore::addSessionMessage($_LANG['AD_FORM_SUCCESFULL_CREATED']);
 
     } else {
 
         $form_id = cmsCore::request('item_id', 'int');
 
-        $inDB->update('cms_forms', cmsCore::callEvent('UPDATE_FORM', $item), $form_id);
+        cmsCore::c('db')->update('cms_forms', cmsCore::callEvent('UPDATE_FORM', $item), $form_id);
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'].'.');
 
     }
@@ -231,14 +225,14 @@ if (in_array($opt, array('submit', 'update'))) {
 if ($opt == 'delete') {
 
     $item_id = cmsCore::request('item_id', 'int');
-    $mod = $inDB->get_fields('cms_forms', "id = '{$item_id}'", '*');
+    $mod = cmsCore::c('db')->get_fields('cms_forms', "id = '{$item_id}'", '*');
     if(!$mod){ cmsCore::error404(); }
 
     cmsCore::callEvent('DELETE_FORM', $item_id);
 
-    $inDB->delete('cms_forms', "id = '{$item_id}'", 1);
+    cmsCore::c('db')->delete('cms_forms', "id = '{$item_id}'", 1);
 
-    $inDB->delete('cms_form_fields', "form_id = '{$item_id}'");
+    cmsCore::c('db')->delete('cms_form_fields', "form_id = '{$item_id}'");
 
     files_remove_directory(PATH.'/upload/forms/'.$item_id);
 
@@ -279,9 +273,9 @@ if (in_array($opt, array('add', 'edit'))) {
         $item_id  = cmsCore::request('item_id', 'int');
         $field_id = cmsCore::request('field_id', 'int');
 
-        $mod = $inDB->get_fields('cms_forms', "id = '{$item_id}'", '*');
+        $mod = cmsCore::c('db')->get_fields('cms_forms', "id = '{$item_id}'", '*');
 
-        $field = $inDB->get_fields('cms_form_fields', "id='{$field_id}'", '*');
+        $field = cmsCore::c('db')->get_fields('cms_form_fields', "id='{$field_id}'", '*');
         if($field){
             $field['config'] = cmsCore::yamlToArray($field['config']);
         }
@@ -400,7 +394,7 @@ if (in_array($opt, array('add', 'edit'))) {
         </p>
     </form>
     <?php if ($opt == 'edit') {
-        $last_order = 1 + $inDB->get_field('cms_form_fields', "form_id='{$mod['id']}' ORDER BY ordering DESC", 'ordering'); ?>
+        $last_order = 1 + cmsCore::c('db')->get_field('cms_form_fields', "form_id='{$mod['id']}' ORDER BY ordering DESC", 'ordering'); ?>
 
         {tab=<?php echo $_LANG['AD_FIELDS']; ?>}
         <table width="761" cellpadding="8" cellspacing="5">

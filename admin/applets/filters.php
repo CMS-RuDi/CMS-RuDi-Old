@@ -21,7 +21,7 @@ function applet_filters(){
 	if (!cmsUser::isAdminCan('admin/plugins', $adminAccess)) { cpAccessDenied(); }
 	if (!cmsUser::isAdminCan('admin/filters', $adminAccess)) { cpAccessDenied(); }
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_FILTERS'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_FILTERS']);
  	cpAddPathway($_LANG['AD_FILTERS'], 'index.php?view=filters');
 
 	$do = cmsCore::request('do', 'str', 'list');

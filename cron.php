@@ -20,9 +20,9 @@ if(PHP_SAPI != 'cli') die('Access denied');
 Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
 define('PATH', dirname(__FILE__));
-define("VALID_CMS", 1);
+define('VALID_CMS', 1);
 
-include(PATH.'/core/cms.php');
+include(PATH .'/core/cms.php');
 
 cmsCore::getInstance();
 cmsCore::loadClass('cron');

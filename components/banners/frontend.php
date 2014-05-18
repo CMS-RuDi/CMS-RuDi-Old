@@ -14,24 +14,18 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function banners(){
-
     $inCore = cmsCore::getInstance();
 
-    $model = new cms_model_banners();
-
-    $do = $inCore->do;
-	$banner_id = cmsCore::request('id', 'int', 0);
+    $banner_id = cmsCore::request('id', 'int', 0);
 
 //======================================================================================================================//
 
-    if ($do=='view'){
+    if ($inCore->do == 'view'){
+        $banner = cmsCore::m('banners')->getBanner($banner_id);
+        if(!$banner || !$banner['published']) { cmsCore::error404(); }
 
-        $banner = $model->getBanner($banner_id);
-		if(!$banner || !$banner['published']) { cmsCore::error404(); }
-
-        $model->clickBanner($banner_id);
+        cmsCore::m('banners')->clickBanner($banner_id);
         cmsCore::redirect($banner['link']);
-
     }
 
 }

@@ -81,12 +81,12 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
         $inActions->showTargets(true);
 
 		if ($act_component){
-			$inDB->where("a.component = '$act_component'");
+			cmsCore::c('db')->where("a.component = '$act_component'");
 		}
 
 		$total = $inActions->getCountActions();
 
-        $inDB->limitPage($page, $perpage);
+        cmsCore::c('db')->limitPage($page, $perpage);
 
         $actions = $inActions->getActionsLog();
 
@@ -131,7 +131,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
                        ORDER BY title
                        LIMIT 100";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
 		?>
 
@@ -176,8 +176,8 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 						$html = '<table cellpadding="0" cellspacing="0">' . "\n";
 
-						if ($inDB->num_rows($result)){
-							while($option = $inDB->fetch_assoc($result)){
+						if (cmsCore::c('db')->num_rows($result)){
+							while($option = cmsCore::c('db')->fetch_assoc($result)){
 
 								$html .= '<tr>' . "\n" .
 											"\t" . '<td><input type="checkbox" id="act_type_'.$option['name'].'" name="act_type['.$option['name'].']" value="'.$option['id'].'" '.(@in_array($option['id'], $model->config['act_type']) ? 'checked="checked"' : '').' />' . "\n" .

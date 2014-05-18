@@ -16,9 +16,6 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 function applet_tree(){
 
     $inCore = cmsCore::getInstance();
-    $inUser = cmsUser::getInstance();
-	$inDB 	= cmsDatabase::getInstance();
-	$inPage = cmsPage::getInstance();
 
 	cmsCore::loadLib('tags');
 
@@ -31,10 +28,11 @@ function applet_tree(){
     cmsCore::loadModel('content');
     $model = new cms_model_content();
 
-    $GLOBALS['cp_page_title'] = $_LANG['AD_ARTICLES'];
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES']);
     cpAddPathway($_LANG['AD_ARTICLES'], 'index.php?view=tree');
 
-	$GLOBALS['cp_page_head'][] = '<script language="JavaScript" type="text/javascript" src="js/content.js"></script>';
+    cmsCore::c('page')->addHeadJS('admin/js/content.js');
+    
     echo '<script>';
     echo cmsPage::getLangJS('AD_NO_SELECTED_ARTICLES');
     echo cmsPage::getLangJS('AD_DELETE_SELECTED_ARTICLES');
@@ -77,16 +75,16 @@ function applet_tree(){
         }
 
         if ($title_part){
-            $inDB->where('LOWER(con.title) LIKE \'%'.mb_strtolower($title_part).'%\'');
+            cmsCore::c('db')->where('LOWER(con.title) LIKE \'%'.mb_strtolower($title_part).'%\'');
         }
 
         if ($only_hidden){
-            $inDB->where('con.published = 0');
+            cmsCore::c('db')->where('con.published = 0');
         }
 
-        $inDB->orderBy($orderby, $orderto);
+        cmsCore::c('db')->orderBy($orderby, $orderto);
 
-        $inDB->limitPage($page, $perpage);
+        cmsCore::c('db')->limitPage($page, $perpage);
 
         $total = $model->getArticlesCount(false);
 

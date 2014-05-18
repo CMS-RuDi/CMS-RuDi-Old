@@ -20,7 +20,7 @@
     cmsCore::loadLanguage('admin/lang');
     cmsCore::loadLanguage('admin/applets/applet_modules');
 
-    if (!$inUser->is_admin) { cmsCore::halt($_LANG['ACCESS_DENIED']); }
+    if (!cmsCore::c('user')->is_admin) { cmsCore::halt($_LANG['ACCESS_DENIED']); }
 
     $adminAccess = cmsUser::getAdminAccess();
 
@@ -30,7 +30,7 @@
 
     $module_id = cmsCore::request('id', 'int');
 
-    $mod = $inDB->get_fields('cms_modules', "id='{$module_id}'", '*');
+    $mod = cmsCore::c('db')->get_fields('cms_modules', "id='{$module_id}'", '*');
     if (!$mod) { cmsCore::halt(); }
 
     $mod_name = $mod['user'] ? '' : preg_replace('/[^a-z0-9_\-]/iu', '', $mod['content']);

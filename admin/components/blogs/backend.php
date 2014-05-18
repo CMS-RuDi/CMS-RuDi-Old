@@ -13,14 +13,13 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 
 function cpBlogOwner($item){
-    $inDB = cmsDatabase::getInstance();
     if($item['owner']=='user'){
-        $nickname = $inDB->get_field('cms_users', "id='{$item['user_id']}'", 'nickname');
+        $nickname = cmsCore::c('db')->get_field('cms_users', "id='{$item['user_id']}'", 'nickname');
         $link = '<a href="?view=users&do=edit&id='.$item['user_id'].'" class="user_link" target="_blank">
                  '.$nickname.'
                  </a>';
     } else {
-        $title = $inDB->get_field('cms_clubs', "id='{$item['user_id']}'", 'title');
+        $title = cmsCore::c('db')->get_field('cms_clubs', "id='{$item['user_id']}'", 'title');
         $link = '<a href="?view=components&do=config&link=clubs&opt=edit&item_id='.$item['user_id'].'" class="club_link" target="_blank">'.$title.'</a>';
     }
     return $link;
@@ -280,7 +279,7 @@ if ($opt=='edit_blog'){
        { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
     } else { $item_id = cmsCore::request('item_id', 'int', 0); }
 
-    $mod = $inDB->get_fields('cms_blogs', "id = '$item_id'", '*');
+    $mod = cmsCore::c('db')->get_fields('cms_blogs', "id = '$item_id'", '*');
     if(!$mod){ cmsCore::error404(); }
 
     echo '<h3>'.$_LANG['AD_EDIT_BLOG'].' '.$ostatok.'</h3>';

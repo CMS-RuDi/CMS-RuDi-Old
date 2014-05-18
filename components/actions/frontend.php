@@ -14,156 +14,137 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function actions(){
-
     $inCore = cmsCore::getInstance();
-    $inUser = cmsUser::getInstance();
-	$inPage = cmsPage::getInstance();
-	$inDB   = cmsDatabase::getInstance();
-	$inActions = cmsActions::getInstance();
-
-    $model = new cms_model_actions();
 
     global $_LANG;
 
-    $do      = $inCore->do;
-	$page    = cmsCore::request('page', 'int', 1);
-	$user_id = cmsCore::request('user_id', 'int', 0);
-	$perpage = 6;
+    $page    = cmsCore::request('page', 'int', 1);
+    $user_id = cmsCore::request('user_id', 'int', 0);
+    $perpage = 6;
 
     $pagetitle = $inCore->getComponentTitle();
 
-    $inPage->setTitle($pagetitle);
-    $inPage->addPathway($pagetitle, '/actions');
+    cmsCore::c('page')->setTitle($pagetitle);
+    cmsCore::c('page')->addPathway($pagetitle, '/actions');
 
 //======================================================================================================================//
 
-    if ($do=='delete'){
-
-        if (!$inUser->is_admin) { cmsCore::error404(); }
+    if ($inCore->do == 'delete'){
+        if (!cmsCore::c('user')->is_admin) { cmsCore::error404(); }
 
         $id = cmsCore::request('id', 'int', 0);
         if (!$id) { cmsCore::error404(); }
 
-        $model->deleteAction($id);
+        cmsCore::m('actions')->deleteAction($id);
+        
         cmsCore::redirectBack();
-
     }
 
 //======================================================================================================================//
 
-    if ($do=='view'){
+    if ($inCore->do == 'view'){
+        cmsCore::c('actions')->showTargets(cmsCore::m('actions')->config['show_target']);
+        
+        if(cmsCore::m('actions')->config['act_type'] && !cmsCore::m('actions')->config['is_all']){
+            cmsCore::c('actions')->onlySelectedTypes(cmsCore::m('actions')->config['act_type']);
+	}
+        
+        $total = cmsCore::c('actions')->getCountActions();
 
-        $inActions->showTargets($model->config['show_target']);
+        cmsCore::c('db')->limitPage($page, cmsCore::m('actions')->config['perpage']);
 
-		if($model->config['act_type'] && !$model->config['is_all']){
-        	$inActions->onlySelectedTypes($model->config['act_type']);
-		}
-
-		$total = $inActions->getCountActions();
-
-        $inDB->limitPage($page, $model->config['perpage']);
-
-        $actions = $inActions->getActionsLog();
-		if(!$actions && $page > 1){ cmsCore::error404(); }
+        $actions = cmsCore::c('actions')->getActionsLog();
+        if(!$actions && $page > 1){ cmsCore::error404(); }
 
         cmsPage::initTemplate('components', 'com_actions_view')->
-                assign('actions', $actions)->
-                assign('pagetitle', $pagetitle)->
-                assign('total', $total)->
-                assign('user_id', $inUser->id)->
-                assign('pagebar', cmsPage::getPagebar($total, $page, $model->config['perpage'], '/actions/page-%page%'))->
-                display('com_actions_view.tpl');
-
+            assign('actions', $actions)->
+            assign('pagetitle', $pagetitle)->
+            assign('total', $total)->
+            assign('user_id', cmsCore::c('user')->id)->
+            assign('pagebar', cmsPage::getPagebar($total, $page, cmsCore::m('actions')->config['perpage'], '/actions/page-%page%'))->
+            display('com_actions_view.tpl');
     }
 
 //======================================================================================================================//
 
-    if ($do=='view_user_feed'){
+    if ($inCore->do == 'view_user_feed'){
+        if(!cmsCore::c('user')->id) { cmsCore::error404(); }
 
-		if(!$inUser->id) { cmsCore::error404(); }
+        if(!cmsCore::isAjax()) { cmsCore::error404(); }
 
-		if(!cmsCore::isAjax()) { cmsCore::error404(); }
+        // Получаем друзей
+        $friends = cmsUser::getFriends(cmsCore::c('user')->id);
 
-		// Получаем друзей
-		$friends = cmsUser::getFriends($inUser->id);
+        $friends_total = count($friends);
 
-		$friends_total = count($friends);
+        // нам нужно только определенное количество друзей
+        $friends = array_slice($friends, ($page-1)*$perpage, $perpage, true);
 
-		// нам нужно только определенное количество друзей
-		$friends = array_slice($friends, ($page-1)*$perpage, $perpage, true);
+        if($friends){
+            cmsCore::c('actions')->onlyMyFriends();
 
-		if($friends){
-
-			$inActions->onlyMyFriends();
-
-			$inActions->showTargets($model->config['show_target']);
-			$inDB->limitIs($model->config['perpage_tab']);
-        	$actions = $inActions->getActionsLog();
-
-		}
+            cmsCore::c('actions')->showTargets(cmsCore::m('actions')->config['show_target']);
+            cmsCore::c('db')->limitIs(cmsCore::m('actions')->config['perpage_tab']);
+            $actions = cmsCore::c('actions')->getActionsLog();
+        }
 
         cmsPage::initTemplate('components', 'com_actions_view_tab')->
-                assign('actions', $actions)->
-                assign('friends', $friends)->
-                assign('user_id', $user_id)->
-                assign('page', $page)->
-                assign('cfg', $model->config)->
-                assign('total_pages', ceil($friends_total / $perpage))->
-                assign('friends_total', $friends_total)->
-                display('com_actions_view_tab.tpl');
-
+            assign('actions', $actions)->
+            assign('friends', $friends)->
+            assign('user_id', $user_id)->
+            assign('page', $page)->
+            assign('cfg', cmsCore::m('actions')->config)->
+            assign('total_pages', ceil($friends_total / $perpage))->
+            assign('friends_total', $friends_total)->
+            display('com_actions_view_tab.tpl');
     }
 //======================================================================================================================//
-    if ($do=='view_user_feed_only'){
+    if ($inCore->do == 'view_user_feed_only'){
+        if(!cmsCore::c('user')->id) { cmsCore::error404(); }
 
-		if(!$inUser->id) { cmsCore::error404(); }
+        if(!cmsCore::isAjax()) { cmsCore::error404(); }
 
-		if(!cmsCore::isAjax()) { cmsCore::error404(); }
+        if($user_id){
+            if(!cmsUser::isFriend($user_id)) { cmsCore::error404(); }
+            cmsCore::c('actions')->whereUserIs($user_id);
+        } else {
+            cmsCore::c('actions')->onlyMyFriends();
+        }
 
-		if($user_id){
-			if(!cmsUser::isFriend($user_id)) { cmsCore::error404(); }
-			$inActions->whereUserIs($user_id);
-		} else {
-			$inActions->onlyMyFriends();
-		}
-
-		$inActions->showTargets($model->config['show_target']);
-		$inDB->limitIs($model->config['perpage_tab']);
-		$actions = $inActions->getActionsLog();
-		// получаем последний элемент массива для выборки имя пользователя и ссылки на профиль.
-		$user = end($actions);
+        cmsCore::c('actions')->showTargets(cmsCore::m('actions')->config['show_target']);
+        cmsCore::c('db')->limitIs(cmsCore::m('actions')->config['perpage_tab']);
+        $actions = cmsCore::c('actions')->getActionsLog();
+        // получаем последний элемент массива для выборки имя пользователя и ссылки на профиль.
+        $user = end($actions);
 
         cmsPage::initTemplate('components', 'com_actions_tab')->
-                assign('actions', $actions)->
-                assign('user_id', $user_id)->
-                assign('user', $user)->
-                assign('cfg', $model->config)->
-                display('com_actions_tab.tpl');
-
+            assign('actions', $actions)->
+            assign('user_id', $user_id)->
+            assign('user', $user)->
+            assign('cfg', cmsCore::m('actions')->config)->
+            display('com_actions_tab.tpl');
     }
 //======================================================================================================================//
-    if ($do=='view_user_friends_only'){
+    if ($inCore->do == 'view_user_friends_only'){
+        if(!cmsCore::c('user')->id) { cmsCore::error404(); }
 
-		if(!$inUser->id) { cmsCore::error404(); }
+        if(!cmsCore::isAjax()) { cmsCore::error404(); }
 
-		if(!cmsCore::isAjax()) { cmsCore::error404(); }
+        // Получаем друзей
+        $friends = cmsUser::getFriends(cmsCore::c('user')->id);
 
-		// Получаем друзей
-		$friends = cmsUser::getFriends($inUser->id);
+        $friends_total = count($friends);
 
-		$friends_total = count($friends);
-
-		// нам нужно только определенное количество друзей
-		$friends = array_slice($friends, ($page-1)*$perpage, $perpage, true);
+        // нам нужно только определенное количество друзей
+        $friends = array_slice($friends, ($page-1)*$perpage, $perpage, true);
 
         cmsPage::initTemplate('components', 'com_actions_friends')->
-				assign('friends', $friends)->
-				assign('page', $page)->
-				assign('user_id', $user_id)->
-				assign('total_pages', ceil($friends_total / $perpage))->
-				assign('friends_total', $friends_total)->
-                display('com_actions_friends.tpl');
-
+            assign('friends', $friends)->
+            assign('page', $page)->
+            assign('user_id', $user_id)->
+            assign('total_pages', ceil($friends_total / $perpage))->
+            assign('friends_total', $friends_total)->
+            display('com_actions_friends.tpl');
     }
 
 }

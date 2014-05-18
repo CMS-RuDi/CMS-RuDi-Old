@@ -53,9 +53,9 @@
                 <strong>{$LANG.IMAGE}:</strong>
             </td>
             <td>
-                {if $mod.image}
+                {if $mod.image_small}
                     <div style="padding-bottom:10px">
-                        <img src="/images/photos/small/{$mod.image}" border="0" />
+                        <img src="{$mod.image_small}" border="0" />
                     </div>
                     <table cellpadding="0" cellspacing="0" border="0">
                         <tr>
@@ -74,17 +74,17 @@
     </table>
     </div>
 
-	<table width="100%" border="0">
-		<tr>
-			<td>
-                <h3>{$LANG.ARTICLE_ANNOUNCE}</h3>
-				<div>{wysiwyg name='description' value=$mod.description height=200 width='100%'}</div>
+    <table width="100%" border="0">
+            <tr>
+                    <td>
+            <h3>{$LANG.ARTICLE_ANNOUNCE}</h3>
+                            <div>{wysiwyg name='description' value=$mod.description height=200 width='100%'}</div>
 
-				<h3>{$LANG.ARTICLE_TEXT}</h3>
-				<div>{wysiwyg name='content' value=$mod.content height=450 width='100%'}</div>
-			</td>
-		</tr>
-	</table>
+                            <h3>{$LANG.ARTICLE_TEXT}</h3>
+                            <div>{wysiwyg name='content' value=$mod.content height=450 width='100%'}</div>
+                    </td>
+            </tr>
+    </table>
 
     {if $cfg.img_on && $ajaxUploader}
     <div class="bar" style="padding:10px 10px;margin-top: 10px;">
@@ -123,12 +123,12 @@
         {/literal}
     </script>
 
-	<p style="margin-top:15px">
-        <input name="add_mod" type="hidden" value="1" />
-		<input name="savebtn" type="button" onclick="submitArticle()" id="add_mod" {if $do=='addarticle'} value="{$LANG.ADD_ARTICLE}" {else} value="{$LANG.SAVE_CHANGES}" {/if} />
-		<input name="back" type="button" id="back" value="{$LANG.CANCEL}" onclick="window.history.back();"/>
-		{if $do=='editarticle'}
-			<input name="id" type="hidden" value="{$mod.id}" />
-		{/if}
-	</p>
+    <p style="margin-top:15px">
+    <input name="add_mod" type="hidden" value="1" />
+            <input name="savebtn" type="button" onclick="submitArticle()" id="add_mod" {if $do=='addarticle'} value="{$LANG.ADD_ARTICLE}" {else} value="{$LANG.SAVE_CHANGES}" {/if} />
+            <input name="back" type="button" id="back" value="{$LANG.CANCEL}" onclick="window.history.back();"/>
+            {if $do=='editarticle'}
+                    <input name="id" type="hidden" value="{$mod.id}" />
+            {/if}
+    </p>
 </form>

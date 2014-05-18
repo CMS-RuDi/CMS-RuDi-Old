@@ -19,7 +19,7 @@ function applet_phpinfo(){
 	global $adminAccess;
 	if (!cmsUser::isAdminCan('admin/config', $adminAccess)) { cpAccessDenied(); }
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_PHP_INFO'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_PHP_INFO']);
 
 	cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
 	cpAddPathway($_LANG['AD_PHP_INFO'], 'index.php?view=phpinfo');

@@ -120,7 +120,7 @@ function applet_install(){
 
 	global $_LANG;
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_SETUP_EXTENSION'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_SETUP_EXTENSION']);
 
     $do = cmsCore::request('do', 'str', 'list');
 

@@ -452,6 +452,7 @@ CREATE TABLE `#__content` (
   `url` varchar(100) NOT NULL,
   `tpl` varchar(50) NOT NULL DEFAULT 'com_content_read.tpl',
   `images` longtext NOT NULL,
+  `slidecfg` varchar(64) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `seolink` (`seolink`),
   KEY `category_id` (`category_id`),

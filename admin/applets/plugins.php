@@ -19,7 +19,7 @@ function applet_plugins(){
 
     $inCore = cmsCore::getInstance();
 
-    $GLOBALS['cp_page_title'] = $_LANG['AD_PLUGINS'];
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_PLUGINS']);
     cpAddPathway($_LANG['AD_PLUGINS'], 'index.php?view=plugins');
 
 	global $adminAccess;
@@ -122,7 +122,7 @@ function applet_plugins(){
         $plugin = $inCore->loadPlugin($plugin_name);
         $config = $inCore->loadPluginConfig($plugin_name);
 
-        $GLOBALS['cp_page_title'] = $plugin->info['title'];
+        cmsCore::c('page')->setAdminTitle($plugin->info['title']);
         cpAddPathway($plugin->info['title'], 'index.php?view=plugins&do=config&id='.$id);
 
         echo '<h3>'.$plugin->info['title'].'</h3>';

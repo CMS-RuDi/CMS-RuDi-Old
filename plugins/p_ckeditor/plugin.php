@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.3                                //
+//                             CMS RuDi v0.0.4                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -78,7 +78,7 @@ class p_ckeditor extends cmsPlugin {
         if (cmsCore::c('user')->is_admin){
             $tbar = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, '/', { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] }, '/', { name: 'links' }, { name: 'forms' }, { name: 'insert' }, '/', { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
         }else{
-            $tbar = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, '/', { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align' ] }, { name: 'links' }, { name: 'insert' }, '/', { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
+            $tbar = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, '/', { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align' ] }, { name: 'links' }, { name: 'insert' }, { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
         }
         
         return array('rplugins' => $rplugins, 'tbar' => $tbar);

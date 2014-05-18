@@ -8,6 +8,7 @@
     {if $slide_opt == 3}
         {add_js file='includes/sliders/jCarousel/js/jcarousel.responsive.js'}
         {add_css file='includes/sliders/jCarousel/css/jcarousel.responsive.css'}
+        {literal}<style type="text/css">.jcarousel img {border: #000000 2px solid; max-width: 240px; max-height: 250px}</style>{/literal}
     {/if}
 
     <div class="jcarousel-wrapper">

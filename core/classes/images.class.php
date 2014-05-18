@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.3                                //
+//                             CMS RuDi v0.0.4                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -75,21 +75,52 @@ class rudi_graphics{
         return array('width' => imagesx($image), 'heigth' => imagesy($image));
     }
 
-    public function resize($image_file){
+    public function resize($image_file, $upload_file=false){
         $this->checkSizeOpt();
         $m_dir = mb_strstr($this->medium_dir, PATH) ? $this->medium_dir : $this->big_dir . $this->medium_dir;
         $s_dir = mb_strstr($this->small_dir, PATH) ? $this->small_dir : $this->big_dir . $this->small_dir;
         
-        if (mb_strstr($image_file, 'http://')){
-            $image_file2 = PATH .'/cache/'. md5($image_file .' '. time()) .'.jpg';
+        if ($upload_file === true){
+            if (!empty($_FILES[$image_file]['name'])){
+                global $_LANG;
 
-            $inCurl = cmsCore::initCurl();
-            if (!$inCurl->saveFile($image_file, $image_file2)){
+                $max_size = ini_get('upload_max_filesize');
+                $max_size = str_ireplace(array('M','K'), array('Mb','Kb'), $max_size);
+
+                $uploadErrors = array(
+                    UPLOAD_ERR_OK => $_LANG['UPLOAD_ERR_OK'],
+                    UPLOAD_ERR_INI_SIZE => $_LANG['UPLOAD_ERR_INI_SIZE'].' &mdash; '.$max_size,
+                    UPLOAD_ERR_FORM_SIZE => $_LANG['UPLOAD_ERR_INI_SIZE'],
+                    UPLOAD_ERR_PARTIAL => $_LANG['UPLOAD_ERR_PARTIAL'],
+                    UPLOAD_ERR_NO_FILE => $_LANG['UPLOAD_ERR_NO_FILE'],
+                    UPLOAD_ERR_NO_TMP_DIR => $_LANG['UPLOAD_ERR_NO_TMP_DIR'],
+                    UPLOAD_ERR_CANT_WRITE => $_LANG['UPLOAD_ERR_CANT_WRITE'],
+                    UPLOAD_ERR_EXTENSION => $_LANG['UPLOAD_ERR_EXTENSION']
+                );
+                
+                if($errorCode !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])){
+                    $_SESSION['file_upload_error'] = $uploadErrors[$errorCode];
+                    return false;
+                }
+                
+                $image_file = $_FILES[$image_file]['tmp_name'];
+            }else{
                 return false;
             }
-            unset($inCurl);
-            
-            $image_file = $image_file2;
+        }else{
+            if (
+                (mb_substr($image_file, 0, 7) == 'http://') ||
+                (mb_substr($image_file, 0, 8) == 'https://')
+            ){
+                $image_file2 = PATH .'/cache/'. md5($image_file .' '. microtime(true)) .'.tmp';
+
+                if (!cmsCore::c('curl')->saveFile($image_file, $image_file2)){
+                    return false;
+                }
+                cmsCore::cd('curl');
+
+                $image_file = $image_file2;
+            }
         }
         
         if (!$size = self::getImgInfo($image_file)){
@@ -143,7 +174,7 @@ class rudi_graphics{
                 }
             }
             
-            if ($this->watermark){
+            if (!empty($this->watermark)){
                 self::addWatermark($this->big_dir . $this->filename, PATH .'/images/'. $inConf->wmark, $this->watermark);
             }
         }else if ($this->new_bw == 'copy'){
@@ -172,7 +203,7 @@ class rudi_graphics{
             }else{
                 $gif_resize->resize($image_file, $m_dir . $this->filename, $this->new_mw, $this->new_mh);
             }
-            if ($this->mwatermark){
+            if (!empty($this->mwatermark)){
                 self::addWatermark($m_dir . $this->filename, PATH .'/images/'. $inConf->wmark, $this->mwatermark);
             }
         }

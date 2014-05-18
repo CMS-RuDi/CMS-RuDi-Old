@@ -1,6 +1,76 @@
 CMS Rudi 0.0.4 (Instant CMS v1.10.3 DS Soft Mod v 0.0.4)
 --------------------------------------------------------------------------------
-
+[+] Добавлен плагин прикрепления к статьям видео плееров. Вставка плеера в текст
+    статьи осуществляется командой {video#100} где 100 это id плеера;
+[=] Небольщие исправления прикрепления изображений к статьям;
+[+] Добавлены настройки качества изображений и наносить или нет водяной знак
+    на среднюю копию, для прикрепленных изображений;
+[+] Главное изображение статьи сохраняется теперь в папке /images/content/medium/XXX/
+    /images/content/small/XXX/ где XXX это ceil(id/100);
+[=] В каталоге статей обновлен метод загрузки изображений с использованием класса
+    images.class.php;
+[=] Обновлен код модулей: mod_latest, mod_bestcontent;
+[=] Обновлены файлы шаблонов: com_content_edit.tpl, com_content_rating.tpl, 
+    com_content_read.tpl, com_content_view.tpl, mod_latest.tpl, mod_bestcontent.tpl;
+[=] Обновлен код компонентов: actions, arhive, banners, blogs;
+[=] Рефакторинг кода админки;
+[=] Вместо $GLOBALS['cp_page_title'] = '' теперь для указания заголовка страницы 
+    в админке надо использовать метод cmsCore::c('page')->setAdminTitle('');
+[=] Вместо cpHead() теперь в админке используется метод cmsCore::c('page')->printAdminHead()
+    но cpHead() еще оставлен для совместимости через пару обновлений будет удален
+    из кода окончательно;
+[+] Добавлены новые события для плагинов:
+    PRINT_ADMIN_PAGE_CSS
+    PRINT_ADMIN_PAGE_JS
+    PRINT_ADMIN_PAGE_HEAD;
+[=] Вместо $GLOBALS['cp_page_head'][] = '' теперь в админке надо использовать
+    методы класса cmsPage: cmsCore::c('page')->addHead(), cmsCore::c('page')->addHeadJS()
+    и cmsCore::c('page')->addHeadCSS(), поддержка $GLOBALS['cp_page_head'] еще 
+    продолжается но через пару версий будет прекращено.;
+[=] Изменена логика работы метода ядра "c". При инициализации объекта класса
+    сперва проверяется наличие метода getInstance, при отсутствии проверяется
+    наличие __construct при отсутствии класс инициализируется через new $className(),
+    Вторым параметром можно передать массив аргументов необходимых для инициализации
+    класса.
+    Данный метод теперь можно использовать для инициализации любого класса
+    из папки /core/classes/ кроме класса plugin.class.php.
+    Внимание! Данный метод создает один объект класса и работает в дальнейшем с 
+    ним, если нужно создать новый объект класса нужно третьим параметром передать
+    методу true (это не относится к singltone классам у них всегда будет только
+    один экземпляр класса), пример:
+            cmsCore::c('curl', array(), true)->get($url)
+        или же с параметрами:
+            cmsCore::c('curl', array($cfg), true)->get($url)
+[-] Удален метод ядра initCurl;
+[-] Удалены функции:
+        cmsPrintSitename
+        cmsPrintHead
+        cmsPathway
+        cmsBody
+        cmsCountModules
+        cmsModule
+    вместо них в шаблонах следует использовать следующие методы класса cmsPage:
+        cmsCore::c('page')->printSitename()
+        cmsCore::c('page')->printHead()
+        cmsCore::c('page')->printPathway($separator)
+        cmsCore::c('page')->printBody()
+        cmsCore::c('page')->countModules($position)
+        cmsCore::c('page')->printModules($position)
+[-] Удалены функции для работы с БД:
+        dbRowsCount
+        dbGetField
+        dbGetFields
+        dbGetTable
+        dbLastId
+        dbDeleteNS
+        dbDeleteListNS
+    вместо них нужно использовать методы класса cmsDatabase:
+        cmsCore::c('db')->get_field($table, $where, $field)
+        cmsCore::c('db')->get_fields($table, $where, $fields, $order)
+        cmsCore::c('db')->get_table($table, $where, $fields)
+        cmsCore::c('db')->get_last_id($table)
+        cmsCore::c('db')->deleteNS($table, $id)
+        cmsCore::c('db')->deleteListNS($table, $list);
 ================================================================================
 
 CMS Rudi 0.0.3 (Instant CMS v1.10.3 DS Soft Mod v 0.0.3)
@@ -132,7 +202,7 @@ CMS Rudi 0.0.1 (Instant CMS v1.10.3 DS Soft Mod v 0.0.1)
      * @param array $metas
      * @return \cmsPage
      */
-[+] Добавлены нове события для плагинов:
+[+] Добавлены новые события для плагинов:
     PRINT_PAGE_CSS
     PRINT_PAGE_META
     PRINT_PAGE_JS

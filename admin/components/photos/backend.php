@@ -149,7 +149,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 	if ($opt == 'show_album'){
         $item_id = cmsCore::request('item_id', 'int', 0);
-        $inDB->query("UPDATE cms_photo_albums SET published = 1 WHERE id = '$item_id'") ;
+        cmsCore::c('db')->query("UPDATE cms_photo_albums SET published = 1 WHERE id = '$item_id'") ;
         echo '1'; exit;
 	}
 
@@ -158,7 +158,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 	if ($opt == 'hide_album'){
         $item_id = cmsCore::request('item_id', 'int', 0);
-        $inDB->query("UPDATE cms_photo_albums SET published = 0 WHERE id = '$item_id'") ;
+        cmsCore::c('db')->query("UPDATE cms_photo_albums SET published = 0 WHERE id = '$item_id'") ;
         echo '1'; exit;
 	}
 
@@ -193,7 +193,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 		$album = cmsCore::callEvent('ADD_ALBUM', $album);
 
-		$inDB->addNsCategory('cms_photo_albums', $album);
+		cmsCore::c('db')->addNsCategory('cms_photo_albums', $album);
 
 		cmsCore::addSessionMessage($_LANG['AD_ALBUM'].' "'.stripslashes($album['title']).'" '.$_LANG['AD_ALBUM_CREATED'], 'success');
 
@@ -208,7 +208,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 		if(cmsCore::inRequest('item_id')){
 
-			$album = $inDB->getNsCategory('cms_photo_albums', cmsCore::request('item_id', 'int', 0));
+			$album = cmsCore::c('db')->getNsCategory('cms_photo_albums', cmsCore::request('item_id', 'int', 0));
 			if (!$album) { cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=list_albums'); }
 
 			cmsCore::addSessionMessage($_LANG['AD_ALBUM'].' "'.stripslashes($album['title']).'", '.$_LANG['AD_EMBEDED_PHOTOS_REMOVED'].'.', 'success');
@@ -232,7 +232,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 			$item_id = cmsCore::request('item_id', 'int', 0);
 
-			$old_album = $inDB->getNsCategory('cms_photo_albums', $item_id);
+			$old_album = cmsCore::c('db')->getNsCategory('cms_photo_albums', $item_id);
 			if (!$old_album) { cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=list_albums'); }
 
             $album['title']         = cmsCore::request('title', 'str', 'NO_TITLE');
@@ -264,7 +264,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 				$inCore->nestedSetsInit('cms_photo_albums')->MoveNode($item_id, $album['parent_id']);
 			}
 
-			$inDB->update('cms_photo_albums', $album, $item_id);
+			cmsCore::c('db')->update('cms_photo_albums', $album, $item_id);
 			cmsCore::addSessionMessage($_LANG['AD_ALBUM'].' "'.stripslashes($album['title']).'" '.$_LANG['AD_ALBUM_SAVED'].'.', 'success');
 			cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=list_albums');
 
@@ -303,7 +303,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
             $item_id = cmsCore::request('item_id', 'int', 0);
 
-            $mod = $inDB->getNsCategory('cms_photo_albums', $item_id);
+            $mod = cmsCore::c('db')->getNsCategory('cms_photo_albums', $item_id);
 
             cpAddPathway($_LANG['AD_ALBUM_EDIT']);
             echo '<h3>'.$_LANG['AD_ALBUM_EDIT'].' "'.$mod['title'].'"</h3>';
@@ -345,7 +345,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
             <tr>
                 <td valign="top"><?php echo $_LANG['AD_ALBUM_PARENT']; ?>:</td>
                 <td valign="top">
-                    <?php $rootid = $inDB->get_field('cms_photo_albums', "parent_id=0 AND NSDiffer=''", 'id'); ?>
+                    <?php $rootid = cmsCore::c('db')->get_field('cms_photo_albums', "parent_id=0 AND NSDiffer=''", 'id'); ?>
                     <select name="parent_id" size="8" id="parent_id" style="width:285px">
                         <option value="<?php echo $rootid; ?>" <?php if (@$mod['parent_id']==$rootid || !isset($mod['parent_id'])) { echo 'selected'; }?>><?php echo $_LANG['AD_ALBUM_ROOT']; ?></option>
                         <?php
@@ -496,7 +496,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
                 <?php  } ?>
                 </td>
                 <td valign="top">
-                <?php if ($inDB->rows_count('cms_photo_files', 'album_id = '.$item_id.'')) { ?>
+                <?php if (cmsCore::c('db')->rows_count('cms_photo_files', 'album_id = '.$item_id.'')) { ?>
                     <select name="iconurl" id="iconurl" style="width:285px" onchange="showMapMarker()">
                         <?php
                             if (!empty($mod['iconurl']) && file_exists(PATH.'/images/photos/small/'.$mod['iconurl'])){

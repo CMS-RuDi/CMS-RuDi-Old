@@ -24,14 +24,11 @@
     cmsCore::getInstance();
     cmsCore::loadClass('user');
 
-    $inUser = cmsUser::getInstance();
-    $inConf = cmsConfig::getInstance();
+    if (!cmsCore::c('user')->update()) { cmsCore::error404(); }
 
-    if (!$inUser->update()) { cmsCore::error404(); }
+	if(!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
 
-	if(!cmsCore::checkAccessByIp($inConf->allow_ip)) { cmsCore::error404(); }
-
-    if (!$inUser->is_admin){
+    if (!cmsCore::c('user')->is_admin){
         cmsCore::error404();
     }
 

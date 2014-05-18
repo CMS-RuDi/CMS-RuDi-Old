@@ -15,9 +15,8 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function createMenuItem($menu, $id, $title){
     $inCore = cmsCore::getInstance();
-    $inDB = cmsDatabase::getInstance();
     
-    $rootid = $inDB->getNsRootCatId('cms_menu');
+    $rootid = cmsCore::c('db')->getNsRootCatId('cms_menu');
     
     $ns = $inCore->nestedSetsInit('cms_menu');
     
@@ -38,17 +37,16 @@ function createMenuItem($menu, $id, $title){
                             iconurl=''
                     WHERE id = '$myid'";
 
-    $inDB->query($sql);
+    cmsCore::c('db')->query($sql);
     return true;
 }
 
 function applet_cats(){
     $inCore = cmsCore::getInstance();
-    $inDB   = cmsDatabase::getInstance();
 
     global $_LANG;
 
-    $GLOBALS['cp_page_title'] = $_LANG['AD_ARTICLES']	;
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES']);
     cpAddPathway($_LANG['AD_ARTICLES'], 'index.php?view=tree');
 
     cmsCore::loadModel('content');
@@ -75,7 +73,7 @@ function applet_cats(){
             $category['title']       = cmsCore::request('title', 'str', $_LANG['AD_SECTION_UNTITLED']);
             $category['parent_id']   = cmsCore::request('parent_id', 'int');
             $category['description'] = cmsCore::request('description', 'html', '');
-            $category['description'] = $inDB->escape_string($category['description']);
+            $category['description'] = cmsCore::c('db')->escape_string($category['description']);
             $category['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
             $category['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
             $category['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
@@ -114,7 +112,7 @@ function applet_cats(){
             }
 
             // получаем старую категорию
-            $old = $inDB->get_fields('cms_category', "id='{$category['id']}'", '*');
+            $old = cmsCore::c('db')->get_fields('cms_category', "id='". $category['id'] ."'", '*');
 
             // если сменили категорию
             if($old['parent_id'] != $category['parent_id']){
@@ -122,7 +120,7 @@ function applet_cats(){
                 $inCore->nestedSetsInit('cms_category')->MoveNode($category['id'], $category['parent_id']);
 
                 // обновляем сеолинки категорий
-                $inDB->updateNsCategorySeoLink('cms_category', $category['id'], $model->config['is_url_cyrillic']);
+                cmsCore::c('db')->updateNsCategorySeoLink('cms_category', $category['id'], $model->config['is_url_cyrillic']);
 
                 // Обновляем ссылки меню на категории
                 $model->updateCatMenu();
@@ -133,13 +131,13 @@ function applet_cats(){
                 cmsCore::addSessionMessage($_LANG['AD_CATEGORY_NEW_URL'], 'info');
             }
 
-            $inDB->update('cms_category', $category, $category['id']);
+            cmsCore::c('db')->update('cms_category', $category, $category['id']);
 
             // если пришел запрос на обновление ссылок
             // и категория не менялась - если менялась, мы выше все обновили
             if (cmsCore::inRequest('update_seolink') && ($old['parent_id'] == $category['parent_id'])){
                 // обновляем сеолинки категорий
-                $inDB->updateNsCategorySeoLink('cms_category', $category['id'], $model->config['is_url_cyrillic']);
+                cmsCore::c('db')->updateNsCategorySeoLink('cms_category', $category['id'], $model->config['is_url_cyrillic']);
 
                 // Обновляем ссылки меню на категории
                 $model->updateCatMenu();
@@ -177,7 +175,7 @@ function applet_cats(){
         }
         $category['parent_id']   = cmsCore::request('parent_id', 'int');
         $category['description'] = cmsCore::request('description', 'html', '');
-        $category['description'] = $inDB->escape_string($category['description']);
+        $category['description'] = cmsCore::c('db')->escape_string($category['description']);
         $category['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
         $category['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
         $category['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
@@ -217,7 +215,7 @@ function applet_cats(){
         $category['seolink'] = cmsCore::generateCatSeoLink($category, 'cms_category', $model->config['is_url_cyrillic']);
 
         if ($category['id']){
-            $inDB->update('cms_category', $category, $category['id']);
+            cmsCore::c('db')->update('cms_category', $category, $category['id']);
 
             if (!cmsCore::request('is_access', 'int', 0)){
                 $showfor = $_REQUEST['showfor'];
@@ -240,7 +238,7 @@ function applet_cats(){
 
     if ($do == 'add' || $do == 'edit'){
         require('../includes/jwtabs.php');
-        $GLOBALS['cp_page_head'][] = jwHeader();
+        cmsCore::c('page')->addHead(jwHeader());
         
         $toolmenu = array(
             array(
@@ -285,7 +283,7 @@ function applet_cats(){
                 $id = cmsCore::request('id', 'int', 0);
             }
             
-            $mod = $inDB->get_fields('cms_category', 'id='.$id, '*');
+            $mod = cmsCore::c('db')->get_fields('cms_category', 'id='.$id, '*');
             if (!empty($mod['photoalbum'])){
                 $mod['photoalbum'] = unserialize($mod['photoalbum']);
             }
@@ -327,7 +325,7 @@ function applet_cats(){
                     <div>
                         <div class="parent_notice" style="color:red;margin:4px 0px;display:none"><?php echo $_LANG['AD_ANOTHER_PARENT'];?></div>
                         <select name="parent_id" size="12" id="parent_id" style="width:100%" onchange="if($(this).val()=='<?php echo cmsCore::getArrVal($mod, 'id', ''); ?>'){ $('.parent_notice').show();$('#add_mod').prop('disabled', true); } else { $('.parent_notice').hide();$('#add_mod').prop('disabled', false); }">
-                            <?php $rootid = $inDB->getNsRootCatId('cms_category'); ?>
+                            <?php $rootid = cmsCore::c('db')->getNsRootCatId('cms_category'); ?>
                             <option value="<?php echo $rootid; ?>" <?php if (!isset($mod['parent_id']) || cmsCore::getArrVal($mod, 'parent_id', '') == $rootid) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_SECTION'];?></option>
                             <?php echo $inCore->getListItemsNS('cms_category', cmsCore::getArrVal($mod, 'parent_id', 0)); ?>
                         </select>
@@ -562,20 +560,20 @@ function applet_cats(){
                             <td width="20">
                                 <?php
                                     $sql    = "SELECT * FROM cms_user_groups";
-                                    $result = $inDB->query($sql) ;
+                                    $result = cmsCore::c('db')->query($sql) ;
                                     
                                     $style  = 'disabled="disabled"';
                                     $public = 'checked="checked"';
                                     
                                     if ($do == 'edit'){
                                         $sql2 = "SELECT * FROM cms_content_access WHERE content_id = ". $mod['id'] ." AND content_type = 'category'";
-                                        $result2 = $inDB->query($sql2);
+                                        $result2 = cmsCore::c('db')->query($sql2);
                                         $ord = array();
                                         
-                                        if ($inDB->num_rows($result2)){
+                                        if (cmsCore::c('db')->num_rows($result2)){
                                             $public = '';
                                             $style = '';
-                                            while ($r = $inDB->fetch_assoc($result2)){
+                                            while ($r = cmsCore::c('db')->fetch_assoc($result2)){
                                                 $ord[] = $r['group_id'];
                                             }
                                         }
@@ -602,8 +600,8 @@ function applet_cats(){
                         <div>
                             <?php
                                 echo '<select style="width: 99%" name="showfor[]" id="showin" size="6" multiple="multiple" '. $style .'>';
-                                if ($inDB->num_rows($result)){
-                                    while ($item = $inDB->fetch_assoc($result)){
+                                if (cmsCore::c('db')->num_rows($result)){
+                                    while ($item = cmsCore::c('db')->fetch_assoc($result)){
                                         echo '<option value="'. $item['id'] .'"';
                                         if ($do=='edit'){
                                             if (inArray($ord, $item['id'])){

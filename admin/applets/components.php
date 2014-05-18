@@ -28,14 +28,12 @@ function cpComponentCanRemove($item){
 function applet_components(){
 
     $inCore = cmsCore::getInstance();
-    $inDB   = cmsDatabase::getInstance();
-	$inUser = cmsUser::getInstance();
 
     global $_LANG;
 	global $adminAccess;
 	if (!cmsUser::isAdminCan('admin/components', $adminAccess)) { cpAccessDenied(); }
 
-	$GLOBALS['cp_page_title'] = $_LANG['AD_COMPONENTS'];
+	cmsCore::c('page')->setAdminTitle($_LANG['AD_COMPONENTS']);
  	cpAddPathway($_LANG['AD_COMPONENTS'], 'index.php?view=components');
 
 	$do = cmsCore::request('do', 'str', 'list');
@@ -100,7 +98,7 @@ function applet_components(){
 
 		$where = '';
 
-        if ($inUser->id > 1){
+        if (cmsCore::c('user')->id > 1){
             foreach($adminAccess as $key=>$value){
                 if (mb_strstr($value, 'admin/com_')){
                     if ($where) { $where .= ' OR '; }

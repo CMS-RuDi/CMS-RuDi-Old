@@ -185,7 +185,7 @@ if ($opt == 'submit_item'){
     $sql = "INSERT INTO cms_faq_quests (category_id, pubdate, published, quest, answer, user_id, answeruser_id, answerdate)
             VALUES ('$category_id', '$pubdate', $published, '$quest', '$answer', $user_id, $answeruser_id, '$answerdate')";
 
-    $inDB->query($sql);
+    cmsCore::c('db')->query($sql);
 
     cmsCore::redirect('?view=components&do=config&opt=list_items&id='.$id);
 
@@ -222,7 +222,7 @@ if ($opt == 'update_item'){
                     answerdate='$answerdate'
                 WHERE id = $id
                 LIMIT 1";
-        $inDB->query($sql);
+        cmsCore::c('db')->query($sql);
     }
 
     if (!isset($_SESSION['editlist']) || @sizeof($_SESSION['editlist'])==0){
@@ -245,7 +245,7 @@ if ($opt == 'show_cat'){
     if(isset($_REQUEST['item_id'])) {
         $id = (int)$_REQUEST['item_id'];
         $sql = "UPDATE cms_faq_cats SET published = 1 WHERE id = $id";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
         echo '1'; exit;
     }
 }
@@ -254,7 +254,7 @@ if ($opt == 'hide_cat'){
     if(isset($_REQUEST['item_id'])) {
         $id = (int)$_REQUEST['item_id'];
         $sql = "UPDATE cms_faq_cats SET published = 0 WHERE id = $id";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
         echo '1'; exit;
     }
 }
@@ -268,7 +268,7 @@ if ($opt == 'submit_cat'){
 
     $sql = "INSERT INTO cms_faq_cats (parent_id, title, published, description)
             VALUES ($parent_id, '$title', $published, '$description')";
-    $inDB->query($sql);
+    cmsCore::c('db')->query($sql);
     cmsCore::redirect('?view=components&do=config&opt=list_cats&id='.(int)$_REQUEST['id']);
 }
 
@@ -277,10 +277,10 @@ if($opt == 'delete_cat'){
         $id = (int)$_REQUEST['item_id'];
         //DELETE ITEMS
         $sql = "DELETE FROM cms_faq_quests WHERE category_id = $id";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
         //DELETE CATEGORY
         $sql = "DELETE FROM cms_faq_cats WHERE id = $id LIMIT 1";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
     }
     cmsCore::redirect('?view=components&do=config&opt=list_cats&id='.(int)$_REQUEST['id']);
 }
@@ -302,7 +302,7 @@ if ($opt == 'update_cat'){
                     published=$published
                 WHERE id = $id
                 LIMIT 1";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
 
         cmsCore::redirect('?view=components&do=config&opt=list_cats&id='.(int)$_REQUEST['id']);
 
@@ -409,9 +409,9 @@ if ($opt == 'add_item' || $opt == 'edit_item'){
         $sql = "SELECT *, DATE_FORMAT(pubdate, '%d.%m.%Y') as pubdate, DATE_FORMAT(answerdate, '%d.%m.%Y') as answerdate
                 FROM cms_faq_quests
                 WHERE id = $id LIMIT 1";
-        $result = $inDB->query($sql) ;
-        if ($inDB->num_rows($result)){
-           $mod = $inDB->fetch_assoc($result);
+        $result = cmsCore::c('db')->query($sql) ;
+        if (cmsCore::c('db')->num_rows($result)){
+           $mod = cmsCore::c('db')->fetch_assoc($result);
         }
 
         echo '<h3>'.$_LANG['AD_VIEW_QUESTION'].'</h3>';
@@ -446,7 +446,7 @@ if ($opt == 'add_item' || $opt == 'edit_item'){
               if (isset($mod['user_id'])) {
                     echo $inCore->getListItems('cms_users', $mod['user_id'], 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname');
               } else {
-                    echo $inCore->getListItems('cms_users', $inUser->id, 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname');
+                    echo $inCore->getListItems('cms_users', cmsCore::c('user')->id, 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname');
               }
           ?>
         </select></td>
@@ -511,9 +511,9 @@ if ($opt == 'add_cat' || $opt == 'edit_cat'){
         if(isset($_REQUEST['item_id'])){
             $id = (int)$_REQUEST['item_id'];
             $sql = "SELECT * FROM cms_faq_cats WHERE id = $id LIMIT 1";
-            $result = $inDB->query($sql) ;
-            if ($inDB->num_rows($result)){
-               $mod = $inDB->fetch_assoc($result);
+            $result = cmsCore::c('db')->query($sql) ;
+            if (cmsCore::c('db')->num_rows($result)){
+               $mod = cmsCore::c('db')->fetch_assoc($result);
             }
         }
 

@@ -15,8 +15,6 @@
  * @version 1.2.3
  */
 class miniCurl{
-    private static $instance;
-
     public static $Server = false;
     
     private $key = '';
@@ -51,15 +49,6 @@ class miniCurl{
             curl_close($this->ch);
             $this->ch = null;
         }
-    }
-    
-    public static function getInstance($cfg=array()) {
-        if (empty(self::$instance)){
-            self::$instance = new self($cfg);
-        }else if (!empty($cfg)){
-            self::getInstance()->reInit($cfg);
-        }
-        return $instance;
     }
     
     public function reInit($cfg=array()){

@@ -113,7 +113,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
             <td valign="top"><strong><?php echo $_LANG['AD_SEARCH_CASH']; ?>:</strong> </td>
             <td valign="top">
 			<?php
-				$records = $inDB->rows_count('cms_search', "1=1");
+				$records = cmsCore::c('db')->rows_count('cms_search', "1=1");
 				echo $records .' '.$_LANG['AD_PIECES'];
 				if ($records) {
 					echo ' | <a href="?view=components&do=config&id='.$id.'&opt=dropcache">'.$_LANG['AD_CLEAN'].'</a>';

@@ -32,23 +32,19 @@
     cmsCore::loadClass('user');
     cmsCore::loadClass('actions');
 
-    $inPage = cmsPage::getInstance();
-    $inConf = cmsConfig::getInstance();
-    $inDB   = cmsDatabase::getInstance();
-    $inUser = cmsUser::getInstance();
-
-    if (!$inUser->update()) { cmsCore::error404(); }
+    if (!cmsCore::c('user')->update()) { cmsCore::error404(); }
 
     // проверяем доступ по Ip
-    if(!cmsCore::checkAccessByIp($inConf->allow_ip)) { cmsCore::error404(); }
+    if(!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
 
-    define('TEMPLATE_DIR', PATH.'/templates/'.$inConf->template.'/');
-    define('DEFAULT_TEMPLATE_DIR', PATH.'/templates/_default_/');
+    define('TEMPLATE_DIR', PATH .'/templates/'. cmsCore::c('config')->template .'/');
+    define('DEFAULT_TEMPLATE_DIR', PATH .'/templates/_default_/');
 
     cmsCore::loadLanguage('admin/lang');
-
+    global $_LANG;
+    
     //-------CHECK AUTHENTICATION--------------------------------------//
-    if (!$inUser->is_admin){
+    if (!cmsCore::c('user')->is_admin){
         include PATH.'/admin/login.php';
         cmsCore::halt();
     }
@@ -59,12 +55,12 @@
 
     //------------------------------------------------------------------//
 
-    $inUser->onlineStats();
+    cmsCore::c('user')->onlineStats();
 
     $GLOBALS['applet'] = cmsCore::request('view', 'str', 'main');
     if (!preg_match('/^[a-z0-9]+$/i', $GLOBALS['applet'])) { cmsCore::error404(); }
 
-    $GLOBALS['cp_page_title'] = '';
+    cmsCore::c('page')->setAdminTitle();
     $GLOBALS['cp_page_head']  = array();
     $GLOBALS['cp_page_body']  = '';
 

@@ -22,15 +22,12 @@ function cpStripComment($text){
 
 }
 function cpCommentAuthor($item){
-
-    $inDB = cmsDatabase::getInstance();
-
 	if(!$item['user_id']) {
         $author = $item['guestname'];
     } else {
 		$usersql = "SELECT id, nickname, login FROM cms_users WHERE id = ".$item['user_id'];
-		$userres = $inDB->query($usersql);
-		$u = $inDB->fetch_assoc($userres);
+		$userres = cmsCore::c('db')->query($usersql);
+		$u = cmsCore::c('db')->fetch_assoc($userres);
 		$author = $u['nickname'].' (<a href="/admin/index.php?view=users&do=edit&id='.$u['id'].'" target="_blank">'.$u['login'].'</a>)';
 	}
 
@@ -79,13 +76,13 @@ if ($opt=='saveconfig'){
 
 if ($opt == 'show_comment'){
     $item_id = cmsCore::request('item_id', 'int', 0);
-    $inDB->query("UPDATE cms_comments SET published = 1 WHERE id = '$item_id'") ;
+    cmsCore::c('db')->query("UPDATE cms_comments SET published = 1 WHERE id = '$item_id'") ;
     echo '1'; exit;
 }
 
 if ($opt == 'hide_comment'){
     $item_id = cmsCore::request('item_id', 'int', 0);
-    $inDB->query("UPDATE cms_comments SET published = 0 WHERE id = '$item_id'") ;
+    cmsCore::c('db')->query("UPDATE cms_comments SET published = 0 WHERE id = '$item_id'") ;
     echo '1'; exit;
 }
 
@@ -98,7 +95,7 @@ if ($opt == 'update'){
     $guestname = cmsCore::request('guestname', 'str', '');
     $pubdate   = cmsCore::request('pubdate', 'str');
     $published = cmsCore::request('published', 'int');
-    $content   = $inDB->escape_string(cmsCore::request('content', 'html'));
+    $content   = cmsCore::c('db')->escape_string(cmsCore::request('content', 'html'));
 
     $sql = "UPDATE cms_comments
             SET guestname = '$guestname',
@@ -107,7 +104,7 @@ if ($opt == 'update'){
                 content='$content'
             WHERE id = $item_id
             LIMIT 1";
-    $inDB->query($sql) ;
+    cmsCore::c('db')->query($sql) ;
 
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
     cmsCore::redirect('index.php?view=components&do=config&id='.$id.'&opt=list');

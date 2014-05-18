@@ -77,7 +77,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
             $sql = "INSERT INTO cms_user_autoawards (title, description, imageurl, p_comment, p_blog, p_forum, p_photo, p_privphoto, p_content, p_karma, published)
                     VALUES ('$title', '$description', '$imageurl', $p_comment, $p_blog, $p_forum, $p_photo, $p_privphoto, $p_content, $p_karma, $published)";
-            $inDB->query($sql);
+            cmsCore::c('db')->query($sql);
 
             cmsCore::redirect('?view=components&do=config&opt=list&id='.$id);
 
@@ -99,7 +99,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
                         published=$published
                     WHERE id = '$item_id'";
 
-            $inDB->query($sql);
+            cmsCore::c('db')->query($sql);
 
             if (!isset($_SESSION['editlist']) || @sizeof($_SESSION['editlist'])==0){
                 cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=list');
@@ -114,9 +114,9 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 	if($opt == 'delete'){
         $item_id = cmsCore::request('item_id', 'int', 0);
         $sql = "DELETE FROM cms_user_autoawards WHERE id = $item_id";
-        $inDB->query($sql);
+        cmsCore::c('db')->query($sql);
         $sql = "DELETE FROM cms_user_awards WHERE award_id = $item_id";
-        $inDB->query($sql);
+        cmsCore::c('db')->query($sql);
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
         cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=list');
 	}
@@ -181,7 +181,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
                { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
             } else { $item_id = cmsCore::request('item_id', 'int', 0); }
 
-            $mod = $inDB->get_fields('cms_user_autoawards', "id = '$item_id'", '*');
+            $mod = cmsCore::c('db')->get_fields('cms_user_autoawards', "id = '$item_id'", '*');
             if(!$mod){ cmsCore::error404(); }
 
             echo '<h3>'.$mod['title'].' '.$ostatok.'</h3>';

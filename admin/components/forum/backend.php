@@ -158,7 +158,7 @@ if ($opt == 'submit_forum'){
 
     $icon = uploadCategoryIcon();
 
-    $inDB->addNsCategory('cms_forums', array('category_id'=>$category_id,
+    cmsCore::c('db')->addNsCategory('cms_forums', array('category_id'=>$category_id,
                                              'parent_id'=>$parent_id,
                                              'title'=>$title,
                                              'description'=>$description,
@@ -192,14 +192,14 @@ if ($opt == 'update_forum'){
     if (!$is_access){
         $access_list = cmsCore::request('access_list', 'array_int');
         $group_access = $access_list ? cmsCore::arrayToYaml($access_list) : '';
-        $inDB->query("UPDATE cms_forum_threads SET is_hidden = 1 WHERE forum_id = '$item_id'");
+        cmsCore::c('db')->query("UPDATE cms_forum_threads SET is_hidden = 1 WHERE forum_id = '$item_id'");
     } else {
         $group_access = '';
-        $inDB->query("UPDATE cms_forum_threads SET is_hidden = 0 WHERE forum_id = '$item_id'");
+        cmsCore::c('db')->query("UPDATE cms_forum_threads SET is_hidden = 0 WHERE forum_id = '$item_id'");
     }
 
     $ns = $inCore->nestedSetsInit('cms_forums');
-    $old = $inDB->get_fields('cms_forums', "id='$item_id'", '*');
+    $old = cmsCore::c('db')->get_fields('cms_forums', "id='$item_id'", '*');
 
     $icon = uploadCategoryIcon($old['icon']);
 
@@ -219,7 +219,7 @@ if ($opt == 'update_forum'){
             WHERE id = '$item_id'
             LIMIT 1";
 
-    $inDB->query($sql);
+    cmsCore::c('db')->query($sql);
 
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'info');
 
@@ -235,7 +235,7 @@ if($opt == 'delete_forum'){
     $forum = $model->getForum(cmsCore::request('item_id', 'int'));
     if(!$forum){ cmsCore::error404(); }
 
-    $inDB->addJoin('INNER JOIN cms_forums f ON f.id = t.forum_id');
+    cmsCore::c('db')->addJoin('INNER JOIN cms_forums f ON f.id = t.forum_id');
     $model->whereThisAndNestedForum($forum['NSLeft'], $forum['NSRight']);
 
     $threads = $model->getThreads();
@@ -244,7 +244,7 @@ if($opt == 'delete_forum'){
         $model->deleteThread($thread['id']);
     }
 
-    $inDB->deleteNS('cms_forums', $forum['id']);
+    cmsCore::c('db')->deleteNS('cms_forums', $forum['id']);
     if(file_exists(PATH.'/upload/forum/cat_icons/'.$forum['icon'])){
         @chmod(PATH.'/upload/forum/cat_icons/'.$forum['icon'], 0777);
         @unlink(PATH.'/upload/forum/cat_icons/'.$forum['icon']);
@@ -260,7 +260,7 @@ if($opt == 'delete_forum'){
 if ($opt == 'config') {
 
     require('../includes/jwtabs.php');
-    $GLOBALS['cp_page_head'][] = jwHeader();
+    cmsCore::c('page')->addHead(jwHeader());
     cpAddPathway($_LANG['AD_SETTINGS']);
 
     ?>
@@ -521,7 +521,7 @@ if ($opt == 'show_cat'){
     if(isset($_REQUEST['item_id'])) {
         $item_id = $_REQUEST['item_id'];
         $sql = "UPDATE cms_forum_cats SET published = 1 WHERE id = $item_id";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
         echo '1'; exit;
     }
 }
@@ -530,7 +530,7 @@ if ($opt == 'hide_cat'){
     if(isset($_REQUEST['item_id'])) {
         $item_id = $_REQUEST['item_id'];
         $sql = "UPDATE cms_forum_cats SET published = 0 WHERE id = $item_id";
-        $inDB->query($sql) ;
+        cmsCore::c('db')->query($sql) ;
         echo '1'; exit;
     }
 }
@@ -544,7 +544,7 @@ if ($opt == 'submit_cat'){
     $cat['ordering']  = cmsCore::request('ordering', 'int');
     $cat['seolink']   = $model->getCatSeoLink($cat['title']);
 
-    $inDB->insert('cms_forum_cats', $cat);
+    cmsCore::c('db')->insert('cms_forum_cats', $cat);
 
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'info');
 
@@ -555,8 +555,8 @@ if ($opt == 'submit_cat'){
 if($opt == 'delete_cat'){
 
     $item_id = cmsCore::request('item_id', 'int');
-    $inDB->query("UPDATE cms_forums SET category_id = 0, published = 0  WHERE category_id = '$item_id'");
-    $inDB->query("DELETE FROM cms_forum_cats WHERE id = '$item_id'");
+    cmsCore::c('db')->query("UPDATE cms_forums SET category_id = 0, published = 0  WHERE category_id = '$item_id'");
+    cmsCore::c('db')->query("DELETE FROM cms_forum_cats WHERE id = '$item_id'");
 
     cmsCore::addSessionMessage($_LANG['AD_CATEGORY_REMOVED'], 'info');
 
@@ -575,7 +575,7 @@ if ($opt == 'update_cat'){
     $cat['ordering']  = cmsCore::request('ordering', 'int');
     $cat['seolink']   = $model->getCatSeoLink($cat['title'], $item_id);
 
-    $inDB->update('cms_forum_cats', $cat, $item_id);
+    cmsCore::c('db')->update('cms_forum_cats', $cat, $item_id);
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'info');
     cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=list_cats');
 
@@ -719,7 +719,7 @@ if ($opt == 'add_forum' || $opt == 'edit_forum'){
             <tr>
                 <td><strong><?php echo $_LANG['AD_FORUM_PARENTS']; ?>:</strong></td>
                 <td>
-                    <?php $rootid = $inDB->get_field('cms_forums', 'parent_id=0', 'id'); ?>
+                    <?php $rootid = cmsCore::c('db')->get_field('cms_forums', 'parent_id=0', 'id'); ?>
                     <select name="parent_id" id="parent_id" style="width:260px">
                             <option value="<?php echo $rootid?>" <?php if ($mod['parent_id']==$rootid || !isset($mod['parent_id'])) { echo 'selected'; }?>><?php echo $_LANG['AD_FORUM_SQUARE']; ?> </option>
                     <?php

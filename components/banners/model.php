@@ -15,16 +15,15 @@ if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 class cms_model_banners{
 
-	public function __construct(){
-		$this->config = cmsCore::getInstance()->loadComponentConfig('banners');
+    public function __construct(){
+        $this->config = cmsCore::getInstance()->loadComponentConfig('banners');
     }
 
 /* ==================================================================================================== */
 /* ==================================================================================================== */
 
-	public static function getBanner($id){
-
-		$banner = cmsDatabase::getInstance()->get_fields('cms_banners', "id = '$id'", '*');
+    public static function getBanner($id){
+        $banner = cmsCore::c('db')->get_fields('cms_banners', "id = '$id'", '*');
 
         if ($banner){
             return cmsCore::callEvent('GET_BANNER', $banner);
@@ -37,22 +36,18 @@ class cms_model_banners{
 /* ==================================================================================================== */
 /* ==================================================================================================== */
 
-	public static function getImageBanner($banner){
-
-		return '<a href="/gobanner'.$banner['id'].'" title="'.$banner['title'].'" target="_blank"><img src="/images/banners/'.$banner['fileurl'].'" border="0" alt="'.$banner['title'].'"/></a>';
-
+    public static function getImageBanner($banner){
+        return '<a href="/gobanner'.$banner['id'].'" title="'.$banner['title'].'" target="_blank"><img src="/images/banners/'.$banner['fileurl'].'" border="0" alt="'.$banner['title'].'"/></a>';
     }
 
-	public static function getSwfBanner($banner){
-
-		return '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="468" height="60">'."\n".
-						'<param name="movie" value="/images/banners/'.$banner['fileurl'].'?banner_id='.$banner['id'].'" />'."\n".
-						'<param name="quality" value="high" />'."\n".
-						'<param name="FlashVars" value="banner_id='.$banner['id'].'" />'."\n".
-						'<embed src="/images/banners/'.$banner['fileurl'].'?banner_id='.$banner['id'].'" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="468" height="60">'."\n".
-						'</embed>'."\n".
-					'</object>';
-
+    public static function getSwfBanner($banner){
+        return '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="468" height="60">'."\n".
+                    '<param name="movie" value="/images/banners/'.$banner['fileurl'].'?banner_id='.$banner['id'].'" />'."\n".
+                    '<param name="quality" value="high" />'."\n".
+                    '<param name="FlashVars" value="banner_id='.$banner['id'].'" />'."\n".
+                    '<embed src="/images/banners/'.$banner['fileurl'].'?banner_id='.$banner['id'].'" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="468" height="60">'."\n".
+                    '</embed>'."\n".
+		'</object>';
     }
 
 /* ==================================================================================================== */
@@ -64,35 +59,30 @@ class cms_model_banners{
      * @return html
      */
     public static function getBannerHTML($position) {
+        $position = cmsCore::c('db')->escape_string($position);
 
-        $inDB   = cmsDatabase::getInstance();
-        $inUser = cmsUser::getInstance();
+        $html = '';
 
-        $position = $inDB->escape_string($position);
+        $banner = cmsCore::c('db')->get_fields('cms_banners', "position = '$position' AND published = 1 AND ((maxhits > hits) OR (maxhits = 0))", '*', 'RAND()');
+        if(!$banner) { return $html; }
 
-		$html = '';
+        if ($banner['typeimg']=='image'){
+            $html = self::getImageBanner($banner);
+        }
 
-		$banner = $inDB->get_fields('cms_banners', "position = '$position' AND published = 1 AND ((maxhits > hits) OR (maxhits = 0))", '*', 'RAND()');
-		if(!$banner) { return $html; }
+        if ($banner['typeimg']=='swf'){
+            $html = self::getSwfBanner($banner);
+        }
 
-		if ($banner['typeimg']=='image'){
-			$html = self::getImageBanner($banner);
-		}
-
-		if ($banner['typeimg']=='swf'){
-			$html = self::getSwfBanner($banner);
-		}
-
-		if ($html) {
+        if ($html) {
             // обновляем статистику просмотра баннера
-            $inDB->query("INSERT IGNORE INTO cms_banner_hits (banner_id, ip) VALUES ('{$banner['id']}', '{$inUser->ip}')");
-            if($inDB->get_last_id()){
-                $inDB->query("UPDATE cms_banners SET hits = hits + 1 WHERE id= '{$banner['id']}'");
+            cmsCore::c('db')->query("INSERT IGNORE INTO cms_banner_hits (banner_id, ip) VALUES ('{$banner['id']}', '{cmsCore::c('user')->ip}')");
+            if(cmsCore::c('db')->get_last_id()){
+                cmsCore::c('db')->query("UPDATE cms_banners SET hits = hits + 1 WHERE id= '{$banner['id']}'");
             }
         }
 
         return $html;
-
     }
 
 /* ==================================================================================================== */
@@ -103,18 +93,17 @@ class cms_model_banners{
      * @return html
      */
     public static function getBannerById($id){
-
         $html = '';
 
         $banner = self::getBanner($id);
-		if(!$banner) { return $html; }
+        if(!$banner) { return $html; }
 
-		if ($banner['typeimg']=='image'){
-			$html = self::getImageBanner($banner);
-		}
-		if ($banner['typeimg']=='swf'){
-			$html = self::getSwfBanner($banner);
-		}
+        if ($banner['typeimg']=='image'){
+            $html = self::getImageBanner($banner);
+        }
+        if ($banner['typeimg']=='swf'){
+            $html = self::getSwfBanner($banner);
+        }
 
         return $html;
     }
@@ -142,14 +131,12 @@ class cms_model_banners{
 /* ==================================================================================================== */
 /* ==================================================================================================== */
 
-	public static function clickBanner($id){
-
-        cmsDatabase::getInstance()->query("UPDATE cms_banners SET clicks = clicks + 1 WHERE id = '$id'");
+    public static function clickBanner($id){
+        cmsCore::c('db')->query("UPDATE cms_banners SET clicks = clicks + 1 WHERE id = '$id'");
 
         cmsCore::callEvent('CLICK_BANNER', $id);
 
         return true;
-
     }
 
 }

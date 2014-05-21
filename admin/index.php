@@ -61,6 +61,8 @@
     if (!preg_match('/^[a-z0-9]+$/i', $GLOBALS['applet'])) { cmsCore::error404(); }
 
     cmsCore::c('page')->setAdminTitle();
+    cmsCore::c('page')->addHeadJS('admin/js/common.js');
+    cmsCore::c('page')->addHeadJS('includes/jquery/jquery.js');
     $GLOBALS['cp_page_head']  = array();
     $GLOBALS['cp_page_body']  = '';
 

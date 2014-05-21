@@ -39,7 +39,6 @@ class cmsCron {
      * @return bool
      */
     public static function registerJob($job_name, $job){
-
         if (!isset($job['enabled'])) { $job['enabled'] = 1; }
         if (!isset($job['class_name'])) { $job['class_name'] = ''; }
         if (!isset($job['class_method'])) { $job['class_method'] = ''; }
@@ -56,7 +55,6 @@ class cmsCron {
         cmsCore::c('db')->query($sql);
 
         return true;
-
     }
 
     /**
@@ -300,4 +298,3 @@ class cmsCron {
 // ============================================================================ //
 
 }
-?>

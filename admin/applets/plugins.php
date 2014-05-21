@@ -31,15 +31,15 @@ function applet_plugins(){
 // ===================================================================================== //
 
 	if ($do == 'hide'){
-		dbHide('cms_plugins', $id);
-		echo '1'; exit;
+            cmsCore::c('db')->setFlag('cms_plugins', $id, 'published', '0');
+            cmsCore::halt('1');
 	}
 
 // ===================================================================================== //
 
 	if ($do == 'show'){
-		dbShow('cms_plugins', $id);
-		echo '1'; exit;
+            cmsCore::c('db')->setFlag('cms_plugins', $id, 'published', '1');
+            cmsCore::halt('1');
 	}
 
 // ===================================================================================== //

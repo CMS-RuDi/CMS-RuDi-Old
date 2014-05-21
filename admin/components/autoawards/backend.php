@@ -35,23 +35,23 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 	if ($opt == 'show_award'){
 		if (!isset($_REQUEST['item'])){
-			if (isset($_REQUEST['item_id'])){ dbShow('cms_user_autoawards', $_REQUEST['item_id']);  }
-			echo '1'; exit;
+                    if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_user_autoawards', $_REQUEST['item_id'], 'published', '1'); }
+                    cmsCore::halt('1');
 		} else {
-			dbShowList('cms_user_autoawards', $_REQUEST['item']);
-            cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
-			cmsCore::redirectBack();
+                    cmsCore::c('db')->setFlags('cms_user_autoawards', $_REQUEST['item'], 'published', '1');
+                    cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
+                    cmsCore::redirectBack();
 		}
 	}
 
 	if ($opt == 'hide_award'){
 		if (!isset($_REQUEST['item'])){
-			if (isset($_REQUEST['item_id'])){ dbHide('cms_user_autoawards', $_REQUEST['item_id']);  }
-			echo '1'; exit;
+                    if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_user_autoawards', $_REQUEST['item_id'], 'published', '0'); }
+                    cmsCore::halt('1');
 		} else {
-			dbHideList('cms_user_autoawards', $_REQUEST['item']);
-            cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
-			cmsCore::redirectBack();
+                    cmsCore::c('db')->setFlags('cms_user_autoawards', $_REQUEST['item'], 'published', '0');
+                    cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
+                    cmsCore::redirectBack();
 		}
 	}
 

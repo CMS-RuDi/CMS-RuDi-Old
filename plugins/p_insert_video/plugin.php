@@ -14,19 +14,20 @@ class p_insert_video extends cmsPlugin {
 
         parent::__construct();
 
-        $this->info['plugin']           = 'p_insert_video';
-        $this->info['title']            = 'Прикрепление к статьям Видео материалов';
-        $this->info['description']      = 'На страницу добавления редактирования статьи плагин встраивает возможность прикреплять видео материалы к статье. После прикрепления видео в текст статью нужно прописать команду {video#100} где 100 это id прикрепленного видео, при просмотре статьи эта команда будет заменена на сам код видео плеера.';
-        $this->info['author']           = 'DS Soft';
-        $this->info['version']          = '0.0.1';
+        $this->info['plugin']       = 'p_insert_video';
+        $this->info['title']        = 'Прикрепление к статьям Видео материалов';
+        $this->info['description']  = 'На страницу добавления редактирования статьи плагин встраивает возможность прикреплять видео материалы к статье. После прикрепления видео в текст статью нужно прописать команду {video#100} где 100 это id прикрепленного видео, при просмотре статьи эта команда будет заменена на сам код видео плеера.';
+        $this->info['author']       = 'DS Soft';
+        $this->info['version']      = '0.0.4';
 
-        $this->config['PIV_DOMENS']     = 'youtube.com,vk.com,vkontakte.ru,rutube.ru,instagram.com';
+        $this->config['PIV_DOMENS'] = 'youtube.com,vk.com,vkontakte.ru,rutube.ru,instagram.com';
+        $this->config['PIV_TAB']    = 'Видео';
 
-        $this->events[]                 = 'AFTER_COMPONENT_CONTENT';
-        $this->events[]                 = 'ADD_ARTICLE_SUCCESS';
-        $this->events[]                 = 'UPDATE_ARTICLE';
-        $this->events[]                 = 'GET_ARTICLE';
-        $this->events[]                 = 'DELETE_ARTICLE';
+        $this->events[]             = 'AFTER_COMPONENT_CONTENT';
+        $this->events[]             = 'ADD_ARTICLE_SUCCESS';
+        $this->events[]             = 'GET_ARTICLE';
+        $this->events[]             = 'DELETE_ARTICLE';
+        $this->events[]             = 'ADMIN_CONTENT_TABS';
 
     }
 
@@ -58,6 +59,10 @@ class p_insert_video extends cmsPlugin {
             
             case 'DELETE_ARTICLE':
                 cmsCore::c('db')->delete('`cms_content_videos`', "`target` = 'content' AND `target_id` = '". $item ."'");
+            
+            case 'ADMIN_CONTENT_TABS':
+                $this->info['tab'] = $this->config['PIV_TAB'];
+                return $this->getFormHtml($item);
             break;
         }
 
@@ -75,22 +80,26 @@ class p_insert_video extends cmsPlugin {
     }
     
     private function insertForm($html){
-        
         if (($this->inCore->do == 'addarticle' || $this->inCore->do == 'editarticle') && !cmsCore::inRequest('add_mod')){
-        
-            $id = cmsCore::request('id', 'int', 0);
 
-            ob_start();
-            cmsPage::initTemplate('plugins', 'p_insert_video.tpl')->
-                assign('target', 'content')->
-                assign('target_id', $id)->
-                assign('videos', cmsCore::c('db')->get_table('cms_content_videos', "`target` = 'content' AND `target_id` = '". $id ."'". ($id == 0 ? " AND `user_id` = '". cmsCore::c('user')->id ."'" : "")))->
-                assign('cfg', $this->config)->
-                display('p_insert_video.tpl');
-            
-            $html = preg_replace('#<script type="text/javascript">[\s]+var LANG_SELECT_CAT#is',  ob_get_clean() ."\n". '<script type="text/javascript"> var LANG_SELECT_CAT', $html);
+            $html = preg_replace('#<script type="text/javascript">[\s]+var LANG_SELECT_CAT#is', $this->getFormHtml(array('id' => cmsCore::request('id', 'int', 0))) ."\n". '<script type="text/javascript"> var LANG_SELECT_CAT', $html);
             
         }
+        
+        return $html;
+    }
+    
+    private function getFormHtml($item){
+        $id = empty($item['id']) ? 0 : $item['id'];
+        
+        ob_start();
+        cmsPage::initTemplate('plugins', 'p_insert_video.tpl')->
+            assign('target', 'content')->
+            assign('target_id', $id)->
+            assign('videos', cmsCore::c('db')->get_table('cms_content_videos', "`target` = 'content' AND `target_id` = '". $id ."'". ($id == 0 ? " AND `user_id` = '". cmsCore::c('user')->id ."'" : "")))->
+            assign('cfg', $this->config)->
+            display('p_insert_video.tpl');
+        $html = ob_get_clean();
         
         return $html;
     }

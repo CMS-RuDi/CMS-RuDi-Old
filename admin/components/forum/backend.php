@@ -117,20 +117,20 @@ if ($opt=='saveranks'){
 
 if ($opt == 'show_forum'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbShow('cms_forums', $_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_forums', $_REQUEST['item_id'], 'published', '1'); }
+        cmsCore::halt('1');
     } else {
-        dbShowList('cms_forums', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_forums', $_REQUEST['item'], 'published', '1');
         cmsCore::redirectBack();
     }
 }
 
 if ($opt == 'hide_forum'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbHide('cms_forums', $_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_forums', $_REQUEST['item_id'], 'published', '0'); }
+        cmsCore::halt();
     } else {
-        dbHideList('cms_forums', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_forums', $_REQUEST['item'], 'published', '0');
         cmsCore::redirectBack();
     }
 }

@@ -190,7 +190,7 @@ if ($do=='club'){
 	}
 
 	// Получаем плагины
-	$plugins = $model->getPluginsOutput($club);
+        $plugins = cmsCore::callTabEventPlugins('GET_SINGLE_CLUB', $club);
 
 	cmsPage::initTemplate('components', 'com_clubs_view_club')->
             assign('club', $club)->

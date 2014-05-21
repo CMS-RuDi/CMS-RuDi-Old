@@ -1486,4 +1486,3 @@ function unichr($c) {
 	return false;
     }
 }
-?>

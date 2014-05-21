@@ -19,6 +19,13 @@ class p_ckeditor extends cmsPlugin {
         'codesnippet', 'forms', 'flash', 'iframe', 'uicolor', 'scayt', 'div', 'about', 'autosave'
     );
     
+    private $tbar_admin = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, '/', { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] }, '/', { name: 'links' }, { name: 'forms' }, { name: 'insert' }, '/', { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
+    
+    private $tbar_user = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, '/', { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align' ] }, { name: 'links' }, { name: 'insert' }, { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
+    
+    private $admin_tbar = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] }, '/', { name: 'links' }, { name: 'forms' }, { name: 'insert' }, { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
+
+
     public function __construct(){
 
         parent::__construct();
@@ -27,7 +34,7 @@ class p_ckeditor extends cmsPlugin {
         $this->info['title']       = 'CKEditor 4.4';
         $this->info['description'] = 'Визуальный редактор';
         $this->info['author']      = 'Plugin - DS SOFT. CKEditor - Frederico Knabben';
-        $this->info['version']     = '0.0.1';
+        $this->info['version']     = '0.0.2';
         $this->info['type']        = 'wysiwyg';
         
         $this->config['PCK_INLINE']= '1';
@@ -75,10 +82,14 @@ class p_ckeditor extends cmsPlugin {
         $rplugins = implode(',', $rplugins);
         
         $tbar = '';
-        if (cmsCore::c('user')->is_admin){
-            $tbar = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, '/', { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] }, '/', { name: 'links' }, { name: 'forms' }, { name: 'insert' }, '/', { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
+        if (!defined('VALID_CMS_ADMIN')){
+            if (cmsCore::c('user')->is_admin){
+                $tbar = $this->tbar_admin;
+            }else{
+                $tbar = $this->tbar_user;
+            }
         }else{
-            $tbar = "[{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] }, { name: 'clipboard', groups: [ 'clipboard', 'undo' ] }, { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ] }, '/', { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] }, { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align' ] }, { name: 'links' }, { name: 'insert' }, { name: 'styles' }, { name: 'colors' }, { name: 'tools' }, { name: 'others' } ]";
+            $tbar = $this->admin_tbar;
         }
         
         return array('rplugins' => $rplugins, 'tbar' => $tbar);
@@ -87,7 +98,7 @@ class p_ckeditor extends cmsPlugin {
     private function insertEditor($item){
         
         cmsCore::c('page')->addHeadJS('plugins/p_ckeditor/ckeditor/ckeditor.js');
-        cmsCore::c('page')->addHead('<script type="text/javascript">function wysiwygInsertHtml(html, name){ eval("CKEDITOR.instances.con_"+ name +".insertHtml(\'"+ html +"\');") }</script>');
+        cmsCore::c('page')->addHead('<script type="text/javascript">function wysiwygInsertHtml(html, name){ if (!name){ name="content"; } eval("CKEDITOR.instances.con_"+ name +".insertHtml(\'"+ html +"\');") }</script>');
         
         $opt = $this->getToolbarAndRPlugins();
         

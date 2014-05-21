@@ -14,12 +14,10 @@
  * Класс инициализации шаблонизатора Smarty
  */
 class smartyTpl{
-
     private static $i_smarty;
     private $smarty;
 
     public function __construct($tpl_folder, $tpl_file){
-
         global $_LANG;
 
         $this->smarty = $this->loadSmarty();
@@ -29,11 +27,9 @@ class smartyTpl{
         $this->smarty->template_dir = $is_exists_tpl_file ? TEMPLATE_DIR . $tpl_folder : DEFAULT_TEMPLATE_DIR . $tpl_folder;
         $this->smarty->compile_id   = $is_exists_tpl_file ? TEMPLATE : '_default_';
         $this->smarty->assign('LANG', $_LANG);
-
     }
 
     private function loadSmarty(){
-
         if(isset(self::$i_smarty)){
             return self::$i_smarty;
         }
@@ -55,7 +51,6 @@ class smartyTpl{
         self::$i_smarty = $smarty;
 
         return $smarty;
-
     }
 
     public function __set($name, $value){
@@ -76,7 +71,6 @@ class smartyTpl{
  * Вспомогательные функции
  */
 function cmsSmartyComments($params){
-
     if (!$params['target']) { return false; }
     if (!$params['target_id']) { return false; }
 
@@ -85,7 +79,6 @@ function cmsSmartyComments($params){
     comments($params['target'], $params['target_id'], $params['labels']);
 
     return;
-
 }
 
 function cmsSmartyAddJS($params){
@@ -107,10 +100,10 @@ function cmsSmartyProfileURL($params){
 }
 
 function cmsSmartyCurrentComponent(){
-	return cmsCore::getInstance()->component;
+    return cmsCore::getInstance()->component;
 }
 function cmsSmartyCurrentTemplate(){
-	return TEMPLATE;
+    return TEMPLATE;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ?>

@@ -462,14 +462,13 @@ class cmsDatabase {
 // ============================================================================ //
 
     public function setFlag($table, $id, $flag, $value) {
-        $this->query("UPDATE {$table} SET {$flag} = '{$value}' WHERE id='{$id}'");
+        $this->query("UPDATE ". $table ." SET ". $flag ." = '". $value ."' WHERE id='". (int)$id ."'");
         return $this;
     }
 
     public function setFlags($table, $items, $flag, $value) {
-        foreach($items as $id){
-            $this->setFlag($table, $id, $flag, $value);
-        }
+        foreach ($items as $k=>$v){ $items[$k] = (int)$v; }
+        $this->query("UPDATE ". $table ." SET ". $flag ." = '". $value ."' WHERE `id` = '". implode("' OR `id` = '", $items) ."' LIMIT ". count($items));
         return $this;
     }
 
@@ -648,5 +647,3 @@ class cmsDatabase {
     }
 // ============================================================================ //
 }
-
-?>

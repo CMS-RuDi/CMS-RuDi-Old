@@ -44,11 +44,11 @@
     $inUser = cmsUser::getInstance();
     $inPage = cmsPage::getInstance();
 
-	if (!$inUser->update()) { cmsCore::halt(); }
+    if (!$inUser->update()) { cmsCore::halt(); }
 
-	if ($inConf->siteoff && !$inUser->is_admin){ cmsCore::halt(); }
+    if ($inConf->siteoff && !$inUser->is_admin){ cmsCore::halt(); }
 
-	global $_LANG;
+    global $_LANG;
 
     $inPage->setRequestIsAjax();
 

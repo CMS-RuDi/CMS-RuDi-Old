@@ -77,20 +77,20 @@ if ($opt=='saveconfig'){
 
 if ($opt == 'show_club'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbShow('cms_clubs', $_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_clubs', $_REQUEST['item_id'], 'published', '1'); }
+        cmsCore::halt('1');
     } else {
-        dbShowList('cms_clubs', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_clubs', $_REQUEST['item'], 'published', '1');
         cmsCore::redirectBack();
     }
 }
 
 if ($opt == 'hide_club'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbHide('cms_clubs', $_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_clubs', $_REQUEST['item_id'], 'published', '0'); }
+        cmsCore::halt('1');
     } else {
-        dbHideList('cms_clubs', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_clubs', $_REQUEST['item'], 'published', '0');
         cmsCore::redirectBack();
     }
 }

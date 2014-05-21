@@ -12,7 +12,6 @@
 /******************************************************************************/
 
 class cmsgeo {
-
     private $url = 'http://ipgeobase.ru:7020/geo?ip=';
     private $ip;
     private static $valid_keys = array('inetnum', 'country', 'city', 'region', 'district', 'lat', 'lng');
@@ -33,7 +32,6 @@ class cmsgeo {
      * @return mixed
      */
     public static function getInfo($ip, $key = false, $cache = true) {
-
         // для работы требуется CURL
         if(!function_exists('curl_setopt') || !function_exists('curl_init')) { return false; }
 
@@ -83,7 +81,6 @@ class cmsgeo {
      * @return array
      */
     private function getData() {
-        
         $out = cmsCore::c('curl', array(
             array(
                 'header' => 0,
@@ -97,8 +94,6 @@ class cmsgeo {
         }
 
         return $data;
-
     }
 
 }
-?>

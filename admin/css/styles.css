@@ -713,3 +713,9 @@ div.filter {
 .userform_table label{ color: #666666; }
 .userform_fieldtitle .edit_links { display: none; margin: 0 0 0 5px; }
 .userform_fieldtitle .edit_links img { width: 13px; margin: 0 2px; }
+
+
+.blockdiv_dashed{
+    padding: 5px;
+    border: 1px dashed #cccccc;
+}

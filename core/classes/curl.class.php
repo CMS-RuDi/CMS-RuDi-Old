@@ -540,5 +540,3 @@ if (miniCurl::$Server === true and !empty($_POST['request'])){
     $inCurl = new miniCurl();
     $inCurl->startServer();
 }
-
-?>

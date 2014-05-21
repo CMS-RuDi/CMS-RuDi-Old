@@ -413,7 +413,7 @@ if ($do=='profile'){
 		}
 	}
 
-    $plugins = $model->getPluginsOutput($usr);
+    $plugins = cmsCore::callTabEventPlugins('USER_PROFILE', $usr);
 
     cmsPage::initTemplate('components', 'com_users_profile.tpl')->
             assign('usr', $usr)->

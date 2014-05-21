@@ -107,20 +107,20 @@ cpToolMenu($toolmenu);
 
 if ($opt == 'show_item'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbShow('cms_board_items', (int)$_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_board_items', (int)$_REQUEST['item_id'], 'published', '1'); }
+        cmsCore::halt('1');
     } else {
-        dbShowList('cms_board_items', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_board_items', $_REQUEST['item'], 'published', '1');
         cmsCore::redirectBack();
     }
 }
 
 if ($opt == 'hide_item'){
     if (!isset($_REQUEST['item'])){
-        dbHide('cms_board_items', cmsCore::request('item_id', 'int', 0));
-        echo '1'; exit;
+        cmsCore::c('db')->setFlag('cms_board_items', cmsCore::request('item_id', 'int', 0), 'published', '0');
+        cmsCore::halt('1');
     } else {
-        dbHideList('cms_board_items', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_board_items', $_REQUEST['item'], 'published', '0');
         cmsCore::redirectBack();
     }
 }

@@ -590,7 +590,9 @@ class cms_model_content{
             @unlink(PATH .'/images/content/small/'. ceil($id/100). '/article'. $id .'.jpg');
             @unlink(PATH .'/images/content/medium/'. ceil($id/100). '/article'. $id .'.jpg');
         }
-        
+
+        mkdir(PATH .'/images/content/small/'. ceil($id/100), 0777, true);
+        mkdir(PATH .'/images/content/medium/'. ceil($id/100), 0777, true);
         
         cmsCore::c('images')->filename    = 'article'. $id .'.jpg';
         

@@ -230,10 +230,10 @@ function applet_modules(){
 
 	if ($do == 'show'){
             if (!isset($_REQUEST['item'])){
-                if ($id >= 0){ dbShow('cms_modules', $id);  }
-                echo '1'; exit;
+                if ($id >= 0){ cmsCore::c('db')->setFlag('cms_modules', $id, 'published', '1'); }
+                cmsCore::halt('1');
             } else {
-                dbShowList('cms_modules', $_REQUEST['item']);
+                cmsCore::c('db')->setFlags('cms_modules', $_REQUEST['item'], 'published', '1');
                 cmsCore::redirectBack();
             }
 
@@ -241,10 +241,10 @@ function applet_modules(){
 
 	if ($do == 'hide'){
             if (!isset($_REQUEST['item'])){
-                if ($id >= 0){ dbHide('cms_modules', $id);  }
-                echo '1'; exit;
+                if ($id >= 0){ cmsCore::c('db')->setFlag('cms_modules', $id, 'published', '0'); }
+                cmsCore::halt('1');
             } else {
-                dbHideList('cms_modules', $_REQUEST['item']);
+                cmsCore::c('db')->setFlags('cms_modules', $_REQUEST['item'], 'published', '0');
                 cmsCore::redirectBack();
             }
 	}

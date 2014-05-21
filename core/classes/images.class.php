@@ -98,7 +98,7 @@ class rudi_graphics{
                     UPLOAD_ERR_EXTENSION => $_LANG['UPLOAD_ERR_EXTENSION']
                 );
                 
-                if($errorCode !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])){
+                if($_FILES[$image_file]['error'] !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])){
                     $_SESSION['file_upload_error'] = $uploadErrors[$errorCode];
                     return false;
                 }
@@ -444,5 +444,3 @@ class rudi_graphics{
         }
     }
 }
-
-?>

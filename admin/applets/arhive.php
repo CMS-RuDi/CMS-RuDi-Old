@@ -14,42 +14,39 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function applet_arhive(){
-
     $inCore = cmsCore::getInstance();
+    
+    global $_LANG;
+    
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES_ARCHIVE']);
+    
+    $cfg = $inCore->loadComponentConfig('content');
+    $cfg_arhive = $inCore->loadComponentConfig('arhive');
 
-	global $_LANG;
+    cpAddPathway($_LANG['AD_ARTICLE_SITE'], 'index.php?view=tree');
+    cpAddPathway($_LANG['AD_ARTICLES_ARCHIVE'], 'index.php?view=arhive');
 
-	cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES_ARCHIVE']);
-
-	$cfg = $inCore->loadComponentConfig('content');
-	$cfg_arhive = $inCore->loadComponentConfig('arhive');
-    cmsCore::loadModel('content');
-    $model = new cms_model_content();
-
-	cpAddPathway($_LANG['AD_ARTICLE_SITE'], 'index.php?view=tree');
-	cpAddPathway($_LANG['AD_ARTICLES_ARCHIVE'], 'index.php?view=arhive');
-
-	$do = cmsCore::request('do', 'str', 'list');
-	$id = cmsCore::request('id', 'int', -1);
+    $do = cmsCore::request('do', 'str', 'list');
+    $id = cmsCore::request('id', 'int', -1);
 
     if ($do=='saveconfig'){
-
         if (!cmsCore::validateForm()) { cmsCore::error404(); }
-		$cfg['source'] = cmsCore::request('source', 'str', '');
-		$inCore->saveComponentConfig('arhive', $cfg);
+        
+        $cfg['source'] = cmsCore::request('source', 'str', '');
+        $inCore->saveComponentConfig('arhive', $cfg);
+        
         cmsCore::addSessionMessage($_LANG['AD_CONFIG_SAVE_SUCCESS'] , 'success');
         cmsCore::redirect('?view=arhive&do=config');
-
-	}
-
+    }
+    
     if ($do=='config'){
-		$toolmenu = array();
-		$toolmenu[0]['icon'] = 'folders.gif';
-		$toolmenu[0]['title'] = $_LANG['AD_LIST_OF_ARTICLES'];
-		$toolmenu[0]['link'] = '?view=arhive';
-
-		cpToolMenu($toolmenu);
-		cpAddPathway($_LANG['AD_SETTINGS'], 'index.php?view=arhive&do=config');
+        $toolmenu = array();
+        $toolmenu[0]['icon'] = 'folders.gif';
+        $toolmenu[0]['title'] = $_LANG['AD_LIST_OF_ARTICLES'];
+        $toolmenu[0]['link'] = '?view=arhive';
+        
+        cpToolMenu($toolmenu);
+        cpAddPathway($_LANG['AD_SETTINGS'], 'index.php?view=arhive&do=config');
 ?>
 <form action="index.php?view=arhive&do=saveconfig" method="post" name="optform" target="_self" id="form1">
     <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
@@ -71,64 +68,66 @@ function applet_arhive(){
         <input name="back" type="button" id="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=arhive';" />
     </p>
 </form>
-<?php }
+<?php
+    }
 
-	if ($do == 'list'){
-		$toolmenu = array();
-		$toolmenu[0]['icon'] = 'config.gif';
-		$toolmenu[0]['title'] = $_LANG['AD_SETTINGS'];
-		$toolmenu[0]['link'] = '?view=arhive&do=config';
+    if ($do == 'list'){
+        $toolmenu = array();
+        $toolmenu[0]['icon'] = 'config.gif';
+        $toolmenu[0]['title'] = $_LANG['AD_SETTINGS'];
+        $toolmenu[0]['link'] = '?view=arhive&do=config';
 
-		$toolmenu[1]['icon'] = 'delete.gif';
-		$toolmenu[1]['title'] = $_LANG['AD_DELETE_SELECTED'] ;
-		$toolmenu[1]['link'] = "javascript:checkSel('?view=arhive&do=delete&multiple=1');";
+        $toolmenu[1]['icon'] = 'delete.gif';
+        $toolmenu[1]['title'] = $_LANG['AD_DELETE_SELECTED'] ;
+        $toolmenu[1]['link'] = "javascript:checkSel('?view=arhive&do=delete&multiple=1');";
 
-		cpToolMenu($toolmenu);
+        cpToolMenu($toolmenu);
 
-		//TABLE COLUMNS
-		$fields = array();
+        //TABLE COLUMNS
+        $fields = array();
+        $fields[] = array(
+            'title' => 'id', 'field' => 'id', 'width' => '30'
+        );
+        $fields[] = array(
+            'title' => $_LANG['AD_CREATE'], 'field' => 'pubdate', 'width' => '80', 'filter' => 15, 'fdate' => '%d/%m/%Y'
+        );
+        $fields[] = array(
+            'title' => $_LANG['TITLE'], 'field' => 'title', 'width' => '', 'link' => '?view=content&do=edit&id=%id%', 'filter' => 15
+        );
+        $fields[] = array(
+            'title' => $_LANG['AD_PARTITION'], 'field' => 'category_id', 'width' => '100', 'filter' => 1, 'prc' => 'cpCatById', 'filterlist' => cpGetList('cms_category')
+        );
 
-		$fields[0]['title'] = 'id'; $fields[0]['field'] = 'id'; $fields[0]['width'] = '30';
-		$fields[1]['title'] = $_LANG['AD_CREATE']; $fields[1]['field'] = 'pubdate'; $fields[1]['width'] = '80'; $fields[1]['filter'] = 15;
-		$fields[1]['fdate'] = '%d/%m/%Y';
-		$fields[2]['title'] = $_LANG['TITLE']; $fields[2]['field'] = 'title'; $fields[2]['width'] = ''; $fields[2]['link'] = '?view=content&do=edit&id=%id%';
-		$fields[2]['filter'] = 15;
-		$fields[3]['title'] = $_LANG['AD_PARTITION']; $fields[3]['field'] = 'category_id'; $fields[3]['width'] = '100';	$fields[3]['filter'] = 1;
-		$fields[3]['prc'] = 'cpCatById'; $fields[3]['filterlist'] = cpGetList('cms_category');
+        //ACTIONS
+        $actions = array();
+        $actions[] = array(
+            'title' => $_LANG['AD_TO_ARTICLES_CATALOG'], 'icon' => 'arhive_off.gif', 'link' => '?view=arhive&do=arhive_off&id=%id%'
+        );
+        $actions[] = array(
+            'title' => $_LANG['DELETE'], 'icon' => 'delete.gif', 'link' => '?view=content&do=delete&id=%id%', 'confirm' => $_LANG['AD_DELETE_MATERIALS']
+        );
 
-		//ACTIONS
-		$actions = array();
-		$actions[0]['title'] = $_LANG['AD_TO_ARTICLES_CATALOG'];
-		$actions[0]['icon']  = 'arhive_off.gif';
-		$actions[0]['link']  = '?view=arhive&do=arhive_off&id=%id%';
-
-		$actions[2]['title'] = $_LANG['DELETE'] ;
-		$actions[2]['icon']  = 'delete.gif';
-		$actions[2]['confirm'] = $_LANG['AD_DELETE_MATERIALS'];
-		$actions[2]['link']  = '?view=content&do=delete&id=%id%';
-
-		//Print table
-		cpListTable('cms_content', $fields, $actions, 'is_arhive=1');
-	}
-
-	if ($do == 'arhive_off'){
-		if(isset($_REQUEST['id'])) {
-			$sql = "UPDATE cms_content SET is_arhive = 0 WHERE id = '$id'";
-			cmsCore::c('db')->query($sql) ;
+        //Print table
+        cpListTable('cms_content', $fields, $actions, 'is_arhive=1');
+    }
+    
+    if ($do == 'arhive_off'){
+        if(cmsCore::inRequest('id')) {
+            cmsCore::c('db')->setFlag('cms_content', $id, 'is_arhive', '0');
             cmsCore::redirect('?view=arhive');
-		}
-	}
+        }
+    }
 
-	if ($do == 'delete'){
-		if (!isset($_REQUEST['item'])){
-			if ($id >= 0){
-				$model->deleteArticle($id, $cfg['af_delete']);
-			}
-		} else {
-			$model->deleteArticles($_REQUEST['item'], $cfg['af_delete']);
-		}
+    if ($do == 'delete'){
+        if (!cmsCore::inRequest('item')){
+            if ($id >= 0){
+                cmsCore::m('content')->deleteArticle($id, $cfg['af_delete']);
+            }
+        }else{
+            cmsCore::m('content')->deleteArticles(cmsCore::request('item', 'array_int'), $cfg['af_delete']);
+        }
         cmsCore::redirect('?view=arhive');
-	}
+    }
 
 }
 

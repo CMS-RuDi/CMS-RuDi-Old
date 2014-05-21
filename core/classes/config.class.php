@@ -12,12 +12,10 @@
 /******************************************************************************/
 
 class cmsConfig {
-
     private static $instance = null;
     private static $config = array();
 
     private function __construct(){
-
         mb_internal_encoding("UTF-8");
 
         self::$config = self::getDefaultConfig();
@@ -27,7 +25,6 @@ class cmsConfig {
         setlocale(LC_ALL, "ru_RU.UTF-8");
 
         return true;
-
     }
 
     private function __clone() {}
@@ -60,7 +57,6 @@ class cmsConfig {
      * @return array
      */
     public static function getDefaultConfig() {
-
         $d_cfg = array(
             'sitename'=>'',
             'title_and_sitename'=>1,
@@ -115,7 +111,6 @@ class cmsConfig {
         }
 
         return $cfg;
-
     }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +122,6 @@ class cmsConfig {
      * @return mixed
      */
     public static function getConfig($value = '') {
-
         if($value){
             if(isset(self::$config[$value])){
                 return self::$config[$value];
@@ -137,7 +131,6 @@ class cmsConfig {
         } else {
             return self::$config;
         }
-
     }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,9 +140,8 @@ class cmsConfig {
      * @param array $_CFG
      */
     public static function saveToFile($_CFG, $file='config.inc.php'){
-
         global $_LANG;
-        $filepath = PATH.'/includes/'.$file;
+        $filepath = PATH .'/includes/'. $file;
 
         if (file_exists($filepath)){
             if (!@is_writable($filepath)){ die(sprintf($_LANG['FILE_NOT_WRITABLE'], '/includes/'.$file)); }
@@ -176,9 +168,5 @@ class cmsConfig {
         fclose($cfg_file);
 
         return true;
-
     }
-
 }
-
-?>

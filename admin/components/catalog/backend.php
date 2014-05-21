@@ -181,12 +181,12 @@ if ($opt=='saveprices'){
 if ($opt == 'show_item'){
     if (!isset($_REQUEST['item'])){
         if (isset($_REQUEST['item_id'])){
-            dbShow('cms_uc_items', $_REQUEST['item_id']);
-            cmsCore::c('db')->query('UPDATE cms_uc_items SET on_moderate = 0 WHERE id='.(int)$_REQUEST['item_id']);
+            cmsCore::c('db')->setFlag('cms_uc_items', (int)$_REQUEST['item_id'], 'published', '1');
+            cmsCore::c('db')->setFlag('cms_uc_items', (int)$_REQUEST['item_id'], 'on_moderate', '0');
         }
         echo '1'; exit;
     } else {
-        dbShowList('cms_uc_items', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_uc_items', $_REQUEST['item'], 'published', '1');
         foreach($_REQUEST['item'] as $k=>$id){
             cmsCore::c('db')->query('UPDATE cms_uc_items SET on_moderate = 0 WHERE id='.(int)$id);
         }
@@ -200,10 +200,10 @@ if ($opt == 'show_item'){
 
 if ($opt == 'hide_item'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbHide('cms_uc_items', $_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_uc_items', $_REQUEST['item_id'], 'published', '0'); }
+        cmsCore::halt('1');
     } else {
-        dbHideList('cms_uc_items', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_uc_items', $_REQUEST['item'], 'published', '0');
         cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'success');
         cmsCore::redirectBack();
     }

@@ -100,7 +100,7 @@ class cmsPage {
 
         // загружаем шаблонизатор текущего шаблона
         if(!cmsCore::includeFile('core/tpl_classes/'.$tpl_info['renderer'].'.php') ||
-                !class_exists($tpl_info['renderer'])){
+            !class_exists($tpl_info['renderer'])){
             global $_LANG;
             cmsCore::halt(sprintf($_LANG['TEMPLATE_CLASS_NOTFOUND'], $tpl_info['renderer']));
         }
@@ -305,7 +305,7 @@ class cmsPage {
     /**
      * Печатает головную область страницы
      */
-    public function printHead(){
+    public function printHead($indent = ''){
         $this->addHeadJsLang(array('SEND','CONTINUE','CLOSE','SAVE','CANCEL','ATTENTION','CONFIRM','LOADING','ERROR', 'ADD','SELECT_CITY','SELECT'));
 
         // Если есть пагинация и страница больше первой, добавляем "страница №"
@@ -322,33 +322,33 @@ class cmsPage {
 
         //Ключевые слова
         if (!$this->page_keys) { $this->page_keys = $this->site_cfg->keywords; }
-        echo '<meta name="keywords" content="', htmlspecialchars($this->page_keys), '" />',"\n";
+        echo $indent,'<meta name="keywords" content="', htmlspecialchars($this->page_keys), '" />',"\n";
 
         //Описание
         if (!$this->page_desc) { $this->page_desc = $this->site_cfg->metadesc; }
-        echo '<meta name="description" content="',htmlspecialchars($this->page_desc),'" />',"\n";
+        echo $indent,'<meta name="description" content="',htmlspecialchars($this->page_desc),'" />',"\n";
 
         //Генератор
-        echo '<meta name="generator" content="InstantCMS - www.instantcms.ru"/>',"\n";
+        echo $indent,'<meta name="generator" content="InstantCMS - www.instantcms.ru"/>',"\n";
 
         //CSS
         $this->page_css = cmsCore::callEvent('PRINT_PAGE_CSS', $this->page_css);
-        foreach ($this->page_css as $value){ echo '<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n"; }
+        foreach ($this->page_css as $value){ echo $indent,'<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n"; }
 
         //Meta
         $this->page_meta = cmsCore::callEvent('PRINT_PAGE_META', $this->page_meta);
-        foreach ($this->page_meta as $value){ echo $value,"\n"; }
+        foreach ($this->page_meta as $value){ echo $indent,$value,"\n"; }
 
         //JS
         $this->page_js = cmsCore::callEvent('PRINT_PAGE_JS', $this->page_js);
-        foreach ($this->page_js as $value){ echo '<script type="text/javascript" src="'. $value .'"></script>',"\n"; }
+        foreach ($this->page_js as $value){ echo $indent,'<script type="text/javascript" src="'. $value .'"></script>',"\n"; }
 
         //Оставшиеся теги
         $this->page_head = cmsCore::callEvent('PRINT_PAGE_HEAD', $this->page_head);
-        foreach($this->page_head as $value) { echo $value,"\n"; }
+        foreach($this->page_head as $value) { echo $indent,$value,"\n"; }
 
         // LANG переменные
-        echo '<script type="text/javascript">'; foreach($this->page_lang as $value) { echo $value; }; echo '</script>',"\n";
+        echo $indent,'<script type="text/javascript">'; foreach($this->page_lang as $value) { echo $value; }; echo '</script>',"\n";
     }
     
     /**
@@ -454,7 +454,7 @@ class cmsPage {
         $menu_template = $inCore->menuTemplate();
 
         if ($menu_template && file_exists(PATH.'/templates/'.$menu_template.'/template.php')){
-            require(PATH.'/templates/'.$menu_template.'/template.php');
+            require(PATH .'/templates/'. $menu_template .'/template.php');
             return;
         }
 
@@ -514,7 +514,6 @@ class cmsPage {
         $modules = array();
 
         $inCore = cmsCore::getInstance();
-        $inDB   = cmsDatabase::getInstance();
 
         if (!$inCore->isMenuIdStrict()){ $strict_sql = "AND (m.is_strict_bind = 0)"; } else { $strict_sql = ''; }
 
@@ -526,11 +525,11 @@ class cmsPage {
                 WHERE m.published = 1 $strict_sql
                 ORDER BY m.ordering ASC";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        if(!$inDB->num_rows($result)){ $this->modules = $modules; return true; }
+        if(!cmsCore::c('db')->num_rows($result)){ $this->modules = $modules; return true; }
 
-        while ($mod = $inDB->fetch_assoc($result)){
+        while ($mod = cmsCore::c('db')->fetch_assoc($result)){
             if (!cmsCore::checkContentAccess($mod['access_list'])) { continue; }
 
             // формируем html модуля
@@ -646,7 +645,7 @@ class cmsPage {
             $where = "MATCH(content) AGAINST ('{$id}' IN BOOLEAN MODE)";
         }
 
-        $mod = cmsDatabase::getInstance()->get_fields('cms_modules', $where, '*');
+        $mod = cmsCore::c('db')->get_fields('cms_modules', $where, '*');
         if(!$mod){ return false; }
 
         if (!cmsCore::checkContentAccess($mod['access_list'])){ return false; }
@@ -971,5 +970,3 @@ class cmsPage {
         return $this;
     }
 }
-
-?>

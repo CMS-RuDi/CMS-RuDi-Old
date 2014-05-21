@@ -30,24 +30,21 @@ class cmsAdmin extends cmsCore {
      * @return int
      */
     public function installPlugin($plugin, $events, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
         if (!@$plugin['type']) { $plugin['type'] = 'plugin'; }
 
-        $config_yaml = cmsCore::arrayToYaml($config);
+        $config_yaml = self::arrayToYaml($config);
         if (!$config_yaml) { $config_yaml = ''; }
-		$plugin['config'] = $inDB->escape_string($config_yaml);
+        $plugin['config'] = self::c('db')->escape_string($config_yaml);
 
         //добавляем плагин в базу
-        $plugin_id = $inDB->insert('cms_plugins', $plugin);
+        $plugin_id = self::c('db')->insert('cms_plugins', $plugin);
 
         //возвращаем ложь, если плагин не установился
         if (!$plugin_id)    { return false; }
 
         //добавляем хуки событий для плагина
         foreach($events as $event){
-            $inDB->insert('cms_event_hooks', array('event'=>$event, 'plugin_id'=>$plugin_id));
+            self::c('db')->insert('cms_event_hooks', array('event'=>$event, 'plugin_id'=>$plugin_id));
         }
 
         //возращаем ID установленного плагина
@@ -64,9 +61,6 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function upgradePlugin($plugin, $events, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
         //находим ID установленной версии
         $plugin_id = $this->getPluginId($plugin['plugin']);
 
@@ -91,15 +85,15 @@ class cmsAdmin extends cmsCore {
         }
 
         //конвертируем массив настроек в YAML
-		$plugin['config'] = $inDB->escape_string(cmsCore::arrayToYaml($old_config));
+        $plugin['config'] = self::c('db')->escape_string(self::arrayToYaml($old_config));
 
         //обновляем плагин в базе
-		$inDB->update('cms_plugins', $plugin, $plugin_id);
+        self::c('db')->update('cms_plugins', $plugin, $plugin_id);
 
         //добавляем новые хуки событий для плагина
         foreach($events as $event){
             if (!$this->isPluginHook($plugin_id, $event)){
-                $inDB->insert('cms_event_hooks', array('event'=>$event, 'plugin_id'=>$plugin_id));
+                self::c('db')->insert('cms_event_hooks', array('event'=>$event, 'plugin_id'=>$plugin_id));
             }
         }
 
@@ -116,21 +110,17 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function removePlugin($plugin_id){
-
-        $inDB = cmsDatabase::getInstance();
-
         //если плагин не был установлен, выходим
         if (!$plugin_id) { return false; }
 
         //удаляем плагин из базы
-        $inDB->delete('cms_plugins', "id = '$plugin_id'");
+        self::c('db')->delete('cms_plugins', "id = '$plugin_id'");
 
         //Удаляем хуки событий плагина
-		$inDB->delete('cms_event_hooks', "plugin_id = '$plugin_id'");
+        self::c('db')->delete('cms_event_hooks', "plugin_id = '$plugin_id'");
 
         //плагин успешно удален
         return true;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,14 +130,13 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public function getNewPlugins() {
-
         $new_plugins    = array();
         $all_plugins    = $this->getPluginsDirs();
 
         if (!$all_plugins) { return false; }
 
         foreach($all_plugins as $plugin){
-            $installed = cmsDatabase::getInstance()->rows_count('cms_plugins', "plugin='{$plugin}'", 1);
+            $installed = self::c('db')->rows_count('cms_plugins', "plugin='{$plugin}'", 1);
             if (!$installed){
                 $new_plugins[] = $plugin;
             }
@@ -165,7 +154,6 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public function getUpdatedPlugins() {
-
         $upd_plugins    = array();
         $all_plugins    = $this->getPluginsDirs();
 
@@ -193,7 +181,7 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public static function getPluginsDirs(){
-        return cmsCore::getDirsList('/plugins');
+        return self::getDirsList('/plugins');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,9 +192,7 @@ class cmsAdmin extends cmsCore {
      * @return int
      */
     public function getPluginId($plugin){
-
-        return cmsDatabase::getInstance()->get_field('cms_plugins', "plugin='{$plugin}'", 'id');
-
+        return self::c('db')->get_field('cms_plugins', "plugin='{$plugin}'", 'id');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,9 +203,7 @@ class cmsAdmin extends cmsCore {
      * @return string
      */
     public function getPluginById($plugin_id){
-
-        return cmsDatabase::getInstance()->get_field('cms_plugins', "id='{$plugin_id}'", 'plugin');
-
+        return self::c('db')->get_field('cms_plugins', "id='{$plugin_id}'", 'plugin');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,9 +214,7 @@ class cmsAdmin extends cmsCore {
      * @return float
      */
     public function getPluginVersion($plugin){
-
-        return cmsDatabase::getInstance()->get_field('cms_plugins', "plugin='{$plugin}'", 'version');
-
+        return self::c('db')->get_field('cms_plugins', "plugin='{$plugin}'", 'version');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,19 +226,15 @@ class cmsAdmin extends cmsCore {
      * @return int
      */
     public function installComponent($component, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
-        $config_yaml = cmsCore::arrayToYaml($config);
+        $config_yaml = self::arrayToYaml($config);
         if (!$config_yaml) { $config_yaml = ''; }
-		$component['config'] = $inDB->escape_string($config_yaml);
+		$component['config'] = self::c('db')->escape_string($config_yaml);
 
         //добавляем компонент в базу
-        $component_id = $inDB->insert('cms_components', $component);
+        $component_id = self::c('db')->insert('cms_components', $component);
 
         //возращаем ID установленного компонента
         return $component_id ? $component_id : false;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,9 +246,6 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function upgradeComponent($component, $config){
-
-        $inDB = cmsDatabase::getInstance();
-
         //находим ID установленной версии
         $component_id = $this->getComponentId( $component['link'] );
 
@@ -295,11 +270,10 @@ class cmsAdmin extends cmsCore {
         }
 
         //конвертируем массив настроек в YAML
-		$component['config'] = $inDB->escape_string(cmsCore::arrayToYaml($old_config));
+        $component['config'] = self::c('db')->escape_string(self::arrayToYaml($old_config));
 
         //обновляем компонент в базе
-		return $inDB->update('cms_components', $component, $component_id);
-
+        return self::c('db')->update('cms_components', $component, $component_id);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +284,6 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function removeComponent($component_id) {
-
         //если компонент не был установлен, выходим
         if (!$component_id) { return false; }
 
@@ -331,11 +304,10 @@ class cmsAdmin extends cmsCore {
         }
 
         //удаляем компонент из базы, но только если он не системный
-        cmsDatabase::getInstance()->delete('cms_components', "id = '$component_id' AND system = 0");
+        self::c('db')->delete('cms_components', "id = '$component_id' AND system = 0");
 
         //компонент успешно удален
         return true;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,7 +317,6 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public function getNewComponents() {
-
         $new_components = array();
         $all_components = self::getComponentsDirs();
 
@@ -377,7 +348,6 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public function getUpdatedComponents() {
-
         $upd_components = array();
 
         foreach($this->components as $component){
@@ -404,7 +374,7 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public static function getComponentsDirs(){
-        return cmsCore::getDirsList('/components');
+        return self::getDirsList('/components');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -415,17 +385,15 @@ class cmsAdmin extends cmsCore {
      * @return int
      */
     public function getComponentId($component){
+        $component_id = 0;
 
-		$component_id = 0;
-
-		foreach ($this->components as $inst_component){
-		   if($inst_component['link'] == $component){
-			  $component_id = $inst_component['id']; break;
-		   }
-		}
+        foreach ($this->components as $inst_component){
+           if($inst_component['link'] == $component){
+                  $component_id = $inst_component['id']; break;
+           }
+        }
 
         return $component_id;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -436,17 +404,15 @@ class cmsAdmin extends cmsCore {
      * @return string
      */
     public function getComponentById($component_id){
+        $link = '';
 
-		$link = '';
-
-		foreach ($this->components as $inst_component){
-		   if($inst_component['id'] == $component_id){
-			  $link = $inst_component['link']; break;
-		   }
-		}
+        foreach ($this->components as $inst_component){
+           if($inst_component['id'] == $component_id){
+                  $link = $inst_component['link']; break;
+           }
+        }
 
         return $link;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -457,26 +423,22 @@ class cmsAdmin extends cmsCore {
      * @return float
      */
     public function getComponentVersion($component){
+        $version = '';
 
-		$version = '';
-
-		foreach ($this->components as $inst_component){
-		   if($inst_component['link'] == $component){
-			  $version = $inst_component['version']; break;
-		   }
-		}
+        foreach ($this->components as $inst_component){
+           if($inst_component['link'] == $component){
+                  $version = $inst_component['version']; break;
+           }
+        }
 
         return $version;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public function loadComponentInstaller($component){
-
         return $this->includeFile('components/'.$component.'/install.php');;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -488,12 +450,9 @@ class cmsAdmin extends cmsCore {
      * @return int
      */
     public function installModule($module, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
-        $config_yaml = cmsCore::arrayToYaml($config);
+        $config_yaml = self::arrayToYaml($config);
         if (!$config_yaml) { $config_yaml = ''; }
-		$module['config'] = $inDB->escape_string($config_yaml);
+		$module['config'] = self::c('db')->escape_string($config_yaml);
         // Помечаем, что модуль внешний
         $module['is_external'] = 1;
         // переходной костыль
@@ -506,8 +465,7 @@ class cmsAdmin extends cmsCore {
         }
 
         //возращаем ID установленного модуля
-        return $inDB->insert('cms_modules', $module);
-
+        return self::c('db')->insert('cms_modules', $module);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -519,9 +477,6 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function upgradeModule($module, $config) {
-
-        $inDB = cmsDatabase::getInstance();
-
         // удалить в следующем обновлении
         if (isset($module['link'])) {
             $module['content'] = $module['link'];
@@ -551,16 +506,15 @@ class cmsAdmin extends cmsCore {
         }
 
         //конвертируем массив настроек в YAML
-		$module['config'] = $inDB->escape_string(cmsCore::arrayToYaml($old_config));
+        $module['config'] = self::c('db')->escape_string(self::arrayToYaml($old_config));
 
-		unset($module['position']);
+        unset($module['position']);
 
         //обновляем модуль в базе
-        $inDB->update('cms_modules', $module, $module_id);
+        self::c('db')->update('cms_modules', $module, $module_id);
 
         //модуль успешно обновлен
         return true;
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -571,7 +525,6 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function removeModule($module_id) {
-
         if(is_array($module_id)){
             foreach ($module_id as $id) {
                 $this->removeModule((int)$id);
@@ -580,13 +533,12 @@ class cmsAdmin extends cmsCore {
 
         $module = $this->getModuleById($module_id);
         if ($this->loadModuleInstaller($module)){
-			if(function_exists('remove_module_'.$module)){
+            if(function_exists('remove_module_'.$module)){
             	call_user_func('remove_module_'.$module);
-			}
+            }
         }
 
-		return cmsDatabase::getInstance()->delete('cms_modules', "id = '{$module_id}'", 1);
-
+        return self::c('db')->delete('cms_modules', "id = '{$module_id}'", 1);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -596,7 +548,6 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public function getNewModules() {
-
         $new_modules = array();
         $all_modules = self::getModulesDirs();
 
@@ -608,7 +559,7 @@ class cmsAdmin extends cmsCore {
 
             if (file_exists($installer_file)){
 
-                $installed = cmsDatabase::getInstance()->rows_count('cms_modules', "content='{$module}' AND user=0", 1);
+                $installed = self::c('db')->rows_count('cms_modules', "content='{$module}' AND user=0", 1);
                 if (!$installed){
                     $new_modules[] = $module;
                 }
@@ -629,9 +580,8 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public function getUpdatedModules() {
-
         $upd_modules = array();
-        $all_modules = cmsDatabase::getInstance()->get_table('cms_modules', 'user=0');
+        $all_modules = self::c('db')->get_table('cms_modules', 'user=0');
 
         if (!$all_modules) { return false; }
 
@@ -659,7 +609,7 @@ class cmsAdmin extends cmsCore {
      * @return array
      */
     public static function getModulesDirs() {
-        return cmsCore::getDirsList('/modules');
+        return self::getDirsList('/modules');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -670,9 +620,7 @@ class cmsAdmin extends cmsCore {
      * @return int
      */
     public function getModuleId($module){
-
-        return cmsDatabase::getInstance()->get_field('cms_modules', "content='{$module}' AND user=0", 'id');
-
+        return self::c('db')->get_field('cms_modules', "content='{$module}' AND user=0", 'id');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -683,9 +631,7 @@ class cmsAdmin extends cmsCore {
      * @return string
      */
     public function getModuleById($module_id){
-
-        return cmsDatabase::getInstance()->get_field('cms_modules', "id='{$module_id}' AND user=0", 'content');
-
+        return self::c('db')->get_field('cms_modules', "id='{$module_id}' AND user=0", 'content');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -696,18 +642,14 @@ class cmsAdmin extends cmsCore {
      * @return float
      */
     public function getModuleVersion($module){
-
-        return cmsDatabase::getInstance()->get_field('cms_modules', "content='{$module}' AND user=0", 'version');
-
+        return self::c('db')->get_field('cms_modules', "content='{$module}' AND user=0", 'version');
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public function loadModuleInstaller($module){
-
-        return cmsCore::includeFile('modules/'.$module.'/install.php');;
-
+        return self::includeFile('modules/'.$module.'/install.php');;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -719,15 +661,12 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function isPluginHook($plugin_id, $event) {
-
-        return cmsDatabase::getInstance()->rows_count('cms_event_hooks', "plugin_id='{$plugin_id}' AND event='{$event}'");
-
+        return self::c('db')->rows_count('cms_event_hooks', "plugin_id='{$plugin_id}' AND event='{$event}'");
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static function getModuleTemplates() {
-
         $tpl_dir = is_dir(TEMPLATE_DIR.'modules') ? TEMPLATE_DIR.'modules' : PATH.'/templates/_default_/modules';
         $pdir    = opendir($tpl_dir);
 
@@ -759,8 +698,6 @@ class cmsAdmin extends cmsCore {
      * @return string 
      */ 
     public function getMenuLink($linktype, $linkid){ 
-        $inDB = cmsDatabase::getInstance(); 
-
         $menulink = ''; 
 
         if ($linktype=='component'){ 
@@ -772,36 +709,47 @@ class cmsAdmin extends cmsCore {
         } 
 
         if ($linktype=='category' || $linktype=='content'){ 
-            $this->loadModel('content'); 
-            $model = new cms_model_content(); 
             switch($linktype){ 
-                case 'category': $menulink = $model->getCategoryURL(null, $inDB->get_field('cms_category', "id='{$linkid}'", 'seolink')); break; 
-                case 'content':  $menulink = $model->getArticleURL(null, $inDB->get_field('cms_content', "id='{$linkid}'", 'seolink')); break; 
+                case 'category': $menulink = self::m('content')->getCategoryURL(null, self::c('db')->get_field('cms_category', "id='{$linkid}'", 'seolink')); break; 
+                case 'content':  $menulink = self::m('content')->getArticleURL(null, self::c('db')->get_field('cms_content', "id='{$linkid}'", 'seolink')); break; 
             } 
         } 
 
         if ($linktype=='blog'){ 
-            $this->loadModel('blogs'); 
-            $model = new cms_model_blogs(); 
-            $menulink = $model->getBlogURL($inDB->get_field('cms_blogs', "id='{$linkid}'", 'seolink')); 
+            $menulink = self::m('blogs')->getBlogURL(self::c('db')->get_field('cms_blogs', "id='{$linkid}'", 'seolink')); 
         } 
 
         if ($linktype=='video_cat'){ 
             $this->loadModel('video'); 
             $model = cms_model_video::initModel(); 
-            $cat = $inDB->get_fields('cms_video_category', "id='{$linkid}'", 'id, seolink'); 
+            $cat = self::c('db')->get_fields('cms_video_category', "id='{$linkid}'", 'id, seolink'); 
             $menulink = $model->getCatLink($cat['seolink'], $cat['id']); 
         } 
 
         if ($linktype=='uccat'){ 
-            $menulink = '/catalog/'.$linkid; 
+            $menulink = '/catalog/'. $linkid; 
         } 
 
         if ($linktype=='photoalbum'){ 
-            $menulink = '/photos/'.$linkid; 
+            $menulink = '/photos/'. $linkid; 
         } 
 
         return $menulink; 
     } 
 }
+
+//---------------------------- DEPRECATED FUNCTIONS ----------------------------
+function dbShowList($table, $list){
+    cmsCore::c('db')->setFlags($table, $list, 'published', '1');
+}
+function dbHideList($table, $list){
+    cmsCore::c('db')->setFlags($table, $list, 'published', '0');
+}
+function dbShow($table, $id){
+    cmsCore::c('db')->setFlag($table, $id, 'published', '1');
+}
+function dbHide($table, $id){
+    cmsCore::c('db')->setFlag($table, $id, 'published', '0');
+}
+//==============================================================================
 ?>

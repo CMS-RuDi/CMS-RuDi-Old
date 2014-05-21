@@ -18,8 +18,6 @@ cmsCore::c('page')->addHeadCSS('admin/js/hmenu/hmenu.css');
 cmsCore::c('page')->addHeadCSS('includes/jquery/tablesorter/style.css');
 cmsCore::c('page')->addHeadCSS('includes/jqueryui/css/smoothness/jquery-ui.min.css');
 
-cmsCore::c('page')->addHeadJS('includes/jquery/jquery.js');
-cmsCore::c('page')->addHeadJS('admin/js/common.js');
 cmsCore::c('page')->addHeadJS('admin/js/admin.js');
 cmsCore::c('page')->addHeadJS('includes/jquery/jquery.columnfilters.js');
 cmsCore::c('page')->addHeadJS('includes/jquery/tablesorter/jquery.tablesorter.min.js');

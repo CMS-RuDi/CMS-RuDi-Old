@@ -12,7 +12,6 @@
 /******************************************************************************/
 
 class cmsActions {
-
     private static $instance;
 
     private static $defaultLogArray = array('pubdate'=>'','user_id'=>'','object'=>'','object_url'=>'','object_id'=>'','target'=>'','target_url'=>'','target_id'=>'','description'=>'','is_friends_only'=>'','is_users_only'=>'');
@@ -23,9 +22,7 @@ class cmsActions {
 // ============================================================================ //
 // ============================================================================ //
 
-    private function __construct() {
-		$this->inDB = cmsDatabase::getInstance();
-	}
+    private function __construct() {}
 
     private function __clone() {}
 
@@ -40,19 +37,17 @@ class cmsActions {
 // ============================================================================ //
 
     public static function checkLogArrayValues($input_array = array()) {
+        if(!$input_array || !is_array($input_array)) { return array(); }
 
-		if(!$input_array || !is_array($input_array)) { return array(); }
-
-		// убираем ненужные ячейки массива
-		foreach($input_array as $k=>$v){
-		   	if (!isset(self::$defaultLogArray[$k])) { unset($input_array[$k]); continue; }
+        // убираем ненужные ячейки массива
+        foreach($input_array as $k=>$v){
+            if (!isset(self::$defaultLogArray[$k])) { unset($input_array[$k]); continue; }
             $input_array[$k] =  preg_replace('/\[hide(.*?)\](.*?)\[\/hide\]/sui', '', $input_array[$k]);
             $input_array[$k] =  preg_replace('/\[hide(.*?)\](.*?)$/sui', '', $input_array[$k]);
-			$input_array[$k] =  cmsDatabase::getInstance()->escape_string(str_replace(array('\r', '\n'), ' ', $input_array[$k]));
-		}
+            $input_array[$k] =  cmsCore::c('db')->escape_string(str_replace(array('\r', '\n'), ' ', $input_array[$k]));
+        }
 
-		return $input_array;
-
+        return $input_array;
     }
 
 // ============================================================================ //
@@ -65,15 +60,13 @@ class cmsActions {
      * @return bool
      */
     public static function registerAction($component, $action){
-
         $action['is_tracked'] = 1;
         $action['is_visible'] = 1;
-		$action['component']  = $component;
+        $action['component']  = $component;
 
-        cmsDatabase::getInstance()->insert('cms_actions', $action);
+        cmsCore::c('db')->insert('cms_actions', $action);
 
         return true;
-
     }
 
 // ============================================================================ //
@@ -86,13 +79,11 @@ class cmsActions {
      * @return array | false
      */
     public static function getAction($action_name, $only_tracked=true){
-
         $tracked = $only_tracked ? 'AND is_tracked=1' : '';
 
-        $action = cmsDatabase::getInstance()->get_fields('cms_actions', "name='{$action_name}' {$tracked}", '*');
+        $action = cmsCore::c('db')->get_fields('cms_actions', "name='{$action_name}' {$tracked}", '*');
 
         return is_array($action) ? cmsCore::callEvent('GET_ACTION', $action) : false;
-
     }
 
 // ============================================================================ //
@@ -105,25 +96,21 @@ class cmsActions {
      * @return bool
      */
     public static function log($action_name, $params){
+        $params = self::checkLogArrayValues($params);
+        if(!$params) { return false; }
 
-		$params = self::checkLogArrayValues($params);
-		if(!$params) { return false; }
-
-        $inUser = cmsUser::getInstance();
-
-        if (!$inUser->id && $action_name != 'add_user'){ return false; }
+        if (!cmsCore::c('user')->id && $action_name != 'add_user'){ return false; }
 
         $action = self::getAction($action_name);
         if (!$action) { return false; }
 
-		$params['user_id']   =  !empty($params['user_id']) ? $params['user_id'] : $inUser->id;
-		$params['action_id'] =  $action['id'];
-		$params['pubdate']   =  date("Y-m-d H:i:s");
+        $params['user_id']   =  !empty($params['user_id']) ? $params['user_id'] : cmsCore::c('user')->id;
+        $params['action_id'] =  $action['id'];
+        $params['pubdate']   =  date("Y-m-d H:i:s");
 
-        cmsDatabase::getInstance()->insert('cms_actions_log', cmsCore::callEvent('LOG_ACTION', $params));
+        cmsCore::c('db')->insert('cms_actions_log', cmsCore::callEvent('LOG_ACTION', $params));
 
         return true;
-
     }
 
     /**
@@ -133,7 +120,6 @@ class cmsActions {
      * @return bool
      */
     public static function removeObjectLog($action_name, $object_id, $user_id = false){
-
         $arg = func_get_args();
 
         cmsCore::callEvent('DELETE_OBJECT_LOG', $arg);
@@ -142,10 +128,9 @@ class cmsActions {
 
         $usr_sql = $user_id ? "AND user_id = {$user_id}" : '';
 
-        cmsDatabase::getInstance()->delete('cms_actions_log', "action_id = '{$action['id']}' AND object_id = '{$object_id}' $usr_sql");
+        cmsCore::c('db')->delete('cms_actions_log', "action_id = '{$action['id']}' AND object_id = '{$object_id}' $usr_sql");
 
         return true;
-
     }
 
     /**
@@ -155,7 +140,6 @@ class cmsActions {
      * @return bool
      */
     public static function removeTargetLog($action_name, $target_id, $user_id = false){
-
         $arg = func_get_args();
 
         cmsCore::callEvent('DELETE_TARGET_LOG', $arg);
@@ -164,18 +148,15 @@ class cmsActions {
 
         $usr_sql = $user_id ? "AND user_id = {$user_id}" : '';
 
-        cmsDatabase::getInstance()->delete('cms_actions_log', "action_id = '{$action['id']}' AND target_id = '{$target_id}' $usr_sql");
+        cmsCore::c('db')->delete('cms_actions_log', "action_id = '{$action['id']}' AND target_id = '{$target_id}' $usr_sql");
 
         return true;
-
     }
 
     public static function removeLogById($id){
-
         cmsCore::callEvent('DELETE_LOG', $id);
 
-        return cmsDatabase::getInstance()->delete('cms_actions_log', "id = '{$id}'");
-
+        return cmsCore::c('db')->delete('cms_actions_log', "id = '{$id}'");
     }
 
     /**
@@ -183,39 +164,36 @@ class cmsActions {
      * @return bool
      */
     public static function updateLog($action_name, $params, $object_id=0, $target_id=0){
+        $params = self::checkLogArrayValues($params);
 
-		$inDB = cmsDatabase::getInstance();
-
-		$params = self::checkLogArrayValues($params);
-
-		if(!$params) { return false; }
-		if(!$object_id && !$target_id) { return false; }
+        if(!$params) { return false; }
+        if(!$object_id && !$target_id) { return false; }
 
         $arg = func_get_args();
 
         cmsCore::callEvent('UPDATE_LOG', $arg);
 
-		// Получаем id записи
-		$action = self::getAction($action_name);
-		if (!$action) { return false; }
+        // Получаем id записи
+        $action = self::getAction($action_name);
+        if (!$action) { return false; }
         $set = '';
-		// формируем запрос на вставку в базу
-		foreach($params as $field=>$value){
-			$set .= "{$field} = '{$value}',";
-		}
-		$set = rtrim($set, ',');
+        
+        // формируем запрос на вставку в базу
+        foreach($params as $field=>$value){
+            $set .= "{$field} = '{$value}',";
+        }
+        $set = rtrim($set, ',');
 
-		// если обновляем сам объект
-		if($object_id){
-			$inDB->query("UPDATE cms_actions_log SET {$set} WHERE action_id='{$action['id']}' AND object_id='{$object_id}' LIMIT 1");
-		}
-		// если обновляем все место назначения
-		if($target_id){
-			$inDB->query("UPDATE cms_actions_log SET {$set} WHERE action_id='{$action['id']}' AND target_id='{$target_id}'");
-		}
+        // если обновляем сам объект
+        if($object_id){
+            cmsCore::c('db')->query("UPDATE cms_actions_log SET {$set} WHERE action_id='{$action['id']}' AND object_id='{$object_id}' LIMIT 1");
+        }
+        // если обновляем все место назначения
+        if($target_id){
+            cmsCore::c('db')->query("UPDATE cms_actions_log SET {$set} WHERE action_id='{$action['id']}' AND target_id='{$target_id}'");
+        }
 
-		return true;
-
+        return true;
     }
 
 // ============================================================================ //
@@ -234,65 +212,57 @@ class cmsActions {
      * Включает режим показа только событий друзей
      *
      */
-	public function onlyMyFriends(){
+    public function onlyMyFriends(){
+        $friends = cmsUser::getFriends(cmsCore::c('user')->id);
+        if (!$friends){ cmsCore::c('db')->where('1=0'); return; }
+        
+        $f_list = array();
 
-		$inUser = cmsUser::getInstance();
-
-		$friends = cmsUser::getFriends($inUser->id);
-		if (!$friends){ $this->inDB->where('1=0'); return; }
-
-		$f_list = array();
-
-		foreach($friends as $friend){
-			$f_list[] = $friend['id'];
-		}
-
-		$f_list = rtrim(implode(',', $f_list), ',');
+        foreach($friends as $friend){
+            $f_list[] = $friend['id'];
+        }
+        
+        $f_list = rtrim(implode(',', $f_list), ',');
 
         if ($f_list){
-            $this->inDB->where("log.user_id IN ({$f_list})");
+            cmsCore::c('db')->where("log.user_id IN ({$f_list})");
         } else {
-            $this->inDB->where('1=0');
+            cmsCore::c('db')->where('1=0');
         }
 
         $this->only_friends = true;
-
-		return;
-
-	}
+        
+        return;
+    }
 
     /**
      * Показывает события определенного юзера
      *
      */
-	public function whereUserIs($user_id){
-
+    public function whereUserIs($user_id){
         if ($user_id){
-            $this->inDB->where("log.user_id = '$user_id'");
+            cmsCore::c('db')->where("log.user_id = '$user_id'");
         } else {
-            $this->inDB->where('1=0');
+            cmsCore::c('db')->where('1=0');
         }
-
-		return;
-
-	}
+        
+        return;
+    }
 
     public function onlySelectedTypes($types) {
-
-        if (!is_array($types)){ $this->inDB->where('1=0'); return; }
+        if (!is_array($types)){ cmsCore::c('db')->where('1=0'); return; }
 
         $t_list = array();
 
-		foreach($types as $type){
-			$t_list[] = $type;
-		}
+        foreach($types as $type){
+            $t_list[] = $type;
+        }
+        
+        $t_list = rtrim(implode(',', $t_list), ',');
 
-		$t_list = rtrim(implode(',', $t_list), ',');
+        cmsCore::c('db')->where("a.id IN ({$t_list})");
 
-		$this->inDB->where("a.id IN ({$t_list})");
-
-		return;
-
+        return;
     }
 
 // ============================================================================ //
@@ -303,22 +273,18 @@ class cmsActions {
      * @return int
      */
     public function getCountActions() {
-
-        $inUser = cmsUser::getInstance();
-
-        if (!$this->only_friends){ $this->inDB->where('log.is_friends_only = 0'); }
-        if (!$inUser->id) { $this->inDB->where('log.is_users_only = 0'); }
+        if (!$this->only_friends){ cmsCore::c('db')->where('log.is_friends_only = 0'); }
+        if (!cmsCore::c('user')->id) { cmsCore::c('db')->where('log.is_users_only = 0'); }
 
         $sql = "SELECT 1
-                FROM cms_actions_log log
-				LEFT JOIN cms_actions a ON a.id = log.action_id AND a.is_visible = 1
-                WHERE 1=1 {$this->inDB->where}
+                    FROM cms_actions_log log
+                    LEFT JOIN cms_actions a ON a.id = log.action_id AND a.is_visible = 1
+                    WHERE 1=1 {cmsCore::c('db')->where}
                 ";
 
-		$result = $this->inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-		return $this->inDB->num_rows($result);
-
+        return cmsCore::c('db')->num_rows($result);
     }
 
 // ============================================================================ //
@@ -328,11 +294,8 @@ class cmsActions {
      * @return array
      */
     public function getActionsLog(){
-
-        $inUser = cmsUser::getInstance();
-
-        if (!$this->only_friends){ $this->inDB->where('log.is_friends_only = 0'); }
-        if (!$inUser->id) { $this->inDB->where('log.is_users_only = 0'); }
+        if (!$this->only_friends){ cmsCore::c('db')->where('log.is_friends_only = 0'); }
+        if (!cmsCore::c('user')->id) { cmsCore::c('db')->where('log.is_users_only = 0'); }
 
         $sql = "SELECT log.id as id,
                        log.user_id,
@@ -349,24 +312,24 @@ class cmsActions {
                 FROM cms_actions_log log
                 LEFT JOIN cms_actions a ON a.id = log.action_id AND a.is_visible = 1
                 LEFT JOIN cms_users u ON u.id = log.user_id
-                WHERE 1=1 {$this->inDB->where}
+                WHERE 1=1 {cmsCore::c('db')->where}
                 ORDER BY log.id DESC
 				";
 
-        if ($this->inDB->limit){
-            $sql .= "LIMIT {$this->inDB->limit}";
+        if (cmsCore::c('db')->limit){
+            $sql .= "LIMIT {cmsCore::c('db')->limit}";
         }
 
-        $result = $this->inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
 		// Сбрасываем условия
-        $this->inDB->resetConditions();
+        cmsCore::c('db')->resetConditions();
 
-        if (!$this->inDB->num_rows($result)){ return false; }
+        if (!cmsCore::c('db')->num_rows($result)){ return false; }
 
         $actions = array();
 
-        while($action = $this->inDB->fetch_assoc($result)){
+        while($action = cmsCore::c('db')->fetch_assoc($result)){
 
             $action['object_link'] = $action['target_link'] = '';
 
@@ -395,7 +358,7 @@ class cmsActions {
 
             }
 
-            $action['is_new']   = (bool) (strtotime($action['pubdate']) > strtotime($inUser->logdate));
+            $action['is_new']   = (bool) (strtotime($action['pubdate']) > strtotime(cmsCore::c('user')->logdate));
             $action['user_url'] = cmsUser::getProfileURL($action['user_login']);
             $action['pubdate']  = cmsCore::dateDiffNow($action['pubdate']);
 
@@ -404,7 +367,6 @@ class cmsActions {
         }
 
         return cmsCore::callEvent('GET_ACTIONS', $actions);
-
     }
 
 // ============================================================================ //
@@ -416,9 +378,7 @@ class cmsActions {
      * @return bool
      */
     public static function removeOldLog($pubdays = 60){
-
-		return cmsDatabase::getInstance()->delete('cms_actions_log', "DATEDIFF(NOW(), pubdate) > '{$pubdays}'");
-
+        return cmsCore::c('db')->delete('cms_actions_log', "DATEDIFF(NOW(), pubdate) > '{$pubdays}'");
     }
 
 // ============================================================================ //
@@ -429,11 +389,8 @@ class cmsActions {
      * @return bool
      */
     public static function removeUserLog($user_id){
-
-		if (!$user_id) { return false; }
-
-        return cmsDatabase::getInstance()->delete('cms_actions_log', "user_id = '$user_id'");
-
+        if (!$user_id) { return false; }
+        return cmsCore::c('db')->delete('cms_actions_log', "user_id = '$user_id'");
     }
 
 // ============================================================================ //
@@ -443,9 +400,7 @@ class cmsActions {
      * @return array
      */
     public static function getActionsComponents(){
-
-        return cmsDatabase::getInstance()->get_table('cms_components com INNER JOIN cms_actions act ON act.component = com.link', 'com.internal=0 AND com.published=1 GROUP BY com.link', 'com.title, com.link');
-
+        return cmsCore::c('db')->get_table('cms_components com INNER JOIN cms_actions act ON act.component = com.link', 'com.internal=0 AND com.published=1 GROUP BY com.link', 'com.title, com.link');
     }
 
 }

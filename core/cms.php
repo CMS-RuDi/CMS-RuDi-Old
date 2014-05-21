@@ -2518,18 +2518,17 @@ class cmsCore {
      * Очищает системный кеш
      */
     public static function clearCache(){
-
         cmsCore::callEvent('CLEAR_CACHE', '');
 
-        $directory = PATH.'/cache';
+        $directory = PATH .'/cache';
 
         $handle = opendir($directory);
 
         while (false !== ($node = readdir($handle))){
             if($node != '.' && $node != '..' && $node != '.htaccess'){
-                $path = $directory.'/'.$node;
-                if(is_file($path)){
-                    if(!@unlink($path)) { return false; }
+                $path = $directory .'/'. $node;
+                if (is_file($path)){
+                    if (!@unlink($path)) { return false; }
                 }
             }
         }
@@ -2537,7 +2536,6 @@ class cmsCore {
         closedir($handle);
 
         return true;
-
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2739,6 +2737,35 @@ class cmsCore {
         }
         
         return $default;
+    }
+    
+    public static function callTabEventPlugins($event, $item){
+        $plugins_list = array();
+
+        $plugins      = self::getInstance()->getEventPlugins($event);
+
+        foreach ($plugins as $plugin_name){
+            $html   = '';
+            $plugin = self::loadPlugin($plugin_name);
+
+            if ($plugin !== false){
+                $html = $plugin->execute($event, $item);
+            }
+
+            if ($html !== false){
+                $p['name']      = $plugin_name;
+                $p['title']     = !empty($plugin->info['tab']) ? $plugin->info['tab'] : $plugin->info['title'];
+                $p['ajax_link'] = !empty($plugin->info['ajax_link']) ? $plugin->info['ajax_link'] : '';
+                $p['html']      = $html;
+
+                $plugins_list[] = $p;
+
+                self::unloadPlugin($plugin);
+            }
+
+        }
+
+        return $plugins_list;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

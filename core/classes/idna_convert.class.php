@@ -1602,4 +1602,3 @@ class idna_convert
                     )
             );
 }
-?>

@@ -743,48 +743,10 @@ function dbMoveUp($table, $id, $current_ord){
 function dbMoveDown($table, $id, $current_ord){
     $id = (int)$id;
     $current_ord = (int)$current_ord;
-	$sql = "UPDATE $table SET ordering = ordering - 1 WHERE ordering = ($current_ord+1) LIMIT 1";
-	cmsCore::c('db')->query($sql) ;
-	$sql = "UPDATE $table SET ordering = ordering + 1 WHERE id = $id LIMIT 1";
-	cmsCore::c('db')->query($sql) ;
-}
-
-function dbShow($table, $id){
-    $id = (int)$id;
-	$sql = "UPDATE $table SET published = 1 WHERE id = $id";
-	cmsCore::c('db')->query($sql) ;
-}
-function dbShowList($table, $list){
-	if (is_array($list)){
-		$sql = "UPDATE $table SET published = 1 WHERE ";
-		$item = 0;
-		foreach($list as $key => $value){
-			$item ++;
-			$sql .= 'id = '.(int)$value;
-			if ($item<sizeof($list)) { $sql .= ' OR '; }
-		}
-		$sql .= ' LIMIT '.sizeof($list);
-		cmsCore::c('db')->query($sql) ;
-	}
-}
-
-function dbHide($table, $id){
-    $id = (int)$id;
-	$sql = "UPDATE $table SET published = 0 WHERE id = $id";
-	cmsCore::c('db')->query($sql) ;
-}
-function dbHideList($table, $list){
-	if (is_array($list)){
-		$sql = "UPDATE $table SET published = 0 WHERE ";
-		$item = 0;
-		foreach($list as $key => $value){
-			$item ++;
-			$sql .= 'id = '.(int)$value;
-			if ($item<sizeof($list)) { $sql .= ' OR '; }
-		}
-		$sql .= ' LIMIT '.sizeof($list);
-		cmsCore::c('db')->query($sql) ;
-	}
+    $sql = "UPDATE $table SET ordering = ordering - 1 WHERE ordering = ($current_ord+1) LIMIT 1";
+    cmsCore::c('db')->query($sql) ;
+    $sql = "UPDATE $table SET ordering = ordering + 1 WHERE id = $id LIMIT 1";
+    cmsCore::c('db')->query($sql) ;
 }
 
 function dbDelete($table, $id){

@@ -15,7 +15,6 @@ define('USER_MASSMAIL', -2);
 define('ONLINE_INTERVAL', 3); // интервал в минутах, когда пользователь считается online
 
 class cmsUser {
-
     const PROFILE_LINK_PREFIX  = 'users/';
     const MAXIMUM_TOKENS_COUNT = 30;
 
@@ -37,7 +36,7 @@ class cmsUser {
     public $online_users;
     public $online_users_ids;
 
-    private function __construct() { }
+    private function __construct() {}
 
     private function __clone() {}
 
@@ -59,7 +58,7 @@ class cmsUser {
      * @return bool
      */
     public function update() {
-
+        
         // привязка ip адреса к сессии
         if(!$this->checkSpoofingSession()){
             $this->logout();
@@ -68,16 +67,16 @@ class cmsUser {
 
         $user_id = (int)(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
 
-		// Свойства для гостя
+        // Свойства для гостя
         if (!$user_id){
 
             self::setUserLogdate();
 
-			$guest_info = self::getGuestInfo();
+            $guest_info = self::getGuestInfo();
 
-			foreach($guest_info as $key=>$value){
-				$this->{$key} = $value;
-			}
+            foreach($guest_info as $key=>$value){
+                $this->{$key} = $value;
+            }
 
         } else {
 
@@ -93,7 +92,7 @@ class cmsUser {
 
         }
 
-		// проверяем бан
+        // проверяем бан
         $this->checkBan();
 
         return true;
@@ -150,7 +149,7 @@ class cmsUser {
             return true;
         }
 
-		return mb_strstr($_SERVER['REMOTE_ADDR'], $_SESSION['user_net']);
+        return mb_strstr($_SERVER['REMOTE_ADDR'], $_SESSION['user_net']);
 
     }
 
@@ -168,9 +167,7 @@ class cmsUser {
         }
 
         $where = $user_id ? "u.id = '$user_id'" : $where;
-        if(!$where) { return false; }
-
-        $inDB = cmsDatabase::getInstance();
+        if (!$where) { return false; }
 
         $sql  = "SELECT u.*, g.is_admin, g.alias, g.access, p.imageurl, p.imageurl as orig_imageurl, p.karma, p.city
            FROM cms_users u
@@ -178,11 +175,11 @@ class cmsUser {
                            INNER JOIN cms_user_profiles p ON p.user_id = u.id
            WHERE {$where} AND u.is_deleted = 0 AND u.is_locked = 0 LIMIT 1";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        if($inDB->num_rows($result) !== 1) { return false; }
+        if (cmsCore::c('db')->num_rows($result) !== 1) { return false; }
 
-        $info = $inDB->fetch_assoc($result);
+        $info = cmsCore::c('db')->fetch_assoc($result);
 
         $info['ip'] = cmsCore::strClear($_SERVER['REMOTE_ADDR']);
 
@@ -201,38 +198,36 @@ class cmsUser {
      * Если да, то показывает сообщение и завершает работу
      */
     private function checkBan(){
-
-        $inDB = cmsDatabase::getInstance();
-
+        
         $user_where = $this->id ? "(ip = '{$this->ip}' OR user_id = '{$this->id}')" : "ip = '{$this->ip}'";
 
-		// Проверяем бан
-		$ban = $inDB->get_fields('cms_banlist', $user_where.' AND status=1', 'int_num, int_period, autodelete, id, status, bandate, user_id, cause');
-		if(!$ban) { return; }
+        // Проверяем бан
+        $ban = cmsCore::c('db')->get_fields('cms_banlist', $user_where.' AND status=1', 'int_num, int_period, autodelete, id, status, bandate, user_id, cause');
+        if(!$ban) { return; }
 
         if($this->id){
-            $inDB->query("UPDATE cms_banlist SET ip = '{$this->ip}' WHERE user_id = '{$this->id}'");
+            cmsCore::c('db')->query("UPDATE cms_banlist SET ip = '{$this->ip}' WHERE user_id = '{$this->id}'");
         }
 
-		$interval = $ban['int_num'] . ' ' .$ban['int_period'];
+        $interval = $ban['int_num'] . ' ' .$ban['int_period'];
 
-		// проверяем истек ли срок бана
-		if ($inDB->rows_count('cms_banlist', "id = '{$ban['id']}' AND bandate <= DATE_SUB(NOW(), INTERVAL $interval) AND int_num > 0")){
-			// если истек и флаг автоудаления есть, удаляем
-			if ($ban['autodelete']){
-				$inDB->query("DELETE FROM cms_banlist WHERE id='{$ban['id']}'");
-			} else {
-				$inDB->query("UPDATE cms_banlist SET status=0 WHERE id='{$ban['id']}'");
-			}
+        // проверяем истек ли срок бана
+        if (cmsCore::c('db')->rows_count('cms_banlist', "id = '{$ban['id']}' AND bandate <= DATE_SUB(NOW(), INTERVAL $interval) AND int_num > 0")){
+            // если истек и флаг автоудаления есть, удаляем
+            if ($ban['autodelete']){
+                    cmsCore::c('db')->query("DELETE FROM cms_banlist WHERE id='{$ban['id']}'");
+            } else {
+                cmsCore::c('db')->query("UPDATE cms_banlist SET status=0 WHERE id='{$ban['id']}'");
+            }
 
-		} else {
-			global $_LANG;
-			$ban['bandate'] = cmsCore::dateformat($ban['bandate']);
-			$ban['enddate'] = cmsCore::spellCount($ban['int_num'], $_LANG[$ban['int_period'].'1'], $_LANG[$ban['int_period'].'2'], $_LANG[$ban['int_period'].'10']);
-			cmsPage::includeTemplateFile('special/bantext.php', array('ban' => $ban));
-            $this->logout();
-			cmsCore::halt();
-		}
+        } else {
+            global $_LANG;
+            $ban['bandate'] = cmsCore::dateformat($ban['bandate']);
+            $ban['enddate'] = cmsCore::spellCount($ban['int_num'], $_LANG[$ban['int_period'].'1'], $_LANG[$ban['int_period'].'2'], $_LANG[$ban['int_period'].'10']);
+            cmsPage::includeTemplateFile('special/bantext.php', array('ban' => $ban));
+$this->logout();
+            cmsCore::halt();
+        }
 
     }
 
@@ -280,42 +275,42 @@ class cmsUser {
      * @param int $usr_is_deleted
      * @return str
      */
-	public static function getUserAvatarUrl($user_id, $size='small', $file_name='', $usr_is_deleted=0) {
+    public static function getUserAvatarUrl($user_id, $size='small', $file_name='', $usr_is_deleted=0) {
 
-		// службы обновлений и рассылки
-		if ($user_id == -1) { return '/images/messages/update.jpg';	}
-		if ($user_id == -2) { return '/images/messages/massmail.jpg'; }
+        // службы обновлений и рассылки
+        if ($user_id == -1) { return '/images/messages/update.jpg';	}
+        if ($user_id == -2) { return '/images/messages/massmail.jpg'; }
 
-		// пользователь без аватара
-		if (!$file_name || !file_exists(PATH.'/images/users/avatars/'.$file_name)){
+        // пользователь без аватара
+        if (!$file_name || !file_exists(PATH.'/images/users/avatars/'.$file_name)){
 
-			if ($size == 'small'){
-				return '/images/users/avatars/small/nopic.jpg';
-			} else {
-				return '/images/users/avatars/nopic.jpg';
-			}
+            if ($size == 'small'){
+                return '/images/users/avatars/small/nopic.jpg';
+            } else {
+                return '/images/users/avatars/nopic.jpg';
+            }
 
-		}
+        }
 
-		if($usr_is_deleted){
+        if($usr_is_deleted){
 
-			if ($size == 'small'){
-				return '/images/users/avatars/small/noprofile.jpg';
-			} else {
-				return '/images/users/avatars/noprofile.jpg';
-			}
+            if ($size == 'small'){
+                return '/images/users/avatars/small/noprofile.jpg';
+            } else {
+                return '/images/users/avatars/noprofile.jpg';
+            }
 
-		} else {
+        } else {
 
-			if ($size == 'small'){
-				return '/images/users/avatars/small/'.$file_name;
-			} else {
-				return '/images/users/avatars/'.$file_name;
-			}
+            if ($size == 'small'){
+                return '/images/users/avatars/small/'.$file_name;
+            } else {
+                return '/images/users/avatars/'.$file_name;
+            }
 
-		}
+        }
 
-	}
+    }
 
 // ============================================================================ //
 // ============================================================================ //
@@ -327,27 +322,25 @@ class cmsUser {
      */
     public static function getRating($user_id) {
 
-        $inDB = cmsDatabase::getInstance();
+        $rating = 0;
 
-		$rating = 0;
-
-		$targets = $inDB->get_table('cms_rating_targets', 'is_user_affect = 1 ORDER BY user_weight', 'target, user_weight, target_table');
-		if(!$targets) { return $rating; }
+        $targets = cmsCore::c('db')->get_table('cms_rating_targets', 'is_user_affect = 1 ORDER BY user_weight', 'target, user_weight, target_table');
+        if(!$targets) { return $rating; }
 
         $start_sql = "SELECT SUM( r.total_rating ) AS rating FROM cms_ratings_total r \n";
 
-		foreach($targets as $target){
+        foreach($targets as $target){
 
-			$sql = "INNER JOIN {$target['target_table']} {$target['target']} ON
-					 r.item_id = {$target['target']}.id AND
-					 r.target = '{$target['target']}' AND
-					 {$target['target']}.user_id = '{$user_id}' \n";
+            $sql = "INNER JOIN {$target['target_table']} {$target['target']} ON
+                             r.item_id = {$target['target']}.id AND
+                             r.target = '{$target['target']}' AND
+                             {$target['target']}.user_id = '{$user_id}' \n";
 
-			$result  = $inDB->query($start_sql . $sql);
-			$data    = $inDB->fetch_assoc($result);
-			$rating += (int)@$data['rating'] * (int)$target['user_weight'];
+            $result  = cmsCore::c('db')->query($start_sql . $sql);
+            $data    = cmsCore::c('db')->fetch_assoc($result);
+            $rating += (int)@$data['rating'] * (int)$target['user_weight'];
 
-		}
+        }
 
         return $rating;
 
@@ -363,14 +356,12 @@ class cmsUser {
      */
     public static function getKarma($user_id){
 
-        $inDB = cmsDatabase::getInstance();
-
         $sql = "SELECT SUM(points) as karma FROM cms_user_karma WHERE user_id = '$user_id' GROUP BY user_id";
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-		if (!$inDB->num_rows($result)){ return 0; }
+        if (!cmsCore::c('db')->num_rows($result)){ return 0; }
 
-        $data = $inDB->fetch_assoc($result);
+        $data = cmsCore::c('db')->fetch_assoc($result);
 
         return (int)$data['karma'];
 
@@ -383,23 +374,21 @@ class cmsUser {
      * @param int $from_user_id Кто изменяет карму
      * @return int
      */
-	public static function changeKarmaUser($to_user_id, $points, $from_user_id=0){
+    public static function changeKarmaUser($to_user_id, $points, $from_user_id=0){
 
-		$inDB = cmsDatabase::getInstance();
+        $from_user_id = $from_user_id ? $from_user_id : self::getInstance()->id;
 
-		$from_user_id = $from_user_id ? $from_user_id : self::getInstance()->id;
+        cmsCore::c('db')->query("INSERT INTO cms_user_karma (user_id, sender_id, points, senddate) VALUES ('$to_user_id', '$from_user_id', '$points', NOW())");
 
-		$inDB->query("INSERT INTO cms_user_karma (user_id, sender_id, points, senddate) VALUES ('$to_user_id', '$from_user_id', '$points', NOW())");
+        $user_karma = self::getKarma($to_user_id);
 
-		$user_karma = self::getKarma($to_user_id);
+        cmsCore::c('db')->query("UPDATE cms_user_profiles SET karma = '$user_karma' WHERE user_id = '$to_user_id'");
 
-		$inDB->query("UPDATE cms_user_profiles SET karma = '$user_karma' WHERE user_id = '$to_user_id'");
+        self::checkAwards($to_user_id);
 
-		self::checkAwards($to_user_id);
+        return $user_karma;
 
-		return $user_karma;
-
-	}
+    }
 
 // ============================================================================ //
 // ============================================================================ //
@@ -410,23 +399,21 @@ class cmsUser {
      */
     public static function getBirthdayUsers() {
 
-        $inDB = cmsDatabase::getInstance();
-
-		$today = date("d-m");
+        $today = date("d-m");
 
         $sql = "SELECT u.id as id, u.nickname as nickname, u.login as login, u.birthdate, p.gender as gender
                 FROM cms_users u
 				LEFT JOIN cms_user_profiles p ON p.user_id = u.id
                 WHERE u.is_locked = 0 AND u.is_deleted = 0 AND p.showbirth = 1 AND DATE_FORMAT(u.birthdate, '%d-%m')='$today'";
 
-        $rs     = $inDB->query($sql);
-        $total  = $inDB->num_rows($rs);
+        $rs     = cmsCore::c('db')->query($sql);
+        $total  = cmsCore::c('db')->num_rows($rs);
 
         $now=0; $html = '';
 
         if (!$total){ return false; }
 
-        while($usr = $inDB->fetch_assoc($rs)){
+        while($usr = cmsCore::c('db')->fetch_assoc($rs)){
             $html .= self::getGenderLink($usr['id'], $usr['nickname'], $usr['gender'], $usr['login']);
             if ($now < $total-1) { $html .= ', '; }
             $now ++;
@@ -446,16 +433,14 @@ class cmsUser {
      */
     public static function getUsersList($selected=0, $exclude=array()){
 
-        $inDB   = cmsDatabase::getInstance();
-
         $html   = '';
 
         $sql    = "SELECT id, nickname FROM cms_users WHERE is_locked = 0 AND is_deleted = 0 ORDER BY nickname";
-        $rs     = $inDB->query($sql);
+        $rs     = cmsCore::c('db')->query($sql);
 
-        if (!$inDB->num_rows($rs)){ return; }
+        if (!cmsCore::c('db')->num_rows($rs)){ return; }
 
-        while($u = $inDB->fetch_assoc($rs)){
+        while($u = cmsCore::c('db')->fetch_assoc($rs)){
             if(!in_array($u['id'], $exclude)){
                 if ($selected){
                     if ($u['id'] == $selected){
@@ -486,12 +471,11 @@ class cmsUser {
 
         if (!$authors) { return; }
 
-        $inDB = cmsDatabase::getInstance();
         $html = '';
 
         $sql = "SELECT id, nickname FROM cms_users WHERE ";
 
-		$a_list = implode(',', $authors);
+        $a_list = implode(',', $authors);
 
         if ($a_list){
             $sql .= "id IN ({$a_list})";
@@ -499,10 +483,10 @@ class cmsUser {
             $sql .= '1=0';
         }
 
-        $rs = $inDB->query($sql);
+        $rs = cmsCore::c('db')->query($sql);
 
-        if ($inDB->num_rows($rs)){
-            while($u = $inDB->fetch_assoc($rs)){
+        if (cmsCore::c('db')->num_rows($rs)){
+            while($u = cmsCore::c('db')->fetch_assoc($rs)){
                 if ($selected){
                     if (in_array($u['id'], $selected)){
                         $html .= '<option value="'.$u['id'].'" selected="selected">'.$u['nickname'].'</option>';
@@ -526,31 +510,31 @@ class cmsUser {
      * @param str $dir
      * @return array
      */
-	public static function getAwardsImages($dir = '/images/users/awards'){
+    public static function getAwardsImages($dir = '/images/users/awards'){
 
-		$images = array();
+        $images = array();
 
-		if ($handle = opendir(PATH.$dir)) {
+        if ($handle = opendir(PATH.$dir)) {
 
-			while (false !== ($file = readdir($handle))) {
+            while (false !== ($file = readdir($handle))) {
 
-				if ($file != '.' && $file != '..' && mb_strstr($file, '.gif')){
+                if ($file != '.' && $file != '..' && mb_strstr($file, '.gif')){
 
-					$tag = str_replace('.gif', '', $file);
+                    $tag = str_replace('.gif', '', $file);
 
-					$images[] = htmlspecialchars($tag.'.gif');
+                    $images[] = htmlspecialchars($tag.'.gif');
 
-				}
+                }
 
-			}
+            }
 
-			closedir($handle);
+            closedir($handle);
 
-		}
+        }
 
-		return $images;
+        return $images;
 
-	}
+    }
 
 // ============================================================================ //
 // ============================================================================ //
@@ -563,26 +547,24 @@ class cmsUser {
      */
     public static function getFriendsList($user_id, $selected=0){
 
-        $inDB = cmsDatabase::getInstance();
-
         $html = '';
 
-		$sql = "SELECT
-				CASE
-				WHEN f.from_id = $user_id
-				THEN f.to_id
-				WHEN f.to_id = $user_id
-				THEN f.from_id
-				END AS id, u.nickname as nickname
-                FROM cms_user_friends f
-				LEFT JOIN cms_users u ON u.id = CASE WHEN f.from_id = $user_id THEN f.to_id WHEN f.to_id = $user_id THEN f.from_id END
-				WHERE (from_id = $user_id OR to_id = $user_id) AND is_accepted =1";
+        $sql = "SELECT
+                        CASE
+                        WHEN f.from_id = $user_id
+                        THEN f.to_id
+                        WHEN f.to_id = $user_id
+                        THEN f.from_id
+                        END AS id, u.nickname as nickname
+        FROM cms_user_friends f
+                        LEFT JOIN cms_users u ON u.id = CASE WHEN f.from_id = $user_id THEN f.to_id WHEN f.to_id = $user_id THEN f.from_id END
+                        WHERE (from_id = $user_id OR to_id = $user_id) AND is_accepted =1";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        if ($inDB->num_rows($result)){
+        if (cmsCore::c('db')->num_rows($result)){
 
-            while($friend = $inDB->fetch_assoc($result)){
+            while($friend = cmsCore::c('db')->fetch_assoc($result)){
 
                 if (@$selected==$friend['id']){
                     $s = 'selected';
@@ -607,28 +589,28 @@ class cmsUser {
      */
     public static function isFriend($user_id=0){
 
-		if (!$user_id) { return false; }
+        if (!$user_id) { return false; }
 
-		$my_id = self::getInstance()->id;
-		if (!$my_id) { return false; }
+        $my_id = self::getInstance()->id;
+        if (!$my_id) { return false; }
 
-		$my_friends = cmsUser::getFriends($my_id);
-		if(!$my_friends) { return false; }
+        $my_friends = cmsUser::getFriends($my_id);
+        if(!$my_friends) { return false; }
 
-		$is_friend = false;
+        $is_friend = false;
 
-		foreach($my_friends as $friend){
+        foreach($my_friends as $friend){
 
-			if($friend['id'] == $user_id){
-			   $is_friend = true;
-			   break;
-			}else{
-			   $is_friend = false;
-			}
+            if($friend['id'] == $user_id){
+               $is_friend = true;
+               break;
+            }else{
+               $is_friend = false;
+            }
 
-		}
+        }
 
-		return $is_friend;
+        return $is_friend;
 
     }
 
@@ -641,17 +623,22 @@ class cmsUser {
      */
     public static function addFriend($user_id=0){
 
-		if (!$user_id) { return false; }
+        if (!$user_id) { return false; }
 
         cmsCore::callEvent('ADD_FRIEND', $user_id);
 
-		$my_id = self::getInstance()->id;
-		if (!$my_id) { return false; }
+        $my_id = self::getInstance()->id;
+        if (!$my_id) { return false; }
 
-        return cmsDatabase::getInstance()->insert('cms_user_friends', array('to_id'=>$user_id,
-                                                                            'from_id'=>$my_id,
-                                                                            'logdate'=>date('Y-m-d H:i:s'),
-                                                                            'is_accepted'=>0));
+        return cmsCore::c('db')->insert(
+                'cms_user_friends',
+                array(
+                    'to_id' => $user_id,
+                    'from_id' => $my_id,
+                    'logdate' => date('Y-m-d H:i:s'),
+                    'is_accepted' => 0
+                )
+            );
 
     }
 /* ========================================================================== */
@@ -663,7 +650,7 @@ class cmsUser {
      */
     public static function deleteFriend($user_id=0){
 
-		if (!$user_id) { return false; }
+        if (!$user_id) { return false; }
 
         $friend_field_id = self::getFriendFieldId($user_id);
 
@@ -671,16 +658,16 @@ class cmsUser {
 
             cmsCore::callEvent('DELETE_FRIEND', $user_id);
 
-			cmsDatabase::getInstance()->query("DELETE FROM cms_user_friends WHERE id = '{$friend_field_id}'");
+            cmsCore::c('db')->query("DELETE FROM cms_user_friends WHERE id = '{$friend_field_id}'");
 
-			cmsActions::removeObjectLog('add_friend', $friend_field_id);
-			cmsUser::clearSessionFriends();
+            cmsActions::removeObjectLog('add_friend', $friend_field_id);
+            cmsUser::clearSessionFriends();
 
             return true;
 
         }
 
-		return false;
+        return false;
 
     }
 
@@ -694,10 +681,10 @@ class cmsUser {
      */
     public static function getFriendFieldId($user_id=0, $accepted=false, $to_from=false){
 
-		if (!$user_id) { return false; }
+        if (!$user_id) { return false; }
 
-		$my_id = self::getInstance()->id;
-		if (!$my_id) { return false; }
+        $my_id = self::getInstance()->id;
+        if (!$my_id) { return false; }
 
         if($to_from === false){
 
@@ -722,7 +709,7 @@ class cmsUser {
             $where .= $accepted ? 'AND is_accepted = 1' : 'AND is_accepted = 0';
         }
 
-		return cmsDatabase::getInstance()->get_field('cms_user_friends', $where, 'id');
+        return cmsCore::c('db')->get_field('cms_user_friends', $where, 'id');
 
     }
 
@@ -735,9 +722,9 @@ class cmsUser {
      */
     public static function getFriendsCount($user_id=0){
 
-		if (!$user_id) { return 0; }
+        if (!$user_id) { return 0; }
 
-		return cmsDatabase::getInstance()->rows_count('cms_user_friends', "(from_id = '$user_id' OR to_id = '$user_id') AND is_accepted =1");
+        return cmsCore::c('db')->rows_count('cms_user_friends', "(from_id = '$user_id' OR to_id = '$user_id') AND is_accepted =1");
 
     }
 
@@ -752,19 +739,19 @@ class cmsUser {
      */
     public static function getFriends($user_id=0){
 
-		if(!$user_id) { return array(); }
+        if(!$user_id) { return array(); }
 
         $friends = array();
 
-		// уже полученных друзей отдаем сразу
-		if(isset(self::getInstance()->friends[$user_id])){
-			return self::getInstance()->friends[$user_id];
-		}
+        // уже полученных друзей отдаем сразу
+        if(isset(self::getInstance()->friends[$user_id])){
+            return self::getInstance()->friends[$user_id];
+        }
 
         $is_me = (@$_SESSION['user']['id'] == $user_id);
 
-		//Если список уже в сессии, возвращаем
-		if ($is_me && self::sessionGet('friends') !== false) {
+        //Если список уже в сессии, возвращаем
+        if ($is_me && self::sessionGet('friends') !== false) {
 
             foreach (self::sessionGet('friends') as $key=>$friend) {
                 $friend['flogdate'] = self::getOnlineStatus($friend['id'], $friend['logdate']);
@@ -774,37 +761,35 @@ class cmsUser {
 
         }
 
-		//иначе получаем список из базы, кладем в сессию и возвращаем
-        $inDB = cmsDatabase::getInstance();
+	//иначе получаем список из базы, кладем в сессию и возвращаем
+        $sql = "SELECT
+                        CASE
+                        WHEN f.from_id = $user_id
+                        THEN f.to_id
+                        WHEN f.to_id = $user_id
+                        THEN f.from_id
+                        END AS id, u.nickname as nickname, u.login as login, u.is_deleted, u.status, u.logdate, p.imageurl
+        FROM cms_user_friends f
+                        LEFT JOIN cms_users u ON u.id = CASE WHEN f.from_id = $user_id THEN f.to_id WHEN f.to_id = $user_id THEN f.from_id END
+                        INNER JOIN cms_user_profiles p ON p.user_id = u.id
+                        WHERE (from_id = $user_id OR to_id = $user_id) AND is_accepted =1 ORDER BY u.logdate DESC";
 
-		$sql = "SELECT
-				CASE
-				WHEN f.from_id = $user_id
-				THEN f.to_id
-				WHEN f.to_id = $user_id
-				THEN f.from_id
-				END AS id, u.nickname as nickname, u.login as login, u.is_deleted, u.status, u.logdate, p.imageurl
-                FROM cms_user_friends f
-				LEFT JOIN cms_users u ON u.id = CASE WHEN f.from_id = $user_id THEN f.to_id WHEN f.to_id = $user_id THEN f.from_id END
-				INNER JOIN cms_user_profiles p ON p.user_id = u.id
-				WHERE (from_id = $user_id OR to_id = $user_id) AND is_accepted =1 ORDER BY u.logdate DESC";
+        $result = cmsCore::c('db')->query($sql);
 
-        $result = $inDB->query($sql);
-
-        if ($inDB->num_rows($result)){
-            while($friend = $inDB->fetch_assoc($result)){
-				$friend['avatar']    = self::getUserAvatarUrl($friend['id'], 'small', $friend['imageurl'], $friend['is_deleted']);
-				$friend['is_online'] = self::isOnline($friend['id']);
-				$friend['flogdate']  = self::getOnlineStatus($friend['id'], $friend['logdate']);
-				$friends[$friend['id']] = $friend;
+        if (cmsCore::c('db')->num_rows($result)){
+            while($friend = cmsCore::c('db')->fetch_assoc($result)){
+                $friend['avatar']    = self::getUserAvatarUrl($friend['id'], 'small', $friend['imageurl'], $friend['is_deleted']);
+                $friend['is_online'] = self::isOnline($friend['id']);
+                $friend['flogdate']  = self::getOnlineStatus($friend['id'], $friend['logdate']);
+                $friends[$friend['id']] = $friend;
             }
         }
 
-		// своих друзей кладем в сессию
-		if ($is_me) { self::sessionPut('friends', $friends); }
+        // своих друзей кладем в сессию
+        if ($is_me) { self::sessionPut('friends', $friends); }
 
-		// Запоминаем список друзей пользователя
-		self::getInstance()->friends[$user_id] = $friends;
+        // Запоминаем список друзей пользователя
+        self::getInstance()->friends[$user_id] = $friends;
 
         return $friends;
 
@@ -816,7 +801,7 @@ class cmsUser {
      * Очищает список друзей в сессии
      */
     public static function clearSessionFriends(){
-		self::sessionDel('friends');
+        self::sessionDel('friends');
     }
 
 // ============================================================================ //
@@ -830,17 +815,16 @@ class cmsUser {
      */
     public static function getUserWall($target_id, $component='users', $my_profile=0, $is_admin=0){
 
-        $inDB   = cmsDatabase::getInstance();
         $inUser = self::getInstance();
-
-		cmsCore::loadLanguage('components/'.$component);
+        
+        cmsCore::loadLanguage('components/'.$component);
 
         if(!$my_profile && !$is_admin) { $my_profile = $inUser->is_admin; }
 
         $records = array();
 
         //получаем общее число записей на стене этого пользователя
-        $total = $inDB->rows_count('cms_user_wall', "user_id = '$target_id' AND usertype = '$component'");
+        $total = cmsCore::c('db')->rows_count('cms_user_wall', "user_id = '$target_id' AND usertype = '$component'");
 
         if ($total){
 
@@ -850,16 +834,16 @@ class cmsUser {
 					INNER JOIN cms_user_profiles g ON g.user_id = u.id
                     WHERE w.user_id = '$target_id' AND w.usertype = '$component'
                     ORDER BY w.pubdate DESC\n";
-			if ($inDB->limit){
-				$sql .= "LIMIT {$inDB->limit}";
-			}
+            if (cmsCore::c('db')->limit){
+                    $sql .= "LIMIT ". cmsCore::c('db')->limit;
+            }
 
-            $result = $inDB->query($sql);
-			$inDB->resetConditions();
+            $result = cmsCore::c('db')->query($sql);
+            cmsCore::c('db')->resetConditions();
 
-            while($record = $inDB->fetch_assoc($result)){
+            while($record = cmsCore::c('db')->fetch_assoc($result)){
                 $record['is_today'] = time() - strtotime($record['pubdate']) < 86400;
-				$record['fpubdate'] = $record['is_today'] ? cmsCore::dateDiffNow($record['pubdate']) : cmsCore::dateFormat($record['pubdate']);
+                $record['fpubdate'] = $record['is_today'] ? cmsCore::dateDiffNow($record['pubdate']) : cmsCore::dateFormat($record['pubdate']);
                 $record['avatar']   = cmsUser::getUserAvatarUrl($record['author_id'], 'small', $record['imageurl'], $record['is_deleted']);
                 $records[]          = $record;
             }
@@ -878,7 +862,7 @@ class cmsUser {
                 assign('is_admin', $is_admin)->
                 assign('component', $component)->
                 assign('total', $total)->
-                assign('pagebar', cmsPage::getPagebar($total, $inDB->page, $inDB->perpage, 'javascript:wallPage(%page%)'))->
+                assign('pagebar', cmsPage::getPagebar($total, cmsCore::c('db')->page, cmsCore::c('db')->perpage, 'javascript:wallPage(%page%)'))->
                 display('com_users_wall.tpl');
 
         return ob_get_clean();
@@ -893,29 +877,29 @@ class cmsUser {
      * @param str $allow_who
      * @return bool
      */
-	public static function checkUserContentAccess($allow_who, $user_id){
+    public static function checkUserContentAccess($allow_who, $user_id){
 
-		$access = false;
+        $access = false;
 
         $inUser = self::getInstance();
 
-		// автору показываем всегда
-		if ($inUser->id == $user_id) { return true; }
+        // автору показываем всегда
+        if ($inUser->id == $user_id) { return true; }
 
-		// администраторам показываем всегда
-		if ($inUser->is_admin) { return true; }
+        // администраторам показываем всегда
+        if ($inUser->is_admin) { return true; }
 
-		switch ($allow_who){
-			case 'all':        	$access = true; break;
-			case 'registered': 	$access = $inUser->id ? true : false; break;
-			case 'nobody':      $access = $inUser->id == $user_id ? true : false; break;
-			case 'friends':		$access = $inUser->isFriend($user_id); break;
-			default: $access = false;
-		}
+        switch ($allow_who){
+            case 'all':        	$access = true; break;
+            case 'registered': 	$access = $inUser->id ? true : false; break;
+            case 'nobody':      $access = $inUser->id == $user_id ? true : false; break;
+            case 'friends':		$access = $inUser->isFriend($user_id); break;
+            default: $access = false;
+        }
 
-		return $access;
+        return $access;
 
-	}
+    }
 
 // ============================================================================ //
 // ============================================================================ //
@@ -923,15 +907,15 @@ class cmsUser {
      * Проверяет, голосовал ли пользователь за указанную цель
      * @return int
      */
-	public static function isRateUser($target='', $user_id=0, $item_id=0){
-		// если на входе одноги из параметров нет, считаем, что пользователь голосовал
-		if(!$target || !$user_id || !$item_id) { return true; }
-		// если для этого запроса есть кеш, возвращаем значение из кеша
-		if(isset(self::$cache[$target][$item_id][$user_id])){ return self::$cache[$target][$item_id][$user_id]; }
-		$is_rate = cmsDatabase::getInstance()->rows_count('cms_ratings', "item_id = '$item_id' AND target = '$target' AND user_id = '$user_id'");
-		// возвращаем и кешируем значение
-		return self::$cache[$target][$item_id][$user_id] = $is_rate;
-	}
+    public static function isRateUser($target='', $user_id=0, $item_id=0){
+        // если на входе одноги из параметров нет, считаем, что пользователь голосовал
+        if(!$target || !$user_id || !$item_id) { return true; }
+        // если для этого запроса есть кеш, возвращаем значение из кеша
+        if(isset(self::$cache[$target][$item_id][$user_id])){ return self::$cache[$target][$item_id][$user_id]; }
+        $is_rate = cmsCore::c('db')->rows_count('cms_ratings', "item_id = '$item_id' AND target = '$target' AND user_id = '$user_id'");
+        // возвращаем и кешируем значение
+        return self::$cache[$target][$item_id][$user_id] = $is_rate;
+    }
 
 // ============================================================================ //
 // ============================================================================ //
@@ -943,16 +927,16 @@ class cmsUser {
 
         if (!self::$guest_group_info){
 
-			$data = cmsDatabase::getInstance()->get_fields('cms_user_groups', "alias = 'guest'", 'id, access');
+            $data = cmsCore::c('db')->get_fields('cms_user_groups', "alias = 'guest'", 'id, access');
 
             if ($data){
 
-				$data['group_id'] = $data['id'];
-				$data['access']   = explode(',', str_replace(', ', ',', $data['access']));
-				$data['id']       = 0;
-				$data['ip']       = cmsCore::strClear($_SERVER['REMOTE_ADDR']);
-				$data['is_admin'] = 0;
-				$data['karma']    = -1000000;
+                $data['group_id'] = $data['id'];
+                $data['access']   = explode(',', str_replace(', ', ',', $data['access']));
+                $data['id']       = 0;
+                $data['ip']       = cmsCore::strClear($_SERVER['REMOTE_ADDR']);
+                $data['is_admin'] = 0;
+                $data['karma']    = -1000000;
                 $data['logdate']  = self::getUserLogdate();
                 $data['city']     = '';
                 self::$guest_group_info = cmsCore::callEvent('GET_GUEST', $data);
@@ -963,13 +947,13 @@ class cmsUser {
 
         }
 
-		// если запрашивали конкретное что то, возвращаем если есть
-		// иначе возвращаем массив
-		if($field){
-        	return isset(self::$guest_group_info[$field]) ? self::$guest_group_info[$field] : false;
-		} else {
-			return self::$guest_group_info;
-		}
+        // если запрашивали конкретное что то, возвращаем если есть
+        // иначе возвращаем массив
+        if($field){
+            return isset(self::$guest_group_info[$field]) ? self::$guest_group_info[$field] : false;
+        } else {
+            return self::$guest_group_info;
+        }
 
     }
 // ============================================================================ //
@@ -1008,7 +992,7 @@ class cmsUser {
         }
 
         if($user_id){
-            cmsDatabase::getInstance()->query("UPDATE cms_users SET logdate = CURRENT_TIMESTAMP WHERE id = '$user_id'");
+            cmsCore::c('db')->query("UPDATE cms_users SET logdate = CURRENT_TIMESTAMP WHERE id = '$user_id'");
         }
 
         return true;
@@ -1035,7 +1019,7 @@ class cmsUser {
         $useragent = cmsCore::strClear((string)$_SERVER['HTTP_USER_AGENT']);
         $page      = cmsCore::isAjax() ? '' : cmsCore::strClear((string)$_SERVER['REQUEST_URI']);
 
-        cmsDatabase::getInstance()->
+        cmsCore::c('db')->
                 query("INSERT IGNORE INTO cms_online (ip, sess_id, user_id) VALUES ('{$this->ip}', '$sess_id', '{$this->id}') ON DUPLICATE KEY UPDATE agent = '$useragent', viewurl = '$page'");
 
         // удаляем старые записи
@@ -1051,15 +1035,14 @@ class cmsUser {
      * Удаляет просроченные данные об online пользователях
      */
     public static function clearOnlineUsers() {
-        return cmsDatabase::getInstance()->
-                query("DELETE FROM cms_online WHERE lastdate <= DATE_SUB(NOW(), INTERVAL ".ONLINE_INTERVAL." MINUTE) LIMIT 5");
+        return cmsCore::c('db')->query("DELETE FROM cms_online WHERE lastdate <= DATE_SUB(NOW(), INTERVAL ".ONLINE_INTERVAL." MINUTE) LIMIT 5");
     }
     /**
      * Загружает всех пользователей и гостей кто онлайн
      */
     private function loadOnlineUsers() {
         if(!isset($this->online_users)){
-            $this->online_users = cmsDatabase::getInstance()->get_table('cms_online');
+            $this->online_users = cmsCore::c('db')->get_table('cms_online');
         }
     }
     /**
@@ -1070,19 +1053,19 @@ class cmsUser {
 
         $ou = self::getInstance()->online_users;
 
-		$guests = 0;
-		$online = array();
+        $guests = 0;
+        $online = array();
 
         foreach ($ou as $o) {
-			if ($o['user_id'] == 0 || $o['user_id'] == ''){
-				$guests++;
-			} else {
-				$online[$o['user_id']][] = $o;
-			}
+            if ($o['user_id'] == 0 || $o['user_id'] == ''){
+                $guests++;
+            } else {
+                $online[$o['user_id']][] = $o;
+            }
         }
 
-		$people['guests'] = $guests;
-		$people['users']  = sizeof($online);
+        $people['guests'] = $guests;
+        $people['users']  = sizeof($online);
 
         return $people;
 
@@ -1095,23 +1078,23 @@ class cmsUser {
      */
     public static function getOnlineStatus($user_id, $logdate=''){
 
-		global $_LANG;
+        global $_LANG;
 
-		if (self::isOnline($user_id)){
+        if (self::isOnline($user_id)){
 
-			$status = '<span class="online">'.$_LANG['ONLINE'].'</span>';
+            $status = '<span class="online">'. $_LANG['ONLINE'] .'</span>';
 
-		} else {
+        } else {
 
-			if ($logdate){
+            if ($logdate){
 
-				$status = '<span class="logdate">'.cmsCore::dateDiffNow($logdate).' '.$_LANG['BACK'].'</span>';
+                $status = '<span class="logdate">'. cmsCore::dateDiffNow($logdate) .' '. $_LANG['BACK'] .'</span>';
 
-			} else {
-				$status = '<span class="offline">'.$_LANG['OFFLINE'].'</span>';
-			}
+            } else {
+                $status = '<span class="offline">'. $_LANG['OFFLINE'] .'</span>';
+            }
 
-		}
+        }
 
         return $status;
 
@@ -1123,13 +1106,13 @@ class cmsUser {
      */
     public static function isOnline($user_id){
 
-		if($user_id<=0) { return false; }
+        if($user_id<=0) { return false; }
 
-		$inUser = self::getInstance();
+        $inUser = self::getInstance();
 
-		$online_users = array();
+        $online_users = array();
 
-		if(!isset($inUser->online_users_ids)){
+        if(!isset($inUser->online_users_ids)){
 
             $ou = $inUser->online_users;
             foreach ($ou as $data) {
@@ -1138,11 +1121,11 @@ class cmsUser {
                 }
             }
 
-			$inUser->online_users_ids = $online_users;
+            $inUser->online_users_ids = $online_users;
 
-		} else {
-			$online_users = $inUser->online_users_ids;
-		}
+        } else {
+            $online_users = $inUser->online_users_ids;
+        }
 
         return in_array($user_id, $online_users);
 
@@ -1159,29 +1142,28 @@ class cmsUser {
     public static function getNewMessages($user_id){
 
         $inUser = self::getInstance();
-        $inDB   = cmsDatabase::getInstance();
-
+        
         if($inUser->new_msg) { return $inUser->new_msg; }
 
         $sql    = "SELECT from_id FROM cms_user_msg WHERE to_id = '$user_id' AND to_del = 0 AND is_new = 1";
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-		$messages = 0;
-		$notices  = 0;
+        $messages = 0;
+        $notices  = 0;
 
-        while($o = $inDB->fetch_assoc($result)){
-			if ($o['from_id'] < 0){
-				$notices++;
-			} else {
-				$messages++;
-			}
+        while($o = cmsCore::c('db')->fetch_assoc($result)){
+            if ($o['from_id'] < 0){
+                $notices++;
+            } else {
+                $messages++;
+            }
         }
 
-		$counts['messages'] = $messages;
-		$counts['notices']  = $notices;
-		$counts['total']    = $notices+$messages;
+        $counts['messages'] = $messages;
+        $counts['notices']  = $notices;
+        $counts['total']    = $notices+$messages;
 
-		return $inUser->new_msg = $counts;
+        return $inUser->new_msg = $counts;
 
     }
 
@@ -1194,11 +1176,11 @@ class cmsUser {
      */
     public static function getAwardsList($user_id){
 
-        if(!$user_id){ return array(); }
+        if (!$user_id){ return array(); }
 
-        if(isset(self::$cache['users_awards'][$user_id])) { return self::$cache['users_awards'][$user_id]; }
+        if (isset(self::$cache['users_awards'][$user_id])) { return self::$cache['users_awards'][$user_id]; }
 
-        $aw = cmsDatabase::getInstance()->get_table('cms_user_awards', "user_id = '$user_id'", '*');
+        $aw = cmsCore::c('db')->get_table('cms_user_awards', "user_id = '$user_id'", '*');
 
         return self::$cache['users_awards'][$user_id] = $aw;
 
@@ -1211,9 +1193,7 @@ class cmsUser {
      * @return array
      */
     public static function getAutoAwards(){
-
-        return cmsDatabase::getInstance()->get_table('cms_user_autoawards', "published = 1 ORDER BY title", '*');
-
+        return cmsCore::c('db')->get_table('cms_user_autoawards', "published = 1 ORDER BY title", '*');
     }
 
 // ============================================================================ //
@@ -1226,38 +1206,37 @@ class cmsUser {
      */
     public static function checkAwards($user_id=0){
 
-		if (!$user_id){ return false; }
+        if (!$user_id){ return false; }
 
-        $inDB = cmsDatabase::getInstance();
-
-		$awards = self::getAutoAwards();
+        $awards = self::getAutoAwards();
+        
         if (!$awards){ return false; }
 
-		$p_content   = $inDB->rows_count('cms_content', "user_id='$user_id' AND published = 1");
-		$p_comment   = $inDB->rows_count('cms_comments', "user_id='$user_id' AND published = 1");
-		$p_blog      = $inDB->rows_count('cms_blog_posts', "user_id='$user_id' AND published = 1");
-		$p_forum     = $inDB->rows_count('cms_forum_posts', "user_id='$user_id'");
-		$p_photo     = $inDB->rows_count('cms_photo_files', "user_id='$user_id' AND published = 1");
-		$p_privphoto = $inDB->rows_count('cms_user_photos', "user_id='$user_id'");
-		$p_karma     = $inDB->get_field('cms_user_profiles', "user_id='$user_id'", 'karma');
+        $p_content   = cmsCore::c('db')->rows_count('cms_content', "user_id='$user_id' AND published = 1");
+        $p_comment   = cmsCore::c('db')->rows_count('cms_comments', "user_id='$user_id' AND published = 1");
+        $p_blog      = cmsCore::c('db')->rows_count('cms_blog_posts', "user_id='$user_id' AND published = 1");
+        $p_forum     = cmsCore::c('db')->rows_count('cms_forum_posts', "user_id='$user_id'");
+        $p_photo     = cmsCore::c('db')->rows_count('cms_photo_files', "user_id='$user_id' AND published = 1");
+        $p_privphoto = cmsCore::c('db')->rows_count('cms_user_photos', "user_id='$user_id'");
+        $p_karma     = cmsCore::c('db')->get_field('cms_user_profiles', "user_id='$user_id'", 'karma');
 
-		foreach ($awards as $award) {
+        foreach ($awards as $award) {
 
-			if ($inDB->rows_count('cms_user_awards', "user_id = '$user_id' AND award_id = '{$award['id']}'")) { continue; }
+            if (cmsCore::c('db')->rows_count('cms_user_awards', "user_id = '$user_id' AND award_id = '{$award['id']}'")) { continue; }
 
-			$granted = ($award['p_content'] <= $p_content) &&
-					   ($award['p_comment'] <= $p_comment) &&
-					   ($award['p_blog'] <= $p_blog) &&
-					   ($award['p_forum'] <= $p_forum) &&
-					   ($award['p_photo'] <= $p_photo) &&
-					   ($award['p_privphoto'] <= $p_privphoto) &&
-					   ($award['p_karma'] <= $p_karma);
+            $granted = ($award['p_content'] <= $p_content) &&
+                               ($award['p_comment'] <= $p_comment) &&
+                               ($award['p_blog'] <= $p_blog) &&
+                               ($award['p_forum'] <= $p_forum) &&
+                               ($award['p_photo'] <= $p_photo) &&
+                               ($award['p_privphoto'] <= $p_privphoto) &&
+                               ($award['p_karma'] <= $p_karma);
 
-			if (!$granted){ continue; }
+            if (!$granted){ continue; }
 
-			self::giveAward($award, $user_id);
+            self::giveAward($award, $user_id);
 
-		}
+        }
 
         return true;
     }
@@ -1273,37 +1252,36 @@ class cmsUser {
      */
     public static function giveAward($award, $user_id){
 
-		if(!$award || !$user_id) { return false; }
+        if(!$award || !$user_id) { return false; }
 
         global $_LANG;
 
-        $inDB = cmsDatabase::getInstance();
-
-		$user = self::getShortUserData($user_id);
+        $user = self::getShortUserData($user_id);
         if(!$user){ return false; }
 
         if(!file_exists(PATH.'/images/users/awards/'.$award['imageurl'])){ return false; }
 
-        $award = $inDB->escape_string($award);
+        $award = cmsCore::c('db')->escape_string($award);
 
-		$sql = "INSERT INTO cms_user_awards (user_id, pubdate, title, description, imageurl, from_id, award_id)
-				VALUES ('$user_id', NOW(), '{$award['title']}', '{$award['description']}', '{$award['imageurl']}', '{$award['from_id']}', '{$award['id']}')";
-		$inDB->query($sql);
-		$award_id = $inDB->get_last_id('cms_user_awards');
+        $sql = "INSERT INTO cms_user_awards (user_id, pubdate, title, description, imageurl, from_id, award_id)
+                        VALUES ('$user_id', NOW(), '{$award['title']}', '{$award['description']}', '{$award['imageurl']}', '{$award['from_id']}', '{$award['id']}')";
+        cmsCore::c('db')->query($sql);
+        $award_id = cmsCore::c('db')->get_last_id('cms_user_awards');
 
         if(!$award_id){ return false; }
 
-		cmsActions::log('add_award', array(
-				'object' => '"'.$award['title'].'"',
-				'user_id' => $user_id,
-				'object_url' => '',
-				'object_id' => $award['id'],
-				'target' => '',
-				'target_url' => '',
-				'target_id' => 0,
-				'description' => '<img src="/images/users/awards/'.$award['imageurl'].'" border="0" alt="'.htmlspecialchars($award['description']).'">'
-		));
-		self::sendMessage(USER_UPDATER, $user_id, '<b>'.$_LANG['RECEIVED_AWARD'].':</b> <a href="'.cmsUser::getProfileURL($user['login']).'#upr_awards">'.$award['title'].'</a>');
+        cmsActions::log('add_award', array(
+                        'object' => '"'.$award['title'].'"',
+                        'user_id' => $user_id,
+                        'object_url' => '',
+                        'object_id' => $award['id'],
+                        'target' => '',
+                        'target_url' => '',
+                        'target_id' => 0,
+                        'description' => '<img src="/images/users/awards/'.$award['imageurl'].'" border="0" alt="'.htmlspecialchars($award['description']).'">'
+        ));
+
+        self::sendMessage(USER_UPDATER, $user_id, '<b>'.$_LANG['RECEIVED_AWARD'].':</b> <a href="'.cmsUser::getProfileURL($user['login']).'#upr_awards">'.$award['title'].'</a>');
 
         return cmsCore::callEvent('GIVE_AWARD', $award_id);
 
@@ -1320,15 +1298,13 @@ class cmsUser {
      */
     public static function sendMessage($sender_id, $receiver_id, $message){
 
-        $inDB = cmsDatabase::getInstance();
-
-        $message = $inDB->escape_string($message);
+        $message = cmsCore::c('db')->escape_string($message);
 
         $sql = "INSERT INTO cms_user_msg (to_id, from_id, senddate, is_new, message)
                 VALUES ('$receiver_id', '$sender_id', NOW(), 1, '$message')";
-        $inDB->query($sql);
+        cmsCore::c('db')->query($sql);
 
-        $msg_id = $inDB->get_last_id('cms_user_msg');
+        $msg_id = cmsCore::c('db')->get_last_id('cms_user_msg');
 
         return $msg_id ? $msg_id : false;
 
@@ -1345,9 +1321,9 @@ class cmsUser {
      */
     public static function sendMessages($sender_id, $receiver_ids, $message){
 
-		if(!is_array($receiver_ids) || !$receiver_ids) { return false; }
+        if (!is_array($receiver_ids) || !$receiver_ids) { return false; }
 
-		$msg = array();
+        $msg = array();
 
         foreach ($receiver_ids as $receiver_id){
             $msg[] = self::sendMessage($sender_id, $receiver_id, $message);
@@ -1366,26 +1342,26 @@ class cmsUser {
      */
     public static function sendMessageToGroup($sender_id, $group, $message){
 
-		// если отсылаем нескольким группам
-		if(is_array($group)){
+        // если отсылаем нескольким группам
+        if(is_array($group)){
 
-			$count = 0;
+            $count = 0;
 
-			foreach ($group as $group_id){
-				$count += self::sendMessageToGroup($sender_id, $group_id, $message);
-			}
+            foreach ($group as $group_id){
+                $count += self::sendMessageToGroup($sender_id, $group_id, $message);
+            }
 
-		} else { // отсылаем одной группе
+        } else { // отсылаем одной группе
 
-			// получаем участников групппы
-			$user_list = self::getGroupMembers($group);
-			if(!$user_list) { return false; }
-			// получаем id пользователей
-			$user_ids  = array_keys($user_list);
+            // получаем участников групппы
+            $user_list = self::getGroupMembers($group);
+            if(!$user_list) { return false; }
+            // получаем id пользователей
+            $user_ids  = array_keys($user_list);
 
-			return self::sendMessages($sender_id, $user_ids, $message);
+            return self::sendMessages($sender_id, $user_ids, $message);
 
-		}
+        }
 
         return $count;
 
@@ -1403,7 +1379,7 @@ class cmsUser {
      */
     public static function isSubscribed($user_id, $target, $target_id){
         if(!$user_id){ return false; }
-        return (bool)cmsDatabase::getInstance()->rows_count('cms_subscribe', "user_id = '$user_id' AND target = '$target' AND target_id = '$target_id'");
+        return (bool)cmsCore::c('db')->rows_count('cms_subscribe', "user_id = '$user_id' AND target = '$target' AND target_id = '$target_id'");
     }
 
 // ============================================================================ //
@@ -1418,16 +1394,15 @@ class cmsUser {
      * @return bool
      */
     public static function subscribe($user_id, $target, $target_id, $subscribe=true){
-        $inDB = cmsDatabase::getInstance();
         if ($subscribe){
-            if (!$inDB->rows_count('cms_subscribe', "user_id = '$user_id' AND target = '$target' AND target_id = '$target_id'")){
+            if (!cmsCore::c('db')->rows_count('cms_subscribe', "user_id = '$user_id' AND target = '$target' AND target_id = '$target_id'")){
                 $sql = "INSERT INTO cms_subscribe (user_id, target, target_id, pubdate)
                         VALUES ('{$user_id}', '{$target}', '{$target_id}', NOW())";
-                $inDB->query($sql) ;
+                cmsCore::c('db')->query($sql) ;
             }
         } else {
             $sql = "DELETE FROM cms_subscribe WHERE user_id = '$user_id' AND target = '$target' AND target_id = '$target_id'";
-            $inDB->query($sql) ;
+            cmsCore::c('db')->query($sql) ;
         }
         return true;
     }
@@ -1448,21 +1423,20 @@ class cmsUser {
         global $_LANG;
 
         $inUser = self::getInstance();
-        $inDB   = cmsDatabase::getInstance();
-
+        
         //получаем список подписанных пользователей
         $sql = "SELECT u.id, u.email, p.cm_subscribe as subscribe_type
                 FROM cms_subscribe s
                 INNER JOIN cms_users u ON u.id = s.user_id
                 INNER JOIN cms_user_profiles p ON p.user_id = u.id
                 WHERE s.target = '{$target}' AND s.target_id = '{$target_id}'";
-        $r = $inDB->query($sql);
-        if (!$inDB->num_rows($r)){ return false; }
+        $r = cmsCore::c('db')->query($sql);
+        if (!cmsCore::c('db')->num_rows($r)){ return false; }
 
         $letter = cmsCore::getLanguageTextFile($item['letter_file']);
         if(!$letter){ return false; }
 
-        while ($user = $inDB->fetch_assoc($r)){
+        while ($user = cmsCore::c('db')->fetch_assoc($r)){
 
             if ($user['id'] == $inUser->id) { continue; }
 
@@ -1500,14 +1474,12 @@ class cmsUser {
      */
     public static function getGenderLink($user_id, $nickname='', $gender='', $login='', $css_style=''){
 
-        $inDB = cmsDatabase::getInstance();
-
         if (!$gender){
-            $gender = $inDB->get_field('cms_user_profiles', "user_id = '$user_id'", 'gender');
+            $gender = cmsCore::c('db')->get_field('cms_user_profiles', "user_id = '$user_id'", 'gender');
         }
 
         if (!$nickname || !$login){
-            $user = $inDB->get_fields('cms_users', "id = '$user_id'", 'nickname, login');
+            $user = cmsCore::c('db')->get_fields('cms_users', "id = '$user_id'", 'nickname, login');
             $nickname   = $user['nickname'];
             $login      = $user['login'];
         }
@@ -1545,11 +1517,9 @@ class cmsUser {
      * Запоминает текущий URI в сессии и перенаправляет пользователя на форму логина
      */
     public static function goToLogin(){
-
-		self::sessionPut('auth_back_url', cmsCore::strClear($_SERVER['REQUEST_URI']));
+        self::sessionPut('auth_back_url', cmsCore::strClear($_SERVER['REQUEST_URI']));
 
         cmsCore::redirect('/login');
-
     }
 
 // ============================================================================ //
@@ -1598,7 +1568,7 @@ class cmsUser {
     /**
      * Формирует и возвращает csrf токен
      */
-	public static function getCsrfToken(){
+    public static function getCsrfToken(){
 
         if(!self::$csrf_token){
 
@@ -1619,17 +1589,17 @@ class cmsUser {
             self::$csrf_token = $token;
         }
 
-		return self::$csrf_token;
+        return self::$csrf_token;
 
-	}
+    }
     /**
      * Проверяет csrf токен
      * Рекомендуется проверять токен в самую последнюю очередь,
      * после всех проверок входных данных
      */
-	public static function checkCsrfToken(){
+    public static function checkCsrfToken(){
 
-        if(isset($_POST['csrf_token'])) {
+        if (isset($_POST['csrf_token'])) {
 
             $tokens = self::sessionGet('csrf_tokens', 'security');
 
@@ -1637,7 +1607,7 @@ class cmsUser {
 
                 $key = array_search($_POST['csrf_token'], $tokens, true);
 
-                if($key !== false){
+                if ($key !== false){
                     unset($tokens[$key]);
                     ksort($tokens);
                     self::sessionPut('csrf_tokens', $tokens, 'security');
@@ -1650,13 +1620,13 @@ class cmsUser {
 
         return false;
 
-	}
+    }
     /**
      * ====== DEPRECATED =========
      */
-	public static function clearCsrfToken(){
-		return true;
-	}
+    public static function clearCsrfToken(){
+        return true;
+    }
 // ============================================================================ //
 // ============================================================================ //
 
@@ -1665,9 +1635,7 @@ class cmsUser {
      * @return array
      */
     public static function getAllUsers(){
-
-        return cmsDatabase::getInstance()->get_table('cms_users', 'id > 0 AND is_locked = 0 AND is_deleted = 0');
-
+        return cmsCore::c('db')->get_table('cms_users', 'id > 0 AND is_locked = 0 AND is_deleted = 0');
     }
 
     /**
@@ -1675,9 +1643,7 @@ class cmsUser {
      * @return int
      */
     public static function getCountAllUsers(){
-
-        return cmsDatabase::getInstance()->rows_count('cms_users', 'id > 0 AND is_locked=0 AND is_deleted=0');;
-
+        return cmsCore::c('db')->rows_count('cms_users', 'id > 0 AND is_locked=0 AND is_deleted=0');;
     }
 
     /**
@@ -1686,12 +1652,11 @@ class cmsUser {
      * @return array
      */
     public static function getShortUserData($id='') {
-
         if(!$id){ return false; }
 
         $inUser = self::getInstance();
 
-		// для текущего юзера смысла данные из базы брать нет
+	// для текущего юзера смысла данные из базы брать нет
         if ($inUser->id && in_array($id, array($inUser->login, $inUser->id))) {
             return get_object_vars($inUser);
         }
@@ -1708,8 +1673,7 @@ class cmsUser {
             }
         }
 
-        return self::$cache['get_short_user'][$id] = cmsDatabase::getInstance()->get_fields('cms_users', $where, '*', 'id DESC');
-
+        return self::$cache['get_short_user'][$id] = cmsCore::c('db')->get_fields('cms_users', $where, '*', 'id DESC');
     }
 
     /**
@@ -1717,21 +1681,17 @@ class cmsUser {
      * @return array
      */
     public static function getAdminGroups(){
-
-		$inDB = cmsDatabase::getInstance();
-
         $groups = array();
 
-        $result = $inDB->query("SELECT id FROM cms_user_groups WHERE is_admin = 1");
+        $result = cmsCore::c('db')->query("SELECT id FROM cms_user_groups WHERE is_admin = 1");
 
-        if ($inDB->num_rows($result)){
-            while($group = $inDB->fetch_assoc($result)){
+        if (cmsCore::c('db')->num_rows($result)){
+            while($group = cmsCore::c('db')->fetch_assoc($result)){
 				$groups[] = $group['id'];
             }
         }
 
         return $groups;
-
     }
 
     /**
@@ -1740,9 +1700,7 @@ class cmsUser {
      * @return int
      */
     public static function getGroupIdByUserId($user_id){
-
-        return cmsDatabase::getInstance()->get_field('cms_users', "id='{$user_id}'", 'group_id');
-
+        return cmsCore::c('db')->get_field('cms_users', "id='{$user_id}'", 'group_id');
     }
 
     /**
@@ -1751,9 +1709,7 @@ class cmsUser {
      * @return str
      */
     public static function getGroupTitle($group_id){
-
-        return cmsDatabase::getInstance()->get_field('cms_user_groups', "id='{$group_id}'", 'title');
-
+        return cmsCore::c('db')->get_field('cms_user_groups', "id='{$group_id}'", 'title');
     }
 
     /**
@@ -1762,9 +1718,6 @@ class cmsUser {
      * @return array
      */
     public static function getGroups($no_guests=false){
-
-        $inDB = cmsDatabase::getInstance();
-
         $groups = array();
 
         $sql = "SELECT id, title, alias, is_admin, access
@@ -1776,16 +1729,15 @@ class cmsUser {
 
         $sql .= "ORDER BY is_admin ASC";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        if ($inDB->num_rows($result)){
-            while($group = $inDB->fetch_assoc($result)){
+        if (cmsCore::c('db')->num_rows($result)){
+            while($group = cmsCore::c('db')->fetch_assoc($result)){
 				$groups[] = $group;
             }
         }
 
         return $groups;
-
     }
 
     /**
@@ -1794,25 +1746,21 @@ class cmsUser {
      * @return array
      */
     public static function getGroupMembers($group_id){
-
-        $inDB = cmsDatabase::getInstance();
-
         $users = array();
 
         $sql = "SELECT id, nickname, login
                 FROM cms_users
 				WHERE group_id='{$group_id}' AND is_deleted=0";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        if ($inDB->num_rows($result)){
-            while($user = $inDB->fetch_assoc($result)){
+        if (cmsCore::c('db')->num_rows($result)){
+            while($user = cmsCore::c('db')->fetch_assoc($result)){
 				$users[$user['id']] = $user;
             }
         }
 
         return $users;
-
     }
 
     /**
@@ -1821,9 +1769,7 @@ class cmsUser {
      * @return bool
      */
     public static function deleteGroupAccessType($access_type=''){
-
-        return cmsDatabase::getInstance()->query("DELETE FROM cms_user_groups_access WHERE access_type = '{$access_type}'");
-
+        return cmsCore::c('db')->query("DELETE FROM cms_user_groups_access WHERE access_type = '{$access_type}'");
     }
 
     /**
@@ -1833,12 +1779,12 @@ class cmsUser {
      * @return bool
      */
     public static function registerGroupAccessType($access_type='', $access_name='', $hide_for_guest=0){
-        if(!$access_type || !$access_name) { return false; }
+        if (!$access_type || !$access_name) { return false; }
 
         $sql  = "INSERT IGNORE INTO cms_user_groups_access (access_type, access_name, hide_for_guest) 
  		    VALUES ('$access_type', '$access_name', '$hide_for_guest')";
 
-        return cmsDatabase::getInstance()->query($sql);
+        return cmsCore::c('db')->query($sql);
     }
 
 // ============================================================================ //
@@ -1852,85 +1798,80 @@ class cmsUser {
      * @return srt $back_url
      */
     public function signInUser($login = '', $passw = '', $remember_pass = 1, $pass_in_md5 = 0){
+        if ($this->id) { return cmsCore::getBackURL(); }
 
-        if($this->id) { return cmsCore::getBackURL(); }
+        $default_back_url = '/auth/error.html';
 
-		$default_back_url = '/auth/error.html';
+        if(!$login || !$passw) { return $default_back_url; }
 
-		if(!$login || !$passw) { return $default_back_url; }
+        $inCore = cmsCore::getInstance();
 
-        $inDB   = cmsDatabase::getInstance();
-		$inCore = cmsCore::getInstance();
+        // Авторизация по логину или e-mail
+        if (!preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $login)){
+                $where_login = "u.login = '{$login}'";
+        } else {
+                $where_login = "u.email = '{$login}'";
+        }
+        $where_pass = $pass_in_md5 ? "u.password = '$passw'" : "u.password = md5('$passw')";
 
-		// Авторизация по логину или e-mail
-		if (!preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $login)){
-			$where_login = "u.login = '{$login}'";
-		} else {
-			$where_login = "u.email = '{$login}'";
-		}
-		$where_pass = $pass_in_md5 ? "u.password = '$passw'" : "u.password = md5('$passw')";
+        // Проверяем локальную пару логин + пароль
+        $user = $this->loadUser(0, "$where_login AND $where_pass");
+        // иначе пытаемся авторизоваться через плагины
+        if(!$user) {
+                $user = cmsCore::callEvent('SIGNIN_USER', array('login'=>$login,'pass'=>$passw));
+        }
 
-		// Проверяем локальную пару логин + пароль
-		$user = $this->loadUser(0, "$where_login AND $where_pass");
-		// иначе пытаемся авторизоваться через плагины
-		if(!$user) {
-			$user = cmsCore::callEvent('SIGNIN_USER', array('login'=>$login,'pass'=>$passw));
-		}
+        if(!$user) { return $default_back_url; }
 
-		if(!$user) { return $default_back_url; }
+        $_SESSION['user'] = $user;
 
-		$_SESSION['user'] = $user;
+        cmsCore::callEvent('USER_LOGIN', $_SESSION['user']);
 
-		cmsCore::callEvent('USER_LOGIN', $_SESSION['user']);
+        if ($remember_pass){
+                $cookie_code = md5($user['id'] . $user['password']);
+                cmsCore::setCookie('userid', $cookie_code, time()+60*60*24*30);
+        }
 
-		if ($remember_pass){
-			$cookie_code = md5($user['id'] . $user['password']);
-			cmsCore::setCookie('userid', $cookie_code, time()+60*60*24*30);
-		}
-
-		// Флаг первой авторизации
-		$first_time_auth = !$user['is_logged_once'];
-		// обновляем дату последнего визита, ip
+        // Флаг первой авторизации
+        $first_time_auth = !$user['is_logged_once'];
+        // обновляем дату последнего визита, ip
         self::setUserLogdate($user['id']);
-		$inDB->query("UPDATE cms_users SET last_ip = '{$this->ip}', is_logged_once = 1 WHERE id = '{$user['id']}'");
+        cmsCore::c('db')->query("UPDATE cms_users SET last_ip = '{$this->ip}', is_logged_once = 1 WHERE id = '{$user['id']}'");
         // помечаем, что пользователь онлайн
-		$inDB->query("UPDATE cms_online SET user_id = '{$user['id']}' WHERE sess_id = '".session_id()."'");
+        cmsCore::c('db')->query("UPDATE cms_online SET user_id = '{$user['id']}' WHERE sess_id = '".session_id()."'");
 
-		//////////////  юзер уже авторизован //////////////////////////
+        //////////////  юзер уже авторизован //////////////////////////
 
-		// Формируем url редиректа после авторизации
-		// Получаем настройки что делать после авторизации
-		$cfg = $inCore->loadComponentConfig('registration');
+        // Формируем url редиректа после авторизации
+        // Получаем настройки что делать после авторизации
+        $cfg = $inCore->loadComponentConfig('registration');
 
-		// Получаем URL, предыдущий перед формой логина
-		$auth_back_url = cmsUser::sessionGet('auth_back_url');
-		$auth_back_url = $auth_back_url ? $auth_back_url : cmsCore::getBackURL();
+        // Получаем URL, предыдущий перед формой логина
+        $auth_back_url = cmsUser::sessionGet('auth_back_url');
+        $auth_back_url = $auth_back_url ? $auth_back_url : cmsCore::getBackURL();
         if(!mb_strstr($auth_back_url, str_replace('http://', '', HOST))) { $auth_back_url = '/'; }
-		cmsUser::sessionDel('auth_back_url');
+        cmsUser::sessionDel('auth_back_url');
 
-		// Авторизация в админку
-		if($_SESSION['user']['is_admin'] && cmsCore::inRequest('is_admin')){
+        // Авторизация в админку
+        if ($_SESSION['user']['is_admin'] && cmsCore::inRequest('is_admin')){
             return '/admin/';
-		}
+        }
 
-		// Остальные пользователи
-		if($_SESSION['user']['id']){
+        // Остальные пользователи
+        if ($_SESSION['user']['id']){
+            if ($first_time_auth) { $cfg['auth_redirect'] = $cfg['first_auth_redirect']; }
 
-			if ($first_time_auth) { $cfg['auth_redirect'] = $cfg['first_auth_redirect']; }
+            switch ($cfg['auth_redirect']){
+                case 'none':        $url = $auth_back_url; break;
+                case 'index':       $url = '/'; break;
+                case 'profile':     $url = cmsUser::getProfileURL($user['login']); break;
+                case 'editprofile': $url = '/users/'.$user['id'].'/editprofile.html'; break;
+            }
 
-			switch($cfg['auth_redirect']){
-				case 'none':        $url = $auth_back_url; break;
-				case 'index':       $url = '/'; break;
-				case 'profile':     $url = cmsUser::getProfileURL($user['login']); break;
-				case 'editprofile': $url = '/users/'.$user['id'].'/editprofile.html'; break;
-			}
-
-			return $url;
-
-		}
+            return $url;
+        }
 
         return $default_back_url;
-
     }
 
 // ============================================================================ //
@@ -1940,22 +1881,18 @@ class cmsUser {
      * @return bool
      */
     public function logout(){
+        cmsCore::unsetCookie('userid');
 
-		$inDB = cmsDatabase::getInstance();
+        $sess_id = session_id();
 
-		cmsCore::unsetCookie('userid');
-
-		$sess_id = session_id();
-
-		cmsCore::callEvent('USER_LOGOUT', $this->id);
+        cmsCore::callEvent('USER_LOGOUT', $this->id);
 
         self::setUserLogdate($this->id);
-		$inDB->query("DELETE FROM cms_online WHERE user_id = '{$this->id}'");
-		$inDB->query("DELETE FROM cms_search WHERE session_id = '$sess_id'");
+        cmsCore::c('db')->query("DELETE FROM cms_online WHERE user_id = '{$this->id}'");
+        cmsCore::c('db')->query("DELETE FROM cms_search WHERE session_id = '$sess_id'");
 
-		session_destroy();
-
-	}
+        session_destroy();
+    }
 
 // ============================================================================ //
 // ============================================================================ //
@@ -1965,23 +1902,17 @@ class cmsUser {
      * @return bool
      */
     public static function userIsAdmin($user_id){
-
         if (!$user_id) { return false; }
 
         $inUser = self::getInstance();
 
         if ($user_id == $inUser->id){
-
             return $inUser->is_admin;
-
         } else {
-
-			if(isset(self::$cache['is_admin'][$user_id])){ return self::$cache['is_admin'][$user_id]; }
-			$is_admin = cmsDatabase::getInstance()->get_field('cms_users u LEFT JOIN cms_user_groups g ON g.id = u.group_id', "u.id = '$user_id'", 'g.is_admin');
-			return self::$cache['is_admin'][$user_id] = $is_admin;
-
+            if(isset(self::$cache['is_admin'][$user_id])){ return self::$cache['is_admin'][$user_id]; }
+            $is_admin = cmsCore::c('db')->get_field('cms_users u LEFT JOIN cms_user_groups g ON g.id = u.group_id', "u.id = '$user_id'", 'g.is_admin');
+            return self::$cache['is_admin'][$user_id] = $is_admin;
         }
-
     }
 
 // ============================================================================ //
@@ -1994,26 +1925,26 @@ class cmsUser {
      */
     public static function userIsEditor($userid=0){
 
-		$inUser = self::getInstance();
+        $inUser = self::getInstance();
 
-		// если проверяем текущего пользователя
-		if(!$userid || $userid == $inUser->id){
+        // если проверяем текущего пользователя
+        if (!$userid || $userid == $inUser->id){
 
-			if(!$inUser->id) { return false; }
+            if(!$inUser->id) { return false; }
 
-			$group_id = $inUser->group_id;
+            $group_id = $inUser->group_id;
 
-		} elseif($userid) {
+        } elseif($userid) {
 
-			$group_id = self::getGroupIdByUserId($userid);
+            $group_id = self::getGroupIdByUserId($userid);
 
-		}
+        }
 
-		if(!@$group_id) { return false; }
+        if (!@$group_id) { return false; }
 
-		$cat = cmsDatabase::getInstance()->get_table('cms_category', "modgrp_id = '{$group_id}'", 'id');
+        $cat = cmsCore::c('db')->get_table('cms_category', "modgrp_id = '{$group_id}'", 'id');
 
-		return $cat ? $cat : false;
+        return $cat ? $cat : false;
 
     }
 
@@ -2027,9 +1958,9 @@ class cmsUser {
 
         $inUser = self::getInstance();
 
-		if($inUser->id) { return $inUser->access; }
+        if($inUser->id) { return $inUser->access; }
 
-		$access = cmsDatabase::getInstance()->get_field('cms_user_groups', "id = '{$inUser->group_id}'", 'access');
+        $access = cmsCore::c('db')->get_field('cms_user_groups', "id = '{$inUser->group_id}'", 'access');
 
         if ($access){
             $access = str_replace(', ', ',', $access);
@@ -2055,7 +1986,7 @@ class cmsUser {
 
         if (!$inUser->is_admin){ return false; }
 
-        if($inUser->id==1) { return true; }
+        if ($inUser->id==1) { return true; }
 
         if (in_array($access_type, $access_list)){ return true; }
 
@@ -2085,5 +2016,3 @@ class cmsUser {
 // ============================================================================ //
 
 }
-
-?>

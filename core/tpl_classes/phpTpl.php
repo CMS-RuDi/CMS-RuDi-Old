@@ -14,7 +14,6 @@
  * Пример класса для работы с php шаблонами
  */
 class phpTpl{
-
     private $tpl_vars   = array();
     private $tpl_folder;
     private $tpl_file;
@@ -29,18 +28,16 @@ class phpTpl{
      * параметр $tpl_file оставлен для совместимости
      */
     public function display($tpl_file){
-
         global $_LANG;
+        
         extract($this->tpl_vars);
 
         include(TEMPLATE_DIR . $this->tpl_folder.'/'.$this->tpl_file);
-
     }
     /**
      * Добавляет переменную в набор
      */
     public function assign($tpl_var, $value){
-
         if (is_array($tpl_var)){
             foreach ($tpl_var as $key => $val) {
                 if ($key) {
@@ -54,7 +51,6 @@ class phpTpl{
         }
 
         return $this;
-
     }
 
 }

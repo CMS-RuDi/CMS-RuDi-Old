@@ -12,7 +12,6 @@
 /******************************************************************************/
 
 class cmsUploadPhoto {
-
     private static $instance;
 
     public $upload_dir    = '';		// директория загрузки
@@ -128,16 +127,16 @@ class cmsUploadPhoto {
      * Удаляет файл фото с папок загрузки
      * @return bool
      */
-	public function deletePhotoFile($file=''){
+    public function deletePhotoFile($file=''){
 
-		if (!($file && $this->upload_dir)) { return false; }
+        if (!($file && $this->upload_dir)) { return false; }
 
-		@chmod($this->upload_dir . $file, 0777);
-		@unlink($this->upload_dir . $file);
-		@chmod($this->upload_dir . $this->dir_small . $file, 0777);
-		@unlink($this->upload_dir . $this->dir_small . $file);
-		@chmod($this->upload_dir . $this->dir_medium . $file, 0777);
-		@unlink($this->upload_dir . $this->dir_medium . $file);
+        @chmod($this->upload_dir . $file, 0777);
+        @unlink($this->upload_dir . $file);
+        @chmod($this->upload_dir . $this->dir_small . $file, 0777);
+        @unlink($this->upload_dir . $this->dir_small . $file);
+        @chmod($this->upload_dir . $this->dir_medium . $file, 0777);
+        @unlink($this->upload_dir . $this->dir_medium . $file);
 
         return true;
 
@@ -145,4 +144,3 @@ class cmsUploadPhoto {
 // ============================================================================ //
 
 }
-?>

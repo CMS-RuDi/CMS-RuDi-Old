@@ -121,46 +121,40 @@ function showIns(){
 }
 
 function insertTag(kind){
-	var oEditor = FCKeditorAPI.GetInstance('content') ;
+    var text = '';
 
-	var text = '';
+    if (kind=='material'){
+        text = '{МАТЕРИАЛ=' + document.addform.m.options[document.addform.m.selectedIndex].text + '}';
+    }
+    if (kind=='photo'){
+        text = '{ФОТО=' + document.addform.f.options[document.addform.f.selectedIndex].text + '}';
+    }
+    if (kind=='album'){
+        text = '{АЛЬБОМ=' + document.addform.a.options[document.addform.a.selectedIndex].text + '}';
+    }
+    if (kind=='frm'){
+        text = '{ФОРМА=' + document.addform.fm.options[document.addform.fm.selectedIndex].text + '}';
+    }
+    if (kind=='blank'){
+        text = '{БЛАНК=' + document.addform.b.options[document.addform.b.selectedIndex].text + '}';
+    }
+    if (kind=='include'){
+        text = '{ФАЙЛ=' + document.addform.i.value + '}';
+    }
+    if (kind=='filelink'){
+        text = '{СКАЧАТЬ=' + document.addform.fl.value + '}';
+    }
+    if (kind=='banpos'){
+        text = '{БАННЕР=' + document.addform.ban.value + '}';
+    }
+    if (kind=='pagebreak'){
+        text = '{pagebreak}';
+    }
+    if (kind=='pagetitle'){
+        text = '{СТРАНИЦА=' + document.addform.ptitle.value + '}';
+    }
 
-	if ( oEditor.EditMode == FCK_EDITMODE_WYSIWYG ) {
-
-		if (kind=='material'){
-			text = '{МАТЕРИАЛ=' + document.addform.m.options[document.addform.m.selectedIndex].text + '}';
-		}
-		if (kind=='photo'){
-			text = '{ФОТО=' + document.addform.f.options[document.addform.f.selectedIndex].text + '}';
-		}
-		if (kind=='album'){
-			text = '{АЛЬБОМ=' + document.addform.a.options[document.addform.a.selectedIndex].text + '}';
-		}
-		if (kind=='frm'){
-			text = '{ФОРМА=' + document.addform.fm.options[document.addform.fm.selectedIndex].text + '}';
-		}
-		if (kind=='blank'){
-			text = '{БЛАНК=' + document.addform.b.options[document.addform.b.selectedIndex].text + '}';
-		}
-		if (kind=='include'){
-			text = '{ФАЙЛ=' + document.addform.i.value + '}';
-		}
-		if (kind=='filelink'){
-			text = '{СКАЧАТЬ=' + document.addform.fl.value + '}';
-		}
-		if (kind=='banpos'){
-			text = '{БАННЕР=' + document.addform.ban.value + '}';
-		}
-		if (kind=='pagebreak'){
-			text = '{pagebreak}';
-		}
-		if (kind=='pagetitle'){
-			text = '{СТРАНИЦА=' + document.addform.ptitle.value + '}';
-		}
-
-		oEditor.InsertHtml( text ) ;
-	}
-	else adminAlert(LANG_AD_SWITCH_EDITOR) ;
+    wysiwygInsertHtml(text) ;
 }
 
 function InsertPagebreak()

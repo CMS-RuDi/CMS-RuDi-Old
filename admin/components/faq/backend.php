@@ -147,20 +147,20 @@ if ($opt=='config') {
 
 if ($opt == 'show_item'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbShow('cms_faq_quests', (int)$_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_faq_quests', (int)$_REQUEST['item_id'], 'published', '1'); }
+        cmsCore::halt('1');
     } else {
-        dbShowList('cms_faq_quests', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_faq_quests', $_REQUEST['item'], 'published', '1');
         cmsCore::redirectBack();
     }
 }
 
 if ($opt == 'hide_item'){
     if (!isset($_REQUEST['item'])){
-        if (isset($_REQUEST['item_id'])){ dbHide('cms_faq_quests', (int)$_REQUEST['item_id']);  }
-        echo '1'; exit;
+        if (isset($_REQUEST['item_id'])){ cmsCore::c('db')->setFlag('cms_faq_quests', (int)$_REQUEST['item_id'], 'published', '0'); }
+        cmsCore::halt('1');
     } else {
-        dbHideList('cms_faq_quests', $_REQUEST['item']);
+        cmsCore::c('db')->setFlags('cms_faq_quests', $_REQUEST['item'], 'published', '0');
         cmsCore::redirectBack();
     }
 }

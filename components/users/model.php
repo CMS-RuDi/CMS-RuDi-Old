@@ -454,46 +454,6 @@ class cms_model_users{
     }
 
 /* ==================================================================================================== */
-/* ==================================================================================================== */
-
-    public function getPluginsOutput($user){
-
-        $inCore       = cmsCore::getInstance();
-
-        $plugins_list = array();
-
-        $plugins      = $inCore->getEventPlugins('USER_PROFILE');
-
-        foreach($plugins as $plugin_name){
-
-            $html   = '';
-
-            $plugin = cmsCore::loadPlugin( $plugin_name );
-
-            if ($plugin!==false){
-                $html = $plugin->execute('USER_PROFILE', $user);
-            }
-
-            if ($html !== false){
-
-                $p['name']      = $plugin_name;
-                $p['title']     = !empty($plugin->info['tab']) ? $plugin->info['tab'] : $plugin->info['title'];
-                $p['ajax_link'] = !empty($plugin->info['ajax_link']) ? $plugin->info['ajax_link'] : '';
-                $p['html']      = $html;
-
-                $plugins_list[] = $p;
-
-                cmsCore::unloadPlugin($plugin);
-
-            }
-
-        }
-
-        return $plugins_list;
-
-    }
-
-/* ==================================================================================================== */
 /* ===================================          ИНВАЙТЫ           ===================================== */
 /* ==================================================================================================== */
 

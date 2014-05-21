@@ -99,6 +99,7 @@
                     </div>
                 </div>
                 {/if}
+                
                 {if $club.enabled_photos}
                 <div class="album">
                     <div class="title">{$LANG.PHOTOALBUMS}</div>
@@ -115,6 +116,7 @@
                     </div>
                 </div>
                 {/if}
+                
                 {if $plugins}
                     {foreach key=id item=plugin from=$plugins}
                     	{if !is_array($plugin.html) }

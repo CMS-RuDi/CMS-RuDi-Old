@@ -129,23 +129,23 @@ function applet_menu(){
 
 	if ($do == 'show'){
 		if (!isset($_REQUEST['item'])){
-			if ($id >= 0){ dbShow('cms_menu', $id);  }
-			echo '1'; exit;
+                    if ($id >= 0){ cmsCore::c('db')->setFlag('cms_menu', $id, 'published', '1'); }
+                    cmsCore::halt('1');
 		} else {
-			dbShowList('cms_menu', $_REQUEST['item']);
-            cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
-			cmsCore::redirectBack();
+                    cmsCore::c('db')->setFlags('cms_menu', $_REQUEST['item'], 'published', '1');
+                    cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
+                    cmsCore::redirectBack();
 		}
 	}
 
 	if ($do == 'hide'){
 		if (!isset($_REQUEST['item'])){
-			if ($id >= 0){ dbHide('cms_menu', $id);  }
-			echo '1'; exit;
+                    if ($id >= 0){ cmsCore::c('db')->setFlag('cms_menu', $id, 'published', '0'); }
+                    cmsCore::halt('1');
 		} else {
-			dbHideList('cms_menu', $_REQUEST['item']);
-            cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
-			cmsCore::redirectBack();
+                    cmsCore::c('db')->setFlags('cms_menu', $_REQUEST['item'], 'published', '0');
+                    cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
+                    cmsCore::redirectBack();
 		}
 	}
 

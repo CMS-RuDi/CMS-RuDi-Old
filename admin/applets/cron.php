@@ -14,28 +14,28 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function applet_cron(){
-
     cmsCore::loadClass('cron');
+    
+    global $_LANG;
+    
+    global $adminAccess;
+    
+    if (!cmsUser::isAdminCan('admin/config', $adminAccess)) { cpAccessDenied(); }
 
-	global $_LANG;
-
-	global $adminAccess;
-	if (!cmsUser::isAdminCan('admin/config', $adminAccess)) { cpAccessDenied(); }
-
-	cmsCore::c('page')->setAdminTitle($_LANG['AD_CRON_MISSION']);
- 	cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
- 	cpAddPathway($_LANG['AD_CRON_MISSION'], 'index.php?view=cron');
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_CRON_MISSION']);
+    cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
+    cpAddPathway($_LANG['AD_CRON_MISSION'], 'index.php?view=cron');
 
     $do = cmsCore::request('do', 'str', 'list');
     $id = cmsCore::request('id', 'int', '0');
+    
+    if ($do == 'list'){
+        $toolmenu = array();
+        $toolmenu[0]['icon'] = 'new.gif';
+        $toolmenu[0]['title'] = $_LANG['AD_CREATE_CRON_MISSION'];
+        $toolmenu[0]['link'] = "?view=cron&do=add";
 
-	if ($do == 'list'){
-		$toolmenu = array();
-		$toolmenu[0]['icon'] = 'new.gif';
-		$toolmenu[0]['title'] = $_LANG['AD_CREATE_CRON_MISSION'];
-		$toolmenu[0]['link'] = "?view=cron&do=add";
-
-		cpToolMenu($toolmenu);
+        cpToolMenu($toolmenu);
 
         $items = cmsCron::getJobs(false);
 
@@ -43,32 +43,24 @@ function applet_cron(){
         $tpl_dir    = file_exists(TEMPLATE_DIR.$tpl_file) ? TEMPLATE_DIR : DEFAULT_TEMPLATE_DIR;
 
         include($tpl_dir.$tpl_file);
-	}
+    }
 
     if ($do == 'show'){
-
         if ($id){ cmsCron::jobEnabled($id, true);  }
-        echo '1'; exit;
-
-	}
-
-	if ($do == 'hide'){
-
+        cmsCore::halt('1');
+    }
+    
+    if ($do == 'hide'){
         if ($id){ cmsCron::jobEnabled($id, false);  }
-        echo '1'; exit;
-
-	}
-
-	if ($do == 'delete'){
-
+        cmsCore::halt('1');
+    }
+    
+    if ($do == 'delete'){
         if ($id) { cmsCron::removeJobById($id); }
-
         cmsCore::redirect('index.php?view=cron');
-
-	}
-
-	if ($do == 'execute'){
-
+    }
+    
+    if ($do == 'execute'){
         if ($id) { $job_result = cmsCron::executeJobById($id); }
 
         if($job_result){
@@ -78,11 +70,9 @@ function applet_cron(){
         }
 
         cmsCore::redirect('index.php?view=cron');
-
-	}
-
-	if ($do == 'submit'){
-
+    }
+    
+    if ($do == 'submit'){
         if (!cmsCore::validateForm()) { cmsCore::error404(); }
 
         $job_name       = cmsCore::request('job_name', 'str');
@@ -97,23 +87,24 @@ function applet_cron(){
         $class_name     = cmsCore::request('class_name', 'str');
         $class_method   = cmsCore::request('class_method', 'str');
 
-        cmsCron::registerJob($job_name, array(
-                                        'interval' => $job_interval,
-                                        'component' => $component,
-                                        'model_method' => $model_method,
-                                        'comment' => $comment,
-                                        'custom_file' => $custom_file,
-                                        'enabled' => $enabled,
-                                        'class_name' => $class_name,
-                                        'class_method' => $class_method
-                                  ));
+        cmsCron::registerJob(
+            $job_name,
+            array(
+                'interval' => $job_interval,
+                'component' => $component,
+                'model_method' => $model_method,
+                'comment' => $comment,
+                'custom_file' => $custom_file,
+                'enabled' => $enabled,
+                'class_name' => $class_name,
+                'class_method' => $class_method
+            )
+        );
 
         cmsCore::redirect('index.php?view=cron');
-
-	}
-
-	if ($do == 'update'){
-
+    }
+    
+    if ($do == 'update'){
         if (!cmsCore::validateForm()) { cmsCore::error404(); }
 
         if (!$id) { cmsCore::halt(); }
@@ -130,48 +121,47 @@ function applet_cron(){
         $class_name     = cmsCore::request('class_name', 'str');
         $class_method   = cmsCore::request('class_method', 'str');
 
-        cmsCron::updateJob($id, array(
-                                        'job_name' => $job_name,
-                                        'job_interval' => $job_interval,
-                                        'component' => $component,
-                                        'model_method' => $model_method,
-                                        'comment' => $comment,
-                                        'custom_file' => $custom_file,
-                                        'is_enabled' => $enabled,
-                                        'class_name' => $class_name,
-                                        'class_method' => $class_method
-                                  ));
+        cmsCron::updateJob(
+            $id,
+            array(
+                'job_name' => $job_name,
+                'job_interval' => $job_interval,
+                'component' => $component,
+                'model_method' => $model_method,
+                'comment' => $comment,
+                'custom_file' => $custom_file,
+                'is_enabled' => $enabled,
+                'class_name' => $class_name,
+                'class_method' => $class_method
+            )
+        );
 
         cmsCore::redirect('index.php?view=cron');
+    }
+    
+    if ($do == 'edit' || $do== 'add'){
 
-	}
+        $toolmenu = array();
+        $toolmenu[0]['icon'] = 'save.gif';
+        $toolmenu[0]['title'] = $_LANG['SAVE'];
+        $toolmenu[0]['link'] = 'javascript:document.addform.submit();';
 
-   if ($do == 'edit' || $do== 'add'){
+        $toolmenu[1]['icon'] = 'cancel.gif';
+        $toolmenu[1]['title'] = $_LANG['CANCEL'];
+        $toolmenu[1]['link'] = 'javascript:history.go(-1);';
 
- 		$toolmenu = array();
-		$toolmenu[0]['icon'] = 'save.gif';
-		$toolmenu[0]['title'] = $_LANG['SAVE'];
-		$toolmenu[0]['link'] = 'javascript:document.addform.submit();';
-
-		$toolmenu[1]['icon'] = 'cancel.gif';
-		$toolmenu[1]['title'] = $_LANG['CANCEL'];
-		$toolmenu[1]['link'] = 'javascript:history.go(-1);';
-
-		cpToolMenu($toolmenu);
-
-		if ($do=='edit'){
-
+        cpToolMenu($toolmenu);
+        
+        if ($do=='edit'){
             $mod = cmsCron::getJobById($id);
-
-             echo '<h3>'.$_LANG['AD_EDIT_MISSION'].'</h3>';
-             cpAddPathway($mod['job_name'], 'index.php?view=cron&do=edit&id='.$mod['id']);
-
-		} else {
+            
+            echo '<h3>'.$_LANG['AD_EDIT_MISSION'].'</h3>';
+            cpAddPathway($mod['job_name'], 'index.php?view=cron&do=edit&id='.$mod['id']);
+        } else {
             echo '<h3>'.$_LANG['AD_CREATE_CRON_MISSION'].'</h3>';
             cpAddPathway($_LANG['AD_CREATE_CRON_MISSION'], 'index.php?view=cron&do=add');
-		}
-	?>
-
+	}
+?>
     <form action="index.php?view=cron" method="post" enctype="multipart/form-data" name="addform" id="addform">
         <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
         <table width="750" border="0" cellpadding="0" cellspacing="10" class="proptable">
@@ -279,8 +269,8 @@ function applet_cron(){
         }
         ?>
         </p>
-      </form>
-	<?php
+    </form>
+<?php
    }
 }
 

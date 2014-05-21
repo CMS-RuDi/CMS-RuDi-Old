@@ -23,8 +23,7 @@ class cmsForm {
     private static $cached_form_fields = array();
 
     private function __construct($form_id, $values = array(), $is_admin = false) {
-
-        $this->form_id  = cmsDatabase::getInstance()->escape_string($form_id);
+        $this->form_id  = cmsCore::c('db')->escape_string($form_id);
         $this->values   = $values;
         $this->is_admin = $is_admin;
 
@@ -32,7 +31,6 @@ class cmsForm {
 
         $this->loadFormData();
         $this->form_fields = $this->getFormFields($this->form_id);
-
     }
 
 // ============================================================================ //
@@ -300,29 +298,21 @@ class cmsForm {
      * @return array
      */
     public static function getFormFields($form_id){
-
-		if(isset(self::$cached_form_fields[$form_id])) { return self::$cached_form_fields[$form_id]; }
+        if(isset(self::$cached_form_fields[$form_id])) { return self::$cached_form_fields[$form_id]; }
 
         $form_fields = array();
 
-        $inDB = cmsDatabase::getInstance();
+        $sql = "SELECT * FROM cms_form_fields WHERE form_id = '{$form_id}' ORDER BY ordering ASC";
+        $res = cmsCore::c('db')->query($sql);
 
-		$sql = "SELECT * FROM cms_form_fields WHERE form_id = '{$form_id}' ORDER BY ordering ASC";
-		$res = $inDB->query($sql);
-
-		if ($inDB->num_rows($res)){
-
-			while($form_field = $inDB->fetch_assoc($res)){
-
+        if (cmsCore::c('db')->num_rows($res)){
+            while($form_field = cmsCore::c('db')->fetch_assoc($res)){
                 $form_field['config'] = cmsCore::yamlToArray($form_field['config']);
-				$form_fields[] = $form_field;
-
+                $form_fields[] = $form_field;
             }
-
         }
 
         return cmsCore::callEvent('GET_FORM_FIELDS', $form_fields);
-
     }
 
 // ============================================================================ //
@@ -333,15 +323,13 @@ class cmsForm {
      * @return string
      */
     private function getLastEnteredValue($field_id){
+        $ses_value = cmsUser::sessionGet('form_last_'.$this->form_id.'_'.$field_id);
 
-		$ses_value = cmsUser::sessionGet('form_last_'.$this->form_id.'_'.$field_id);
-
-		if ($ses_value){
-			cmsUser::sessionDel('form_last_'.$this->form_id.'_'.$field_id);
-		}
+        if ($ses_value){
+            cmsUser::sessionDel('form_last_'.$this->form_id.'_'.$field_id);
+        }
 
         return (string)$ses_value;
-
     }
 
 // ============================================================================ //
@@ -351,13 +339,11 @@ class cmsForm {
      * @param int $field_id ID поля формы
      * @return string
      */
-	private function getFieldValue($field_id){
+    private function getFieldValue($field_id){
+        $field_value = array_key_exists($field_id, $this->values) ? htmlspecialchars($this->values[$field_id]) : '';
 
-		$field_value = array_key_exists($field_id, $this->values) ? htmlspecialchars($this->values[$field_id]) : '';
-
-		return $field_value ? $field_value : $this->getLastEnteredValue($field_id);
-
-	}
+        return $field_value ? $field_value : $this->getLastEnteredValue($field_id);
+    }
 
 // ============================================================================ //
 // ============================================================================ //
@@ -366,26 +352,23 @@ class cmsForm {
      * @param array $form_field Массив поля формы
      * @return string html
      */
-	public function getFormField($form_field){
-
+    public function getFormField($form_field){
         if(in_array($form_field['kind'], $this->kinds)){
-			$method_name = 'render'.icms_ucfirst($form_field['kind']);
+            $method_name = 'render'.icms_ucfirst($form_field['kind']);
             if(method_exists($this, $method_name)){
 
                 return call_user_func_array(array($this, $method_name), array($form_field));
 
             }
         }
-
-	}
+    }
     /**
      * Возвращает значение поля формы
      * @param array $form_field Массив поля формы
      * @return string html
      */
-	public function getFormFieldValue($form_field){
-
-        if(in_array($form_field['kind'], $this->kinds)){
+    public function getFormFieldValue($form_field){
+        if (in_array($form_field['kind'], $this->kinds)){
 			$method_name = 'get'.icms_ucfirst($form_field['kind']).'Value';
             if(method_exists($this, $method_name)){
 
@@ -398,29 +381,24 @@ class cmsForm {
                    $this->getFieldValue($form_field['id']);
 
         }
-
-	}
+    }
 
 // ============================================================================ //
 // ========================   Методы полей формы   ============================ //
 // ============================================================================ //
-	private function getLinkValue($form_field){
-
+    private function getLinkValue($form_field){
         $value = preg_replace ('/[^a-zA-ZА-Яа-я0-9\-_\.\/\:]/ui', '', $this->getFieldValue($form_field['id']));
-		$value = htmlspecialchars(str_replace ('..', '.', $value));
+        $value = htmlspecialchars(str_replace ('..', '.', $value));
 
-		return $value ? '<a href="/go/url=-'.base64_encode($value).'" target="_blank">'.$value.'</a>' : '';
+        return $value ? '<a href="/go/url=-'.base64_encode($value).'" target="_blank">'.$value.'</a>' : '';
 
-	}
+    }
 
-	private function getTextareaValue($form_field){
+    private function getTextareaValue($form_field){
+        return nl2br($this->getFieldValue($form_field['id']));
+    }
 
-		return nl2br($this->getFieldValue($form_field['id']));
-
-	}
-
-	private function getFileValue($form_field){
-
+    private function getFileValue($form_field){
         $link = '';
 
         if(array_key_exists($form_field['id'], $this->values)){
@@ -445,163 +423,131 @@ class cmsForm {
 
         }
 
-		return $link;
-
-	}
+        return $link;
+    }
 
     private function renderText($form_field){
+        return '<input type="text"
+                    name="field['.$form_field['id'].']"
+                        maxlength="'.(int)$form_field['config']['max'].'"
+                            value="'.$this->getFieldValue($form_field['id']).'"
+                                placeholder="'.htmlspecialchars($form_field['description']).'"
+                                    style="width: '.(int)$form_field['config']['size'].'px"
+                                        class="text-input form_text" />';
 
-		return '<input type="text"
-								  name="field['.$form_field['id'].']"
-								  maxlength="'.(int)$form_field['config']['max'].'"
-								  value="'.$this->getFieldValue($form_field['id']).'"
-								  placeholder="'.htmlspecialchars($form_field['description']).'"
-								  style="width: '.(int)$form_field['config']['size'].'px"
-								  class="text-input form_text" />';
+    }
+    
+    private function renderLink($form_field){
+        return $this->renderText($form_field);
+    }
 
-	}
+    private function renderTextarea($form_field){
+        return '<textarea name="field['.$form_field['id'].']"
+                            class="text-input form_textarea"
+                            maxlength="'.(int)$form_field['config']['max'].'"
+                                style="width: '.(int)$form_field['config']['size'].'px"
+                                    placeholder="'.htmlspecialchars($form_field['description']).'"
+                                        rows="'.(int)$form_field['config']['rows'].'">'.$this->getFieldValue($form_field['id']).'</textarea>';
+    }
 
-	private function renderLink($form_field){
-
-		return $this->renderText($form_field);
-
-	}
-
-	private function renderTextarea($form_field){
-
-		return '<textarea name="field['.$form_field['id'].']"
-						 class="text-input form_textarea"
-						 maxlength="'.(int)$form_field['config']['max'].'"
-						 style="width: '.(int)$form_field['config']['size'].'px"
-                         placeholder="'.htmlspecialchars($form_field['description']).'"
-						 rows="'.(int)$form_field['config']['rows'].'">'.$this->getFieldValue($form_field['id']).'</textarea>';
-
-	}
-
-	private function renderFile($form_field){
-
+    private function renderFile($form_field){
         global $_LANG;
 
         $field_value = $this->values[$form_field['id']];
 
         if(!empty($field_value['url'])){
-
             return '<div class="text-input city_block" style="width:'.(int)$form_field['config']['size'].'px">
                 <input type="hidden" value="'.htmlspecialchars($field_value['url']).'" name="field['.$form_field['id'].'][url]">
                 <input type="hidden" value="'.htmlspecialchars($field_value['name']).'" name="field['.$form_field['id'].'][name]">
                 <input type="file" style="width: 73%" class="city_view" name="field['.$form_field['id'].']">
                 <label>'.$_LANG['DELETE'].' <input type="checkbox" name="field['.$form_field['id'].'][delete]" value="1"></label>
               </div>';
-
         } else {
-
             return '<input type="hidden" value="" name="field['.$form_field['id'].'][url]"><input type="file" style="width: '.(int)$form_field['config']['size'].'px" class="text-input form_file" name="field['.$form_field['id'].']">';
-
         }
+    }
 
-	}
-
-	private function renderCheckbox($form_field){
-
-		global $_LANG;
-
-		$default = $this->getFieldValue($form_field['id']);
+    private function renderCheckbox($form_field){
+        global $_LANG;
+        
+        $default = $this->getFieldValue($form_field['id']);
         $default = $default ? $default : $form_field['config']['checked'];
 
-		$field  = '<label><input type="radio" name="field['.$form_field['id'].']" value="'.$_LANG['YES'].'" ';
-		$field .= ($default || $default == $_LANG['YES']) ? 'checked="checked"' : '';
-		$field .= '/>'.$_LANG['YES'].'</label> ';
-		$field .= '<label><input type="radio" name="field['.$form_field['id'].']" value="'.$_LANG['NO'].'" ';
-		$field .= (!$default || $default == $_LANG['NO']) ? 'checked="checked"' : '';
-		$field .= '/>'.$_LANG['NO'].'</label> ';
+        $field  = '<label><input type="radio" name="field['.$form_field['id'].']" value="'.$_LANG['YES'].'" ';
+        $field .= ($default || $default == $_LANG['YES']) ? 'checked="checked"' : '';
+        $field .= '/>'.$_LANG['YES'].'</label> ';
+        $field .= '<label><input type="radio" name="field['.$form_field['id'].']" value="'.$_LANG['NO'].'" ';
+        $field .= (!$default || $default == $_LANG['NO']) ? 'checked="checked"' : '';
+        $field .= '/>'.$_LANG['NO'].'</label> ';
 
-		return $field;
+        return $field;
 
-	}
+    }
 
-	private function renderRadiogroup($form_field){
-
-		$field = '';
-
-		$items   = explode('/', trim($form_field['config']['items']));
-		$default = $this->getFieldValue($form_field['id']);
-
-		if($items){
-			foreach($items as $i){
-
-				$i = trim(htmlspecialchars($i));
-
-				$field .= '<label><input type="radio" name="field['.$form_field['id'].']" value="'.$i.'" ';
-				if($i == $default) { $field .= 'checked="checked"'; }
-				$field .= ' />'.$i.'</label><br/>';
-
-			}
-		}
-
-		return $field;
-
-	}
-
-	private function renderList($form_field){
-
+    private function renderRadiogroup($form_field){
         $field = '';
 
-		$items   = explode('/', trim($form_field['config']['items']));
-		$default = $this->getFieldValue($form_field['id']);
+        $items   = explode('/', trim($form_field['config']['items']));
+        $default = $this->getFieldValue($form_field['id']);
 
-		if($items){
+        if($items){
+            foreach($items as $i){
+                $i = trim(htmlspecialchars($i));
 
+                $field .= '<label><input type="radio" name="field['.$form_field['id'].']" value="'.$i.'" ';
+                if($i == $default) { $field .= 'checked="checked"'; }
+                $field .= ' />'.$i.'</label><br/>';
+            }
+        }
+
+        return $field;
+    }
+
+    private function renderList($form_field){
+        $field = '';
+
+        $items   = explode('/', trim($form_field['config']['items']));
+        $default = $this->getFieldValue($form_field['id']);
+
+        if($items){
             $field .= '<select class="text-input form_list" style="width: '.(int)$form_field['config']['size'].'px" name="field['.$form_field['id'].']">';
+                foreach($items as $i){
+                    $i = trim(htmlspecialchars($i));
 
-			foreach($items as $i){
-
-				$i = trim(htmlspecialchars($i));
-
-                $field .= '<option value="'.$i.'"';
-                if($i == $default) { $field .= 'selected="selected"'; }
-                $field .= ' >'.$i.'</option>';
-
-			}
+                    $field .= '<option value="'.$i.'"';
+                    if($i == $default) { $field .= 'selected="selected"'; }
+                    $field .= ' >'.$i.'</option>';
+                }
 
             $field .= '</select>';
+        }
 
-		}
+        return $field;
+    }
 
-		return $field;
-
-	}
-
-	private function renderMenu($form_field){
-
+    private function renderMenu($form_field){
         $field = '';
 
-		$items   = explode('/', trim($form_field['config']['items']));
-		$default = $this->getFieldValue($form_field['id']);
+        $items   = explode('/', trim($form_field['config']['items']));
+        $default = $this->getFieldValue($form_field['id']);
 
-		if($items){
-
+        if($items){
             $field .= '<select class="text-input form_menu" style="width: '.(int)$form_field['config']['size'].'px" name="field['.$form_field['id'].']" size="5">';
 
-			foreach($items as $i){
-
-				$i = trim(htmlspecialchars($i));
+            foreach($items as $i){
+                $i = trim(htmlspecialchars($i));
 
                 $field .= '<option value="'.$i.'"';
                 if($i == $default) { $field .= 'selected="selected"'; }
                 $field .= ' >'.$i.'</option>';
-
-			}
+            }
 
             $field .= '</select>';
+        }
 
-		}
-
-		return $field;
-
-	}
+        return $field;
+    }
 // ============================================================================ //
 // ============================================================================ //
 
 }
-
-?>

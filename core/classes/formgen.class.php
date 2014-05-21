@@ -23,12 +23,10 @@ class cmsFormGen {
 //============================================================================//
 
     public function __construct($xml_file, $default_cfg) {
-
         $this->xml         = simplexml_load_file($xml_file);
         $this->default_cfg = $default_cfg;
 
         $this->parseParams();
-
     }
     
     public function getInstance($xml_file, $default_cfg){
@@ -39,7 +37,6 @@ class cmsFormGen {
 //============================================================================//
 
     private function parseParams(){
-
         global $_LANG;
         // подключим LANG файл для модуля
         cmsCore::loadLanguage('admin/modules/'.(string)$this->xml->module->id);
@@ -91,33 +88,25 @@ class cmsFormGen {
             $param['html']  = $this->getParamHTML($param);
 
             $this->params[] = $param;
-
         }
 
         return;
-
     }
 
 //============================================================================//
 //============================================================================//
 
     private function getParamValue($param_name, $default){
-
         if (isset($this->default_cfg[$param_name])){
-
             $value = $this->default_cfg[$param_name];
-
         } else {
-
             $value = $default;
-
         }
 
         if ($value === 'on') { $value = 1; }
         if ($value === 'off') { $value = 0; }
 
         return $value;
-
     }
 
 //============================================================================//
@@ -136,7 +125,6 @@ class cmsFormGen {
         $this->html = ob_get_clean();
 
         return $this->html;
-
     }
 
 
@@ -144,7 +132,6 @@ class cmsFormGen {
 //============================================================================//
 
     private function getParamHTML($param) {
-
         switch ($param['type']){
 
             case 'number':  return $this->renderNumber($param);
@@ -168,35 +155,27 @@ class cmsFormGen {
         }
 
         return;
-
     }
 
 //============================================================================//
 //============================================================================//
 
     private function renderNumber($param) {
-
         return '<input type="text" id="'.$param['name'].'" name="'.$param['name'].'" value="'.$param['value'].'" class="param-number" /> '. $param['units'];
-
     }
 
     private function renderString($param) {
-
         return '<input type="text" id="'.$param['name'].'" name="'.$param['name'].'" value="'.htmlspecialchars($param['value']).'" class="param-string" /> ';
-
     }
 
     private function renderFlag($param) {
-
         $html = '<input type="checkbox" '.($param['value']==1 ? 'checked="checked"' : '').' onclick="$(\'#'.$param['name'].'\').val(1-$(\'#'.$param['name'].'\').val())" />' . "\n" .
                 '<input type="hidden" id="'.$param['name'].'" name="'.$param['name'].'" value="'.$param['value'].'" />';
 
         return $html;
-
     }
 
     private function renderList($param){
-
         $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="param-list">' . "\n";
 
         foreach($param['tag_option'] as $option){
@@ -208,11 +187,9 @@ class cmsFormGen {
         $html .= '</select>' . "\n";
 
         return $html;
-
     }
 
     private function renderListFunction($param) {
-
         $key_title  = isset($param['key_title']) ? $param['key_title'] : 'title';
         $key_value  = isset($param['key_value']) ? $param['key_value'] : 'id';
         $fparam     = isset($param['param']) ? $param['param'] : '';
@@ -241,13 +218,9 @@ class cmsFormGen {
         $html .= '</select>' . "\n";
 
         return $html;
-
     }
 
     private function renderListDB($param) {
-
-        $inDB = cmsDatabase::getInstance();
-
         $src_title  = isset($param['src_title']) ? $param['src_title'] : 'title';
         $src_id     = isset($param['src_value']) ? $param['src_value'] : 'id';
         $src_where  = isset($param['src_where']) ? $param['src_where'] : '';
@@ -267,7 +240,7 @@ class cmsFormGen {
                        ORDER BY {$order_by}
                        LIMIT 100";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
 
         // ------------------------------------------------------------- //
@@ -285,8 +258,8 @@ class cmsFormGen {
                 }
             }
 
-            if ($inDB->num_rows($result)){
-                while($option = $inDB->fetch_assoc($result)){
+            if (cmsCore::c('db')->num_rows($result)){
+                while($option = cmsCore::c('db')->fetch_assoc($result)){
                     if (isset($option['level']) && $option['level'] >= 1){
                         $option['title'] = str_repeat('--', $option['level']-1) . ' ' . $option['title'];
                     }
@@ -307,8 +280,8 @@ class cmsFormGen {
 
             $html = '<table cellpadding="0" cellspacing="0">' . "\n";
 
-            if ($inDB->num_rows($result)){
-                while($option = $inDB->fetch_assoc($result)){
+            if (cmsCore::c('db')->num_rows($result)){
+                while($option = cmsCore::c('db')->fetch_assoc($result)){
                     $html .= '<tr>' . "\n" .
                                 "\t" . '<td><input type="checkbox" id="'.$param['name'].'_'.$option['value'].'" name="'.$param['name'].'['.$option['value'].']" value="'.htmlspecialchars($option['value']).'" '.(in_array($option['value'], $values) ? 'checked="checked"' : '').' />' . "\n" .
                                 "\t" . '<td><label for="'.$param['name'].'_'.$option['value'].'">'.$option['title'].'</label></td>' . "\n" .
@@ -321,7 +294,6 @@ class cmsFormGen {
         }
 
         return $html;
-
     }
 
 
@@ -330,5 +302,3 @@ class cmsFormGen {
 
 
 }
-
-?>

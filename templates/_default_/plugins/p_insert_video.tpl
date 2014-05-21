@@ -2,7 +2,7 @@
     <div>
         <strong>{$LANG.VIDEOS}:</strong>
         <div class="hinttext">
-            {$LANG.VIDEOS_INSERT_HINT_TEXT}: <b>{$cfg.PIV_DOMENS}</b>
+            {$LANG.VIDEOS_INSERT_HINT_TEXT} <b>{$cfg.PIV_DOMENS}</b>
         </div>
     </div>
     <div style="margin-top:10px;">

@@ -520,5 +520,3 @@ class gifresizer {
         }
     }
 }
-
-?>

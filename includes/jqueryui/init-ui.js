@@ -1,165 +1,164 @@
 $(function() {
 
-// ========================================================================== //
-//перетаскиваемые элементы
+    // ====================================================================== //
+    //перетаскиваемые элементы
 
-$( ".uidrag" ).draggable({});
-//умолчания см. http://api.jqueryui.com/draggable/
+    $('.uidrag').draggable({});
+    //умолчания см. http://api.jqueryui.com/draggable/
 
-// ========================================================================== //
-//элементы контейнеры для перетаскиваемых элементов
+    // ====================================================================== //
+    //элементы контейнеры для перетаскиваемых элементов
 
-//$( ".uidrop" ).droppable({
-//умолчания см. http://api.jqueryui.com/droppable/
+    //$('.uidrop').droppable({
+    //умолчания см. http://api.jqueryui.com/droppable/
 
-// ========================================================================== //
-//авторесайз элементы
+    // ====================================================================== //
+    //авторесайз элементы
 
-//$( ".autores" ).resizable({});
-//умолчания см. http://api.jqueryui.com/resizable/
+    //$('.autores').resizable({});
+    //умолчания см. http://api.jqueryui.com/resizable/
 
-// ========================================================================== //
-//выборки
+    // ====================================================================== //
+    //выборки
 
-//$( ".uiselect" ).selectable({
-//умолчания см. http://api.jqueryui.com/selectable/
+    //$('.uiselect').selectable({
+    //умолчания см. http://api.jqueryui.com/selectable/
 
-// ========================================================================== //
-//сортируемые элементы
+    // ====================================================================== //
+    //сортируемые элементы
 
-//$(".uisort").sortable();
-//умолчания см. http://api.jqueryui.com/sortable/
+    //$('.uisort').sortable();
+    //умолчания см. http://api.jqueryui.com/sortable/
 
-//$( ".uisort" ).disableSelection();
+    //$('.uisort').disableSelection();
 
-//ВИДЖЕТЫ:
-// ========================================================================== //
-//Аккордеон
+    //ВИДЖЕТЫ:
+    // ====================================================================== //
+    //Аккордеон
 
-$( ".uiacc" ).accordion({});
-//умолчания см. http://api.jqueryui.com/accordion/
+    $('.uiacc').accordion({});
+    //умолчания см. http://api.jqueryui.com/accordion/
 
-// ========================================================================== //
-//Автоподстановка значений
+    // ====================================================================== //
+    //Автоподстановка значений
 
-//$( ".autocomp" ).autocomplete({});
-//умолчания см. http://api.jqueryui.com/autocomplete/
+    //$('.autocomp').autocomplete({});
+    //умолчания см. http://api.jqueryui.com/autocomplete/
 
-// ========================================================================== //
-//Кнопки, тулбары и т.п.
+    // ====================================================================== //
+    //Кнопки, тулбары и т.п.
 
-$( ".uibtn" ).button({});
-//умолчания см. http://api.jqueryui.com/button/
+    $('.uibtn').button({});
+    //умолчания см. http://api.jqueryui.com/button/
 
-//доступны те же опции
-$( ".uibtnset" ).buttonset({});
+    //доступны те же опции
+    $('.uibtnset').buttonset({});
 
-// ========================================================================== //
-//Установка дат
+    // ====================================================================== //
+    //Установка дат
 
-$( "#pubdate, #enddate, #answerdate" ).datepicker({
-//умолчания см. http://api.jqueryui.com/datepicker/
+    $('#pubdate, #enddate, #answerdate').datepicker({
+    //умолчания см. http://api.jqueryui.com/datepicker/
 
-//altField: "",
-//altFormat: "",
-//appendText: "",
-autoSize: true,
-buttonImage: "/images/icons/date.gif",
-buttonImageOnly: true,
-//buttonText: "...",
-calculateWeek: jQuery.datepicker.iso8601Week,
-changeMonth: true,
-changeYear: true,
-//closeText: 'Закрыть',
-//prevText: '&#x3C;Пред',
-//nextText: 'След&#x3E;',
-//currentText: 'Сегодня',
-//monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-//monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
-//dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
-//dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
-//dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
-//weekHeader: 'Нед',
-dateFormat: 'dd.mm.yy',
-firstDay: 1,
-isRTL: false,
-showMonthAfterYear: false,
-yearSuffix: '',
-constrainInput: false,
-//defaultDate: null,
-//duration: "normal",
-gotoCurrent: false,
-//hideIfNoPrevNext: false,
-maxDate: "+5y",
-minDate: "-5y",
-//navigationAsDateFormat: false,
-//numberOfMonths: 1,
-selectOtherMonths: false,
-//shortYearCutoff: "+10",
-//showAnim: "show",
-showButtonPanel: true,
-//showCurrentAtPos: 0,
-//showMonthAfterYear: false,
-showOn: "both",
-//showOptions: {},
-showOtherMonths: true,
-//showWeek: false,
-//stepMonths: 1,
-//yearRange: "c-10:c+10",
-//beforeShow: null,
-//beforeShowDay: null,
-//onChangeMonthYear: null,
-//onClose: null,
-//onSelect: null
+    //altField: '',
+    //altFormat: '',
+    //appendText: '',
+    autoSize: true,
+    buttonImage: '/images/icons/date.gif',
+    buttonImageOnly: true,
+    //buttonText: '...',
+    calculateWeek: jQuery.datepicker.iso8601Week,
+    changeMonth: true,
+    changeYear: true,
+    //closeText: 'Закрыть',
+    //prevText: '&#x3C;Пред',
+    //nextText: 'След&#x3E;',
+    //currentText: 'Сегодня',
+    //monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+    //monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
+    //dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
+    //dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
+    //dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+    //weekHeader: 'Нед',
+    dateFormat: 'dd.mm.yy',
+    firstDay: 1,
+    isRTL: false,
+    showMonthAfterYear: false,
+    yearSuffix: '',
+    constrainInput: false,
+    //defaultDate: null,
+    //duration: 'normal',
+    gotoCurrent: false,
+    //hideIfNoPrevNext: false,
+    maxDate: '+5y',
+    minDate: '-5y',
+    //navigationAsDateFormat: false,
+    //numberOfMonths: 1,
+    selectOtherMonths: false,
+    //shortYearCutoff: "+10",
+    //showAnim: "show",
+    showButtonPanel: true,
+    //showCurrentAtPos: 0,
+    //showMonthAfterYear: false,
+    showOn: 'both',
+    //showOptions: {},
+    showOtherMonths: true,
+    //showWeek: false,
+    //stepMonths: 1,
+    //yearRange: 'c-10:c+10',
+    //beforeShow: null,
+    //beforeShowDay: null,
+    //onChangeMonthYear: null,
+    //onClose: null,
+    //onSelect: null
 
-//no events
+    //no events
 
-});
-//$( "#enddate" ).datepicker("option", "dateFormat", "yy-mm-dd");
-// ========================================================================== //
-//Диалоги, модалки
+    });
+    //$('#enddate').datepicker('option', 'dateFormat', 'yy-mm-dd');
+    // ====================================================================== //
+    //Диалоги, модалки
 
-$( ".uidialog" ).dialog({});
-//умолчания см. http://api.jqueryui.com/dialog/
+    $('.uidialog').dialog({});
+    //умолчания см. http://api.jqueryui.com/dialog/
 
-// ========================================================================== //
-//Меню
+    // ====================================================================== //
+    //Меню
 
-$( ".uimenu" ).menu({});
-//умолчания см. http://api.jqueryui.com/menu/
+    $('.uimenu').menu({});
+    //умолчания см. http://api.jqueryui.com/menu/
 
-// ========================================================================== //
-//Прогрессбар
+    // ====================================================================== //
+    //Прогрессбар
 
- $( ".uipbar" ).progressbar({});
-//умолчания см. http://api.jqueryui.com/progressbar/
+     $('.uipbar').progressbar({});
+    //умолчания см. http://api.jqueryui.com/progressbar/
 
-// ========================================================================== //
-//Слайдеры
+    // ====================================================================== //
+    //Слайдеры
 
-$( ".uisl" ).slider({});
-//умолчания см. http://api.jqueryui.com/slider/
+    $('.uisl').slider({});
+    //умолчания см. http://api.jqueryui.com/slider/
 
-// ========================================================================== //
-//Спиннеры
+    // ====================================================================== //
+    //Спиннеры
 
-$( '.uispin').spinner();
-//умолчания см. http://api.jqueryui.com/spinner/
+    $('.uispin').spinner();
+    //умолчания см. http://api.jqueryui.com/spinner/
 
-// ========================================================================== //
-//Табы
+    // ====================================================================== //
+    //Табы
 
-$( ".uitabs" ).tabs({});
-//умолчания см. http://api.jqueryui.com/tabs/
+    $('.uitabs').tabs({});
+    //умолчания см. http://api.jqueryui.com/tabs/
 
-// ========================================================================== //
-//Тултипы
+    // ====================================================================== //
+    //Тултипы
 
-$( '.uittip' ).tooltip({});
-//умолчания см. http://api.jqueryui.com/tooltip/
+    $('.uittip').tooltip({});
+    //умолчания см. http://api.jqueryui.com/tooltip/
 
-
-//подхватываем от lightbox
-//$( '.lightbox-enabled' ).colorbox({ transition: "none", width: "90%", height: "90%"});
+    //подхватываем от lightbox
+    //$('.lightbox-enabled').colorbox({ transition: 'none', width: '90%', height: '90%' });
 
 });

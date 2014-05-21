@@ -19,14 +19,14 @@ class p_fckeditor extends cmsPlugin {
 
         parent::__construct();
 
-        $this->info['plugin']           = 'p_fckeditor';
-        $this->info['title']            = 'FCKEditor';
-        $this->info['description']      = 'Визуальный редактор';
-        $this->info['author']           = 'F. C. Knabben';
-        $this->info['version']          = '2.63';
-        $this->info['type']             = 'wysiwyg';
+        $this->info['plugin']      = 'p_fckeditor';
+        $this->info['title']       = 'FCKEditor';
+        $this->info['description'] = 'Визуальный редактор';
+        $this->info['author']      = 'F. C. Knabben';
+        $this->info['version']     = '2.63';
+        $this->info['type']        = 'wysiwyg';
 
-        $this->events[]                 = 'INSERT_WYSIWYG';
+        $this->events[]            = 'INSERT_WYSIWYG';
 
     }
 
@@ -48,7 +48,7 @@ class p_fckeditor extends cmsPlugin {
 
         parent::execute();
         
-        cmsCore::c('page')->addHead('<script type="text/javascript">function wysiwygInsertHtml(html, name){var oEditor = FCKeditorAPI.GetInstance(name); if (oEditor.EditMode == FCK_EDITMODE_WYSIWYG ){ oEditor.InsertHtml(html); }else{ alert("EDITOR ERROR");}}</script>');
+        cmsCore::c('page')->addHead('<script type="text/javascript">function wysiwygInsertHtml(html, name){ if (!name){ name="content"; } var oEditor = FCKeditorAPI.GetInstance(name); if (oEditor.EditMode == FCK_EDITMODE_WYSIWYG ){ oEditor.InsertHtml(html); }else{ alert("EDITOR ERROR");}}</script>');
 
         cmsCore::includeFile('plugins/p_fckeditor/fckeditor/fckeditor.php');
 

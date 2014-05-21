@@ -14,7 +14,6 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function applet_help(){
-
     $topic = cmsCore::request('topic', 'str', '');
 
     $help_url['menu']       = 'http://www.instantcms.ru/wiki/doku.php/%D0%BC%D0%B5%D0%BD%D1%8E_%D1%81%D0%B0%D0%B9%D1%82%D0%B0';
@@ -28,9 +27,8 @@ function applet_help(){
     if (isset($help_url[$topic])){
         cmsCore::redirect($help_url[$topic]);
     }
-
-	cmsCore::redirect('http://www.instantcms.ru/wiki');
-
+    
+    cmsCore::redirect('http://www.instantcms.ru/wiki');
 }
 
 ?>

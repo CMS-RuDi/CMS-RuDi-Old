@@ -91,18 +91,21 @@ class cmsPage {
         $file_name = pathinfo($tpl_file, PATHINFO_FILENAME);
 
         // есть ли файл в текущем шаблоне
-        $is_exists_tpl_file = file_exists(TEMPLATE_DIR . $tpl_folder.'/'.$file_name.'.'.$tpl_info['ext']);
+        $is_exists_tpl_file = file_exists(TEMPLATE_DIR . $tpl_folder .'/'. $file_name .'.'. $tpl_info['ext']);
 
         // если нет, считаем что файл лежит в дефолтном, используем оригинальное имя с расширением
         // если есть формируем полное имя файла с учетом параметров шаблона
-        if (!$is_exists_tpl_file){
+        if (!$is_exists_tpl_file) {
             $tpl_info = $thisObj->default_tpl_info;
+            $tpl_folder = DEFAULT_TEMPLATE_DIR . $tpl_folder;
+        } else {
+            $tpl_folder = TEMPLATE_DIR . $tpl_folder;
         }
         $tpl_file = $file_name.'.'.$tpl_info['ext'];
 
         // загружаем шаблонизатор текущего шаблона
         if (!cmsCore::includeFile('core/tpl_classes/'.$tpl_info['renderer'].'.php') ||
-            !class_exists($tpl_info['renderer'])){
+            !class_exists($tpl_info['renderer'])) {
             global $_LANG;
             cmsCore::halt(sprintf($_LANG['TEMPLATE_CLASS_NOTFOUND'], $tpl_info['renderer']));
         }

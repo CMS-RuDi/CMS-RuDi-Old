@@ -22,10 +22,10 @@ class smartyTpl{
 
         $this->smarty = $this->loadSmarty();
 
-        $is_exists_tpl_file = file_exists(TEMPLATE_DIR . $tpl_folder.'/'.$tpl_file);
+        $parts = explode('/', $tpl_folder);
 
-        $this->smarty->template_dir = $is_exists_tpl_file ? TEMPLATE_DIR . $tpl_folder : DEFAULT_TEMPLATE_DIR . $tpl_folder;
-        $this->smarty->compile_id   = $is_exists_tpl_file ? TEMPLATE : '_default_';
+        $this->smarty->template_dir = $tpl_folder;
+        $this->smarty->compile_id   = $parts[count($parts)-2];
         $this->smarty->assign('LANG', $_LANG);
     }
 
@@ -38,7 +38,7 @@ class smartyTpl{
 
         $smarty = new Smarty();
 
-        $smarty->compile_dir = PATH.'/cache';
+        $smarty->compile_dir = PATH .'/cache';
         $smarty->register_function('wysiwyg', 'cmsSmartyWysiwyg');
         $smarty->register_function('profile_url', 'cmsSmartyProfileURL');
         $smarty->register_function('component', 'cmsSmartyCurrentComponent');

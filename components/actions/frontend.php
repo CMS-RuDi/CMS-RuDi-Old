@@ -15,7 +15,7 @@ if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function actions(){
     $inCore = cmsCore::getInstance();
-
+    
     global $_LANG;
 
     $page    = cmsCore::request('page', 'int', 1);
@@ -68,9 +68,9 @@ function actions(){
 //======================================================================================================================//
 
     if ($inCore->do == 'view_user_feed'){
-        if(!cmsCore::c('user')->id) { cmsCore::error404(); }
+        if (!cmsCore::c('user')->id) { cmsCore::error404(); }
 
-        if(!cmsCore::isAjax()) { cmsCore::error404(); }
+        if (!cmsCore::isAjax()) { cmsCore::error404(); }
 
         // Получаем друзей
         $friends = cmsUser::getFriends(cmsCore::c('user')->id);
@@ -80,7 +80,7 @@ function actions(){
         // нам нужно только определенное количество друзей
         $friends = array_slice($friends, ($page-1)*$perpage, $perpage, true);
 
-        if($friends){
+        if ($friends){
             cmsCore::c('actions')->onlyMyFriends();
 
             cmsCore::c('actions')->showTargets(cmsCore::m('actions')->config['show_target']);

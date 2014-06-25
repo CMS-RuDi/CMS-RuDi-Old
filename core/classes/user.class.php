@@ -735,12 +735,12 @@ $this->logout();
      */
     public static function getFriends($user_id=0){
 
-        if(!$user_id) { return array(); }
+        if (!$user_id) { return array(); }
 
         $friends = array();
 
         // уже полученных друзей отдаем сразу
-        if(isset(self::getInstance()->friends[$user_id])){
+        if (isset(self::getInstance()->friends[$user_id])) {
             return self::getInstance()->friends[$user_id];
         }
 
@@ -753,6 +753,7 @@ $this->logout();
                 $friend['flogdate'] = self::getOnlineStatus($friend['id'], $friend['logdate']);
                 $friends[$key] = $friend;
             }
+            
             return $friends;
 
         }
@@ -772,8 +773,8 @@ $this->logout();
 
         $result = cmsCore::c('db')->query($sql);
 
-        if (cmsCore::c('db')->num_rows($result)){
-            while($friend = cmsCore::c('db')->fetch_assoc($result)){
+        if (cmsCore::c('db')->num_rows($result)) {
+            while($friend = cmsCore::c('db')->fetch_assoc($result)) {
                 $friend['avatar']    = self::getUserAvatarUrl($friend['id'], 'small', $friend['imageurl'], $friend['is_deleted']);
                 $friend['is_online'] = self::isOnline($friend['id']);
                 $friend['flogdate']  = self::getOnlineStatus($friend['id'], $friend['logdate']);

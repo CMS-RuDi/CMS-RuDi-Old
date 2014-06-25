@@ -853,7 +853,7 @@ class cmsCore {
             // Успешность выполнения должна определяться в методе execute плагина
             // Он должен вернуть true
             if (!cmsCore::callEvent(strtoupper('get_'. $this->component .'_action_'. $this->do), false)) {
-                self::loadModel($this->component);
+                cmsCore::m($this->component);
                 self::includeFile('components/'. $this->component .'/frontend.php');
                 if (function_exists($this->component)) {
                     // в компонетах вместо error404() лучше использовать return false

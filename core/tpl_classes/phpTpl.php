@@ -33,7 +33,7 @@ class phpTpl{
         
         extract($this->tpl_vars);
 
-        include(TEMPLATE_DIR . $this->tpl_folder.'/'.$this->tpl_file);
+        include($this->tpl_folder .'/'. $this->tpl_file);
     }
     
     /**

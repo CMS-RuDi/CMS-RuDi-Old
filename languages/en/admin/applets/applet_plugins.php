@@ -13,5 +13,5 @@
 
 $_LANG['AD_PLUGIN_DISABLE']     = 'Plugin is disabled or has no configuration';
 $_LANG['AD_ENABLE_PLUGIN']      = 'Enable it to start working';
-$_LANG['AD_REMOVE_PLUGIN_OK']   = 'Plugin is successfully deleted from the system';
-$_LANG['AD_REMOVE_PLUGIN_FROM'] = 'Delete plugin from the system?';
+$_LANG['AD_REMOVE_PLUGIN_OK']   = 'Plugin is successfully deleted from system';
+$_LANG['AD_REMOVE_PLUGIN_FROM'] = 'Delete plugin from system?';

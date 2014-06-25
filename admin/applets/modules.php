@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -159,9 +159,10 @@ function applet_modules(){
 
 		$fields[] = array('title'=>'id', 'field'=>'id', 'width'=>'30');
 		$fields[] = array('title'=>$_LANG['AD_TITLE'], 'field'=>'title', 'width'=>'', 'filter'=>'15', 'link'=>'?view=modules&do=edit&id=%id%');
-		$fields[] = array('title'=>$_LANG['TITLE'], 'field'=>'name', 'width'=>'300', 'filter'=>'15');
-		$fields[] = array('title'=>$_LANG['AD_AUTHOR'], 'field'=>'author', 'width'=>'120');
-		$fields[] = array('title'=>$_LANG['SHOW'], 'field'=>'published', 'width'=>'80');
+		$fields[] = array('title'=>$_LANG['TITLE'], 'field'=>'name', 'width'=>'220', 'filter'=>'15');
+                $fields[] = array('title'=>$_LANG['AD_VERSION'], 'field'=>'version', 'width'=>'55');
+                $fields[] = array('title'=>$_LANG['AD_AUTHOR'], 'field'=>'author', 'width'=>'110');
+                $fields[] = array('title'=>$_LANG['SHOW'], 'field'=>'published', 'width'=>'65');
 		$fields[] = array('title'=>$_LANG['AD_ORDER'], 'field'=>'ordering', 'width'=>'75');
 		$fields[] = array('title'=>$_LANG['AD_POSITION'], 'field'=>'position', 'width'=>'70', 'filter'=>'10', 'filterlist'=>cpGetList('positions'));
 
@@ -263,7 +264,7 @@ function applet_modules(){
 //============================================================================//
 
 	if ($do == 'update'){
-            if (!cmsCore::validateForm()) { cmsCore::error404(); }
+            if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
             $id             = cmsCore::request('id', 'int', 0);
 
             $name           = cmsCore::request('name', 'str', '');
@@ -341,7 +342,7 @@ function applet_modules(){
 //============================================================================//
 
 	if ($do == 'submit'){
-            if (!cmsCore::validateForm()) { cmsCore::error404(); }
+            if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
             $sql        = "SELECT ordering as max_o FROM cms_menu ORDER BY ordering DESC LIMIT 1";
             $result     = cmsCore::c('db')->query($sql) ;
             $row        = cmsCore::c('db')->fetch_assoc($result);
@@ -381,12 +382,13 @@ function applet_modules(){
                 $sql        = "SELECT * FROM cms_modules WHERE id = $mod_id LIMIT 1";
                 $result     = cmsCore::c('db')->query($sql) ;
                 $original   = cmsCore::c('db')->fetch_assoc($result);
+                $is_original = cmsCore::request('del_orig', 'int', 0) ? 1 : 0;
 
                 $sql = "INSERT INTO cms_modules (position, name, title, is_external,
                                      content, ordering, showtitle, published,
                                      original, user, config, css_prefix, template,
                                      access_list, is_strict_bind,
-                                     cache, cachetime, cacheint)
+                                     cache, cachetime, cacheint, version)
                                 VALUES (
                                                 '{$position}',
                                                 '{$original['name']}',
@@ -396,14 +398,14 @@ function applet_modules(){
                                                 '{$maxorder}',
                                                 '{$showtitle}',
                                                 '{$published}',
-                                                '0',
+                                                '{$is_original}',
                                                 '{$original['user']}',
                                                 '{$original['config']}',
                                                 '$css_prefix',
                     '{$template}',
                     '{$access_list}',
                     '{$is_strict_bind}',
-                    '{$cache}', '{$cachetime}', '{$cacheint}'
+                    '{$cache}', '{$cachetime}', '{$cacheint}', '{$original['version']}'
                     )";
                 cmsCore::c('db')->query($sql);
 
@@ -878,5 +880,3 @@ function applet_modules(){
 //============================================================================//
 
 }
-
-?>

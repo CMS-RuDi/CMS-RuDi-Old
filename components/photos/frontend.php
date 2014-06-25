@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -44,16 +44,13 @@ function photos(){
 
 /////////////////////////////// Просмотр альбома ///////////////////////////////////////////////////////////////////////////////////////////
 if ($do=='view'){
-
-	$album = $inDB->getNsCategory('cms_photo_albums', $id, null); // fuze: убрать null и ниже if(mb_strstr($album['NSDiffer'],'club')) в следующем релизе
+    $album = $inDB->getNsCategory('cms_photo_albums', $id, null);
+    
     if (!$album && $inCore->menuId() !== 1) { cmsCore::error404(); }
 	// Неопубликованные альбомы показываем только админам
 	if (!$album['published'] && !$inUser->is_admin) { cmsCore::error404(); }
 
 	$album = cmsCore::callEvent('GET_PHOTO_ALBUM', $album);
-
-	// Если альбом клубов редиректим на новый адресс (оставлено для совместимости) убрать в следующем релизе
-	if (mb_strstr($album['NSDiffer'],'club')) { cmsCore::redirect('/clubs/photoalbum'.$album['id'], '301'); }
 
 	// если не корневой альбом
 	if($album['id'] != $root_album_id){
@@ -82,10 +79,10 @@ if ($do=='view'){
 	// Сортировка фотографий
 	$orderby = cmsCore::getSearchVar('orderby', $album['orderby']);
 	$orderto = cmsCore::getSearchVar('orderto', $album['orderto']);
-    if(!in_array($orderby, array('title','pubdate','rating','hits'))){
+    if (!in_array($orderby, array('title','pubdate','rating','hits'))) {
         $orderby = $album['orderby'];
     }
-    if(!in_array($orderto, array('desc','desc'))){
+    if (!in_array($orderto, array('desc','asc'))) {
         $orderto = $album['orderto'];
     }
 
@@ -332,7 +329,7 @@ if ($do=='delphoto'){
 
 	if (!$inUser->id) { cmsCore::halt(); }
 
-	if(!cmsCore::validateForm()) { cmsCore::halt(); }
+	if(!cmsUser::checkCsrfToken()) { cmsCore::halt(); }
 
 	$photo = cmsCore::callEvent('GET_PHOTO', $inPhoto->getPhoto($id));
 	if (!$photo) { cmsCore::halt(); }

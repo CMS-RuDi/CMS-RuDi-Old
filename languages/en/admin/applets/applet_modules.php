@@ -11,22 +11,22 @@
 //                                                                            //
 /******************************************************************************/
 
-$_LANG['AD_EDIT_MODULE_VIEW']        = 'Edit the module view';
+$_LANG['AD_EDIT_MODULE_VIEW']        = 'Edit module view';
 $_LANG['AD_EDIT_MODULE']             = 'Edit Module';
 $_LANG['AD_MODULE_ADD_SITE']         = 'The module was successfully added to the system';
 $_LANG['AD_MODULE_DELETE']           = 'Delete module?';
 $_LANG['AD_MODULE_ORDER']            = 'Automatically organize modules';
 $_LANG['AD_MODULE_TITLE']            = 'Module title';
-$_LANG['AD_MODULE_NAME']             = 'The module name';
-$_LANG['AD_SHOW_ADMIN']              = 'It is displayed in the admin panel';
-$_LANG['AD_DEFOLT_VIEW']             = 'The position of the show by default';
+$_LANG['AD_MODULE_NAME']             = 'Module name';
+$_LANG['AD_SHOW_ADMIN']              = 'displayed in the control panel';
+$_LANG['AD_DEFOLT_VIEW']             = 'Default module position';
 $_LANG['AD_POSITION_MUST_BE']        = 'must be present in a template';
-$_LANG['AD_MODULE_TEMPLATE']         = 'template module';
+$_LANG['AD_MODULE_TEMPLATE']         = 'Module position';
 $_LANG['AD_FOLDER_MODULES']          = 'The names of the files in the <b>modules/</b> folder of your current template begin with "module"';
-$_LANG['AD_MODULE_TYPE']             = 'Type of module';
-$_LANG['AD_MODULE_TYPE_NEW']         = 'User (new)';
+$_LANG['AD_MODULE_TYPE']             = 'Module type';
+$_LANG['AD_MODULE_TYPE_NEW']         = 'Custom (new)';
 $_LANG['AD_MODULE_TYPE_COPY']        = 'Duplicate (copy)';
-$_LANG['AD_MODULE_CONTENT']          = 'The contents of the module';
+$_LANG['AD_MODULE_CONTENT']          = 'Module content';
 $_LANG['AD_MODULE_COPY']             = 'copy module';
 $_LANG['AD_ORIGINAL_MODULE_DELETE']  = 'Delete the original';
 $_LANG['AD_MODULE_PUBLIC']           = 'publish module';
@@ -34,8 +34,8 @@ $_LANG['AD_VIEW_ALL_PAGES']          = 'Show on all pages';
 $_LANG['AD_ROOT_PAGES']              = '-- Root page --';
 $_LANG['AD_WHERE_MODULE_VIEW']       = 'Where to show module?';
 $_LANG['AD_DONT_VIEW']               = 'Do not show on the embedded pages';
-$_LANG['AD_MODULE_CACHE']            = 'caching';
-$_LANG['AD_DO_MODULE_CACHE']         = 'cache module?';
+$_LANG['AD_MODULE_CACHE']            = 'Cache';
+$_LANG['AD_DO_MODULE_CACHE']         = 'Module cache enabled';
 $_LANG['AD_MODULE_CACHE_PERIOD']     = 'Cache refresh period';
 $_LANG['AD_MODULE_CACHE_DELETE']     = 'Delete cache';
 $_LANG['AD_NO_CACHE']                = 'There is currently no cache';

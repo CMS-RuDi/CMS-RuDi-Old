@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -30,7 +30,7 @@ function files(){
 
         $fileurl = (mb_strpos($fileurl, '-') === 0) ? htmlspecialchars_decode(base64_decode(ltrim($fileurl, '-'))) : $fileurl;
 
-        if(mb_strstr($fileurl, '..')){ cmsCore::halt(); }
+        if(mb_strstr($fileurl, '..')){ cmsCore::error404(); }
 
         if (mb_strstr($fileurl, 'http:/')){
             if (!mb_strstr($fileurl, 'http://')){ $fileurl = str_replace('http:/', 'http://', $fileurl); }
@@ -68,17 +68,17 @@ function files(){
 
     if ($do=='redirect'){
 
-    	$url = str_replace('--q--', '?', cmsCore::request('url', 'str', ''));
+    	$url = str_replace(array('--q--',' '), array('?','+'), cmsCore::request('url', 'str', ''));
         if (!$url) { cmsCore::error404(); }
 
         $url = (mb_strpos($url, '-') === 0) ? htmlspecialchars_decode(base64_decode(ltrim($url, '-'))) : $url;
 
-        if(mb_strstr($url, '..')){ cmsCore::halt(); }
+        if (mb_strstr($url, '..')) { cmsCore::error404(); }
 
-        if (mb_strstr($url, 'http:/')){
+        if (mb_strstr($url, 'http:/')) {
             if (!mb_strstr($url, 'http://')){ $url = str_replace('http:/', 'http://', $url); }
         }
-        if (mb_strstr($url, 'https:/')){
+        if (mb_strstr($url, 'https:/')) {
             if (!mb_strstr($url, 'https://')){ $url = str_replace('https:/', 'https://', $url); }
         }
         // кириллические домены
@@ -101,4 +101,3 @@ function files(){
 //========================================================================================================================//
 
 }
-?>

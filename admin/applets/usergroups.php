@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -68,7 +68,7 @@ function applet_usergroups(){
 
     if ($do == 'submit' || $do == 'update'){
 
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $types = array('title'=>array('title', 'str', ''),
                        'alias'=>array('alias', 'str', ''),
@@ -210,21 +210,22 @@ function applet_usergroups(){
 				<span class="hinttext"><?php echo $_LANG['AD_COMPONENTS_SETTINGS_ON'];?></span>
 			  </td>
 			  <td valign="top">
-				  <table width="100%" border="0" cellspacing="2" cellpadding="0">
+                              <table width="100%" border="0" cellspacing="2" cellpadding="0">
 
-						<?php
-							$sql = "SELECT * FROM cms_components WHERE config <> '' ORDER BY title";
-							$res = cmsCore::c('db')->query($sql);
+                                    <?php
+                                        $coms = cmsCore::getInstance()->getAllComponents();
+                                        foreach ($coms as $com) {
+                                            if (!file_exists(PATH.'/admin/components/'. $com['link'] .'/backend.php')){
+                                                continue;
+                                            }
+                                    ?>
+                                    <tr>
+                                            <td width="16"><input type="checkbox" name="access[]" id="admin_com_<?php echo $com['link']; ?>" value="admin/com_<?php echo $com['link']; ?>" <?php if (isset($mod['access'])) { if (in_array('admin/com_'.$com['link'], $mod['access'])) { echo 'checked="checked"'; } }?> /></td>
+                                            <td><label for="admin_com_<?php echo $com['link']; ?>"><?php echo $com['title']; ?></label></td>
+                                    </tr>
+                                    <?php } ?>
 
-							while ($com = cmsCore::c('db')->fetch_assoc($res)) {
-						?>
-						<tr>
-							<td width="16"><input type="checkbox" name="access[]" id="admin_com_<?php echo $com['link']; ?>" value="admin/com_<?php echo $com['link']; ?>" <?php if (isset($mod['access'])) { if (in_array('admin/com_'.$com['link'], $mod['access'])) { echo 'checked="checked"'; } }?> /></td>
-							<td><label for="admin_com_<?php echo $com['link']; ?>"><?php echo $com['title']; ?></label></td>
-						</tr>
-						<?php } ?>
-
-				  </table>
+                              </table>
 			  </td>
 		  </tr>
 		</table>
@@ -272,5 +273,3 @@ function applet_usergroups(){
 	<?php
    }
 }
-
-?>

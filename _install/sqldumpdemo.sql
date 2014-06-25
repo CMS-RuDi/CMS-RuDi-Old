@@ -33,7 +33,7 @@ INSERT INTO `#__actions` (`id`, `component`, `name`, `title`, `message`, `is_tra
 (24, 'clubs', 'add_wall_club', 'Добавление записи на стену клуба', 'добавляет запись на стене клуба %s|', 1, 1),
 (25, 'clubs', 'add_post_club', 'Добавление записи в блог клуба', 'пишет пост %s| в блоге клуба %s', 1, 1),
 (26, 'users', 'add_user_photo', 'Добавление фото в личный альбом', 'добавляет фото %s| в альбом %s', 1, 1),
-(27, 'users', 'add_user_photo_multi', 'Добавление много фоток в личный альбом', 'добавляет %s фото| в альбом %s', 1, 1),
+(27, 'users', 'add_user_photo_multi', 'Добавление фотографий в личный альбом (мультизагрузка)', 'добавляет %s фото| в альбом %s', 1, 1),
 (28, 'registration', 'add_user', 'Регистрация нового пользователя', 'регистрируется. Приветствуем!|', 1, 1),
 (29, 'users', 'add_wall_my', 'Добавление записи на свою стену', 'пишет на своей стене|	', 1, 1),
 (30, 'clubs', 'add_photo_club', 'Добавление фото в альбом клуба', 'добавляет фото %s| в альбом клуба %s', 1, 1);
@@ -433,7 +433,7 @@ INSERT INTO `#__components` (`id`, `title`, `link`, `config`, `internal`, `autho
 (3, 'Фотогалерея', 'photos', '---\nlink: 0\nsaveorig: 0\nmaxcols: 2\norderby: title\norderto: desc\nshowlat: 1\nwatermark: 1\ntumb_view: 2\ntumb_from: 1\ntumb_club: \nis_today: 1\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
 (5, 'Поиск', 'search', '---\nperpage: 10\ncomp:\n  - content\n  - photos\n  - catalog\n  - forum\n  - blogs\n  - faq\n  - board\n  - clubs\nsearch_engine:\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
 (6, 'Конструктор форм', 'forms', '---\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
-(7, 'Комментарии пользователей', 'comments', '---\nemail: \ncanguests: 1\nregcap: 0\npublish: 1\nsmiles: 1\nbbcode: 1\nselfdel: 0\nsubscribe: 1\nanchors: 0\nrecode: 0\nmin_karma: 0\nmin_karma_show: 0\nmin_karma_add: 0\nperpage: 20\nj_code: 1\ncmm_ajax: 0\ncmm_ip: 1\n', 1, 'InstantCMS team', 1, '1.10.3', 1),
+(7, 'Комментарии пользователей', 'comments', '---\nemail: \ncanguests: 1\nregcap: 0\npublish: 1\nsmiles: 1\nbbcode: 1\nselfdel: 0\nsubscribe: 1\nanchors: 0\nrecode: 0\nmin_karma: 0\nmin_karma_show: 0\nmin_karma_add: 0\nperpage: 20\nj_code: 1\ncmm_ajax: 0\ncmm_ip: 1\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
 (8, 'Архив статей', 'arhive', '---\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
 (9, 'Универсальный каталог', 'catalog', '---\nemail: shop@site.ru\ndelivery: |\n  Сведения о доставке.\n  Этот текст можно изменить в настройках компонента &quot;Универсальный каталог&quot;.\nnotice: 1\npremod: 1\npremod_msg: 1\nis_comments: 1\nis_rss: 1\nwatermark: 1\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
 (10, 'Профили пользователей', 'users', '---\nshowgroup: 1\nsw_stats: \nsw_comm: 1\nsw_search: 1\nsw_forum: 1\nsw_photo: 1\nsw_wall: 1\nsw_friends: 1\nsw_blogs: 1\nsw_clubs: 1\nsw_feed: 1\nsw_content: 1\nsw_awards: 1\nsw_board: 1\nsw_msg: 1\nsw_guest: 1\nkarmatime: 1\nkarmaint: DAY\nphotosize: 0\nwatermark: 1\nsmallw: 64\nmedw: 200\nmedh: 500\nsw_files: 1\nfilessize: 100\nfilestype: jpeg,gif,png,jpg,bmp,zip,rar,tar\nprivforms: \n  - 3\nj_code: 1\ndeltime: 6\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
@@ -447,9 +447,9 @@ INSERT INTO `#__components` (`id`, `title`, `link`, `config`, `internal`, `autho
 (22, 'Доска объявлений', 'board', '---\nmaxcols: 3\nobtypes: |\n  Продам\n  Куплю\n  Обменяю\n  Подарю\nshowlat: \npublic: 2\nphotos: 1\nsrok: 1\npubdays: 10\nwatermark: 0\naftertime: \ncomments: 1\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
 (23, 'Клубы пользователей', 'clubs', '---\nseo_club: title\nenabled_blogs: 1\nenabled_photos: 1\nthumb1: 48\nthumb2: 200\nthumbsqr: 1\ncancreate: 1\nperpage: 10\ncreate_min_karma: 0\ncreate_min_rating: 0\n', 0, 'InstantCMS team', 1, '1.10.3', 1),
 (24, 'Скачивание и редирект', 'files', '', 1, 'InstantCMS team', 1, '1.10.3', 1),
-(25, 'Голосования', 'polls', '', 1, 'InstantCMS team', 1, '1.10.3', 1),
+(25, 'Голосования', 'polls', '---\n', 1, 'InstantCMS team', 1, '1.10.3', 1),
 (26, 'Подписки', 'subscribes', '', 1, 'InstantCMS team', 1, '1.10.3', 1),
-(27, 'Геолокация', 'geo', '', 1, 'InstantCMS team', 1, '1.10.3', 1);
+(27, 'Геолокация', 'geo', '---\n', 1, 'InstantCMS team', 1, '1.10.3', 1);
 
 DROP TABLE IF EXISTS `#__content`;
 CREATE TABLE `#__content` (
@@ -642,7 +642,7 @@ CREATE TABLE `#__filters` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 INSERT INTO `#__filters` (`id`, `title`, `description`, `link`, `published`) VALUES
-(1, 'Автозамена / Фильтр ссылок', 'Фильтр выполняет замену выражений по созданным вами правилам, а так же служит для создания ссылок в категории прайслиста, фотоальбомы и фотографии.<br/><br/>{ПРАЙС=Название категории}, <br/>{ФОТО=Название фотографии}, <br/>{АЛЬБОМ=Название фотоальбома}, <br/>{МАТЕРИАЛ=Название материала}<br/>{ФОРМА=Название формы} - форма с заголовком<br/>\r\n{БЛАНК=Название формы} - форма без заголовка', 'f_replace', 1),
+(1, 'Автозамена', 'Фильтр выполняет замену выражений по правилам.<br/><br/>{ФОТО=Название фотографии}, <br/>{АЛЬБОМ=Название фотоальбома}, <br/>{МАТЕРИАЛ=Название материала}<br/>{ФОРМА=Название формы} - форма с заголовком<br/>\r\n{БЛАНК=Название формы} - форма без заголовка', 'f_replace', 1),
 (4, 'Постраничный вывод', 'Фильтр разбивает текст материала на несколько страниц в тех местах где будет найден тэг {pagebreak}.', 'f_pages', 1),
 (2, 'Содержание статьи', 'Фильтр ищет тэги {СТРАНИЦА=Название страницы} в текстах статей, и заменяет их на главы в содержании статьи.', 'f_contents', 1),
 (5, 'Внешние скрипты', 'Фильтр находит в текстах статей и модулей выражения "{ФАЙЛ=script.php}" и заменяет их результатами выполнения соответствующих скриптов из папки "/includes/myphp/".', 'f_includes', 1),
@@ -829,8 +829,9 @@ CREATE TABLE `#__forum_votes` (
 DROP TABLE IF EXISTS `#__menu`;
 CREATE TABLE `#__menu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `menu` varchar(200) NOT NULL,
+  `menu` tinytext NOT NULL,
   `title` varchar(200) NOT NULL,
+  `css_class` varchar(15) NOT NULL DEFAULT '',
   `link` varchar(200) NOT NULL,
   `linktype` varchar(12) NOT NULL DEFAULT 'link',
   `linkid` varchar(25) DEFAULT '-1',
@@ -847,29 +848,30 @@ CREATE TABLE `#__menu` (
   `NSDiffer` varchar(40) DEFAULT NULL,
   `NSIgnore` int(11) NOT NULL,
   `parent_id` int(11) NOT NULL,
+  `is_lax` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `parent_id` (`parent_id`),
   KEY `NSLeft` (`NSLeft`,`NSRight`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 INSERT INTO `#__menu` (`id`, `menu`, `title`, `link`, `linktype`, `linkid`, `target`, `component`, `ordering`, `published`, `template`, `access_list`, `iconurl`, `NSLeft`, `NSRight`, `NSLevel`, `NSDiffer`, `NSIgnore`, `parent_id`) VALUES
-(1, 'root', '-- Корневая страница --', '-1', 'link', '-1', '_self', '', 1, 0, '0', '', '', 1, 34, 0, '', 0, 0),
-(10, 'mainmenu', 'Новости', '/novosti', 'category', '2', '_self', '', 1, 1, '0', '', '', 2, 3, 1, '', 0, 1),
-(13, 'mainmenu', 'Q&A', '/faq', 'component', 'faq', '_self', '', 6, 1, '0', '', '', 24, 25, 1, '', 0, 1),
-(15, 'mainmenu', 'Люди', '/users', 'component', 'users', '_self', '', 9, 1, '0', '', '', 30, 31, 1, '', 0, 1),
-(17, 'mainmenu', 'Блоги', '/blogs', 'component', 'blogs', '_self', '', 4, 1, '0', '', '', 20, 21, 1, '', 0, 1),
-(18, 'mainmenu', 'Форум', '/forum', 'component', 'forum', '_self', '', 10, 1, '0', '', '', 32, 33, 1, '', 0, 1),
-(20, 'mainmenu', 'Фото', '/photos', 'component', 'photos', '_self', '', 3, 1, '0', '', '', 14, 19, 1, '', 0, 1),
-(21, 'mainmenu', 'Статьи', '/stati', 'category', '6', '_self', '', 2, 1, '0', '', '', 4, 13, 1, '', 0, 1),
-(23, 'mainmenu', 'Каталог', '/catalog', 'component', 'catalog', '_self', '', 7, 1, '0', '', '', 26, 27, 1, '', 0, 1),
-(42, 'mainmenu', 'Новые фото', '/photos/latest.html', 'link', '/photos/latest.html', '_self', '', 1, 1, '0', '', 'starcons20.gif', 15, 16, 2, '', 0, 20),
-(41, 'mainmenu', 'Психология', '/stati/psihologija', 'category', '14', '_self', '', 3, 1, '0', '', '07.gif', 9, 10, 2, '', 0, 21),
-(40, 'mainmenu', 'Геология', '/stati/geologija', 'category', '12', '_self', '', 2, 1, '0', '', 'objects035.gif', 7, 8, 2, '', 0, 21),
-(39, 'mainmenu', 'Астрономия', '/stati/astronomija', 'category', '11', '_self', '', 1, 1, '0', '', 'objects049.gif', 5, 6, 2, '', 0, 21),
-(38, 'mainmenu', 'Клубы', '/clubs', 'component', 'clubs', '_self', '', 5, 1, '0', '', '', 22, 23, 1, '', 0, 1),
-(37, 'mainmenu', 'Объявления', '/board', 'component', 'board', '_self', '', 8, 1, '0', '', '', 28, 29, 1, '', 0, 1),
-(44, 'mainmenu', 'Маркетинг', '/stati/marketing', 'category', '13', '_self', '', 4, 1, '0', '', 'objects067.gif', 11, 12, 2, '', 0, 21),
-(43, 'mainmenu', 'Лучшие фото', '/photos/top.html', 'link', '/photos/top.html', '_self', '', 2, 1, '0', '', 'voteyes.gif', 17, 18, 2, '', 0, 20);
+(1, '---\n- root\n', '-- Корневая страница --', '-1', 'link', '-1', '_self', '', 1, 0, '0', '', '', 1, 34, 0, '', 0, 0),
+(10, '---\n- mainmenu\n', 'Новости', '/novosti', 'category', '2', '_self', '', 1, 1, '0', '', '', 2, 3, 1, '', 0, 1),
+(13, '---\n- mainmenu\n', 'Q&A', '/faq', 'component', 'faq', '_self', '', 6, 1, '0', '', '', 24, 25, 1, '', 0, 1),
+(15, '---\n- mainmenu\n', 'Люди', '/users', 'component', 'users', '_self', '', 9, 1, '0', '', '', 30, 31, 1, '', 0, 1),
+(17, '---\n- mainmenu\n', 'Блоги', '/blogs', 'component', 'blogs', '_self', '', 4, 1, '0', '', '', 20, 21, 1, '', 0, 1),
+(18, '---\n- mainmenu\n', 'Форум', '/forum', 'component', 'forum', '_self', '', 10, 1, '0', '', '', 32, 33, 1, '', 0, 1),
+(20, '---\n- mainmenu\n', 'Фото', '/photos', 'component', 'photos', '_self', '', 3, 1, '0', '', '', 14, 19, 1, '', 0, 1),
+(21, '---\n- mainmenu\n', 'Статьи', '/stati', 'category', '6', '_self', '', 2, 1, '0', '', '', 4, 13, 1, '', 0, 1),
+(23, '---\n- mainmenu\n', 'Каталог', '/catalog', 'component', 'catalog', '_self', '', 7, 1, '0', '', '', 26, 27, 1, '', 0, 1),
+(42, '---\n- mainmenu\n', 'Новые фото', '/photos/latest.html', 'link', '/photos/latest.html', '_self', '', 1, 1, '0', '', 'starcons20.gif', 15, 16, 2, '', 0, 20),
+(41, '---\n- mainmenu\n', 'Психология', '/stati/psihologija', 'category', '14', '_self', '', 3, 1, '0', '', '07.gif', 9, 10, 2, '', 0, 21),
+(40, '---\n- mainmenu\n', 'Геология', '/stati/geologija', 'category', '12', '_self', '', 2, 1, '0', '', 'objects035.gif', 7, 8, 2, '', 0, 21),
+(39, '---\n- mainmenu\n', 'Астрономия', '/stati/astronomija', 'category', '11', '_self', '', 1, 1, '0', '', 'objects049.gif', 5, 6, 2, '', 0, 21),
+(38, '---\n- mainmenu\n', 'Клубы', '/clubs', 'component', 'clubs', '_self', '', 5, 1, '0', '', '', 22, 23, 1, '', 0, 1),
+(37, '---\n- mainmenu\n', 'Объявления', '/board', 'component', 'board', '_self', '', 8, 1, '0', '', '', 28, 29, 1, '', 0, 1),
+(44, '---\n- mainmenu\n', 'Маркетинг', '/stati/marketing', 'category', '13', '_self', '', 4, 1, '0', '', 'objects067.gif', 11, 12, 2, '', 0, 21),
+(43, '---\n- mainmenu\n', 'Лучшие фото', '/photos/top.html', 'link', '/photos/top.html', '_self', '', 2, 1, '0', '', 'voteyes.gif', 17, 18, 2, '', 0, 20);
 
 DROP TABLE IF EXISTS `#__modules`;
 CREATE TABLE `#__modules` (
@@ -8913,7 +8915,7 @@ INSERT INTO `#__geo_cities` (`id`, `country_id`, `region_id`, `name`) VALUES
 (4344, 3159, 4312, 'Домодедово'),
 (4343, 3159, 4312, 'Долгопрудный'),
 (4342, 3159, 4312, 'Дмитров'),
-(4341, 3159, 4312, 'Джержинский'),
+(4341, 3159, 4312, 'Дзержинский'),
 (4340, 3159, 4312, 'Дедовск'),
 (4339, 3159, 4312, 'Деденево'),
 (4338, 3159, 4312, 'Голицино'),

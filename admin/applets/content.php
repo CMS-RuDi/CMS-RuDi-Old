@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -135,7 +135,7 @@ function applet_content(){
     }
 
     if ($do == 'update'){
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
         
         if (isset($_REQUEST['id'])) {
             $id                     = cmsCore::request('id', 'int', 0);
@@ -211,7 +211,7 @@ function applet_content(){
     }
 
     if ($do == 'submit'){
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
         
         $article['category_id'] = cmsCore::request('category_id', 'int', 1);
         $article['title']       = cmsCore::request('title', 'str');

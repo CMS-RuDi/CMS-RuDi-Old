@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -27,7 +27,9 @@ function cpComponentCanRemove($item){
 
 function applet_components(){
     $inCore = cmsCore::getInstance();
-
+    $inDB   = cmsCore::c('db');
+    $inUser = cmsCore::c('user');
+        
     global $_LANG;
     
     global $adminAccess;

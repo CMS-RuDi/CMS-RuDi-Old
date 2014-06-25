@@ -1,17 +1,15 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
-
-    if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
     /*
      * Доступны объекты $inCore $inUser $inPage($this) $inConf $inDB
@@ -23,30 +21,35 @@
     $mod_count['sidebar'] = $this->countModules('sidebar');
 
     // Подключаем стили шаблона
-    $this->addHeadCSS('templates/'.TEMPLATE.'/css/reset.css');
-    $this->addHeadCSS('templates/'.TEMPLATE.'/css/text.css');
-    $this->addHeadCSS('templates/'.TEMPLATE.'/css/960.css');
-    $this->addHeadCSS('templates/'.TEMPLATE.'/css/styles.css');
+    $this->addHeadCSS('templates/'. TEMPLATE .'/css/reset.css');
+    $this->addHeadCSS('templates/'. TEMPLATE .'/css/text.css');
+    $this->addHeadCSS('templates/'. TEMPLATE .'/css/960.css');
+    $this->addHeadCSS('templates/'. TEMPLATE .'/css/styles.css');
     // Подключаем colorbox (просмотр фото)
     $this->addHeadJS('includes/jquery/colorbox/jquery.colorbox.js');
     $this->addHeadCSS('includes/jquery/colorbox/colorbox.css');
     $this->addHeadJS('includes/jquery/colorbox/init_colorbox.js');
     // LANG фразы для colorbox
     $this->addHeadJsLang(array('CBOX_IMAGE','CBOX_FROM','CBOX_PREVIOUS','CBOX_NEXT','CBOX_CLOSE','CBOX_XHR_ERROR','CBOX_IMG_ERROR', 'CBOX_SLIDESHOWSTOP', 'CBOX_SLIDESHOWSTART'));
+    
+    if (cmsCore::c('user')->is_admin){
+        $this->addHeadJS('admin/js/modconfig.js');
+        $this->addHeadJS('templates/'. TEMPLATE .'/js/nyromodal.js');
+        $this->addHeadCSS('templates/'. TEMPLATE .'/css/modconfig.css');
+        $this->addHeadCSS('templates/'. TEMPLATE .'/css/nyromodal.css');
+    }
+    
+    // подключаем jQuery и js ядра в самое начало
+    $this->prependHeadJS('core/js/common.js');
+    $this->prependHeadJS('includes/jquery/jquery.js');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" prefix="og: http://ogp.me/ns# video: http://ogp.me/ns/video# ya: http://webmaster.yandex.ru/vocabularies/">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <?php $this->printHead(); ?>
-    <?php if(cmsCore::c('user')->is_admin){ ?>
-        <script src="/admin/js/modconfig.js" type="text/javascript"></script>
-        <script src="/templates/<?php echo TEMPLATE; ?>/js/nyromodal.js" type="text/javascript"></script>
-        <link href="/templates/<?php echo TEMPLATE; ?>/css/modconfig.css" rel="stylesheet" type="text/css" />
-        <link href="/templates/<?php echo TEMPLATE; ?>/css/nyromodal.css" rel="stylesheet" type="text/css" />
-    <?php } ?>
+    <?php $this->printHead('    '); ?>
 </head>
 
 <body>
@@ -147,7 +150,7 @@
 
     <script type="text/javascript">
         $(function(){
-            $('#sess_messages').hide().fadeIn().delay(5000).fadeOut('slow');
+            $('#sess_messages').hide().fadeIn();
             $('#topmenu .menu li').hover(
                 function() {
                     $(this).find('ul:first').fadeIn('fast');
@@ -161,7 +164,7 @@
         });
     </script>
     <?php if($inConf->debug && $inUser->is_admin){
-            $time = $inCore->getGenTime(); ?>
+        $time = $inCore->getGenTime(); ?>
         <div class="debug_info">
             <div class="debug_time">
                 <?php echo $_LANG['DEBUG_TIME_GEN_PAGE'].' '.number_format($time, 4).' '.$_LANG['DEBUG_SEC']; ?>
@@ -170,7 +173,7 @@
                 <?php echo $_LANG['DEBUG_MEMORY'].' '.round(@memory_get_usage()/1024/1024, 2).' '.$_LANG['SIZE_MB']; ?>
             </div>
             <div class="debug_query_count">
-                <a href="#debug_query_dump" class="ajaxlink" onclick="$('#debug_query_dump').toggle();"><?php echo $_LANG['DEBUG_QUERY_DB'].' '.$inDB->q_count; ?></a>
+                <a href="#debug_query_dump" class="ajaxlink" onclick="$('#debug_query_dump').toggle();return false;"><?php echo $_LANG['DEBUG_QUERY_DB'] .' '. $inDB->q_count; ?></a>
             </div>
             <div id="debug_query_dump">
                 <?php echo $inDB->q_dump; ?>

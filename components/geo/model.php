@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -25,13 +25,13 @@ class cms_model_geo {
 			);
     }
 
-    private function getItems($table) {
+    private function getItems($table, $first) {
 
         $sql = "SELECT id, name FROM {$table}
                 WHERE 1=1 {$this->inDB->where}
                 {$this->inDB->order_by}\n";
 		$result = $this->inDB->query($sql);
-        if (!$this->inDB->num_rows($result)){ return false; }
+        $c[0] = $first;
 
         while($data = $this->inDB->fetch_assoc($result)){
             $c[$data['id']] = $data['name'];
@@ -42,17 +42,14 @@ class cms_model_geo {
     }
 
     public function getCountries(){
-
         global $_LANG;
 
         $this->inDB->orderBy('ordering, name');
 
-        return array('0'=>$_LANG['GEO_SELECT_COUNTRY']) + $this->getItems('cms_geo_countries');
-
+        return $this->getItems('cms_geo_countries', $_LANG['GEO_SELECT_COUNTRY']);
     }
 
     public function getRegions($country_id=false){
-
         global $_LANG;
 
         if ($country_id){
@@ -61,12 +58,10 @@ class cms_model_geo {
 
         $this->inDB->orderBy('name');
 
-        return array('0'=>$_LANG['GEO_SELECT_REGION']) + $this->getItems('cms_geo_regions');
-
+        return $this->getItems('cms_geo_regions', $_LANG['GEO_SELECT_REGION']); 
     }
 
     public function getCities($region_id=false){
-
         global $_LANG;
 
         if ($region_id){
@@ -75,8 +70,7 @@ class cms_model_geo {
 
         $this->inDB->orderBy('name');
 
-        return array('0'=>$_LANG['GEO_SELECT_CITY']) + $this->getItems('cms_geo_cities');
-
+        return $this->getItems('cms_geo_cities', $_LANG['GEO_SELECT_CITY']);
     }
 
     public function getCityParents($city_id){
@@ -109,5 +103,3 @@ class cms_model_geo {
     }
 
 }
-
-?>

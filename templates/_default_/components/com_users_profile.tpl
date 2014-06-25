@@ -2,9 +2,9 @@
 {add_css file='includes/jquery/tabs/tabs.css'}
 
 {literal}
-	<script type="text/javascript">
+    <script type="text/javascript">
         $(function(){$(".uitabs").tabs();});
-	</script>
+    </script>
 {/literal}
 
 <div id="usertitle">
@@ -15,7 +15,7 @@
                 <table cellpadding="2" cellspacing="0"><tr>
                     <td class="sign_link" style="color:green">
                     {if $usr.can_change_karma}
-                        <a href="javascript:void(0)" onclick="users.changeKarma('{$usr.id}', 'plus');return false;" title="{$LANG.KARMA} +"><img src="/templates/{template}/images/icons/karma_up.png" border="0" alt="{$LANG.KARMA} +"/></a>
+                        <a href="javascript:void(0)" onclick="users.changeKarma('{$usr.id}', 'plus');return false;" title="{$LANG.KARMA} +"><img src="/templates/{template}/images/icons/karma_up.png" alt="{$LANG.KARMA} +"/></a>
                     {/if}
                     </td>
                     <td><span class="user_karma_point" id="u_karma">{$usr.karma}</span></td>
@@ -33,7 +33,7 @@
     </div>
 
     <div class="user_group_name">
-        <div class="{$usr.group_alias}">{$usr.grp}</div>
+        <div class="{$usr.group_alias}"><a href="/users/group/{$usr.group_id}">{$usr.grp}</a></div>
     </div>
 
     <div class="con_heading" id="nickname">

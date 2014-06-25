@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -14,7 +14,7 @@
 defined('VALID_CMS_ADMIN') or die();
 
 function cpAccessDenied(){
-	cmsCore::redirect('/admin/index.php?view=noaccess');
+    cmsCore::redirect('/admin/index.php?view=noaccess');
 }
 
 function cpWarning($text){
@@ -23,11 +23,11 @@ function cpWarning($text){
 }
 
 function cpWritable($file){ //relative path with starting "/"
-	if (is_writable(PATH.$file)){
-		return true;
-	} else {
-		return @chmod(PATH.$file, 0777);
-	}
+    if (is_writable(PATH.$file)){
+        return true;
+    } else {
+        return @chmod(PATH.$file, 0777);
+    }
 }
 
 function cpCheckWritable($file, $type='file'){
@@ -67,12 +67,17 @@ function cpWhoOnline(){
 
 /////////////////////////// PAGE GENERATION ////////////////////////////////////////////////////////////////
 function cpHead(){
-    cmsCore::c('page')->printAdminHead();
-    
+    /* Костыль скоро будет удален */
+    if (!empty($GLOBALS['cp_page_title'])) {
+        cmsCore::c('page')->setAdminTitle($GLOBALS['cp_page_title']);
+    }
     foreach($GLOBALS['cp_page_head'] as $key=>$value) {
-        echo $value,"\n";
+        cmsCore::c('page')->addHead($value);
         unset ($GLOBALS['cp_page_head'][$key]);
     }
+    /******************************/
+    
+    cmsCore::c('page')->printAdminHead();
 
     return;
 }
@@ -610,8 +615,8 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
 		$link = '?view='.$GLOBALS['applet'];
 
 		if ($sort){
-			$link .= '&sort='.$sort;
-			if (isset($_REQUEST['so'])) { $link .= '&so='.$_REQUEST['so']; }
+                    $link .= '&sort='.$sort;
+                    if (cmsCore::inRequest('so')) { $link .= '&so='.cmsCore::request('so'); }
 		}
 
         echo cmsPage::getPagebar($total, $page, $perpage, $_SERVER['PHP_SELF'].'?'.cpAddParam($_SERVER['QUERY_STRING'], 'page', '%page%'));
@@ -925,8 +930,9 @@ function cpGetList($listtype, $field_name='title'){
 	if ($listtype == 'menu'){
 
         $list[] = array('title'=>$_LANG['AD_MAIN_MENU'], 'id'=>'mainmenu');
-
-        for ($m=1; $m<=15; $m++){
+        $list[] = array('title'=>$_LANG['AD_USER_MENU'], 'id'=>'usermenu');
+        
+        for ($m=1; $m<=20; $m++){
             $list[] = array('title'=>"{$_LANG['AD_SUBMENU']} {$m}", 'id'=>'menu'.$m);
         }
 

@@ -15,7 +15,7 @@ $_LANG['BLOG']                   = 'Blog';
 $_LANG['BLOGS']                  = 'Blogs';
 $_LANG['PATH_CREATING_BLOG']     = 'Creating a Blog';
 $_LANG['CREATE_BLOG']            = 'Create a Blog';
-$_LANG['BLOG_ERR_TITLE']         = 'Enter the title of the blog! The title should be no shorter than 5 characters.';
+$_LANG['BLOG_ERR_TITLE']         = 'Enter blog title! Title should be no shorter than 5 characters.';
 $_LANG['BLOG_YOU_NEED']          = 'You do not have enough';
 $_LANG['BLOG_KARMS']             = 'karma';
 $_LANG['FOR_CREATE_PERSON_BLOG'] = 'to create a personal Blog. It is required';
@@ -42,7 +42,7 @@ $_LANG['KARMS']                  = 'karma';
 
 $_LANG['NEW_POST']           = 'New post';
 $_LANG['EDIT_POST']          = 'Edit post';
-$_LANG['POST_ERR_TITLE']     = 'Specify title of the post! The title should be no shorter than 2 characters.';
+$_LANG['POST_ERR_TITLE']     = 'Specify post title! The title should be no shorter than 2 characters.';
 $_LANG['POST_ERR_TEXT']      = 'Fill in the text of the post! The text should be no shorter than 5 characters.';
 $_LANG['ERR_POST_CREATE']    = 'Failed to create a record!';
 $_LANG['POST_CREATED']       = 'Post was added successfully';
@@ -52,15 +52,15 @@ $_LANG['POST_PREMODER_TEXT'] = 'The record will be published on the Blog after v
 $_LANG['PREV_POST']          = 'Previous post';
 $_LANG['NEXT_POST']          = 'Next post';
 
-$_LANG['NEW_CAT']       = 'New section';
-$_LANG['CAT_ERR_TITLE'] = 'Specify  title of the section! The title should be no shorter than 3 characters.';
+$_LANG['NEW_CAT']       = 'New category';
+$_LANG['CAT_ERR_TITLE'] = 'Specify category title! The title should be no shorter than 3 characters.';
 
 $_LANG['CLOSED_POST']      = 'Closed post';
 $_LANG['CLOSED_POST_TEXT'] = 'Users access to this diary post restricted.';
-$_LANG['WITHOUT_CAT']      = 'Without section';
+$_LANG['WITHOUT_CAT']      = 'Without category';
 
 $_LANG['DELETE_POST']           = 'Delete post';
-$_LANG['YOU_REALY_DELETE_POST'] = 'Are you sure you want to delete this post';
+$_LANG['YOU_REALY_DELETE_POST'] = 'Are you sure you want to delete this post?';
 $_LANG['FROM_BLOG']             = 'from the blog?';
 
 $_LANG['YOUR_POST']             = 'Your post';
@@ -70,14 +70,14 @@ $_LANG['PUBLISHED_IN_BLOG']     = 'published on the blog';
 $_LANG['DELETE_BLOG']           = 'Delete Blog';
 $_LANG['YOU_REALY_DELETE_BLOG'] = 'Are you sure you want to delete your blog including all posts?';
 
-$_LANG['YOU_REALY_DELETE_CAT'] = 'Are you sure you want to delete the section? Posts in this section will not be deleted.';
+$_LANG['YOU_REALY_DELETE_CAT'] = 'Are you sure you want to delete category? Posts in this category will not be deleted.';
 
 $_LANG['BLOG_IS_DELETED'] = 'Blog deleted successfully';
 $_LANG['CAT_IS_DELETED']  = 'Category deleted successfully';
 $_LANG['CAT_IS_ADDED']    = 'Category added successfully';
 $_LANG['CAT_IS_UPDATED']  = 'Post saved(updated) successfully';
 
-$_LANG['RSS_BLOGS'] = 'RSS of Blogs';
+$_LANG['RSS_BLOGS'] = 'Blogs RSS';
 
 $_LANG['POPULAR_IN_BLOGS'] = 'Most popular of blogs';
 
@@ -115,7 +115,7 @@ $_LANG['GOTO_BLOG']             = 'Go to Blog';
 $_LANG['MY_PROFILE']            = 'My profile';
 $_LANG['CAT_NAME']              = 'Category title';
 $_LANG['CAT_DESCRIPTION']       = 'Category description';
-$_LANG['TITLE_POST']            = 'Title of the post';
+$_LANG['TITLE_POST']            = 'Post title';
 $_LANG['BLOG_CAT']              = 'Blog category';
 $_LANG['SHOW_POST']             = 'Show post';
 $_LANG['YOUR_MOOD']             = 'Your mood';
@@ -131,9 +131,9 @@ $_LANG['BACK_TO_BLOG']          = 'Back to Blog';
 $_LANG['POSTS_COUNT']           = 'Number of posts';
 $_LANG['ALLOW']                 = 'Allow';
 $_LANG['ERR_CONFIG_BLOG']       = 'Blog settings error!';
-$_LANG['RSS']                   = 'RSS -feed';
+$_LANG['RSS']                   = 'RSS feed';
 $_LANG['BLOG_AVTOR']            = 'Blog author';
-$_LANG['BLOG_ADMIN']            = 'Administrator of the blog';
+$_LANG['BLOG_ADMIN']            = 'Blog administrator';
 $_LANG['RENAME_CAT']            = 'Edit category';
 $_LANG['DEL_CAT']               = 'Delete category';
 $_LANG['CONFIG']                = 'Settings';
@@ -148,8 +148,8 @@ $_LANG['POSTS_RSS']             = 'News feed posts';
 $_LANG['ALL_BLOGS']             = 'All Blogs';
 $_LANG['POSTS_IN_BLOGS']        = 'Number of posts on the blog';
 $_LANG['COMMENT_IN_BLOG']       = 'Number of comments on the blog';
-$_LANG['BLOG_RSS']              = 'RSS -feed of the blog';
-$_LANG['BLOGS_RSS']             = 'RSS -feed of the blogs';
+$_LANG['BLOG_RSS']              = 'Blog RSS feed';
+$_LANG['BLOGS_RSS']             = 'Blog RSS feeds';
 $_LANG['NOT_ACTIVE_BLOGS']      = 'No active Blogs';
 $_LANG['AVTOR']                 = 'Author';
 $_LANG['PUBLISHED']             = 'Published';

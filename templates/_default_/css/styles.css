@@ -349,13 +349,15 @@ span.fast_cfg_link img {
 }
 
 /**************************** Сообщения сессии ********************************/
-#sess_messages {
-    box-shadow: 0 0 3px #000;
-    position: fixed;
-    right: 2px;
-    top: 2px;
-    border-radius: 0;
-}
+.sess_messages { 
+     padding:10px; 
+     background:#E0EAEF; 
+     margin-bottom:15px; 
+     display:block; 
+     clear:both; 
+     border-radius:8px; 
+     -moz-border-radius:8px; 
+} 
 
 .sess_messages {
     padding: 10px;
@@ -1368,6 +1370,14 @@ a.tag {
     overflow: hidden;
     _height: 1%;
     width: 100%;
+    position: relative;
+}
+.bbcodebox_height { 
+    height: 58px; 
+} 
+#imginsert { 
+    position: absolute; 
+    top: 26px; 
 }
 .usr_bb_button {
     display: block;

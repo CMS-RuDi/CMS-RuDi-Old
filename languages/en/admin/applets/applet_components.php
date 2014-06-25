@@ -11,4 +11,4 @@
 //                                                                            //
 /******************************************************************************/
 
-$_LANG['AD_DELETED_COMPONENT_FROM'] = 'Delete component from the system?';
+$_LANG['AD_DELETED_COMPONENT_FROM'] = 'Delete component from system?';

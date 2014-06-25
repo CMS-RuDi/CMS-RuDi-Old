@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -23,16 +23,109 @@
     include(PATH.'/core/cms.php');
     $inCore = cmsCore::getInstance();
 
-    cmsCore::c('user');
-    cmsCore::c('cron');
-    cmsCore::c('actions');
-    cmsCore::c('page');
-
     // принудительно включаем дебаг
     cmsCore::c('config')->debug = 1;
-
-    $version_prev = 'CMS Rudi 0.0.3 или Instant CMS v1.10.3';
-    $version_next = 'CMS Rudi 0.0.4';
+    
+    // Подключаем вспомогательный класс для миграции БД
+    include PATH .'/migrate/migrate.class.php';
+    // Выставляем необходимые опции для миграции
+    $migrateDB = new migrateDB(array(
+        'create_fields' => array(
+            array( 'table' => 'cms_modules_bind', 'name' => 'tpl', 'type' => 'VARCHAR(64)' ),
+            array( 'table' => 'cms_category', 'name' => 'pagetitle', 'type' => 'VARCHAR(255)' ),
+            array( 'table' => 'cms_category', 'name' => 'meta_desc', 'type' => 'VARCHAR(1024)' ),
+            array( 'table' => 'cms_category', 'name' => 'meta_keys', 'type' => 'VARCHAR(1024)' ),
+            array( 'table' => 'cms_content', 'name' => 'images', 'type' => 'longtext' ),
+            array( 'table' => 'cms_content', 'name' => 'slidecfg', 'type' => 'varchar(64)' ),
+            array( 'table' => 'cms_upload_images', 'name' => 'title', 'type' => 'VARCHAR(255)' ),
+            array( 'table' => 'cms_upload_images', 'name' => 'description', 'type' => 'VARCHAR(1024)' ),
+            array( 'table' => 'cms_upload_images', 'name' => 'user_id', 'type' => 'INT(11)' ),
+            array( 'table' => 'cms_upload_images', 'name' => 'pubdate', 'type' => 'DATETIME', 'default' => '0000-00-00 00:00:00' ),
+            array( 'table' => 'cms_clubs', 'name' => 'seolink', 'type' => 'VARCHAR(200)' ),
+            array( 'table' => 'cms_user_groups_access', 'name' => 'hide_for_guest', 'type' => 'TINYINT(1) UNSIGNED', 'default' => '0' ),
+            array( 'table' => 'cms_users', 'name' => 'music_count', 'type' => 'INT(11)', 'default' => '0' ),
+            array( 'table' => 'cms_menu', 'name' => 'is_lax', 'type' => 'tinyint(1)', 'default' => '0' ),
+            array( 'table' => 'cms_menu', 'name' => 'css_class', 'type' => 'VARCHAR(15)', 'default' => '' )
+        ),
+        
+        'drop_indexes' => array(
+            array( 'table' => 'cms_ratings',       'names' => array( 'user_id', 'item_id', 'ip' ) ),
+            array( 'table' => 'cms_ratings_total', 'names' => array( 'target', 'item_id' ) ),
+            array( 'table' => 'cms_upload_images', 'names' => array( 'user_id' ) ),
+            array( 'table' => 'cms_banner_hits', 'names' => array( 'ip' ) ),
+            array( 'table' => 'cms_banner_hits', 'names' => array( 'banner_id' ) )
+        ),
+        
+        'create_indexes' => array(
+            array(
+                'table' => 'cms_ratings',
+                'indexes'  => array(
+                    array( 'name' => 'user_id', 'fields' => array( 'user_id', 'target' ) ),
+                    array( 'name' => 'item_id', 'fields' => array( 'item_id', 'target', 'user_id' ) ),
+                    array( 'name' => 'ip',      'fields' => array( 'item_id', 'target', 'ip' ) )
+                )
+            ),
+            array(
+                'table' => 'cms_ratings_total',
+                'indexes' => array(
+                    array( 'name' => 'item_id', 'fields' => array( 'item_id', 'target' ) )
+                )
+            ),
+            array(
+                'table' => 'cms_upload_images',
+                'indexes' => array(
+                    array( 'name' => 'user_id', 'fields' => array( 'user_id' ) )
+                )
+            ),
+            array(
+                'table' => 'cms_banner_hits',
+                'indexes' => array(
+                    array( 'name' => 'banner_id', 'fields' => array( 'banner_id' ) )
+                )
+            ),
+            array(
+                'table' => 'cms_banner_hits',
+                'indexes' => array(
+                    array( 'unique' => true, 'fields' => array( 'ip', 'banner_id' ) )
+                )
+            )
+        ),
+        
+        'inserts' => array(
+            array( 'table' => 'cms_plugins', 'where' => "plugin='p_content_imgs'", 'insert_array' => array('plugin' => 'p_content_imgs', 'title' => 'Прикрепленные к статьям фотографии', 'description' => 'Плагин добавляет в конце статьи карусель (слайдер) с прикрепленными фотографиями. Вставляет в текст статьи фотографии в тех местах где прописана конструкция вида {img#123}', 'author' => 'DS Soft', 'version' => '0.0.1', 'plugin_type' => 'plugin', 'published' => 1, 'config' => '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n'), 'msg' => 'Установлен и включен плагин p_content_imgs', 'after' => "INSERT INTO `cms_event_hooks` SET `event`='GET_ARTICLE', `plugin_id`='%id%'" )
+        ),
+        
+        'queries' => array(
+            array('sql' => "UPDATE `cms_modules_bind` SET `tpl` = '". cmsCore::c('config')->template ."' WHERE `tpl` = ''"),
+            array('sql' => "UPDATE cms_user_groups_access SET hide_for_guest=1 WHERE id=4 or id=5 or id=6 or id=9 or id=12 or id=14 or id=15"),
+            array('sql' => "UPDATE cms_components SET internal = '0' WHERE link = 'comments'"),
+            array('sql' => "ALTER TABLE `cms_banner_hits` CHANGE `pubdate` `pubdate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"),
+            array('sql' => "ALTER TABLE `cms_menu` CHANGE `menu` `menu` TINYTEXT NOT NULL")
+        ),
+        
+        'com_cfgs' => array(
+            array(
+                'name' => 'content',
+                'unset_keys' => array( 'img_table' ),
+                'merge_cfgs' => array(
+                    'imgs_big_w'    => 300,
+                    'imgs_big_h'    => 300,
+                    'imgs_medium_w' => 200,
+                    'imgs_medium_h' => 200,
+                    'imgs_small_w'  => 100,
+                    'imgs_small_h'  => 100,
+                    'resize_type'   => 'auto',
+                    'mresize_type'  => 'auto',
+                    'sresize_type'  => 'auto',
+                    'watermark_only_big' => 0,
+                    'imgs_quality' => 80
+                )
+            )
+        )
+    ));
+    
+    $version_prev = 'CMS RuDi 0.0.x или Instant CMS v1.10.3+';
+    $version_next = 'CMS RuDi 0.0.6';
 
 // ========================================================================== //
 // ========================================================================== //
@@ -60,7 +153,7 @@
        margin:2px;
        margin-left:20px;
        background:url(/admin/images/actions/on.gif) no-repeat;
-   }
+    }
     .migrate p.info {
        font-size: 16px;
        background: none;
@@ -78,7 +171,7 @@
        margin-top:15px;
        font-size:18px;
     }
-  </style>
+</style>
 <div id="wrapper" class="migrate">
 <?php
     echo "<h2>Миграция InstantCMS {$version_prev} &rarr; {$version_next}</h2>";
@@ -89,156 +182,49 @@
     }
 
 // ========================================================================== //
-// ========================================================================== //
     $step = cmsCore::request('go', 'int', 0);
 
     echo '<h3>Шаг № '.$step.'</h3>';
 
 // ========================================================================== //
-// ========================================================================== //
 
-    if($step == 1){
-        /* Работа с полями таблиц*/
-        $CREATE_FIELDS = array(
-            array( 'table' => 'cms_modules_bind', 'name' => 'tpl', 'type' => 'VARCHAR(64)', 'default' => '_default_' ),
-            
-            array( 'table' => 'cms_category', 'name' => 'pagetitle', 'type' => 'VARCHAR(255)' ),
-            array( 'table' => 'cms_category', 'name' => 'meta_desc', 'type' => 'VARCHAR(1024)' ),
-            array( 'table' => 'cms_category', 'name' => 'meta_keys', 'type' => 'VARCHAR(1024)' ),
-            
-            array( 'table' => 'cms_content', 'name' => 'images', 'type' => 'longtext' ),
-            array( 'table' => 'cms_content', 'name' => 'slidecfg', 'type' => 'varchar(64)' ),
-            
-            array( 'table' => 'cms_upload_images', 'name' => 'title', 'type' => 'VARCHAR(255)' ),
-            array( 'table' => 'cms_upload_images', 'name' => 'description', 'type' => 'VARCHAR(1024)' ),
-            array( 'table' => 'cms_upload_images', 'name' => 'user_id', 'type' => 'int(11)' ),
-            array( 'table' => 'cms_upload_images', 'name' => 'pubdate', 'type' => 'DATETIME', 'default' => '0000-00-00 00:00:00' ),
-            
-            array( 'table' => 'cms_clubs', 'name' => 'seolink', 'type' => 'VARCHAR(200)' ),
-            array( 'table' => 'cms_user_groups_access', 'name' => 'hide_for_guest', 'type' => 'TINYINT( 1 ) UNSIGNED', 'default' => '0' ),
-        );
+    if ($step == 1) {
+        // Добавляем новые поля
+        $migrateDB->createFields();
+        // Удаляем не нужные индексы
+        $migrateDB->dropIndexes();
+        // Создаем новые индексы
+        $migrateDB->createIndexes();
+        // Вставляем данные в БД
+        $migrateDB->inserts();
+        // Выполняем произвольные запросы в БД
+        $migrateDB->query();
+        // Изменяем настройки компонентов если требуется
+        $migrateDB->setComCfgs();
         
-        if (!empty($CREATE_FIELDS)){
-            foreach ($CREATE_FIELDS as $create_field){
-                if (!cmsCore::c('db')->isFieldExists($create_field['table'], $create_field['name'])){
-                    cmsCore::c('db')->query("ALTER TABLE `". $create_field['table'] ."` ADD `". $create_field['name'] ."` ". $create_field['type'] ." NOT NULL". (isset($create_field['default']) ? " DEFAULT ". $create_field['default'] : ""));
-                    echo '<p>Поле "'. $create_field['name'] .'" добавлено в таблицу "'. $create_field['table'] .'";</p>';
+        if ($migrateDB->checkCreateField('is_lax')) {
+            $result = cmsCore::c('db')->query("SELECT id, menu FROM cms_menu");
+            if (cmsCore::c('db')->num_rows($result)) {
+                while ($item = cmsCore::c('db')->fetch_assoc($result)) {
+                    $item['menu'] = cmsCore::arrayToYaml(array($item['menu']));
+                    cmsCore::c('db')->query("UPDATE cms_menu SET menu = '". $item['menu'] ."' WHERE id = '". $item['id'] ."'");
                 }
             }
-        }
-        /*====================================================================*/
-        
-        /*--------------------- Работа с индексами таблиц --------------------*/
-        $DROP_INDEXES = array(
-            array( 'table' => 'cms_ratings',       'names' => array( 'user_id', 'item_id', 'ip' ) ),
-            array( 'table' => 'cms_ratings_total', 'names' => array( 'target', 'item_id' ) ),
-            array( 'table' => 'cms_upload_images', 'names' => array( 'user_id' ) )
-        );
-        
-        $CREATE_INDEXES = array(
-            array(
-                'table' => 'cms_ratings',
-                'indexes'  => array(
-                    array( 'name' => 'user_id', 'fields' => array( 'user_id', 'target' ) ),
-                    array( 'name' => 'item_id', 'fields' => array( 'item_id', 'target', 'user_id' ) ),
-                    array( 'name' => 'ip',      'fields' => array( 'item_id', 'target', 'ip' ) )
-                )
-            ),
-            array(
-                'table' => 'cms_ratings_total',
-                'indexes' => array(
-                    array( 'name' => 'item_id', 'fields' => array( 'item_id', 'target' ) )
-                )
-            ),
-            array(
-                'table' => 'cms_upload_images',
-                'indexes' => array(
-                    array( 'name' => 'user_id', 'fields' => array( 'user_id' ) )
-                )
-            ),
-        );
-        
-        if (!empty($DROP_INDEXES)){
-            foreach ($DROP_INDEXES as $drop_index){
-                $table = cmsCore::c('db')->fetch_assoc(cmsCore::c('db')->query('SHOW CREATE TABLE `'. $drop_index['table'] .'`'));
-                foreach ($drop_index['names'] as $index){
-                    if (preg_match('#KEY[\s]+`'. $index .'`#is', $table['Create Table'], $m)){
-                        cmsCore::c('db')->query('ALTER TABLE `'. $drop_index['table'] .'` DROP INDEX `'. $index .'`');
-                    }
-                }
-            }
+            echo '<p>Поддержка множественного выбора меню для показа выполнена</p>';
         }
         
-        if (!empty($CREATE_INDEXES)){
-            foreach ($CREATE_INDEXES as $create_index){
-                foreach ($create_index['indexes'] as $index){
-                    cmsCore::c('db')->query('ALTER TABLE `'. $create_index['table'] .'` ADD INDEX `'. $index['name'] .'` (`'. implode('`,`', $index['fields']) .'`)');
-                }
-            }
+        if (cmsCore::c('db')->get_field('cms_plugins', "plugin = 'p_loginza'", 'version') != '1.10.4') { 
+            cmsCore::c('db')->query("UPDATE `cms_users` SET `openid` = MD5(openid) WHERE `openid` IS NOT NULL"); 
+            cmsCore::c('db')->query("UPDATE `cms_plugins` SET `version` = '1.10.4' WHERE `plugin` = 'p_loginza'"); 
+            echo '<p>Плагин "Авторизация Loginza" обновлен.</p>'; 
         }
-        /*====================================================================*/
         
-        
-        /*--------------------------------------------------------------------*/
-        cmsCore::c('db')->query("UPDATE `cms_modules_bind` SET `tpl` = '". cmsCore::c('config')->template ."' WHERE `tpl` = ''");
-        cmsCore::c('db')->query("UPDATE cms_user_groups_access SET hide_for_guest=1 WHERE id=4 or id=5 or id=6 or id=9 or id=12 or id=14 or id=15");
-        
-//        $items = cmsCore::c('db')->get_table('cms_clubs');
-//        foreach ($items as $item){
-//            cmsCore::c('db')->query("UPDATE `cms_clubs` SET `seolink`='". cmsCore::strToURL($item['title']) ."' WHERE id='". $item['id'] ."'");
-//        }
-//        echo '<p>---- Сгенерированы seolink для всех клубов;</p>';
-        
-        if (!cmsCore::c('db')->get_field('cms_plugins', "plugin='p_content_imgs'", 'id')){
-            $id = cmsCore::c('db')->insert('cms_plugins', array('plugin' => 'p_content_imgs', 'title' => 'Прикрепленные к статьям фотографии', 'description' => 'Плагин добавляет в конце статьи карусель (слайдер) с прикрепленными фотографиями. Вставляет в текст статьи фотографии в тех местах где прописана конструкция вида {img#123}', 'author' => 'DS Soft', 'version' => '0.0.1', 'plugin_type' => 'plugin', 'published' => 1, 'config' => '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n'));
-            cmsCore::c('db')->insert('cms_event_hooks', array('event' => 'GET_ARTICLE', 'plugin_id' => $id));
-            echo '<p>Установлен и включен плагин p_content_imgs;</p>';
-        }
-        /*====================================================================*/
-        
-        
-        /*----------------- Работа с настройками компонентов -----------------*/
-        $COM_CFGS = array(
-            array(
-                'name' => 'content',
-                'unset_keys' => array( 'img_table' ),
-                'merge_cfgs' => array(
-                    'imgs_big_w'    => 300,
-                    'imgs_big_h'    => 300,
-                    'imgs_medium_w' => 200,
-                    'imgs_medium_h' => 200,
-                    'imgs_small_w'  => 100,
-                    'imgs_small_h'  => 100,
-                    'resize_type'   => 'auto',
-                    'mresize_type'  => 'auto',
-                    'sresize_type'  => 'auto',
-                    'watermark_only_big' => 0,
-                    'imgs_quality' => 80
-                )
-            )
-        );
-        
-        if (!empty($COM_CFGS)){
-            foreach ($COM_CFGS as $com){
-                $com_cfg = $inCore->loadComponentConfig($com['name']);
-                if (!empty($com['unset_keys'])){
-                    foreach ($com['unset_keys'] as $key){
-                        if (isset($com_cfg[$key])){ unset($com_cfg[$key]); }
-                    }
-                }
-                if (!empty($com['merge_cfgs'])){
-                    $com_cfg = array_merge($com_cfg, $com['merge_cfgs']);
-                }
-                $inCore->saveComponentConfig($com['name'], $com_cfg);
-            }
-        }
-        /*====================================================================*/
-        
-        
+        // Оптимизируем таблицы в БД
         cmsDatabase::optimizeTables();
         
-        echo '<h3><a href="/migrate/index.php?go=2">Шаг 2. Перенос изображений статей...</a></h3>';
+        echo '<h3><a href="/migrate/index.php?go=2">Шаг № 2. Работа с файлами и папками...</a></h3>';
     }
+
 // ========================================================================== //
     if ($step == 2){
         $dir_m = PATH .'/images/photos/medium';
@@ -281,5 +267,3 @@
 // ========================================================================== //
 
     echo '</div></body></html>';
-
-?>

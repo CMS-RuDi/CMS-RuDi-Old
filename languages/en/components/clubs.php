@@ -132,3 +132,4 @@ $_LANG['VIP_BILLING_INFO']            = 'To support VIP -clubs component is requ
 $_LANG['VIP_BILLING_INFO1']           = 'By connecting a billing you will be able to assign VIP -status to any club and set the rate of charge for joining into the club.';
 $_LANG['ALL_MEMBER']                  = 'All members';
 $_LANG['YOU_NO_SELECT_USER']          = 'You did not select any user!';
+$_LANG['MSG_CLUB_PHOTO_SUBMIT']       = 'User %s added photo "<b>%s</b>" on the club album "<b>%s</b>".<br> Please moderate it.';

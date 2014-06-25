@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -29,12 +29,14 @@ class cmsDatabase {
     private $cache = array(); // кеш некоторых запросов
 
     public $db_link;
+    private $db_prefix;
 
 // ============================================================================ //
 // ============================================================================ //
 
     private function __construct(){
         $this->db_link = self::initConnection();
+        $this->db_prefix = cmsConfig::getConfig('db_prefix') .'_';
     }
     public function __destruct(){
         mysqli_close($this->db_link);
@@ -56,8 +58,13 @@ class cmsDatabase {
      * Реинициализирует соединение с базой
      */
     public static function reinitializedConnection(){
-        self::getInstance()->db_link = self::initConnection();
-
+        $db = self::getInstance();
+        if (!mysqli_ping($db->db_link)) {
+            if (!empty($db->db_link)) {
+                mysqli_close($db->db_link);
+            }
+            $db->db_link = self::initConnection();
+        }
         return true;
     }
 
@@ -138,27 +145,32 @@ class cmsDatabase {
 // ============================================================================ //
 
     protected function replacePrefix($sql, $prefix='cms_'){
-        return trim(str_replace($prefix, cmsConfig::getConfig('db_prefix').'_', $sql));
+        if ($prefix == $this->db_prefix) {
+            return trim($sql);
+        }
+        return trim(str_replace($prefix, $this->db_prefix, $sql));
     }
 
 // ============================================================================ //
 // ============================================================================ //
 
-    public function query($sql, $ignore_errors=false, $replace_prefix = true){
-        if (empty($sql)){ return false; }
-
+    public function query($sql, $ignore_errors=false, $replace_prefix = true) {
+        if (empty($sql)) { return false; }
+        
+        $time = microtime(true);
+        
         $sql = $replace_prefix ? $this->replacePrefix($sql) : $sql;
 
         $result = mysqli_query($this->db_link, $sql);
 
-        if (cmsConfig::getConfig('debug')){
+        if (cmsConfig::getConfig('debug')) {
             $this->q_count += 1;
-            $this->q_dump .= '<pre>'.$sql.'</pre><hr/>';
+            $this->q_dump .= '<pre>'. number_format(microtime(true)-$time,6) ."\n". $sql .'</pre><hr/>';
         }
 
-        if (cmsConfig::getConfig('debug') && !$ignore_errors){
+        if (cmsConfig::getConfig('debug') && !$ignore_errors) {
             $error = $this->error();
-            if($error){
+            if ($error) {
                 die('<div style="border:solid 1px gray;padding:12px">DATABASE ERROR: <pre>'.$sql.'</pre>'.$error.'</div>');
             }
         }
@@ -297,7 +309,7 @@ class cmsDatabase {
     public function escape_string($value){
         if(is_array($value)){
             foreach ($value as $key=>$string) {
-                $value[$key] = self::escape_string($string);
+                $value[$key] = $this->escape_string($string);
             }
             return $value;
         }

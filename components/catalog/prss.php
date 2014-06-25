@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -58,8 +58,8 @@ function rss_catalog($item_id, $cfg){
 			$items[$id]['comments'] = $items[$id]['link'].'#c';
 			$items[$id]['category'] = $item['category'];
 
-			$image_file = PATH.'/images/catalog/medium/'.$item['imageurl'].'.jpg';
-			$image_url  = HOST . '/images/catalog/medium/'.$item['imageurl'].'.jpg';
+			$image_file = PATH.'/images/catalog/medium/'. $item['imageurl'];
+			$image_url  = HOST . '/images/catalog/medium/'. $item['imageurl'];
 
 			$items[$id]['image'] = file_exists($image_file) ? $image_url : '';
 			$items[$id]['size'] = $items[$id]['image'] ? round(filesize($image_file)) : 0;
@@ -71,6 +71,3 @@ function rss_catalog($item_id, $cfg){
 				 'items' => $items);
 
 }
-
-
-?>

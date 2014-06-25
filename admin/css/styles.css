@@ -11,7 +11,7 @@ body {
 }
 
 #header{ color:#B2D1E8; }
-#header table { background:url(../images/topbg.jpg) repeat-x; }
+#header table { background: #385C89; }
 
 input[type=text], input[type=password], textarea{
 	border-color:#8E9CAE;

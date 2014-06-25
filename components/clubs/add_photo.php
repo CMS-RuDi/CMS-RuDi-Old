@@ -63,5 +63,3 @@ if ($do_photo == 'uploaded'){
 	cmsCore::redirect('/clubs/photoalbum'.$album['id']);
 
 }
-
-?>

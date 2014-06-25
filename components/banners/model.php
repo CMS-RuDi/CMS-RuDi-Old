@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -76,7 +76,7 @@ class cms_model_banners{
 
         if ($html) {
             // обновляем статистику просмотра баннера
-            cmsCore::c('db')->query("INSERT IGNORE INTO cms_banner_hits (banner_id, ip) VALUES ('{$banner['id']}', '{cmsCore::c('user')->ip}')");
+            cmsCore::c('db')->query("INSERT IGNORE INTO cms_banner_hits (banner_id, ip) VALUES ('{$banner['id']}', '". cmsCore::c('user')->ip ."')");
             if(cmsCore::c('db')->get_last_id()){
                 cmsCore::c('db')->query("UPDATE cms_banners SET hits = hits + 1 WHERE id= '{$banner['id']}'");
             }

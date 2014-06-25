@@ -910,8 +910,8 @@ class bbcode {
                 "'([^\w\d-\.]|^)([\w\d-\.]+@[\w\d-\.]+\.[\w]+[^.,;\s<\"\'\)]+)'usi"
             );
         $replace = array(
-                '$1<a href="/go/url=$2" target="_blank">$2</a>',
-                '$1<a href="/go/url=http://$2" target="_blank">$2</a>',
+                '$1<a href="/go/url=$2">$2</a>',
+                '$1<a href="/go/url=http://$2">$2</a>',
                 '$1<a href="mailto:$2">$2</a>'
             );
 
@@ -921,7 +921,7 @@ class bbcode {
           '#<a href="/go/url=([^"]+)"#',
           create_function(
               '$matches',
-              'return "<a title=\"".htmlspecialchars($matches[1])."\" href=\"/go/url=-".base64_encode($matches[1])."\"";'
+              'if (!strstr($matches[1], $_SERVER[\'HTTP_HOST\'])){ return "<a target=\"_blank\" title=\"".htmlspecialchars($matches[1])."\" href=\"/go/url=-".base64_encode($matches[1])."\""; } else { return "<a href=\"".htmlspecialchars($matches[1])."\""; }'
           ),
           $text
         );
@@ -1273,30 +1273,30 @@ class bbcode {
         $attr = '';
         $href = $elem['attrib']['url'];
         if (!$href) {
-            return $this -> get_html($elem['val']);
+            return $this->get_html($elem['val']);
         }
         $protocols = array(
             'http://','https://','ftp://','file://','#','/','?','./','../'
         );
         $is_http = false;
         foreach ($protocols as $val) {
-            if ($val==mb_substr($href,0,mb_strlen($val))) {
+            if ($val == substr($href, 0, strlen($val))) {
                 $is_http = true;
                 break;
             }
         }
-        if (! $is_http) { $href = 'http://'.$href; }
-        if ($href) {
-            if (mb_strstr($href, $_SERVER['HTTP_HOST']) || mb_substr($href,0,1)=='/'){
-                $url = $href;
-                $local = true;
-            } else {
-                $url = '/go/url=-'.base64_encode($href);
-                $local = false;
-            }
-            $attr .= ' href="'.$this->cleanAttrValue($url).'"';
+        if (!$is_http) { $href = 'http://'.$href; }
+        
+        if (strstr($href, $_SERVER['HTTP_HOST']) || substr($href,0,1) == '/') {
+            $url = $href;
+            $local = true;
+        } else {
+            $url = '/go/url=-'. base64_encode($href);
+            $local = false;
         }
-        $attr .= ' title="'.$this->cleanAttrValue($href).'"';
+        $attr .= ' href="'. $this->cleanAttrValue($url) .'"';
+        
+        $attr .= ' title="'. $this->cleanAttrValue($href) .'"';
         $name = isset($elem['attrib']['name']) ? $elem['attrib']['name'] : '';
         if ($name) { $attr .= ' name="'.$this->cleanAttrValue($name).'"'; }
         $target = isset($elem['attrib']['target']) ? $elem['attrib']['target'] : '';
@@ -1308,5 +1308,3 @@ class bbcode {
     }
 
 }
-
-?>

@@ -2,10 +2,10 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -78,7 +78,7 @@ cpToolMenu($toolmenu);
 
 if ($opt == 'go_import_xls'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $item['category_id'] = cmsCore::request('cat_id', 'int', 0);
     $item['user_id']     = cmsCore::request('user_id', 'int', 1);
@@ -159,9 +159,6 @@ if ($opt == 'go_import_xls'){
 //=================================================================================================//
 
 if ($opt=='saveprices'){
-
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
-
     $prices = cmsCore::request('price', 'array_str', array());
     if (is_array($prices)){
         foreach($prices as $id=>$price){
@@ -233,7 +230,7 @@ if($opt == 'delete_item'){
 
 if ($opt == 'submit_discount' || $opt == 'update_discount'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $item['title']      = cmsCore::request('title', 'str');
     $item['cat_id']     = cmsCore::request('cat_id', 'int');
@@ -282,7 +279,7 @@ if ($opt == 'hide_cat'){
 
 if ($opt == 'submit_cat' || $opt == 'update_cat'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cat['parent_id']      = cmsCore::request('parent_id', 'int');
     $cat['title']          = cmsCore::request('title', 'str', $_LANG['AD_UNTITLED']);
@@ -960,7 +957,7 @@ if ($opt == 'add_discount' || $opt == 'edit_discount'){
 
 if($opt=='saveconfig'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cfg = array();
 

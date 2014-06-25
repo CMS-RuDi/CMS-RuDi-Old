@@ -24,7 +24,7 @@
 
         {if $item.NSLevel > 1 && $item.NSLevel > $last_level}<ul>{/if}
 
-            <li {if $menuid==$item.id || ($currentmenu.NSLeft > $item.NSLeft && $currentmenu.NSRight < $item.NSRight)}class="selected"{/if}>
+            <li class="{$item.css_class} {if $menuid==$item.id || ($currentmenu.NSLeft > $item.NSLeft && $currentmenu.NSRight < $item.NSRight)}selected{/if}">
 
                 <a href="{$item.link}" target="{$item.target}" {if $menuid==$item.id}class="selected"{/if} title="{$item.title|escape:'html'}">
 

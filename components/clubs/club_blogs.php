@@ -10,11 +10,11 @@ if (in_array($bdo, array('newpost', 'editpost'))){
         if (!$post){ cmsCore::error404(); }
         $post['tags'] = cmsTagLine($inBlog->getTarget('tags'), $post['id'], false);
 
-		$blog = $inBlog->getBlog($post['blog_id']);
-		if (!$blog) { cmsCore::error404(); }
+            $blog = $inBlog->getBlog($post['blog_id']);
+            if (!$blog) { cmsCore::error404(); }
 
-		$club = $model->getClub($blog['user_id']);
-		if(!$club) { cmsCore::error404(); }
+            $club = $model->getClub($blog['user_id']);
+            if(!$club) { cmsCore::error404(); }
 
 	}
 
@@ -44,8 +44,8 @@ if (in_array($bdo, array('newpost', 'editpost'))){
 
     $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
 
-	// проверяем является ли пользователь автором, если редактируем пост
-	if (($bdo=='editpost') && !$inUser->is_admin && $post['user_id'] != $inUser->id) { cmsCore::error404(); }
+    // проверяем является ли пользователь автором, если редактируем пост
+    if (($bdo == 'editpost') && !$is_admin && !$is_moder && $post['user_id'] != $inUser->id) { cmsCore::error404(); }
 
     //Если еще не было запроса на сохранение
     if (!cmsCore::inRequest('goadd')){
@@ -119,10 +119,8 @@ if (in_array($bdo, array('newpost', 'editpost'))){
         $mod['cat_id'] 	  = cmsCore::request('cat_id', 'int');
         $mod['allow_who'] = cmsCore::request('allow_who', 'str', $blog['allow_who']);
         $mod['tags'] 	  = cmsCore::request('tags', 'str', '');
-		$mod['comments']  = cmsCore::request('comments', 'int', 1);
-
-		$mod['published'] = ($is_admin || $is_moder || !$club['blog_premod']) ? 1 : 0;
-		$mod['blog_id']   = $blog['id'];
+        $mod['comments']  = cmsCore::request('comments', 'int', 1);
+        $mod['blog_id']   = $blog['id'];
 
         //Проверяем их
         if (mb_strlen($mod['title'])<2) {  cmsCore::addSessionMessage($_LANG['POST_ERR_TITLE'], 'error'); $errors = true; }
@@ -136,12 +134,13 @@ if (in_array($bdo, array('newpost', 'editpost'))){
 
         //Если нет ошибок
 		//добавляем новый пост...
-		if ($bdo=='newpost'){
+		if ($bdo == 'newpost'){
 
 			if (IS_BILLING){ cmsBilling::process('blogs', 'add_post'); }
 
-			$mod['pubdate'] = date( 'Y-m-d H:i:s');
-			$mod['user_id'] = $inUser->id;
+			$mod['pubdate']   = date( 'Y-m-d H:i:s');
+                        $mod['user_id']   = $inUser->id;
+                        $mod['published'] = ($is_admin || $is_moder || !$club['blog_premod']) ? 1 : 0;
 
 			// добавляем пост, получая его id и seolink
 			$added = $inBlog->addPost($mod);
@@ -192,29 +191,29 @@ if (in_array($bdo, array('newpost', 'editpost'))){
 
 		//...или сохраняем пост после редактирования
 		if ($bdo=='editpost') {
+                    $mod['edit_times'] = (int)$post['edit_times']+1;
 
-			$mod['edit_times'] = (int)$post['edit_times']+1;
+                    if (!$is_admin && !$is_moder) {
+                        $mod['published'] = !$club['blog_premod'] ? 1 : 0;
+                    }
 
-			$inBlog->updatePost($post['id'], $mod);
+                    $inBlog->updatePost($post['id'], $mod);
 
-			cmsActions::updateLog($inBlog->getTarget('actions_post'), array('object' => $mod['title']), $post['id']);
+                    cmsActions::updateLog($inBlog->getTarget('actions_post'), array('object' => $mod['title']), $post['id']);
 
-			if (!$mod['published']) {
+                    if (!($is_admin || $is_moder) && !$mod['published']) {
+                        $message = str_replace('%user%', cmsUser::getProfileLink($inUser->login, $inUser->nickname), $_LANG['MSG_CLUB_POST_UPDATE']);
+                        $message = str_replace('%post%', '<a href="'.$model->getPostURL($club['id'], $post['seolink']).'">'.$mod['title'].'</a>', $message);
+                        $message = str_replace('%club%', '<a href="/clubs/'.$club['id'].'">'.$club['title'].'</a>', $message);
 
-				$message = str_replace('%user%', cmsUser::getProfileLink($inUser->login, $inUser->nickname), $_LANG['MSG_CLUB_POST_UPDATE']);
-				$message = str_replace('%post%', '<a href="'.$model->getPostURL($club['id'], $post['seolink']).'">'.$mod['title'].'</a>', $message);
-				$message = str_replace('%club%', '<a href="/clubs/'.$club['id'].'">'.$club['title'].'</a>', $message);
+                        cmsUser::sendMessage(USER_UPDATER, $club['admin_id'], $message);
 
-				cmsUser::sendMessage(USER_UPDATER, $club['admin_id'], $message);
+                        cmsCore::addSessionMessage($_LANG['POST_PREMODER_TEXT'], 'info');
+                    } else {
+                        cmsCore::addSessionMessage($_LANG['POST_UPDATED'], 'success');
+                    }
 
-				cmsCore::addSessionMessage($_LANG['POST_PREMODER_TEXT'], 'info');
-
-			} else {
-				cmsCore::addSessionMessage($_LANG['POST_UPDATED'], 'success');
-			}
-
-			cmsCore::redirect($model->getPostURL($club['id'], $post['seolink']));
-
+                    cmsCore::redirect($model->getPostURL($club['id'], $post['seolink']));
 		}
 
     }
@@ -290,12 +289,9 @@ if($bdo=='post'){
 }
 ///////////////////////// УДАЛЕНИЕ ПОСТА /////////////////////////////////////////////////////////////////////////////
 if ($bdo == 'delpost'){
+	if (!cmsUser::checkCsrfToken()) { cmsCore::halt(); }
 
-	if(!cmsCore::validateForm()) { cmsCore::halt(); }
-
-	if($_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') { cmsCore::halt(); }
-
-	if (!$inUser->id) { cmsCore::halt(); }
+	if(!cmsCore::isAjax() || !$inUser->id) { return false; }
 
 	$post = $inBlog->getPost($post_id);
 	if (!$post){ cmsCore::halt(); }
@@ -330,27 +326,22 @@ if ($bdo == 'delpost'){
 
 	cmsCore::addSessionMessage($_LANG['POST_IS_DELETED'], 'success');
 
-    // Очищаем токен
-    cmsUser::clearCsrfToken();
-
-	cmsCore::jsonOutput(array('error' => false, 'redirect'  => '/clubs/'.$club['id']));
-
+    cmsCore::jsonOutput(array('error' => false, 'redirect'  => '/clubs/'.$club['id']));
 }
 ////////// ПРОСМОТР БЛОГА ////////////////////////////////////////////////////////////////////////////////////////
 if ($bdo=='blog'){
+    $club = $model->getClub($id);
+    if(!$club) { cmsCore::error404(); }
 
-	$club = $model->getClub($id);
-	if(!$club) { cmsCore::error404(); }
+    $blog = $inBlog->getBlogByUserId($club['id']);
+    if (!$blog) { cmsCore::error404(); }
 
-	$blog = $inBlog->getBlogByUserId($club['id']);
-	if (!$blog) { cmsCore::error404(); }
+    // если блоги запрещены
+    if(!$club['enabled_blogs']){ cmsCore::error404(); }
 
-	// если блоги запрещены
-	if(!$club['enabled_blogs']){ cmsCore::error404(); }
-
-	// Инициализируем участников клуба
-	$model->initClubMembers($club['id']);
-	// права доступа
+    // Инициализируем участников клуба
+    $model->initClubMembers($club['id']);
+    // права доступа
     $is_admin  = $inUser->is_admin || ($inUser->id == $club['admin_id']);
     $is_moder  = $model->checkUserRightsInClub('moderator');
     $is_member = $model->checkUserRightsInClub();
@@ -446,12 +437,9 @@ if ($bdo=='blog'){
 }
 ////////// НОВАЯ РУБРИКА / РЕДАКТИРОВАНИЕ РУБРИКИ //////////////////////////////////////////////////////
 if (in_array($bdo, array('newcat','editcat'))){
+	if (!cmsCore::isAjax() || !$inUser->id) { return false; }
 
-	if($_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') { cmsCore::halt(); }
-
-	if (!$inUser->id) { cmsCore::halt(); }
-
-	if($bdo=='editcat'){
+	if ($bdo=='editcat') {
 
         $cat = $inBlog->getBlogCategory($cat_id);
         if (!$cat) { cmsCore::halt(); }
@@ -493,7 +481,7 @@ if (in_array($bdo, array('newcat','editcat'))){
 
     if (cmsCore::inRequest('goadd')){
 
-		if(!cmsCore::validateForm()) { cmsCore::halt(); }
+		if(!cmsUser::checkCsrfToken()) { cmsCore::halt(); }
 
         $new_cat['title']       = cmsCore::request('title', 'str', '');
 		$new_cat['description'] = cmsCore::request('description', 'str', '');
@@ -510,19 +498,13 @@ if (in_array($bdo, array('newcat','editcat'))){
 			cmsCore::addSessionMessage($_LANG['CAT_IS_UPDATED'], 'success');
 		}
 
-        cmsUser::clearCsrfToken();
-
-		cmsCore::jsonOutput(array('error' => false, 'redirect'  => $model->getBlogURL($club['id'], 1, $cat['id'])));
-
+        cmsCore::jsonOutput(array('error' => false, 'redirect'  => $model->getBlogURL($club['id'], 1, $cat['id'])));
     }
 
 }
 ///////////////////////// УДАЛЕНИЕ РУБРИКИ /////////////////////////////////////////////////////////////////////////
 if ($bdo == 'delcat'){
-
-	if($_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') { cmsCore::halt(); }
-
-	if (!$inUser->id) { cmsCore::halt(); }
+	if (!cmsCore::isAjax() || !$inUser->id) { return false; }
 
 	$cat = $inBlog->getBlogCategory($cat_id);
 	if (!$cat) { cmsCore::halt(); }
@@ -542,23 +524,17 @@ if ($bdo == 'delcat'){
 
     if (!$is_admin && !$is_moder) { cmsCore::halt(); }
 
-	if(!cmsCore::validateForm()) { cmsCore::halt(); }
+	if(!cmsUser::checkCsrfToken()) { cmsCore::halt(); }
 
 	$inBlog->deleteBlogCategory($cat['id']);
 
 	cmsCore::addSessionMessage($_LANG['CAT_IS_DELETED'], 'success');
 
-    cmsUser::clearCsrfToken();
-
-	cmsCore::jsonOutput(array('error' => false, 'redirect'  => $model->getBlogURL($club['id'])));
-
+    cmsCore::jsonOutput(array('error' => false, 'redirect'  => $model->getBlogURL($club['id'])));
 }
 ///////////////////////// ПУБЛИКАЦИЯ ПОСТА /////////////////////////////////////////////////////////////////////////
 if ($bdo == 'publishpost'){
-
-	if($_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') { cmsCore::halt(); }
-
-	if (!$inUser->id) { cmsCore::halt(); }
+	if (!cmsCore::isAjax() || !$inUser->id) { return false; }
 
 	$post = $inBlog->getPost($post_id);
 	if (!$post){ cmsCore::halt(); }
@@ -584,25 +560,25 @@ if ($bdo == 'publishpost'){
 
     if ($club['clubtype'] != 'private' && $post['allow_who'] == 'all') { cmsCore::callEvent('ADD_POST_DONE', $post); }
 
-	if ($club['clubtype'] != 'private' && $post['allow_who'] != 'nobody'){
+    if ($club['clubtype'] != 'private' && $post['allow_who'] != 'nobody'){
 
-		cmsActions::log($inBlog->getTarget('actions_post'), array(
-			'object' => $post['title'],
-			'user_id' => $post['user_id'],
-			'object_url' => $post['seolink'],
-			'object_id' => $post['id'],
-			'target' => $club['title'],
-			'target_url' => '/clubs/'.$club['id'],
-			'target_id' => $club['id'],
-			'description' => '',
-			'is_friends_only' => (int)($post['allow_who'] == 'friends')
-		));
+        if(!cmsCore::c('db')->get_field('cms_actions_log', "object_id = '". $post['id'] ."' AND object_url = '". $post['seolink'] ."'", 'id')){
+            cmsActions::log($inBlog->getTarget('actions_post'), array(
+                'object' => $post['title'],
+                'user_id' => $post['user_id'],
+                'object_url' => $post['seolink'],
+                'object_id' => $post['id'],
+                'target' => $club['title'],
+                'target_url' => '/clubs/'.$club['id'],
+                'target_id' => $club['id'],
+                'description' => '',
+                'is_friends_only' => (int)($post['allow_who'] == 'friends')
+            ));
+        }
 
-	}
+    }
 
     cmsUser::sendMessage(USER_UPDATER, $post['user_id'], $_LANG['YOUR_POST'].' <b>&laquo;<a href="'.$post['seolink'].'">'.$post['title'].'</a>&raquo;</b> '.$_LANG['PUBLISHED_IN_BLOG'].' <b>&laquo;<a href="'.$model->getBlogURL($club['id']).'">'.$blog['title'].'</a>&raquo;</b>');
 
     cmsCore::halt('ok');
-
 }
-?>

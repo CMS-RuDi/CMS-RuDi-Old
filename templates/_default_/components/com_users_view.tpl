@@ -57,6 +57,9 @@
     <div class="button {if $link.selected=='latest'}selected{/if}"><a rel=”nofollow” href="{$link.latest}">{$LANG.LATEST}</a></div>
     <div class="button {if $link.selected=='positive'}selected{/if}"><a rel=”nofollow” href="{$link.positive}">{$LANG.POSITIVE}</a></div>
     <div class="button {if $link.selected=='rating'}selected{/if}"><a rel=”nofollow” href="{$link.rating}">{$LANG.RATING}</a></div>
+    {if $link.selected=='group'}
+        <div class="button selected"><a rel=”nofollow” href="{$link.group}">{$LANG.GROUP_SEARCH_NAME}</a></div>
+    {/if}
   </div>
   <div class="users_list">
     <table width="100%" cellspacing="0" cellpadding="0" class="users_list">

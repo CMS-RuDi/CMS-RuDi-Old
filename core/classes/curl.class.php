@@ -42,6 +42,8 @@ class miniCurl{
         }
         
         $this->reInit($cfg);
+        
+        return $this;
     }
     
     public function __destruct(){
@@ -208,25 +210,42 @@ class miniCurl{
         return false;
     }
     
-    public function saveFile($src, $dist, $header = ''){
-        $this->get($src, $header);
-        
-        if (!empty($this->result_body)){
-            if (!$file = fopen($dist, 'w')){
-                self::echoError('Не возможно открыть(создать файл) '. $dist);
-            }else{
-                if (fwrite($file, $this->result_body) === false){
-                    self::echoError('Не возможно произвести запись в файл '. $dist);
-                }else{
-                    fclose($file);
-                    return true;
-                }
-            }
-        }else{
-            self::echoError('Не уалось получить файл '. $src);
+    public function saveFile($src, $dist, $header = '') {
+        $file = fopen($dist, 'w');
+        if (!$file){
+            self::echoError('Не возможно открыть(создать файл) '. $dist);
+            return false;
         }
         
-        return false;
+        $this->set_option(CURLOPT_URL, $src);
+        $this->set_option(CURLOPT_FILE, $file);
+        
+        if (!empty($header)) { $this->set_option(CURLOPT_HTTPHEADER, $header); }
+        
+        if ($this->cookies){
+            $cookies = array();
+            foreach ($this->cookies as $k => $v){
+                $cookies[] = $k .'='. $v;
+            }
+            $this->set_option(CURLOPT_COOKIE, implode('; ', $cookies));
+        }
+        
+        $this->setProxy();
+        $this->setInterface();
+
+        $result = curl_exec($this->ch);
+        
+        fclose($file);
+        
+        if ($result === false){
+            self::echoError('Не уалось получить файл '. $src);
+            $this->error = curl_error($this->ch);
+            return false;
+        }
+        
+        $this->info = curl_getinfo($this->ch);
+        
+        return true;
     }
 
     public function post($url, $postdata = null, $header = ''){
@@ -322,7 +341,7 @@ class miniCurl{
         
         $this->result = curl_exec($this->ch);
         
-        if ($this->result == false){
+        if ($this->result === false){
             $this->error = curl_error($this->ch);
             return false;
         }

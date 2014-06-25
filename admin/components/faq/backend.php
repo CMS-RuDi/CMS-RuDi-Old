@@ -2,10 +2,10 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -76,7 +76,7 @@ $model = new cms_model_faq();
 
 if ($opt=='saveconfig'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cfg = array();
     $cfg['guest_enabled'] = cmsCore::request('guest_enabled', 'int', 0);
@@ -166,7 +166,7 @@ if ($opt == 'hide_item'){
 }
 
 if ($opt == 'submit_item'){
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
     $category_id = (int)$_REQUEST['category_id'];
     $published = (int)$_REQUEST['published'];
     $quest = $_REQUEST['quest'];
@@ -192,7 +192,7 @@ if ($opt == 'submit_item'){
 }
 
 if ($opt == 'update_item'){
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
     if (isset($_REQUEST['item_id'])) {
         $id = (int)$_REQUEST['item_id'];
 
@@ -260,7 +260,7 @@ if ($opt == 'hide_cat'){
 }
 
 if ($opt == 'submit_cat'){
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
     $parent_id = (int)$_REQUEST['parent_id'];
     $title = $_REQUEST['title'];
     $published = (int)$_REQUEST['published'];
@@ -286,7 +286,7 @@ if($opt == 'delete_cat'){
 }
 
 if ($opt == 'update_cat'){
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
     if (isset($_REQUEST['item_id'])) {
         $id = (int)$_REQUEST['item_id'];
 

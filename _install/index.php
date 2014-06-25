@@ -1,10 +1,10 @@
 <?php
 /* * *************************************************************************** */
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -43,19 +43,16 @@ cmsCore::loadLanguage('install');
 
 $installed = false;
 
+// Можно делать мультиязычные дампы 
+$sqldumpdemo  = 'sqldumpdemo.sql'; 
+$sqldumpempty = 'sqldumpempty.sql'; 
+if ($inConf->lang != 'ru') { 
+    $sqldumpempty = (file_exists(PATH .'/install/sqldumpempty_'.$inConf->lang.'.sql')) ? 'sqldumpempty_'. $inConf->lang .'.sql' : 'sqldumpempty.sql'; 
+    $sqldumpdemo  = (file_exists(PATH .'/install/sqldumpdemo_'.$inConf->lang.'.sql')) ? 'sqldumpdemo_'. $inConf->lang .'.sql' : $sqldumpempty;; 
+} 
+
 ////////////////////// процесс установки ////////////////////////////////////////
 if (cmsCore::inRequest('install')) {
-
-    // Можно делать мультиязычные дампы
-    $sqldumpdemo  = 'sqldumpdemo.sql';
-    $sqldumpempty = 'sqldumpempty.sql';
-    if($inConf->lang != 'ru'){
-        $sqldumpdemo  = (file_exists(PATH . '/install/sqldumpdemo_'.$inConf->lang.'.sql')) ?
-                'sqldumpdemo_'.$inConf->lang.'.sql' : 'sqldumpdemo.sql';
-        $sqldumpempty = (file_exists(PATH . '/install/sqldumpempty_'.$inConf->lang.'.sql')) ?
-                'sqldumpempty_'.$inConf->lang.'.sql' : 'sqldumpempty.sql';
-    }
-
     $errors = false;
 
     $_CFG['offtext']   = $_LANG['CFG_OFFTEXT'];
@@ -285,8 +282,13 @@ $permissions = check_permissions();
                                                 <tr>
                                                     <td><?php echo $_LANG['INS_FORM_DEMO']; ?></td>
                                                     <td align="center" valign="top">
-                                                        <label><input name="demodata" type="radio" value="1" checked /><?php echo $_LANG['YES']; ?></label>
-                                                        <label><input name="demodata" type="radio" value="0" /> <?php echo $_LANG['NO']; ?></label>
+                                                        <?php if ($sqldumpdemo == $sqldumpempty) { ?>
+                                                            <label><input disabled="true" name="demodata" type="radio" value="1" /><?php echo $_LANG['YES']; ?></label>
+                                                            <label><input disabled="true" name="demodata" type="radio" value="0" checked="true" /> <?php echo $_LANG['NO']; ?></label>
+                                                        <?php } else { ?>
+                                                            <label><input name="demodata" type="radio" value="1" checked /><?php echo $_LANG['YES']; ?></label>
+                                                            <label><input name="demodata" type="radio" value="0" /> <?php echo $_LANG['NO']; ?></label>
+                                                        <?php } ?>
                                                     </td>
                                                 </tr>
                                             </table>

@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -12,31 +12,23 @@
 /******************************************************************************/
 
 class p_loginza extends cmsPlugin {
-
-// ==================================================================== //
-
     public function __construct(){
-
         parent::__construct();
 
         // Информация о плагине
-
-        $this->info['plugin']           = 'p_loginza';
-        $this->info['title']            = 'Авторизация Loginza';
-        $this->info['description']      = 'Позволяет посетителям авторизоваться на сайте, используя аккаунты популярных социальных сетей';
-        $this->info['author']           = 'InstantCMS Team';
-        $this->info['version']          = '1.10.3';
+        $this->info['plugin']      = 'p_loginza';
+        $this->info['title']       = 'Авторизация Loginza';
+        $this->info['description'] = 'Позволяет посетителям авторизоваться на сайте, используя аккаунты популярных социальных сетей';
+        $this->info['author']      = 'InstantCMS Team';
+        $this->info['version']     = '1.10.4';
 
         // Настройки по-умолчанию
-
-        $this->config['PL_PROVIDERS']   = 'vkontakte,facebook,mailruapi,google,yandex,openid,twitter,webmoney,rambler,flickr,mailru,loginza,myopenid,lastfm,verisign,aol,steam';
-        $this->config['PL_LANG']        = 'ru';
+        $this->config['PL_PROVIDERS'] = 'vkontakte,facebook,mailruapi,google,yandex,openid,twitter,webmoney,rambler,flickr,mailru,loginza,myopenid,lastfm,verisign,aol,steam';
+        $this->config['PL_LANG']      = 'ru';
 
         // События, которые будут отлавливаться плагином
-
-        $this->events[]                 = 'LOGINZA_BUTTON';
-        $this->events[]                 = 'LOGINZA_AUTH';
-
+        $this->events[] = 'LOGINZA_BUTTON';
+        $this->events[] = 'LOGINZA_AUTH';
     }
 
 // ==================================================================== //
@@ -46,17 +38,10 @@ class p_loginza extends cmsPlugin {
      * @return bool
      */
     public function install(){
-
-        $inDB = cmsDatabase::getInstance();
-
-        if (!$inDB->isFieldExists('cms_users', 'openid')){
-
-            $inDB->query("ALTER TABLE `cms_users` ADD `openid` VARCHAR( 250 ) NULL, ADD INDEX ( `openid` )");
-
+        if (!cmsCore::c('db')->isFieldExists('cms_users', 'openid')){
+            cmsCore::c('db')->query("ALTER TABLE `cms_users` ADD `openid` VARCHAR( 250 ) NULL, ADD INDEX ( `openid` )");
         }
-
         return parent::install();
-
     }
 
 // ==================================================================== //
@@ -66,9 +51,8 @@ class p_loginza extends cmsPlugin {
      * @return bool
      */
     public function upgrade(){
-
+        cmsCore::c('db')->query("UPDATE `cms_users` SET `openid` = MD5(openid) WHERE `openid` IS NOT NULL");
         return parent::upgrade();
-
     }
 
 // ==================================================================== //
@@ -80,8 +64,11 @@ class p_loginza extends cmsPlugin {
      * @return mixed
      */
     public function execute($event='', $item=array()){
-
         parent::execute();
+        
+        if (cmsCore::m('registration')->config['reg_type'] == 'invite'){
+            return true;
+        }
 
         switch ($event){
             case 'LOGINZA_BUTTON':  $item = $this->showLoginzaButton(); break;
@@ -89,15 +76,14 @@ class p_loginza extends cmsPlugin {
         }
 
         return true;
-
     }
 
 // ==================================================================== //
 
     private function showLoginzaButton() {
-
         global $_LANG;
-        $token_url  = urlencode(HOST . '/plugins/p_loginza/auth.php');
+        
+        $token_url  = urlencode('http://' . $_SERVER['HTTP_HOST'] . '/plugins/p_loginza/auth.php');
 
         $html  = '<div class="lf_title">'.$_LANG['PL_LOGIN_LOGINZA'].'</div><p style="margin:15px 0">'.$_LANG['PL_LOGIN_LOGINZA_INFO'].'</p><p><script src="http://loginza.ru/js/widget.js" type="text/javascript"></script>
                  <a href="http://loginza.ru/api/widget?token_url='.$token_url.'&providers_set='.$this->config['PL_PROVIDERS'].'&lang='.$this->config['PL_LANG'].'" class="loginza">
@@ -113,24 +99,15 @@ class p_loginza extends cmsPlugin {
 // ==================================================================== //
 
     private function loginzaAuth(){
-
-        $inCore = cmsCore::getInstance();
-        $inDB   = cmsDatabase::getInstance();
-		$inUser = cmsUser::getInstance();
-
-        $token = $inCore->request('token', 'str', '');
-        if (!$token){ exit; }
-
-        $loginza_api_url = 'http://loginza.ru/api/authinfo';
+        $token = cmsCore::request('token', 'str', '');
+        if (!$token){ cmsCore::error404(); }
 
         // получение профиля
-        $profile = $this->loginzaRequest($loginza_api_url.'?token='.$token);
-
-        $profile = json_decode($profile);
+        $profile = $this->request('http://loginza.ru/api/authinfo?token=?token='. $token);
 
         // проверка на ошибки
         if (!is_object($profile) || !empty($profile->error_message) || !empty($profile->error_type)) {
-            exit;
+            cmsCore::error404();
         }
 
         // ищем такого пользователя
@@ -143,105 +120,112 @@ class p_loginza extends cmsPlugin {
 
         // если пользователь уже был или успешно создан, авторизуем
         if ($user_id){
-			$user = $inDB->get_fields('cms_users', "id = '{$user_id}'", 'login, password');
-			if(!$user) { return false; }
+            $user = cmsCore::c('db')->get_fields('cms_users', "id = '". $user_id ."'", 'login, password');
+            if (!$user) { cmsCore::error404(); }
 
-			$back_url = $inUser->signInUser($user['login'], $user['password'], 1, 1);
+            $back_url = cmsCore::c('user')->signInUser($user['login'], $user['password'], 1, 1);
 
-			$inCore->redirect($back_url); exit;
-
+            cmsCore::redirect($back_url);
         }
 
         // если авторизация не удалась, редиректим на сообщение об ошибке
-        $inCore->redirect('/auth/error.html');  exit;
-
+        cmsCore::redirect('/auth/error.html');
     }
 
 // ==================================================================== //
 
-    private function createUser($profile){
-
+    private function createUser($profile) {
         $inCore = cmsCore::getInstance();
-        $inDB   = cmsDatabase::getInstance();
-		$inCore->loadClass('actions');
+        
+        cmsCore::loadClass('actions');
+        
+        $nickname = $email = $birthdate = '';
+        
+        $advanced = array();
+        // для вконтакте поолучаем большой аватар, статус и город
+        if (strstr($profile->identity, '//vk.com')) {
+            $vk = $this->callVk($profile->uid);
+            if ($vk) {
+                $advanced = array(
+                    'city' => $vk->city->title,
+                    'status' => $vk->status,
+                    'photo' => $vk->photo_max_orig
+                );
+            }
+        }  
 
-        if ($profile->name->full_name){
-
+        if (!empty($profile->name->full_name)) {
             // указано полное имя
             $nickname   = $profile->name->full_name;
-
-        } elseif($profile->name->first_name) {
-
+        } else if (!empty($profile->name->first_name)) {
             // указано имя и фамилия по-отдельности
             $nickname   = $profile->name->first_name;
-            if ($profile->name->last_name){ $nickname .= ' '. $profile->name->last_name; }
-
-        } elseif(preg_match('/^(http:\/\/)([a-zA-Z0-9\-_]+)\.([a-zA-Z0-9\-_]+)\.([a-zA-Z]{2,6})([\/]?)$/i', $profile->identity)) {
-
-            // не указано имя, но передан идентификатор в виде домена 3-го уровня
-            $nickname = str_replace('http://', '', $profile->identity);
-            $nickname = mb_substr($nickname, 0, mb_strpos($nickname, '.'));
-
-        } else {
-
+            if (!empty($profile->name->last_name)) { $nickname .= ' '. $profile->name->last_name; }
+        } else if (preg_match('/^(http:\/\/)([a-zA-Z0-9\-_]+)\.([a-zA-Z0-9\-_]+)\.([a-zA-Z]{2,6})([\/]?)$/i', $profile->identity)) {
+            // не указано имя, но передан идентификатор в виде домена
+            $nickname = parse_url($profile->identity, PHP_URL_HOST);
+        }
+        
+        $nickname = cmsCore::strClear($nickname); 
+        $login    = substr(str_replace('-', '', cmsCore::strToURL($nickname)), 0, 15);
+        
+        if (!$nickname || !$login) {
             // не указано вообще ничего
-            $max = $inDB->get_fields('cms_users', 'id>0', 'id', 'id DESC');
-            $nickname = 'user' . ($max['id'] + 1);
+            $max = cmsCore::c('db')->get_fields('cms_users', 'id>0', 'id', 'id DESC');
+            $nickname = $login = 'user' . ($max['id'] + 1);
 
         }
-		$nickname  = cmsCore::strClear($nickname);
 
-        $login     = str_replace('-', '', cmsCore::strToURL($nickname));
-        $pass      = md5(mb_substr(md5(rand(0, 9999)), 0, 8));
-        $email     = cmsCore::strClear($profile->email);
-        $birthdate = cmsCore::strClear($profile->dob);
+        // генерируем пароль 
+        $pass = md5(substr(md5(microtime().uniqid()), 0, 8));
+       
+        if (!empty($profile->email)) {
+            $email = cmsCore::strClear($profile->email);
+            $already_email = cmsCore::c('db')->get_field('cms_users', "email='{$email}' AND is_deleted=0", 'email');
+            
+            if ($already_email == $email) {
+                cmsCore::redirect('/auth/error.html');
+            }
+        }
+        
+        if (!empty($profile->dob)) {
+            $birthdate = cmsCore::strClear($profile->dob);
+        }
+        
+        // проверяем занятость логина
+        if (cmsCore::c('db')->get_field('cms_users', "login='{$login}' AND is_deleted=0", 'login') == $login) {
+            // если логин занят, добавляем к нему ID
+            $max = cmsCore::c('db')->get_fields('cms_users', 'id>0', 'id', 'id DESC');
+            $login .= ($max['id']+1);
+        }
 
-        $already_email = $inDB->get_field('cms_users', "email='{$email}' AND is_deleted=0", 'email');
-		$already_login = $inDB->get_field('cms_users', "login='{$login}' AND is_deleted=0", 'login');
-
-		//
-		// проверяем наличие и занятость email
-		//
-		if ($email && $already_email == $email){
-			$inCore->redirect('/auth/error.html');
-		}
-
-		//
-		// проверяем занятость логина
-		//
-		if ($already_login == $login){
-			// если логин занят, добавляем к нему ID
-			$max = $inDB->get_fields('cms_users', 'id>0', 'id', 'id DESC');
-			$login .= ($max['id']+1);
-		}
-
-        $user_array = array(
-                                'login'=>$login,
-                                'nickname'=>$nickname,
-                                'email'=>$email,
-                                'birthdate'=>$birthdate,
-                           );
-
-        $sql = "INSERT INTO cms_users (login, nickname, password, email, regdate, birthdate, openid)
-                VALUES ('$login', '$nickname', '$pass', '$email', NOW(), '$birthdate', '{$profile->identity}')";
-
-        $inDB->query($sql) ;
-
-        $user_id = $inDB->get_last_id('cms_users');
+        $user_array = cmsCore::callEvent('USER_BEFORE_REGISTER', array(
+            'status'=>(!empty($advanced['status']) ? $advanced['status'] : ''),
+            'status_date' => date('Y-m-d H:i:s'),
+            'login' => $login,
+            'nickname' => $nickname,
+            'password' => $pass,
+            'email' => $email,
+            'birthdate' => $birthdate,
+            'group_id' => cmsCore::m('registration')->config['default_gid'],
+            'regdate' => date('Y-m-d H:i:s'),
+            'logdate' => date('Y-m-d H:i:s'),
+            'invited_by' => 0,
+            'openid' => md5($profile->identity),
+        ));
+        $user_array['id'] = $user_id = cmsCore::c('db')->insert('cms_users', $user_array);
 
         // создаем профиль пользователя
         if ($user_id){
-
             $filename = 'nopic.jpg';
 
             // если есть аватар, пробуем скачать
-            if ($profile->photo){
-                $photo_path = $this->downloadAvatar($profile->photo);
+            if (!empty($profile->photo) || !empty($advanced['photo'])){
+                $photo_path = $this->downloadAvatar((!empty($advanced['photo']) ? $advanced['photo'] : $profile->photo));
                 if ($photo_path){
+                    cmsCore::includeGraphics();
 
-                    $inCore->includeGraphics();
-
-                    $uploaddir 		= PATH.'/images/users/avatars/';
+                    $uploaddir 		= PATH .'/images/users/avatars/';
                     $filename 		= md5($photo_path . '-' . $user_id . '-' . time()).'.jpg';
                     $uploadavatar 	= $uploaddir . $filename;
                     $uploadthumb 	= $uploaddir . 'small/' . $filename;
@@ -252,120 +236,107 @@ class p_loginza extends cmsPlugin {
                     @img_resize($photo_path, $uploadthumb, $cfg['smallw'], $cfg['smallw']);
 
                     @unlink($photo_path);
-
                 }
             }
+            
+            cmsCore::c('user')->loadUserGeo();
 
-            $sql = "INSERT INTO cms_user_profiles (user_id, city, description, showmail, showbirth, showicq, karma, imageurl, allow_who)
-                    VALUES ('{$user_id}', '', '', '0', '0', '1', '0', '{$filename}', 'all')";
-            $inDB->query($sql);
+            cmsCore::c('db')->insert('cms_user_profiles', array(
+                'city' => (!empty($advanced['city']) ? $advanced['city'] : cmsCore::c('user')->city),
+                'user_id' => $user_id,
+                'imageurl' => $filename,
+                'gender' => (!empty($profile->gender) ? strtolower($profile->gender) : 'm')
+            ));
 
-            $user_array['id'] = $user_id;
             cmsCore::callEvent('USER_REGISTER', $user_array);
 
-			cmsActions::log('add_user', array(
-				'object' => '',
-				'user_id' => $user_id,
-				'object_url' => '',
-				'object_id' => $user_id,
-				'target' => '',
-				'target_url' => '',
-				'target_id' => 0,
-				'description' => ''
-			));
+            cmsActions::log('add_user', array(
+                    'object' => '',
+                    'user_id' => $user_id,
+                    'object_url' => '',
+                    'object_id' => $user_id,
+                    'target' => '',
+                    'target_url' => '',
+                    'target_id' => 0,
+                    'description' => ''
+            ));
 
-            cmsCore::loadModel('registration');
-            $reg_model = new cms_model_registration();
-
-            if ($reg_model->config['send_greetmsg']){ $reg_model->sendGreetsMessage($user_id); }
+            if (cmsCore::m('registration')->config['send_greetmsg']){ cmsCore::m('registration')->sendGreetsMessage($user_id); }
 
             return $user_id;
-
         }
 
         return false;
-
     }
 
 // ==================================================================== //
 
     private function downloadAvatar($url){
+        $tempfile = PATH.'/images/users/avatars/'.md5(session_id()).'.jpg';
 
-        $tempfile   = PATH.'/images/users/avatars/'.md5(session_id()).'.jpg';
-
-        if (function_exists('curl_init')){
-
+        if (function_exists('curl_init')) {
             $curl = curl_init();
-            $user_agent = 'Loginza-API/InstantCMS';
 
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_USERAGENT, $user_agent);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-			curl_setopt($curl, CURLOPT_URL, $url);
-			curl_setopt($curl, CURLOPT_POST, false);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'InstantCMS/1.10.4 +'. HOST);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_POST, false);
             $raw_data = curl_exec($curl);
             curl_close($curl);
-
         } else {
-
             $raw_data = file_get_contents($url);
-
         }
 
-		if($f = @fopen($tempfile, 'w')){
+        if ($f = @fopen($tempfile, 'w')) {
+            @fwrite($f, $raw_data);
+            @fclose($f);
 
-			@fwrite($f, $raw_data);
-			@fclose($f);
-
-			return $tempfile;
-
-		} else {
-
-			return false;
-
-		}
-
+            return $tempfile;
+        } else {
+            return false;
+        }
     }
 
 // ==================================================================== //
 
     private function getUserByIdentity($identity){
-
-        $inDB   = cmsDatabase::getInstance();
-
-        return $inDB->get_field('cms_users', "openid='{$inDB->escape_string($identity)}'", 'id');
-
+        return cmsCore::c('db')->get_field('cms_users', "openid='". md5($identity) ."'", 'id');
     }
 
 // ==================================================================== //
 
-    private function loginzaRequest($url) {
-
-        if (function_exists('curl_init')){
-
+    private function request($url) {
+        if (function_exists('curl_init')) {
             $curl = curl_init($url);
-            $user_agent = 'Loginza-API/InstantCMS';
 
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_USERAGENT, $user_agent);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_USERAGENT, 'InstantCMS/1.10.4 +'. HOST);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+            
             $raw_data = curl_exec($curl);
+            
             curl_close($curl);
-
-            return $raw_data;
-
         } else {
-
-            return file_get_contents($url);
-
+            $raw_data = @file_get_contents($url);
         }
-
+        
+        return $raw_data ? json_decode($raw_data) : false;
+    }
+    
+    private function callVk($uid) {
+        $r = $this->request('https://api.vk.com/method/users.get?'.http_build_query(array(
+            'v'=>'5.21',
+            'user_ids'=>$uid,
+            'fields'=>'city,photo_max_orig,status'
+        )));
+        return $r ? current($r->response) : false;
     }
 
 // ==================================================================== //
 
 }
-
-?>

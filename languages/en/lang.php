@@ -15,12 +15,12 @@ $_LANG = array();
 
 $_LANG['PATH_HOME']             ='Home';
 $_LANG['DEBUG_TIME_GEN_PAGE']   ='Page generation time:';
-$_LANG['DEBUG_QUERY_DB']        ='Queries to the database:';
+$_LANG['DEBUG_QUERY_DB']        ='Database queries:';
 $_LANG['DEBUG_SEC']             ='sec.';
 $_LANG['DEBUG_MEMORY']          ='Memory consumption:';
 $_LANG['ACCESS_DENIED']         ='Access denied';
 $_LANG['YOU_HAVENT_ACCESS']     ='You do not have access to this page.';
-$_LANG['YOU_NEED_TO_SUBSCRIBE'] = 'Perhaps, you need to subscribe, contact the site administration please.';
+$_LANG['YOU_NEED_TO_SUBSCRIBE'] = 'Perhaps, you need to subscribe, please contact site administration.';
 $_LANG['CONTINUE']              ='Continue';
 $_LANG['BACK']                  ='ago';
 $_LANG['PAGE']                  ='Page';
@@ -38,7 +38,7 @@ $_LANG['EDIT']                  ='Edit';
 $_LANG['MOVE']                  ='Move';
 $_LANG['DELETE']                ='Delete';
 $_LANG['CANCEL']                ='Cancel';
-$_LANG['CONFIRM']               = 'Confirm the action';
+$_LANG['CONFIRM']               = 'Confirm action';
 $_LANG['INSERT']                = 'Insert';
 $_LANG['PUBLISH']               ='Publish';
 $_LANG['SAVE']                  ='Save';
@@ -91,10 +91,10 @@ $_LANG['ON_MODERATE']           ='On moderation';
 $_LANG['FILE']                  ='File';
 $_LANG['NOT_FOUND']             ='not found';
 $_LANG['USER_IS_DELETE']        ='User deleted';
-$_LANG['INSERT_WYSIWYG_ERROR']  ='<p><div>The visual editor is not found or is not included.</div><div>If the editor is installed, enable it in the admin panel (menu <em>Additions</em> &rarr; <em>Plugins</em>).</div></p>';
+$_LANG['INSERT_WYSIWYG_ERROR']  ='<p><div>Visual editor is not found or is not included.</div><div>If editor is installed, enable it in the admin panel (menu <em>Addons</em> &rarr; <em>Plugins</em>).</div></p>';
 
 // For All Modules
-$_LANG['CONFIG_MODULE']         ='Configure the module';
+$_LANG['CONFIG_MODULE']         ='Configure module';
 $_LANG['NOT_RESPECT']           ='No decent.';
 $_LANG['SELECT_ALL']            ='select all';
 $_LANG['REMOVE_ALL']            ='remove all';
@@ -191,21 +191,21 @@ $_LANG['TIME1']                 ='time';
 $_LANG['TIME2']                 ='times';
 
 $_LANG['UPLOAD_ERR_NO_FILE']    = 'File not uploaded';
-$_LANG['UPLOAD_ERR_PARTIAL']    = 'The file was not completely downloaded.';
+$_LANG['UPLOAD_ERR_PARTIAL']    = 'File was not completely downloaded.';
 $_LANG['UPLOAD_ERR_OK']         = 'File uploaded successfully';
-$_LANG['UPLOAD_ERR_INI_SIZE']   = 'The file size is too large';
-$_LANG['UPLOAD_ERR_NO_TMP_DIR'] = 'Unable to find the folder for temporary files on the server';
+$_LANG['UPLOAD_ERR_INI_SIZE']   = 'File size is too large';
+$_LANG['UPLOAD_ERR_NO_TMP_DIR'] = 'Unable to find folder for temporary files on the server';
 $_LANG['UPLOAD_ERR_CANT_WRITE'] = 'Failed to write file to disk';
 $_LANG['UPLOAD_ERR_EXTENSION']  = 'File uploading was interrupted by PHP extension';
 
 $_LANG['UPLOAD_IMG_IS_DISABLE'] = 'Upload of images is forbidden!';
-$_LANG['UPLOAD_IMG_LIMIT']      = 'You have reached the limit of images!';
+$_LANG['UPLOAD_IMG_LIMIT']      = 'You have reached images limit!';
 $_LANG['UPLOAD_IMG']            = 'Upload photo';
 
 $_LANG['FILE_NOT_WRITABLE']     = 'File "<strong>%s</strong>" not writable! Set permissions chmod 777 on this file.';
 $_LANG['DIR_NOT_WRITABLE']      = 'Folder "<strong>%s</strong>" not writable! Set permissions chmod 777 on this folder.';
 
-$_LANG['BAN_TITLE']       = 'Your access to the site is blocked';
+$_LANG['BAN_TITLE']       = 'Your site access is blocked';
 $_LANG['BAN_LOCK_DATE']   = 'Date lock';
 $_LANG['BAN_PERIOD_LOCK'] = 'Time Lock';
 $_LANG['BAN_REASON_LOCK'] = 'Cause lock';
@@ -242,13 +242,13 @@ $_LANG['BB_VIDEO_CODE'] = 'Video code (Youtube/Rutube)';
 $_LANG['BB_IMG_ADDED']  = 'Image added';
 $_LANG['BB_Q_TEXT']     = 'Quote text';
 $_LANG['BB_Q_AUTHOR']   = 'Quote author (not necessary)';
-$_LANG['BB_CUT_TITLE']  = 'URL title to the full text of the post';
+$_LANG['BB_CUT_TITLE']  = 'URL title to post full text';
 $_LANG['BB_CUT_DEMO']   = 'Read more...';
 
 $_LANG['CAPTCHA_CODE']            = 'Enter the captcha code';
 $_LANG['CAPTCHA_RELOAD']          = 'Reload captcha';
 $_LANG['404']                     = 'Page not found &mdash; 404';
-$_LANG['404_INFO']                = 'The page may have been removed or deleted';
+$_LANG['404_INFO']                = 'This page was not found on this server.';
 $_LANG['SITE_IS_OFF']             = 'Site is temporarily unavailable';
 $_LANG['WELCOME_TO_SITE']         = 'Welcome to the site!';
 $_LANG['WELCOME_PAGE']            = 'This is the welcome page.';
@@ -265,7 +265,7 @@ $_LANG['CBOX_IMG_ERROR']      = 'Photo upload failed.';
 $_LANG['CBOX_SLIDESHOWSTOP']  = 'Stop slideshow';
 $_LANG['CBOX_SLIDESHOWSTART'] = 'Start slideshow';
 
-$_LANG['FILE_SELECTED']  = 'The files selected: $file';
+$_LANG['FILE_SELECTED']  = 'Selected files: $file';
 $_LANG['FILE_DENIED']    = 'You cannot choose $ext file.\nThis file type is not allowed...';
 $_LANG['FILE_DUPLICATE'] = 'This file has already been selected:\n$file!';
 

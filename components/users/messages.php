@@ -2,25 +2,31 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
-$opt      = cmsCore::request('opt', 'str', 'in');
-$whith_id = cmsCore::request('with_id', 'int', 0);
-$perpage = 15;
+$whith_id    = cmsCore::request('with_id', 'int', 0);
+$perpage     = 15;
 $show_notice = false;
 
-$new_msg = cmsUser::getNewMessages($inUser->id);
+$new_msg = cmsCore::c('user')->getNewMsg();
 
 $friends = cmsUser::getFriends($inUser->id);
 $interlocutors = cmsCore::getListItems("cms_users u INNER JOIN cms_user_msg m ON m.from_id = u.id AND m.to_id = '{$id}'",
                  $whith_id, 'm.from_id', 'ASC', "m.from_del = 0 AND m.to_del = 0 GROUP BY m.from_id", 'from_id', 'nickname');
+
+if (!cmsCore::inRequest('opt')) {
+    if ($new_msg['messages'] > $new_msg['notices']) { $opt = 'in'; }
+    if ($new_msg['notices'] > $new_msg['messages']) { $opt = 'notices'; }
+} else {
+    $opt = cmsCore::request('opt', array('in', 'out', 'notices', 'history'), 'in');
+}
 
 switch ($opt){
 

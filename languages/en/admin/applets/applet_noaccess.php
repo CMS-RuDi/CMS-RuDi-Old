@@ -11,4 +11,4 @@
 //                                                                            //
 /******************************************************************************/
 
-$_LANG['AD_ACCESS_DENIED_TEXT'] = 'Chief administrator has restricted your access to this section.';
+$_LANG['AD_ACCESS_DENIED_TEXT'] = 'Site administrator has restricted your access to this section.';

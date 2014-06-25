@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -21,11 +21,11 @@ class cms_model_clubs{
 	private $clubs = array();
 
 	public function __construct(){
-        $this->inDB   = cmsDatabase::getInstance();
-		$this->config = cmsCore::getInstance()->loadComponentConfig('clubs');
-		cmsCore::loadLanguage('components/clubs');
-		cmsCore::loadLib('karma');
-    }
+            $this->inDB   = cmsDatabase::getInstance();
+            $this->config = cmsCore::getInstance()->loadComponentConfig('clubs');
+            cmsCore::loadLanguage('components/clubs');
+            cmsCore::loadLib('karma');
+        }
 
 /* ==================================================================================================== */
 /* ==================================================================================================== */
@@ -296,9 +296,9 @@ class cms_model_clubs{
 
         while ($club = $this->inDB->fetch_assoc($result)){
 
-			$club['imageurl'] = self::getClubImage($club['imageurl']);
-			$club['fpubdate'] = cmsCore::dateformat($club['pubdate'], true, true);
-            $clubs[] = $club;
+            $club['imageurl'] = self::getClubImage($club['imageurl']);
+            $club['fpubdate'] = cmsCore::dateFormat($club['pubdate'], true, true);
+            $clubs[$club['id']] = $club;
 
         }
 
@@ -354,7 +354,7 @@ class cms_model_clubs{
 
         $club = $this->inDB->fetch_assoc($result);
 		$club['f_imageurl'] = self::getClubImage($club['imageurl']);
-		$club['fpubdate']   = cmsCore::dateformat($club['pubdate'], true, true);
+		$club['fpubdate']   = cmsCore::dateFormat($club['pubdate'], true, true);
 		$club['flogdate']   = cmsUser::getOnlineStatus($club['admin_id'], $club['logdate']);
 		$club['admin_avatar'] = cmsUser::getUserAvatarUrl($club['admin_id'], 'small', $club['admin_avatar'], $club['is_deleted']);
 		$club['enabled_blogs']	= ($club['enabled_blogs'] == -1) ? $this->config['enabled_blogs'] : $club['enabled_blogs'];
@@ -397,7 +397,7 @@ class cms_model_clubs{
 
 			$u['admin_avatar'] = cmsUser::getUserAvatarUrl($u['user_id'], 'small', $u['admin_avatar'], $u['is_deleted']);
 			$u['is_online']    = cmsUser::isOnline($u['user_id']);
-			$u['logdate']      = cmsCore::dateformat($u['logdate'], true, true);
+			$u['logdate']      = cmsCore::dateFormat($u['logdate'], true, true);
 			$club_members[] = $u;
 
 		}

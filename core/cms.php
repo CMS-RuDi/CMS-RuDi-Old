@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -14,18 +14,15 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
-define('CMS_RUDI_V', '0.0.4');
+define('CMS_RUDI_V', '0.0.5');
 
 define('CORE_VERSION', '1.10.3');
 define('CORE_BUILD', '2');
-define('CORE_VERSION_DATE', '2013-10-15');
-define('CORE_BUILD_DATE', '2013-11-21');
+define('CORE_VERSION_DATE', '2014-06-19');
+define('CORE_BUILD_DATE', '2014-06-25');
 
 class cmsCore {
-
     private static   $instance;
-
-    private static   $jevix;
 
     protected        $start_time;
 
@@ -64,8 +61,8 @@ class cmsCore {
 
     protected function __construct($install_mode=false) {
         // проверяем для совместимости
-        if(!defined('HOST')){
-            define('HOST', '//' . self::getHost());
+        if (!defined('HOST')) {
+            define('HOST', 'http://' . self::getHost());
         }
 
         if ($install_mode){ return; }
@@ -76,17 +73,10 @@ class cmsCore {
         //проверяем был ли переопределен язык через сессию
         if (isset($_SESSION['lang'])) {
             self::c('config')->lang = $_SESSION['lang'];
-        }else{
-            self::loadLanguage('lang');
         }
-
-        //проверяем был ли переопределен шаблон через сессию
-        if (isset($_SESSION['template'])) { self::c('config')->template = $_SESSION['template']; }
-
-        define('TEMPLATE', self::c('config')->template);
-        define('TEMPLATE_DIR', PATH.'/templates/'. self::c('config')->template .'/');
-        define('DEFAULT_TEMPLATE_DIR', PATH .'/templates/_default_/');
-
+        
+        self::loadLanguage('lang');
+        
         // определяем контекст использования
         self::detectContext();
 
@@ -96,11 +86,11 @@ class cmsCore {
         //получим URI
         $this->uri = $this->detectURI();
 
-        //определим компонент
-        $this->component = $this->detectComponent();
-
         //загрузим все компоненты в память
         $this->components = $this->getAllComponents();
+
+        //определим компонент
+        $this->component = $this->detectComponent();
 
         //загрузим все события плагинов в память
         $this->plugins = $this->getAllPlugins();
@@ -108,6 +98,16 @@ class cmsCore {
         // массив текущего пункта меню
         $this->menu_item = $this->getMenuItem($this->menuId());
 
+        // проверяем шаблон пункта меню
+        $menu_template = $this->menuTemplate();
+        if ($menu_template) { self::c('config')->template = $menu_template; }
+
+        //проверяем был ли переопределен шаблон через сессию
+        if (isset($_SESSION['template'])) { self::c('config')->template = $_SESSION['template']; }
+
+        define('TEMPLATE', self::c('config')->template);
+        define('TEMPLATE_DIR', PATH .'/templates/'. self::c('config')->template .'/');
+        define('DEFAULT_TEMPLATE_DIR', PATH .'/templates/_default_/');
     }
 
     protected function __clone() {}
@@ -116,7 +116,7 @@ class cmsCore {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static function getInstance($install_mode=false, $is_admin=false) {
         if (self::$instance === null) {
-            if(!$is_admin){
+            if (!$is_admin) {
                 self::$instance = new self($install_mode);
             } else {
                 self::includeFile('core/cms_admin.php');
@@ -150,7 +150,7 @@ class cmsCore {
      * @return bool
      */
     private static function detectContext(){
-        if((isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        if ((isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
                 $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
                 || isset($_SERVER['HTTP_X_PJAX'])) {
             self::$is_ajax = true;
@@ -600,11 +600,15 @@ class cmsCore {
      * @return string
      */
     private function detectURI(){
+        if (strpos($_SERVER['REQUEST_URI'], '/', 1) === 1){
+            self::error404();
+        }
+        
         $request_uri = ltrim(urldecode(trim($_SERVER['REQUEST_URI'])), '/');
         if (!$request_uri) { return; }
 
         // игнорируемые для детекта url
-        if(preg_match('/^(admin|install|migrate|index)(.*)/ui', $request_uri)){
+        if (preg_match('/^(admin|install|migrate|index)(.*)/ui', $request_uri)) {
             return;
         }
 
@@ -632,16 +636,17 @@ class cmsCore {
 
         $rules = array();
 
-        if(self::includeFile('url_rewrite.php')) {
+        if (self::includeFile('url_rewrite.php')) {
             //подключаем список rewrite-правил
-            if(function_exists('rewrite_rules')){
+            if (function_exists('rewrite_rules')) {
                 //получаем правила
                 $rules = rewrite_rules();
             }
         }
-        if(self::includeFile('custom_rewrite.php')) {
+        
+        if (self::includeFile('custom_rewrite.php')) {
             //подключаем список пользовательских rewrite-правил
-            if(function_exists('custom_rewrite_rules')){
+            if (function_exists('custom_rewrite_rules')) {
                 //добавляем к полученным ранее правилам пользовательские
                 $rules = array_merge($rules, custom_rewrite_rules());
             }
@@ -652,7 +657,7 @@ class cmsCore {
         // Запоминаем реальный uri
         $this->real_uri = $uri;
 
-        if ($rules){
+        if ($rules) {
             //перебираем правила
             foreach($rules as $rule) {
                 //небольшая валидация правила
@@ -724,7 +729,7 @@ class cmsCore {
         // в названии только буквы и цифры
         $component = preg_replace('/[^a-z0-9]/iu', '', $component);
 
-        if (file_exists(PATH.'/components/'.$component.'/frontend.php')){
+        if ($this->isComponentInstalled($component)){
             //если компонент определен и существует
             return $component;
         } else {
@@ -755,7 +760,7 @@ class cmsCore {
         if(!self::includeFile('components/'. $this->component .'/router.php')){ return false; }
 
         $routes = call_user_func('routes_'. $this->component);
-        $routes = self::callEvent('GET_ROUTE_'. mb_strtoupper($this->component), $routes);
+        $routes = self::callEvent('GET_ROUTE_'. strtoupper($this->component), $routes);
         
         // Флаг удачного перебора
         $is_found = false;
@@ -816,42 +821,56 @@ class cmsCore {
      */
     public function proceedBody(){
         ob_start();
-
-        // Подключим jquery и общий js файл
-        self::c('page')->addHeadJS('includes/jquery/jquery.js');
-        self::c('page')->addHeadJS('core/js/common.js');
-
+        
         //проверяем что компонент указан
         if (!$this->component) { return false; }
-
-        // компонент включен?
-        if(!$this->isComponentEnable($this->component)) { self::error404(); }
-
-        self::loadLanguage('components/'.$this->component);
-
-        //парсим адрес и заполняем массив $_REQUEST
-        if(!$this->parseComponentRoute()) { self::error404(); }
-        // узнаем действие в компоненте
-        $this->detectAction();
-
-        // Вызываем сначала плагин (если он есть) на действие
-        // Успешность выполнения должна определяться в методе execute плагина
-        // Он должен вернуть true
-        if(!cmsCore::callEvent(mb_strtoupper('get_'.$this->component.'_action_'.$this->do), false)){
-            
-            self::loadModel($this->component);
-
-            require('components/'. $this->component .'/frontend.php');
-
-            call_user_func($this->component);
-
+        
+        $components = array($this->component);
+        
+        if ($this->url_without_com_name) {
+            $components = cmsCore::callEvent('URL_WITHOUT_COM_NAME', $components);
         }
+        
+        foreach($components as $component) {
+            $this->component = $component;
+            
+            // компонент включен?
+            if (!$this->isComponentEnable($this->component)) { continue; }
+            
+            if ($this->url_without_com_name) {
+                $this->uri = $this->component . strstr($this->uri, '/');
+            }
 
-        if(self::isAjax()){ cmsCore::halt(cmsCore::callEvent('AFTER_COMPONENT_'. mb_strtoupper($this->component), ob_get_clean())); }
+            //парсим адрес и заполняем массив $_REQUEST
+            if (!$this->parseComponentRoute()) { continue; }
 
-        self::c('page')->page_body = cmsCore::callEvent('AFTER_COMPONENT_'. mb_strtoupper($this->component), ob_get_clean());
+            // узнаем действие в компоненте
+            $this->detectAction();
+            
+            self::loadLanguage('components/'. $this->component);
 
-        return true;
+            // Вызываем сначала плагин (если он есть) на действие
+            // Успешность выполнения должна определяться в методе execute плагина
+            // Он должен вернуть true
+            if (!cmsCore::callEvent(strtoupper('get_'. $this->component .'_action_'. $this->do), false)) {
+                self::loadModel($this->component);
+                self::includeFile('components/'. $this->component .'/frontend.php');
+                if (function_exists($this->component)) {
+                    // в компонетах вместо error404() лучше использовать return false
+                    if (call_user_func($this->component) === false){
+                        continue;
+                    }
+                }
+            }
+            
+            if (self::isAjax()){ cmsCore::halt(cmsCore::callEvent('AFTER_COMPONENT_'. strtoupper($this->component), ob_get_clean())); }
+            
+            cmsPage::getInstance()->page_body = cmsCore::callEvent('AFTER_COMPONENT_'. strtoupper($this->component), ob_get_clean());
+            
+            return true;
+        }
+            
+        self::error404();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -989,27 +1008,31 @@ class cmsCore {
         }
 
         if (isset($request[$var])){
-            // массив возможных параметров
-            if(is_array($type)){
-                if(in_array($request[$var], $type)){
-                    return self::strClear((string)$request[$var]);
-                } else {
-                    return $default;
-                }
-            }
-            switch($type){
-                case 'int':   if ($request[$var]!=='') { return (int)$request[$var];  } else { return (int)$default; } break;
-                case 'str':   if ($request[$var]) { return (string)self::strClear($request[$var]); } else { return (string)$default; } break;
-                case 'email': if(preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $request[$var])){ return $request[$var]; } else { return (string)$default; } break;
-                case 'html':  if ($request[$var]) { return (string)self::strClear($request[$var], false); } else { return (string)$default; } break;
-                case 'array': if (is_array($request[$var])) { foreach($request[$var] as $k=>$s){ $arr[$k] = self::strClear($s, false); } return $arr; } else { return $default; } break;
-                case 'array_int': if (is_array($request[$var])) { foreach($request[$var] as $k=>$i){ $arr[$k] = (int)$i; } return $arr; } else { return $default; } break;
-                case 'array_str': if (is_array($request[$var])) { foreach($request[$var] as $k=>$s){ $arr[$k] = self::strClear($s); } return $arr; } else { return $default; } break;
-            }
+            return self::cleanVar($request[$var], $type, $default);
         } else {
             return $default;
         }
 
+    }
+    
+    public static function cleanVar($var, $type='str', $default=false) {
+        // массив возможных параметров
+        if (is_array($type)) {
+            if (in_array($var, $type)) {
+                return self::strClear((string)$var);
+            } else {
+                return $default;
+            }
+        }
+        switch($type){
+            case 'int':   if ($var!=='') { return (int)$var;  } else { return (int)$default; } break;
+            case 'str':   if ($var) { return self::strClear((string)$var); } else { return (string)$default; } break;
+            case 'email': if(preg_match("/^(?:[a-z0-9\._\-]+)@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+(?:[a-z]{2,6})$/ui", (string)$var)){ return $var; } else { return (string)$default; } break;
+            case 'html':  if ($var) { return self::strClear((string)$var, false); } else { return (string)$default; } break;
+            case 'array': if (is_array($var)) { foreach($var as $k=>$s){ $arr[$k] = self::strClear($s, false); } return $arr; } else { return $default; } break;
+            case 'array_int': if (is_array($var)) { foreach($var as $k=>$i){ $arr[$k] = (int)$i; } return $arr; } else { return $default; } break;
+            case 'array_str': if (is_array($var)) { foreach($var as $k=>$s){ $arr[$k] = self::strClear($s); } return $arr; } else { return $default; } break;
+        }
     }
 
     /**
@@ -1180,9 +1203,8 @@ class cmsCore {
      * ====== DEPRECATED =========
      */
     public function initSmarty($tpl_folder, $tpl_file){
-
+        trigger_error('initSmarty is DEPRECATED, use cmsPage::initTemplate', E_USER_NOTICE);
         return cmsPage::initTemplate($tpl_folder, $tpl_file);
-
     }
 
     // CONFIGS //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1414,10 +1436,13 @@ class cmsCore {
         
         $access_list = $this->menu_item['access_list'];
         
+        // если полное совпадение, то ищем опцию "Только для родительских ссылок"
+        // если она включена, то полностью совпадаемый урл показываем
+        if ($this->isMenuIdStrict() && $this->menu_item['is_lax']) {
+            return true;
+        }
+        
         if (!self::checkContentAccess($access_list)) {
-            self::c('page')->addHeadJS('includes/jquery/jquery.js');
-            self::c('page')->addHeadJS('core/js/common.js');
-            
             ob_start();
                 cmsPage::includeTemplateFile('special/accessdenied.php');
             self::c('page')->page_body = ob_get_clean();
@@ -1434,17 +1459,17 @@ class cmsCore {
      * @param str $link
      * @return string
      */
-	public function getLinkInMenu($link){
+    public function getLinkInMenu($link){
 
-		if (!$this->menu_item) { return ''; }
+            if (!$this->menu_item) { return ''; }
 
-		foreach($this->menu_struct as $menu){
-			if($menu['link'] == $link){ return $menu['title']; }
-		}
+            foreach($this->menu_struct as $menu){
+                    if($menu['link'] == $link){ return $menu['title']; }
+            }
 
-		return '';
+            return '';
 
-	}
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1579,6 +1604,7 @@ class cmsCore {
         if (!self::c('db')->num_rows($result)){ return; }
 
         while ($item = self::c('db')->fetch_assoc($result)){
+            $item['menu'] = self::yamlToArray($item['menu']);
             $this->menu_struct[$item['id']] = $item;
         }
 
@@ -1749,7 +1775,7 @@ class cmsCore {
      * @param string $component - Компонент
      * @param string $title - Название цели во множ.числе (например "Статьи")
      * @param string $target_table - таблица, где хранятся комментируемые записи
-     * @param string $title - название цели в родительном падеже (например "вашей статьи")
+     * @param string $subj - название цели в родительном падеже (например "вашей статьи")
      */
     public static function registerCommentsTarget($target, $component, $title, $target_table, $subj) {
         $sql  = "INSERT IGNORE INTO cms_comment_targets (target, component, title, target_table, subj)
@@ -1809,20 +1835,19 @@ class cmsCore {
      * @return bool
      */
     public function isComponentInstalled($component){
+        $is_installed = false;
 
-		$is_installed = false;
-
-		foreach ($this->components as $inst_component){
-		   if($inst_component['link'] == $component){
-			  $is_installed = true; break;
-		   }
-		}
+        foreach ($this->components as $inst_component){
+            if($inst_component['link'] == $component){
+                $is_installed = true; break;
+            }
+        }
 
         return $is_installed;
     }
 
     public function isModuleInstalled($module) {
-        return (bool)self::c('db')->rows_count('cms_modules', "content='{$module}' AND user=0", 1);
+        return (bool)self::c('db')->rows_count('cms_modules', "content='". $module ."' AND user=0", 1);
     }
 
     // DATE METHODS /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1978,15 +2003,16 @@ class cmsCore {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Проверяет доступ (модуля, меню) к группе пользователя
-     * @param $access_list yaml или массив
+     * @param string $access_list yaml или массив
+     * @param bool $admin_always_show
      * @return bool
      */
-    public static function checkContentAccess($access_list){
+    public static function checkContentAccess($access_list, $admin_always_show=true){
         // если $access_list пуста, то считаем что доступ для всех
         if (!$access_list) { return true; }
 
-        // администраторам всегда показываем модуль
-        if (self::c('user')->is_admin) { return true; }
+        // администраторам показываем всегда
+        if (self::c('user')->is_admin && $admin_always_show) { return true; }
 
         // можем передавать как YAML так и сформированный массив
         $access_list = is_array($access_list) ? $access_list : self::yamlToArray($access_list);
@@ -2602,21 +2628,19 @@ class cmsCore {
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static function spellCount($num, $one, $two, $many, $is_full=true) {
 
-		if ($num%10==1 && $num%100!=11){
-			$str = $one;
-		}elseif($num%10>=2 && $num%10<=4 && ($num%100<10 || $num%100>=20)){
-			$str = $two;
-		}else{
-			$str = $many;
-		}
-
-		return ($is_full ? $num : '').' '.$str;
-
-	}
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static function spellCount($num, $one, $two, $many, $is_full=true) {
+        if ($num%10==1 && $num%100!=11) {
+            $str = $one;
+        } elseif ($num%10>=2 && $num%10<=4 && ($num%100<10 || $num%100>=20)) {
+            $str = $two;
+        } else {
+            $str = $many;
+        }
+        
+        return ($is_full ? $num : '') .' '. $str;
+    }
+    
     /**
      * Выводит словами разницу между текущей и указанной датой
      * @param string $date
@@ -2694,25 +2718,28 @@ class cmsCore {
      * @param boolean $reInit определяет нужно ли переинициализировать объект класса
      * @return \CMS Class Object
      */
-    public static function c($class, $args=array(), $reInit=false){
-        if (empty(self::$classes[$class])){
-            if (isset(self::$classes_name[$class]) && self::loadClass($class)){
-                if (!is_array($args) || empty($args[0])){
-                    $args = array($args);
-                }
-                if (method_exists(self::$classes_name[$class], 'getInstance')){
+    public static function c($class, $args=array(), $reInit=false) {
+        if (empty(self::$classes[$class])) {
+            
+            if (isset(self::$classes_name[$class]) && self::loadClass($class)) {
+
+                if (method_exists(self::$classes_name[$class], 'getInstance')) {
+                    if (!is_array($args) || empty($args[0])) {
+                        $args = array($args);
+                    }
+                
                     self::$classes[$class] = call_user_func_array(array(self::$classes_name[$class], 'getInstance'), $args);
-                }else if (method_exists(self::$classes_name[$class], '__construct')){
-                    self::$classes[$class] = call_user_func_array(array(self::$classes_name[$class], '__construct'), $args);
-                }else{
-                    self::$classes[$class] = new self::$classes_name[$class]();
+                } else {
+                    self::$classes[$class] = new self::$classes_name[$class]($args);
                 }
-            }else{
+                
+            } else {
                 global $_LANG;
+                
                 cmsCore::halt(sprintf($_LANG['CLASS_NOT_FOUND'], $class));
             }
-        }else{
-            if ($reInit === true){
+        } else {
+            if ($reInit === true) {
                 unset(self::$classes[$class]);
                 return self::c($class, $args);
             }
@@ -2767,8 +2794,36 @@ class cmsCore {
 
         return $plugins_list;
     }
+    
+    public static function city_input($params) {
+        global $_LANG;
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        array_walk($params, create_function('&$value', 'return htmlspecialchars($value);'));
+
+        if (!isset($params['placeholder'])){ $params['placeholder'] = $_LANG['SELECT_CITY']; }
+        if (!isset($params['width'])){       $params['width']       = '100%';                }
+        if (!isset($params['input_width'])){ $params['input_width'] = '150px';               }
+        if (!isset($params['city_id'])){     $params['city_id']     = 0;                     }
+        if (!isset($params['region_id'])){   $params['region_id']   = 0;                     }
+        if (!isset($params['country_id'])){  $params['country_id']  = 0;                     }
+        if (!isset($params['value'])){       $params['value']       = '';                    }
+
+        self::c('page')->addHeadJS('components/geo/js/geo.js');
+
+        $id = uniqid();
+
+        $display = $params['value'] ? '' : 'style="display:none"';
+
+        return '<div class="text-input city_block" id="'. $id .'" style="width:'. $params['width'] .'">
+                    <input type="hidden" value="'. $params['value'] .'" name="'. $params['name'] .'" class="city_name" />
+                    <input type="hidden" value="'. $params['city_id'] .'" name="city_id" class="city_id" />
+                    <input type="hidden" value="'. $params['region_id'] .'" name="region_id" class="region_id" />
+                    <input type="hidden" value="'. $params['country_id'] .'" name="country_id" class="country_id" />
+                    <input readonly="readonly" placeholder="'. $params['placeholder'] .'" type="text" value="'. $params['value'] .'" class="city_view" onclick="geo.viewForm(\''. $id .'\');return false;" style="width:'. $params['input_width'] .'" />
+                    <a class="city_link city_clear_link" href="#" onclick="geo.clear(\''. $id .'\');return false;" '. $display .'>'. $_LANG['DELETE'] .'</a>
+                    <a class="city_link" href="#" onclick="geo.viewForm(\''. $id .'\');return false;">'. $_LANG['SELECT'] .'</a>
+                </div>' . "\n";
+    }
 } //cmsCore
 
 function icms_ucfirst($str) {
@@ -2776,7 +2831,6 @@ function icms_ucfirst($str) {
 }
 
 function icms_substr_replace($str, $replacement, $offset, $length = NULL){
-
     $length = ($length === NULL) ? mb_strlen($str) : (int)$length;
     preg_match_all('/./us', $str, $str_array);
     preg_match_all('/./us', $replacement, $replacement_array);
@@ -2784,7 +2838,4 @@ function icms_substr_replace($str, $replacement, $offset, $length = NULL){
     array_splice($str_array[0], $offset, $length, $replacement_array[0]);
 
     return implode('', $str_array[0]);
-
 }
-
-?>

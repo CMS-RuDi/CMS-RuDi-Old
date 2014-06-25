@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -516,17 +516,20 @@ if (in_array($do, array('newthread','newpost','editpost'))){
                                     'editdate' => date("Y-m-d H:i:s")
                                 ), $last_post['id']);
 
-            cmsActions::updateLog('add_fpost', array('description' => $message_post), $last_post['id']);
-
-            if($model->config['fa_on'] && cmsCore::checkContentAccess($model->config['group_access'])){
-
+            if ($model->config['fa_on'] && cmsCore::checkContentAccess($model->config['group_access'])) {
+                cmsActions::updateLog('add_thread', array('description' => $message_post), $thread['id']);
+                
                 $file_error = $model->addUpdatePostAttachments($last_post['id']);
 
-                if($file_error === false){
-                    cmsCore::addSessionMessage($_LANG['CHECK_SIZE_TYPE_FILE'].$model->config['fa_max'], 'error');
+                if ($file_error === false) {
+                    cmsCore::addSessionMessage($_LANG['CHECK_SIZE_TYPE_FILE'] . $model->config['fa_max'], 'error');
                 }
 
+            } else {
+                cmsActions::updateLog('add_fpost', array('description' => $message_post), $last_post['id']);
             }
+            
+            $model->updateForumCache($thread['NSLeft'], $thread['NSRight'], true);
 
             if($first_post_id == $last_post['id']){
 

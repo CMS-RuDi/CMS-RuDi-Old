@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -276,7 +276,7 @@ class cms_model_board{
             $item['content']  = nl2br($item['content']);
 			$item['content']  = $this->config['auto_link'] ? $this->inCore->parseSmiles($item['content']) : $item['content'];
 			$item['title']    = $item['obtype'].' '.$item['title'];
-			$item['fpubdate'] = cmsCore::dateformat($item['pubdate']);
+			$item['fpubdate'] = cmsCore::dateFormat($item['pubdate']);
 			$item['enc_city'] = urlencode($item['city']);
             if (!$item['file'] || !file_exists(PATH.'/images/board/small/'.$item['file'])){
 				$item['file'] = 'nopic.jpg';

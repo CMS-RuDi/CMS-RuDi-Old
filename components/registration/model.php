@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -15,9 +15,9 @@ if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 class cms_model_registration {
 
-	public function __construct(){
+    public function __construct(){
         $this->config = cmsCore::getInstance()->loadComponentConfig('registration');
-		cmsCore::loadLanguage('components/registration');
+	cmsCore::loadLanguage('components/registration');
         $this->inDB = cmsDatabase::getInstance();
     }
 
@@ -104,9 +104,9 @@ class cms_model_registration {
         if(!$user_id){ return false; }
         $user['password'] = $send_pass;
 
-        $code = md5($user['email'].mb_substr(md5(rand(0,9999)), 0, 8));
-        $codelink = HOST.'/activate/'.$code;
-
+        $code = md5($user['email'] . mb_substr(md5(mt_rand(0,9999)), 0, mt_rand(0,32)));
+        $codelink = HOST .'/activate/'. $code .'?user_id='. $user_id;
+        
         $sql = "INSERT cms_users_activate (pubdate, user_id, code)
                 VALUES (NOW(), '{$user['id']}', '$code')";
         $this->inDB->query($sql);

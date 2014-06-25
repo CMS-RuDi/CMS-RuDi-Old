@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -472,7 +472,7 @@ function blogs(){
             $cat_list = cmsCore::getListItems('cms_blog_cats', $post['cat_id'], 'id', 'ASC', "blog_id = '{$blog['id']}'");
 
             //получаем код панелей bbcode и смайлов
-            $bb_toolbar = cmsPage::getBBCodeToolbar('message',cmsCore::m('blogs')->config['img_on'], 'blogs', 'post', $post_id);
+            $bb_toolbar = cmsPage::getBBCodeToolbar('message',cmsCore::m('blogs')->config['img_on'], 'blogs', 'blog_post', $post_id);
             $smilies    = cmsPage::getSmilesPanel('message');
 
             $inCore->initAutoGrowText('#message');
@@ -532,11 +532,10 @@ function blogs(){
     $mod = array_merge($mod, $added);
 
                 if ($mod['published']) {
-                    if ($blog['allow_who'] != 'nobody' && $mod['allow_who'] != 'nobody'){
-
                     $mod['seolink'] = cmsCore::m('blogs')->getPostURL($blog['seolink'], $mod['seolink']);
-
-                    cmsCore::callEvent('ADD_POST_DONE', $mod);
+                    
+                    if ($blog['allow_who'] != 'nobody' && $mod['allow_who'] != 'nobody') {
+                        cmsCore::callEvent('ADD_POST_DONE', $mod);
 
                         cmsActions::log('add_post', array(
                                 'object' => $mod['title'],

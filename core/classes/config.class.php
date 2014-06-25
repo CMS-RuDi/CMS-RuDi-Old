@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -97,7 +97,7 @@ class cmsConfig {
             'timediff'=>'',
             'user_stats'=>1,
             'allow_ip'=>'',
-            'JevixAllowTags'=>'p,a,img,i,b,u,s,strike,video,em,strong,nobr,li,ol,ul,div,abbr,sup,sub,acronym,h1,h2,h3,h4,h5,h6,br,hr,pre,code,object,param,embed,blockquote,iframe,span,input,table,caption,th,tr,td,figure,figcaption',
+            'JevixAllowTags'=>'p,a,img,i,b,u,s,strike,video,em,strong,nobr,li,ol,ul,div,abbr,sup,sub,acronym,h1,h2,h3,h4,h5,h6,br,hr,pre,code,object,param,embed,blockquote,iframe,span,input,table,caption,th,tr,td,article,nav,audio,menu,section,time',
             'JevixTagCutWithContent'=>'script,style,meta'
         );
 
@@ -122,7 +122,7 @@ class cmsConfig {
      * @return mixed
      */
     public static function getConfig($value = '') {
-        if($value){
+        if ($value){
             if(isset(self::$config[$value])){
                 return self::$config[$value];
             } else {

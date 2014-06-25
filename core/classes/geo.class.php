@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -33,17 +33,17 @@ class cmsgeo {
      */
     public static function getInfo($ip, $key = false, $cache = true) {
         // для работы требуется CURL
-        if(!function_exists('curl_setopt') || !function_exists('curl_init')) { return false; }
+        if (!function_exists('curl_setopt') || !function_exists('curl_init')) { return false; }
 
         // если уже получали данные, возвращаем их сразу
         $cookie_data = cmsCore::getCookie('geodata');
-        if(!empty(self::$data[$ip])){
+        if (!empty(self::$data[$ip])) {
             $data = self::$data[$ip];
-        } elseif($cookie_data && $cache){
+        } elseif ($cookie_data && $cache) {
             $data = unserialize($cookie_data);
         }
 
-        if(!isset($data)){
+        if (!isset($data)) {
 
             // выполняем запрос к ipgeobase.ru
             $thisObj = new self($ip);
@@ -62,7 +62,7 @@ class cmsgeo {
         }
 
         // можно запрашивать только определенные ключи
-        if(!in_array($key, self::$valid_keys)){
+        if (!in_array($key, self::$valid_keys)) {
             $key = false;
         }
 
@@ -82,17 +82,15 @@ class cmsgeo {
      */
     private function getData() {
         $out = cmsCore::c('curl', array(
-            array(
-                'header' => 0,
-                'connect_timeout' => 2,
-                'user_agent' => 'InstantCMS'
-            )
+            'header' => 0,
+            'connect_timeout' => 2,
+            'user_agent' => 'InstantCMS'
         ))->xmlGet($this->url.$this->ip);
-
+        
         foreach ($out->ip[0] as $key=>$value) {
             $data[$key] = (string)$value;
         }
-
+        
         return $data;
     }
 

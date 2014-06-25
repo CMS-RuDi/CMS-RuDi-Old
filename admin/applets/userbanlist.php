@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -13,33 +13,33 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function applet_userbanlist(){
-
+function applet_userbanlist() {
     $inCore = cmsCore::getInstance();
+    
+    global $_LANG;
+    global $adminAccess;
+    
+    if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
 
-	global $_LANG;
-	global $adminAccess;
-	if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_BANLIST']);
+    cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
+    cpAddPathway($_LANG['AD_BANLIST'], 'index.php?view=userbanlist');
 
-	cmsCore::c('page')->setAdminTitle($_LANG['AD_BANLIST']);
- 	cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
- 	cpAddPathway($_LANG['AD_BANLIST'], 'index.php?view=userbanlist');
-
-	$do = cmsCore::request('do', 'str', 'list');
-	$id = cmsCore::request('id', 'int', -1);
-	$to = cmsCore::request('to', 'int', 0);
+    $do = cmsCore::request('do', 'str', 'list');
+    $id = cmsCore::request('id', 'int', -1);
+    $to = cmsCore::request('to', 'int', 0);
+    
     // для редиректа обратно в профиль на сайт
-    if($to){
+    if ($to) {
         cmsUser::sessionPut('back_url', cmsCore::getBackURL());
     }
 
-	if ($do == 'list'){
-
+    if ($do == 'list') {
         $toolmenu[] = array('icon'=>'useradd.gif', 'title'=>$_LANG['AD_TO_BANLIST_ADD'], 'link'=>'?view=userbanlist&do=add');
         $toolmenu[] = array('icon'=>'edit.gif', 'title'=>$_LANG['AD_EDIT_SELECTED'], 'link'=>"javascript:checkSel('?view=userbanlist&do=edit&multiple=1');");
         $toolmenu[] = array('icon'=>'delete.gif', 'title'=>$_LANG['AD_DELETE_SELECTED'], 'link'=>"javascript:checkSel('?view=userbanlist&do=delete&multiple=1');");
 
-		cpToolMenu($toolmenu);
+        cpToolMenu($toolmenu);
 
         $fields[] = array('title'=>'id', 'field'=>'id', 'width'=>'30');
         $fields[] = array('title'=>$_LANG['AD_IS_ACTIVE'], 'field'=>'status', 'width'=>'55', 'prc'=>'cpYesNo');
@@ -53,73 +53,70 @@ function applet_userbanlist(){
         $actions[] = array('title'=>$_LANG['EDIT'], 'icon'=>'edit.gif', 'link'=>'?view=userbanlist&do=edit&id=%id%');
         $actions[] = array('title'=>$_LANG['DELETE'], 'icon'=>'delete.gif', 'confirm'=>$_LANG['AD_REMOVE_RULE'], 'link'=>'?view=userbanlist&do=delete&id=%id%');
 
-		cpListTable('cms_banlist', $fields, $actions, '1=1', 'ip DESC');
+        cpListTable('cms_banlist', $fields, $actions, '1=1', 'ip DESC');
+    }
 
-	}
-
-    if ($do == 'delete'){
-        if (!isset($_REQUEST['item'])){
-            if ($id >= 0){ dbDelete('cms_banlist', $id);  }
+    if ($do == 'delete') {
+        if (!isset($_REQUEST['item'])) {
+            if ($id >= 0) { dbDelete('cms_banlist', $id); }
         } else {
             dbDeleteList('cms_banlist', $_REQUEST['item']);
         }
         cmsCore::redirect('?view=userbanlist');
     }
 
-	if ($do == 'submit' || $do == 'update'){
+    if ($do == 'submit' || $do == 'update') {
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
-
-        $types = array('user_id'=>array('user_id', 'int', 0),
-                       'ip'=>array('ip', 'str', ''),
-                       'cause'=>array('cause', 'str', ''),
-                       'autodelete'=>array('autodelete', 'int', 0),
-                       'int_num'=>array('int_num', 'int', 0),
-                       'int_period'=>array('int_period', 'str', '',
-                                        create_function('$p', 'if(!in_array($p, array("MONTH","DAY","HOUR","MINUTE"))){ $p = "MINUTE"; } return $p;')));
+        $types = array(
+            'user_id' => array('user_id', 'int', 0),
+            'ip' => array('ip', 'str', ''),
+            'cause' => array('cause', 'str', ''),
+            'autodelete' => array('autodelete', 'int', 0),
+            'int_num' => array('int_num', 'int', 0),
+            'int_period' => array('int_period', 'str', '', create_function('$p', 'if(!in_array($p, array("MONTH","DAY","HOUR","MINUTE"))){ $p = "MINUTE"; } return $p;'))
+        );
 
         $items = cmsCore::getArrayFromRequest($types);
 
         $error = false;
 
-        if (!$items['ip']){
+        if (!$items['ip']) {
             $error = true;
             cmsCore::addSessionMessage($_LANG['AD_NEED_IP'], 'error');
         }
+        
         if ($items['ip'] == $_SERVER['REMOTE_ADDR'] ||
-            $items['user_id'] == cmsCore::c('user')->id){
+            $items['user_id'] == cmsCore::c('user')->id) {
             $error = true;
             cmsCore::addSessionMessage($_LANG['AD_ITS_YOUR_IP'], 'error');
         }
 
-        if(cmsUser::userIsAdmin($items['user_id'])){
+        if (cmsUser::userIsAdmin($items['user_id'])) {
             $error = true;
             cmsCore::addSessionMessage($_LANG['AD_ITS_ADMIN'], 'error');
         }
 
-        if ($error){
+        if ($error) {
             cmsCore::redirectBack();
         }
 
-        if($do == 'update'){
-
+        if ($do == 'update'){
             cmsCore::c('db')->update('cms_banlist', $items, $id);
 
-            if (empty($_SESSION['editlist'])){
+            if (empty($_SESSION['editlist'])) {
                 cmsCore::redirect('?view=userbanlist');
             } else {
                 cmsCore::redirect('?view=userbanlist&do=edit');
             }
-
         }
 
         cmsCore::c('db')->insert('cms_banlist', $items);
         $back_url = cmsUser::sessionGet('back_url'); cmsUser::sessionDel('back_url');
         cmsCore::redirect($back_url ? $back_url : '?view=userbanlist');
+    }
 
-	}
-
-    if ($do == 'add' || $do == 'edit'){
+    if ($do == 'add' || $do == 'edit') {
         cmsCore::c('page')->addHeadJS('admin/js/banlist.js');
 
         $toolmenu[] = array('icon'=>'save.gif', 'title'=>$_LANG['SAVE'], 'link'=>'javascript:document.addform.submit();');
@@ -127,12 +124,12 @@ function applet_userbanlist(){
 
         cpToolMenu($toolmenu);
 
-        if ($do=='add'){
+        if ($do=='add') {
             echo '<h3>'.$_LANG['AD_TO_BANLIST_ADD'].'</h3>';
             cpAddPathway($_LANG['AD_TO_BANLIST_ADD']);
         } else {
-            if(isset($_REQUEST['multiple'])){
-                if (isset($_REQUEST['item'])){
+            if (isset($_REQUEST['multiple'])) {
+                if (isset($_REQUEST['item'])) {
                     $_SESSION['editlist'] = cmsCore::request('item', 'array_int', array());
                 } else {
                     cmsCore::addSessionMessage($_LANG['AD_NO_SELECT_OBJECTS'], 'error');
@@ -142,28 +139,32 @@ function applet_userbanlist(){
 
             $ostatok = '';
 
-            if (isset($_SESSION['editlist'])){
-               $item_id = array_shift($_SESSION['editlist']);
-               if (sizeof($_SESSION['editlist'])==0) { unset($_SESSION['editlist']); } else
-               { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
-            } else { $item_id = cmsCore::request('id', 'int', 0); }
+            if (isset($_SESSION['editlist'])) {
+                $item_id = array_shift($_SESSION['editlist']);
+                if (sizeof($_SESSION['editlist'])==0) {
+                   unset($_SESSION['editlist']);
+                } else {
+                    $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')';
+                }
+            } else {
+                $item_id = cmsCore::request('id', 'int', 0);
+            }
 
             $mod = cmsCore::c('db')->get_fields('cms_banlist', "id = '$item_id'", '*');
-            if(!$mod){ cmsCore::error404(); }
+            if (!$mod) { cmsCore::error404(); }
 
             echo '<h3>'.$_LANG['AD_EDIT_RULE'].' '.$ostatok.'</h3>';
 
             cpAddPathway($_LANG['AD_EDIT_RULE']);
-
         }
 
 	?>
-	  <div style="margin-top:2px;padding:10px;border:dotted 1px silver; width:508px;background:#FFFFCC">
-	  	<div style="font-weight:bold"><?php echo $_LANG['ATTENTION'];?>!</div>
-		<div><?php echo $_LANG['AD_CAUTION_INFO_0'];?></div>
-		<div><?php echo $_LANG['AD_CAUTION_INFO_1'];?></div>
-	  </div>
-      <form id="addform" name="addform" method="post" action="index.php?view=userbanlist">
+    <div style="margin-top:2px;padding:10px;border:dotted 1px silver; width:508px;background:#FFFFCC">
+        <div style="font-weight:bold"><?php echo $_LANG['ATTENTION'];?>!</div>
+        <div><?php echo $_LANG['AD_CAUTION_INFO_0'];?></div>
+        <div><?php echo $_LANG['AD_CAUTION_INFO_1'];?></div>
+    </div>
+    <form id="addform" name="addform" method="post" action="index.php?view=userbanlist">
         <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
         <table width="530" border="0" cellspacing="5" class="proptable">
           <tr>
@@ -232,5 +233,3 @@ function applet_userbanlist(){
 	<?php
    }
 }
-
-?>

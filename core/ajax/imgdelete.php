@@ -31,5 +31,3 @@ if (!empty($image['component'])){
 }
 
 cmsCore::halt('OK');
-
-?>

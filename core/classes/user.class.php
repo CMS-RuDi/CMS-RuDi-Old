@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -60,7 +60,7 @@ class cmsUser {
     public function update() {
         
         // привязка ip адреса к сессии
-        if(!$this->checkSpoofingSession()){
+        if (!$this->checkSpoofingSession()){
             $this->logout();
             cmsCore::redirectBack();
         }
@@ -87,6 +87,9 @@ class cmsUser {
             foreach($info as $key=>$value){
                 $this->{$key} = $value;
             }
+            
+            $this->new_msg = self::getNewMessages($user_id);
+            $this->new_msg_count = $this->new_msg['total'];
 
             $this->logdate = self::getUserLogdate();
 
@@ -103,20 +106,19 @@ class cmsUser {
      * Загружает в свойства данные местоположения пользователя
      */
     public function loadUserGeo() {
-
-        if($this->geo_is_loaded) { return true; }
+        if ($this->geo_is_loaded) { return true; }
 
         $inCore = cmsCore::getInstance();
 
         $geo_cfg = $inCore->loadComponentConfig('geo');
 
-        if($geo_cfg['component_enabled'] &&
+        if ($geo_cfg['component_enabled'] &&
                 $geo_cfg['autodetect'] &&
                 cmsCore::loadClass($geo_cfg['class']) &&
                 class_exists('cms'.$geo_cfg['class'])){
 
             $geo_data = call_user_func(array('cms'.$geo_cfg['class'], 'getInfo'), $this->ip);
-            if($geo_data){
+            if ($geo_data){
 
                 foreach($geo_data as $k=>$v){
                     $this->geo[$k] = $v;
@@ -141,16 +143,14 @@ class cmsUser {
 // ============================================================================ //
 
     private function checkSpoofingSession() {
-
         // первый раз зашли
-        if(!isset($_SESSION['user_net'])) {
+        if (!isset($_SESSION['user_net'])) {
             $octets = explode('.', $_SERVER['REMOTE_ADDR']);
             $_SESSION['user_net'] = rtrim($_SERVER['REMOTE_ADDR'], end($octets));
             return true;
         }
 
         return mb_strstr($_SERVER['REMOTE_ADDR'], $_SESSION['user_net']);
-
     }
 
 // ============================================================================ //
@@ -203,9 +203,9 @@ class cmsUser {
 
         // Проверяем бан
         $ban = cmsCore::c('db')->get_fields('cms_banlist', $user_where.' AND status=1', 'int_num, int_period, autodelete, id, status, bandate, user_id, cause');
-        if(!$ban) { return; }
+        if (!$ban) { return; }
 
-        if($this->id){
+        if ($this->id){
             cmsCore::c('db')->query("UPDATE cms_banlist SET ip = '{$this->ip}' WHERE user_id = '{$this->id}'");
         }
 
@@ -222,7 +222,7 @@ class cmsUser {
 
         } else {
             global $_LANG;
-            $ban['bandate'] = cmsCore::dateformat($ban['bandate']);
+            $ban['bandate'] = cmsCore::dateFormat($ban['bandate']);
             $ban['enddate'] = cmsCore::spellCount($ban['int_num'], $_LANG[$ban['int_period'].'1'], $_LANG[$ban['int_period'].'2'], $_LANG[$ban['int_period'].'10']);
             cmsPage::includeTemplateFile('special/bantext.php', array('ban' => $ban));
 $this->logout();
@@ -238,23 +238,20 @@ $this->logout();
      * @return bool
      */
     public function autoLogin(){
-
         $user_id = (int)(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0); 
 
-        if (cmsCore::getCookie('userid') && !$user_id){
+        if (cmsCore::getCookie('userid') && !$user_id) {
 
             $cookie_code = cmsCore::getCookie('userid');
 
-            if (!preg_match('/^([0-9a-zA-Z]{32})$/ui', $cookie_code)){ return false; }
+            if (!preg_match('/^[0-9a-f]{32}$/i', $cookie_code)){ return false; }
 
-            $user = $this->loadUser(0, "md5(CONCAT(u.id, u.password)) = '$cookie_code'");
+            $user = $this->loadUser(0, "md5(CONCAT(u.id, u.password,'". cmsCore::c('db')->escape_string(PATH) ."')) = '". $cookie_code ."'");
 
-            if($user){
-
+            if ($user) {
                 $_SESSION['user'] = $user;
                 cmsCore::callEvent('USER_LOGIN', $_SESSION['user']);
                 self::setUserLogdate($user['id']);
-
             } else {
                 cmsCore::unsetCookie('user_id');
             }
@@ -262,7 +259,6 @@ $this->logout();
         }
 
         return true;
-
     }
 
 // ============================================================================ //
@@ -991,7 +987,7 @@ $this->logout();
             cmsCore::setCookie('logdate', time(), time()+60*60*24*30);
         }
 
-        if($user_id){
+        if ($user_id) {
             cmsCore::c('db')->query("UPDATE cms_users SET logdate = CURRENT_TIMESTAMP WHERE id = '$user_id'");
         }
 
@@ -1023,7 +1019,7 @@ $this->logout();
                 query("INSERT IGNORE INTO cms_online (ip, sess_id, user_id) VALUES ('{$this->ip}', '$sess_id', '{$this->id}') ON DUPLICATE KEY UPDATE agent = '$useragent', viewurl = '$page'");
 
         // удаляем старые записи
-        if(cmsConfig::getConfig('user_stats') == 1){
+        if (cmsConfig::getConfig('user_stats') == 1){
             self::clearOnlineUsers();
         }
 
@@ -1035,7 +1031,9 @@ $this->logout();
      * Удаляет просроченные данные об online пользователях
      */
     public static function clearOnlineUsers() {
-        return cmsCore::c('db')->query("DELETE FROM cms_online WHERE lastdate <= DATE_SUB(NOW(), INTERVAL ".ONLINE_INTERVAL." MINUTE) LIMIT 5");
+        $sql = "DELETE FROM cms_online WHERE lastdate <= DATE_SUB(NOW(), INTERVAL ". ONLINE_INTERVAL ." MINUTE)";
+        if (cmsConfig::getConfig('user_stats') == 1){ $sql .= ' LIMIT 5'; }
+        return cmsCore::c('db')->query($sql);
     }
     /**
      * Загружает всех пользователей и гостей кто онлайн
@@ -1139,19 +1137,14 @@ $this->logout();
      * @param int $user_id
      * @return array
      */
-    public static function getNewMessages($user_id){
-
-        $inUser = self::getInstance();
-        
-        if($inUser->new_msg) { return $inUser->new_msg; }
-
+    public static function getNewMessages($user_id) {
         $sql    = "SELECT from_id FROM cms_user_msg WHERE to_id = '$user_id' AND to_del = 0 AND is_new = 1";
         $result = cmsCore::c('db')->query($sql);
 
         $messages = 0;
         $notices  = 0;
 
-        while($o = cmsCore::c('db')->fetch_assoc($result)){
+        while($o = cmsCore::c('db')->fetch_assoc($result)) {
             if ($o['from_id'] < 0){
                 $notices++;
             } else {
@@ -1161,10 +1154,13 @@ $this->logout();
 
         $counts['messages'] = $messages;
         $counts['notices']  = $notices;
-        $counts['total']    = $notices+$messages;
+        $counts['total']    = $notices + $messages;
 
-        return $inUser->new_msg = $counts;
-
+        return $counts;
+    }
+    
+    public function getNewMsg() {
+        return $this->new_msg;
     }
 
 // ============================================================================ //
@@ -1631,6 +1627,40 @@ $this->logout();
 // ============================================================================ //
 
     /**
+     * Находит в строке все выжения вида {user.property} и заменяет property
+     * на соответствующее свойство объекта cmsUser
+     * @param string $string
+     * @param boolean $is_title
+     * @return string
+     */
+    public static function stringReplaceUserProperties($string, $is_title=false){
+        $matches_count = preg_match_all('/{user.([a-z0-9_]+)}/i', $string, $matches);
+        
+        if ($matches_count) {
+            $user = self::getInstance();
+            
+            for($i=0; $i<$matches_count; $i++){
+                $tag = $matches[0][$i];
+                $property = $matches[1][$i];
+                
+                if (isset($user->$property)) {
+                    if (is_numeric($user->$property) && $is_title) {
+                        if ($user->$property) {
+                            $string = str_replace($tag, ' ('. $user->$property .')', $string);
+                        } else {
+                            $string = str_replace($tag, '', $string);
+                        }
+                    } else {
+                        $string = str_replace($tag, $user->$property, $string);
+                    }
+                }
+            }
+        }
+ 	
+        return $string;
+    }
+    
+    /**
      * Возвращает список всех активных пользователей
      * @return array
      */
@@ -1801,39 +1831,41 @@ $this->logout();
         if ($this->id) { return cmsCore::getBackURL(); }
 
         $default_back_url = '/auth/error.html';
-
-        if(!$login || !$passw) { return $default_back_url; }
+        
+        if (!$login || !$passw) { return $default_back_url; }
 
         $inCore = cmsCore::getInstance();
 
         // Авторизация по логину или e-mail
         if (!preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $login)){
-                $where_login = "u.login = '{$login}'";
+            $where_login = "u.login = '". $login ."'";
         } else {
-                $where_login = "u.email = '{$login}'";
+            $where_login = "u.email = '". $login ."'";
         }
         $where_pass = $pass_in_md5 ? "u.password = '$passw'" : "u.password = md5('$passw')";
 
         // Проверяем локальную пару логин + пароль
-        $user = $this->loadUser(0, "$where_login AND $where_pass");
+        $user = $this->loadUser(0, $where_login .' AND '. $where_pass);
+        
         // иначе пытаемся авторизоваться через плагины
-        if(!$user) {
-                $user = cmsCore::callEvent('SIGNIN_USER', array('login'=>$login,'pass'=>$passw));
+        if (!$user) {
+            $user = cmsCore::callEvent('SIGNIN_USER', array('login'=>$login,'pass'=>$passw));
         }
 
-        if(!$user) { return $default_back_url; }
+        if (!$user) { return $default_back_url; }
 
         $_SESSION['user'] = $user;
 
         cmsCore::callEvent('USER_LOGIN', $_SESSION['user']);
 
         if ($remember_pass){
-                $cookie_code = md5($user['id'] . $user['password']);
-                cmsCore::setCookie('userid', $cookie_code, time()+60*60*24*30);
+            $cookie_code = md5($user['id'] . $user['password'] . PATH);
+            cmsCore::setCookie('userid', $cookie_code, time()+2592000);
         }
 
         // Флаг первой авторизации
         $first_time_auth = !$user['is_logged_once'];
+        
         // обновляем дату последнего визита, ip
         self::setUserLogdate($user['id']);
         cmsCore::c('db')->query("UPDATE cms_users SET last_ip = '{$this->ip}', is_logged_once = 1 WHERE id = '{$user['id']}'");
@@ -1849,7 +1881,9 @@ $this->logout();
         // Получаем URL, предыдущий перед формой логина
         $auth_back_url = cmsUser::sessionGet('auth_back_url');
         $auth_back_url = $auth_back_url ? $auth_back_url : cmsCore::getBackURL();
-        if(!mb_strstr($auth_back_url, str_replace('http://', '', HOST))) { $auth_back_url = '/'; }
+        if (strpos($auth_back_url, $_SERVER['HTTP_HOST']) === false || strpos($auth_back_url, '/auth/') !== false) {
+            $auth_back_url = '/';
+        }
         cmsUser::sessionDel('auth_back_url');
 
         // Авторизация в админку

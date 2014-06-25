@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -43,7 +43,7 @@ function cmsSubmitKarma($target, $item_id, $points){
 
     //вставляем новый голос
     $sql = "INSERT INTO cms_ratings (item_id, points, ip, target, user_id, pubdate)
-            VALUES ('$item_id', '$points', '$ip', '$target', '{cmsCore::c('user')->id}', NOW())";
+            VALUES ('$item_id', '$points', '$ip', '$target', '". cmsCore::c('user')->id ."', NOW())";
     cmsCore::c('db')->query($sql);
 
     //проверяем была ли сделана агрегация для этой цели ранее

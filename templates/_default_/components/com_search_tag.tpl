@@ -3,7 +3,7 @@
 <div id="other_tag" style="display:none">
     <form id="sform"action="/search" method="post" enctype="multipart/form-data">
         <strong>{$LANG.SEARCH_BY_TAG}: </strong>
-        <input type="hidden" name="mode" value="tag" />
+        <input type="hidden" name="do" value="tag" />
         <input type="text" name="query" id="query" size="40" value="" class="text-input" />
 		<script type="text/javascript">
             {$autocomplete_js}
@@ -31,9 +31,9 @@
 	{/foreach}
     </table>
 	{$pagebar}
-{else}    
+{else}
 <p class="usr_photos_notice">{$LANG.BY_TAG} <strong>"{$query}"</strong> {$LANG.NOTHING_FOUND}. <a href="{$external_link}" target="_blank">{$LANG.CONTINUE_TO_SEARCH}?</a></p>
-{/if}	
+{/if}
 {literal}
 <script type="text/javascript">
 function searchOtherTag(){

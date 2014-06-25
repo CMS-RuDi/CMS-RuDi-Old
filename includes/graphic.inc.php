@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -27,7 +27,7 @@ function img_add_watermark($src){
   img_watermark($isrc, $size[0], $size[1]);
 
    // вывод картинки и очистка памяти
-  imagejpeg($isrc,$src,80);
+  imagejpeg($isrc,$src,95);
 
 }
 
@@ -65,7 +65,7 @@ function img_watermark(&$img, $w, $h){
   $rgb             - цвет фона, по умолчанию - белый
   $quality         - качество генерируемого JPEG, по умолчанию - максимальное (100)
 ***********************************************************************************/
-function img_resize($src, $dest, $maxwidth, $maxheight=160, $is_square=false, $watermark=false, $rgb=0xFFFFFF, $quality=90){
+function img_resize($src, $dest, $maxwidth, $maxheight=160, $is_square=false, $watermark=false, $rgb=0xFFFFFF, $quality=95){
 
   if (!file_exists($src)) return false;
 
@@ -150,4 +150,3 @@ function img_resize($src, $dest, $maxwidth, $maxheight=160, $is_square=false, $w
   return true;
 
 }
-?>

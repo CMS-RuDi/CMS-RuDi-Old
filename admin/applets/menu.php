@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -15,7 +15,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function iconList(){
 	global $_LANG;
-	if ($handle = opendir(PATH.'/images/menuicons')) {
+	if ($handle = opendir(PATH .'/images/menuicons')) {
 		$n = 0;
 		while (false !== ($file = readdir($handle))) {
 			if ($file != '.' && $file != '..' && mb_strstr($file, '.gif')){
@@ -33,6 +33,11 @@ function iconList(){
 	echo '<div align="right" style="clear:both">[<a href="javascript:selectIcon(\'\')">'.$_LANG['AD_NO_ICON'].'</a>] [<a href="javascript:hideIcons()">'.$_LANG['CLOSE'].'</a>]</div>';
 
 	return;
+}
+
+function list_menu($menu) {
+    $m = cmsCore::yamlToArray($menu);
+    return implode(', ', $m);
 }
 
 function cpMenutypeById($item){
@@ -100,7 +105,7 @@ function applet_menu(){
         $fields[] = array('title'=>$_LANG['SHOW'], 'field'=>'published', 'width'=>'60');
         $fields[] = array('title'=>$_LANG['AD_ORDER'], 'field'=>'ordering', 'width'=>'100');
         $fields[] = array('title'=>$_LANG['AD_LINK'], 'field'=>array('linktype', 'linkid', 'link'), 'width'=>'240', 'prc'=>'cpMenutypeById');
-        $fields[] = array('title'=>$_LANG['AD_MENU'], 'field'=>'menu', 'width'=>'70', 'filter'=>'10', 'filterlist'=>cpGetList('menu'));
+        $fields[] = array('title'=>$_LANG['AD_MENU'], 'field'=>'menu', 'width'=>'70', 'filter'=>'10', 'filterlist'=>cpGetList('menu'), 'prc'=>'list_menu');
         $fields[] = array('title'=>$_LANG['TEMPLATE'], 'field'=>'template', 'width'=>'70', 'prc'=>'cpTemplateById');
 
         $actions[] = array('title'=>$_LANG['EDIT'], 'icon'=>'edit.gif', 'link'=>'?view=menu&do=edit&id=%id%');
@@ -123,7 +128,7 @@ function applet_menu(){
 	}
 
 	if ($do == 'move_down'){
-		cmsCore::c('db')->moveNsCategory('cms_menu', $id, 'down');;
+		cmsCore::c('db')->moveNsCategory('cms_menu', $id, 'down');
 		cmsCore::redirectBack();
 	}
 
@@ -139,24 +144,24 @@ function applet_menu(){
 	}
 
 	if ($do == 'hide'){
-		if (!isset($_REQUEST['item'])){
-                    if ($id >= 0){ cmsCore::c('db')->setFlag('cms_menu', $id, 'published', '0'); }
-                    cmsCore::halt('1');
-		} else {
-                    cmsCore::c('db')->setFlags('cms_menu', $_REQUEST['item'], 'published', '0');
-                    cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
-                    cmsCore::redirectBack();
-		}
+            if (!cmsCore::inRequest('item')){
+                if ($id >= 0){ cmsCore::c('db')->setFlag('cms_menu', $id, 'published', '0'); }
+                cmsCore::halt('1');
+            } else {
+                cmsCore::c('db')->setFlags('cms_menu', cmsCore::request('item', 'array_int', array()), 'published', '0');
+                cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
+                cmsCore::redirectBack();
+            }
 	}
 
 	if ($do == 'delete'){
-		if (!isset($_REQUEST['item'])){
-                    if ($id >= 0){ cmsCore::c('db')->deleteNS('cms_menu', $id); }
-		} else {
-                    cmsCore::c('db')->deleteListNS('cms_menu', $_REQUEST['item']);
-		}
-        cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
-		cmsCore::redirectBack();
+            if (!cmsCore::inRequest('item')){
+                if ($id >= 0){ cmsCore::c('db')->deleteNS('cms_menu', (int)$id); }
+            } else {
+                cmsCore::c('db')->deleteListNS('cms_menu', cmsCore::request('item', 'array_int', array()));
+            }
+            cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'] , 'success');
+            cmsCore::redirectBack();
 	}
 
 	if ($do == 'update'){
@@ -167,7 +172,7 @@ function applet_menu(){
         if(!$id){ cmsCore::redirectBack(); }
 
         $title     = cmsCore::request('title', 'str', '');
-        $menu      = cmsCore::request('menu', 'str', '');
+        $menu      = cmsCore::arrayToYaml(cmsCore::request('menu', 'array_str', ''));
         $linktype  = cmsCore::request('mode', 'str', '');
         $linkid    = cmsCore::request($linktype, 'str', '');
         $link      = $inCore->getMenuLink($linktype, $linkid);
@@ -177,6 +182,8 @@ function applet_menu(){
         $iconurl   = cmsCore::request('iconurl', 'str', '');
         $parent_id = cmsCore::request('parent_id', 'int', 0);
         $oldparent = cmsCore::request('oldparent', 'int', 0);
+        $is_lax    = cmsCore::request('is_lax', 'int', 0);
+        $css_class = cmsCore::request('css_class', 'str', '');
 
         $is_public = cmsCore::request('is_public', 'int', '');
         if (!$is_public){
@@ -191,6 +198,7 @@ function applet_menu(){
 
         $sql = "UPDATE cms_menu
                 SET title='$title',
+                    css_class='$css_class',
                     menu='$menu',
                     link='$link',
                     linktype='$linktype',
@@ -199,6 +207,7 @@ function applet_menu(){
                     published='$published',
                     template='$template',
                     access_list='$access_list',
+                    is_lax='$is_lax',
                     iconurl='$iconurl'
                 WHERE id = '$id'
                 LIMIT 1";
@@ -219,7 +228,7 @@ function applet_menu(){
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $title     = cmsCore::request('title', 'str', '');
-        $menu      = cmsCore::request('menu', 'str', '');
+        $menu      = cmsCore::arrayToYaml(cmsCore::request('menu', 'array_str', ''));
         $linktype  = cmsCore::request('mode', 'str', '');
         $linkid    = cmsCore::request($linktype, 'str', '');
         $link      = $inCore->getMenuLink($linktype, $linkid);
@@ -228,8 +237,10 @@ function applet_menu(){
         $template  = cmsCore::request('template', 'str', '');
         $iconurl   = cmsCore::request('iconurl', 'str', '');
         $parent_id = cmsCore::request('parent_id', 'int', 0);
+        $css_class = cmsCore::request('css_class', 'str', '');
 
         $is_public = cmsCore::request('is_public', 'int', '');
+        $is_lax    = cmsCore::request('is_lax', 'int', 0);
         if (!$is_public){
             $access_list = cmsCore::arrayToYaml(cmsCore::request('allow_group', 'array_int'));
         }
@@ -240,6 +251,7 @@ function applet_menu(){
 		$sql = "UPDATE cms_menu
 				SET menu='$menu',
 					title='$title',
+                                        css_class='$css_class',
 					link='$link',
 					linktype='$linktype',
 					linkid='$linkid',
@@ -247,6 +259,7 @@ function applet_menu(){
 					published='$published',
 					template='$template',
 					access_list='$access_list',
+                                        is_lax='$is_lax',
 					iconurl='$iconurl'
 				WHERE id = '$myid'";
 
@@ -465,11 +478,12 @@ function applet_menu(){
 
         $menu_list = cpGetList('menu');
 
-        if ($do=='add'){
-             cpAddPathway($_LANG['AD_MENU_POINT_ADD']);
+        if ($do=='add') {
+            cpAddPathway($_LANG['AD_MENU_POINT_ADD']);
+            $mod['menu'] = array('mainmenu');
         } else {
-            if(isset($_REQUEST['multiple'])){
-                if (isset($_REQUEST['item'])){
+            if (isset($_REQUEST['multiple'])) {
+                if (isset($_REQUEST['item'])) {
                     $_SESSION['editlist'] = cmsCore::request('item', 'array_int', array());
                 } else {
                     cmsCore::addSessionMessage($_LANG['AD_NO_SELECT_OBJECTS'], 'error');
@@ -479,40 +493,31 @@ function applet_menu(){
 
             $ostatok = '';
 
-            if (isset($_SESSION['editlist'])){
+            if (isset($_SESSION['editlist'])) {
                $item_id = array_shift($_SESSION['editlist']);
                if (sizeof($_SESSION['editlist'])==0) { unset($_SESSION['editlist']); } else
                { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
             } else { $item_id = cmsCore::request('id', 'int', 0); }
 
             $mod = cmsCore::c('db')->get_fields('cms_menu', "id = '$item_id'", '*');
-            if(!$mod){ cmsCore::error404(); }
+            if (!$mod) { cmsCore::error404(); }
+            
+            $mod['menu'] = cmsCore::yamlToArray($mod['menu']);
 
             cpAddPathway($_LANG['AD_MENU_POINT_EDIT'].$ostatok.' "'.$mod['title'].'"');
 
         }
-	?>
+?>
     <form id="addform" name="addform" method="post" action="index.php">
         <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
         <input type="hidden" name="view" value="menu" />
 
         <table class="proptable" width="100%" cellpadding="15" cellspacing="2">
             <tr>
-                <!-- главная ячейка -->
                 <td valign="top">
 
                     <div><strong><?php echo $_LANG['AD_MENU_POINT_TITLE']; ?></strong> <span class="hinttext">&mdash; <?php echo $_LANG['AD_VIEW_IN_SITE']; ?></span></div>
                     <div><input name="title" type="text" id="title" style="width:100%" value="<?php echo htmlspecialchars($mod['title']);?>" /></div>
-
-                    <div>
-                        <select name="menu" id="menu" style="width:100%">
-                            <?php foreach ($menu_list as $menu) { ?>
-                                <option value="<?php echo $menu['id']; ?>" <?php if (@$mod['menu']==$menu['id']) { echo 'selected="selected"'; }?>>
-                                    <?php echo $menu['title']; ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </div>
 
                     <div><strong><?php echo $_LANG['AD_PARENT_POINT']; ?></strong></div>
                     <div>
@@ -680,61 +685,67 @@ function applet_menu(){
 
                 </td>
 
-                <!-- боковая ячейка -->
                 <td width="300" valign="top" style="background:#ECECEC;">
 
                     <?php ob_start(); ?>
 
                     {tab=<?php echo $_LANG['AD_TAB_PUBLISH']; ?>}
 
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="checklist">
-                            <tr>
-                                <td width="20"><input type="checkbox" name="published" id="published" value="1" <?php if ($mod['published'] || $do=='add') { echo 'checked="checked"'; } ?>/></td>
-                                <td><label for="published"><strong><?php echo $_LANG['AD_MENU_POINT_PUBLIC']; ?></strong></label></td>
-                            </tr>
-                        </table>
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" class="checklist">
+                        <tr>
+                            <td width="20"><input type="checkbox" name="published" id="published" value="1" <?php if ($mod['published'] || $do=='add') { echo 'checked="checked"'; } ?>/></td>
+                            <td><label for="published"><strong><?php echo $_LANG['AD_MENU_POINT_PUBLIC']; ?></strong></label></td>
+                        </tr>
+                    </table>
 
-                        <div style="margin-top:15px">
-                            <strong><?php echo $_LANG['AD_OPEN_POINT'];?></strong>
-                        </div>
-                        <div>
-                            <select name="target" id="target" style="width:100%">
-                                <option value="_self" <?php if (@$mod['target']=='_self') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_SELF']; ?></option>
-                                <option value="_parent"><?php echo $_LANG['AD_PARENT'];?></option>
-                                <option value="_blank" <?php if (@$mod['target']=='_blank') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_BLANK']; ?></option>
-                                <option value="_top" <?php if (@$mod['target']=='_top') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_TOP']; ?></option>
-                            </select>
-                        </div>
+                    <div style="margin-top:15px">
+                        <strong><?php echo $_LANG['AD_OPEN_POINT'];?></strong>
+                    </div>
+                    <div>
+                        <select name="target" id="target" style="width:100%">
+                            <option value="_self" <?php if (@$mod['target']=='_self') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_SELF']; ?></option>
+                            <option value="_parent"><?php echo $_LANG['AD_PARENT'];?></option>
+                            <option value="_blank" <?php if (@$mod['target']=='_blank') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_BLANK']; ?></option>
+                            <option value="_top" <?php if (@$mod['target']=='_top') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_TOP']; ?></option>
+                        </select>
+                    </div>
 
-                        <div style="margin-top:15px">
-                            <strong><?php echo $_LANG['TEMPLATE'];?></strong><br/>
-                            <span class="hinttext"><?php echo $_LANG['AD_DESIGN_CHANGE'] ;?></span>
-                        </div>
-                        <div>
-                            <select name="template" id="template" style="width:100%">
-                                <option value="0" <?php if (@$mod['template']==0 || !$mod['template']) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_DEFAULT'];?></option>
-                                <?php
-                                $templates = cmsCore::getDirsList('/templates');
-                                foreach ($templates as $template) {
-                                    echo '<option value="'.$template.'" '.(@$mod['template'] == $template ? 'selected="selected"': '').'>'.$template.'</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
+                    <div style="margin-top:15px">
+                        <strong><?php echo $_LANG['TEMPLATE'];?></strong><br/>
+                        <span class="hinttext"><?php echo $_LANG['AD_DESIGN_CHANGE'] ;?></span>
+                    </div>
+                    <div>
+                        <select name="template" id="template" style="width:100%">
+                            <option value="0" <?php if (@$mod['template']==0 || !$mod['template']) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_DEFAULT'];?></option>
+                            <?php
+                            $templates = cmsCore::getDirsList('/templates');
+                            foreach ($templates as $template) {
+                                echo '<option value="'.$template.'" '.(@$mod['template'] == $template ? 'selected="selected"': '').'>'.$template.'</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
 
-                        <div style="margin-top:15px">
-                            <strong><?php echo $_LANG['AD_ICON_PICTURE'];?></strong><br/>
-                            <span class="hinttext"><?php echo $_LANG['AD_ICON_FILENAME'];?></span>
-                        </div>
+                    <div style="margin-top:15px">
+                        <strong><?php echo $_LANG['AD_ICON_PICTURE'];?></strong><br/>
+                        <span class="hinttext"><?php echo $_LANG['AD_ICON_FILENAME'];?></span>
+                    </div>
+                    <div>
+                        <input name="iconurl" type="text" id="iconurl" size="30" value="<?php echo @$mod['iconurl'];?>" style="width:100%"/>
                         <div>
-                            <input name="iconurl" type="text" id="iconurl" size="30" value="<?php echo @$mod['iconurl'];?>" style="width:100%"/>
-                            <div>
-                                <a id="iconlink" style="display:block;" href="javascript:showIcons()"><?php echo $_LANG['AD_CHECK_ICON'];?></a>
-                                <div id="icondiv" style="display:none; padding:6px;border:solid 1px gray;background:#FFF">
-                                    <div><?php iconList(); ?></div>
-                                </div>
+                            <a id="iconlink" style="display:block;" href="javascript:showIcons()"><?php echo $_LANG['AD_CHECK_ICON'];?></a>
+                            <div id="icondiv" style="display:none; padding:6px;border:solid 1px gray;background:#FFF">
+                                <div><?php iconList(); ?></div>
                             </div>
                         </div>
+                    </div>
+
+                    <div style="margin-top:15px">
+                        <strong><?php echo $_LANG['AD_CSS_CLASS'];?></strong>
+                    </div>
+                    <div>
+                        <input name="css_class" type="text" size="30" value="<?php echo @$mod['css_class'];?>" style="width:100%"/>
+                    </div>
 
                     {tab=<?php echo $_LANG['AD_TAB_ACCESS'] ;?>}
                     <table width="100%" cellpadding="0" cellspacing="0" border="0" class="checklist" style="margin-top:5px">
@@ -799,6 +810,33 @@ function applet_menu(){
                             ?>
                         </div>
                     </div>
+                    
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" class="checklist" style="margin-top:5px">
+                        <tr>
+                            <td width="20">
+                                <input name="is_lax" type="checkbox" id="is_lax" value="1" <?php if(@$mod['is_lax']) {?>checked="checked"<?php } ?> />
+                            </td>
+                            <td><label for="is_lax"><strong><?php echo $_LANG['AD_ONLY_CHILD_ITEM']; ?></strong></label></td>
+                        </tr>
+                    </table>
+                    {tab=<?php echo $_LANG['AD_MENU']; ?>}
+                    <div style="padding:5px;padding-right:0px;">
+                        <div>
+                            <strong><?php echo $_LANG['AD_MENU_TO_VIEW'];?></strong><br />
+                            <span class="hinttext">
+                                <?php echo $_LANG['AD_SELECT_MULTIPLE_CTRL'];?>
+                            </span>
+                        </div>
+                        <div>
+                            <select style="width: 99%" name="menu[]" size="9" multiple="multiple">
+                                <?php foreach ($menu_list as $menu) { ?>
+                                    <option value="<?php echo $menu['id']; ?>" <?php if (@in_array($menu['id'], @$mod['menu'])) { echo 'selected="selected"'; }?>>
+                                        <?php echo $menu['title']; ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
 
                     {/tabs}
 
@@ -823,5 +861,3 @@ function applet_menu(){
     <?php
    }
 }
-
-?>

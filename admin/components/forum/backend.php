@@ -2,10 +2,10 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -64,7 +64,7 @@ cpToolMenu($toolmenu);
 
 if ($opt=='saveconfig'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cfg['is_rss']      = cmsCore::request('is_rss', 'int', 1);
     $cfg['pp_thread']   = cmsCore::request('pp_thread', 'int', 15);
@@ -102,7 +102,7 @@ if ($opt=='saveconfig'){
 
 if ($opt=='saveranks'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cfg['ranks']   = cmsCore::request('rank', 'array_str', array());
     $cfg['modrank'] = cmsCore::request('modrank', 'int');
@@ -137,7 +137,7 @@ if ($opt == 'hide_forum'){
 
 if ($opt == 'submit_forum'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $category_id = cmsCore::request('category_id', 'int');
     $title       = cmsCore::request('title', 'str', 'NO_TITLE');
@@ -176,7 +176,7 @@ if ($opt == 'submit_forum'){
 
 if ($opt == 'update_forum'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $item_id     = cmsCore::request('item_id', 'int');
     $category_id = cmsCore::request('category_id', 'int');
@@ -537,7 +537,7 @@ if ($opt == 'hide_cat'){
 
 if ($opt == 'submit_cat'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cat['title']     = cmsCore::request('title', 'str', 'NO_TITLE');
     $cat['published'] = cmsCore::request('published', 'int');
@@ -566,7 +566,7 @@ if($opt == 'delete_cat'){
 
 if ($opt == 'update_cat'){
 
-    if (!cmsCore::validateForm()) { cmsCore::error404(); }
+    if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $item_id = cmsCore::request('item_id', 'int');
 

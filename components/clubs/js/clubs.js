@@ -354,7 +354,7 @@ $(function(){
       var users = {};
       var error = true;
       $('div#flist_data div.flist_cell_on').each(function(i, el) {
-        users[i] = $(this).val();
+        users[i] = $(this).attr('value');
         error = false;
       });
       core.hide_popup_info();

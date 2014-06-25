@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -262,7 +262,7 @@ class cmsBlogs {
                        ". cmsCore::c('db')->order_by ."\n";
 
         if (cmsCore::c('db')->limit){
-            $sql .= "LIMIT {cmsCore::c('db')->limit}";
+            $sql .= "LIMIT ". cmsCore::c('db')->limit;
         }
 
         $result = cmsCore::c('db')->query($sql);
@@ -685,7 +685,7 @@ class cmsBlogs {
             cmsUser::checkAwards($item['user_id']);
         }
 
-        cmsCore::setIdUploadImage('post', $post_id, 'blogs');
+        cmsCore::setIdUploadImage('blog_post', $post_id);
 
         return array('id'=>$post_id, 'seolink'=>$item['seolink']);
     }
@@ -752,7 +752,7 @@ class cmsBlogs {
 
         cmsClearTags($this->getTarget('tags'), $post_id);
 
-        cmsCore::deleteUploadImages($post_id, 'post');
+        cmsCore::deleteUploadImages($post_id, 'blog_post');
         cmsActions::removeObjectLog($this->getTarget('actions_post'), $post_id);
 
         return true;

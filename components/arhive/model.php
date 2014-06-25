@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -93,15 +93,15 @@ class cms_model_arhive{
 /* ==================================================================================================== */
 
     public function getArhiveContent(){
-        $sql = "SELECT {cmsCore::c('db')->select}
+        $sql = "SELECT ". cmsCore::c('db')->select ."
                 FROM cms_content con
-				{cmsCore::c('db')->join}
-                WHERE 1=1 {cmsCore::c('db')->where}
-                {cmsCore::c('db')->group_by}
-                {cmsCore::c('db')->order_by}\n";
+				". cmsCore::c('db')->join ."
+                WHERE 1=1 ". cmsCore::c('db')->where ."
+                ". cmsCore::c('db')->group_by ."
+                ". cmsCore::c('db')->order_by ."\n";
 
         if (cmsCore::c('db')->limit){
-            $sql .= "LIMIT {cmsCore::c('db')->limit}";
+            $sql .= "LIMIT ". cmsCore::c('db')->limit;
         }
 
         $result = cmsCore::c('db')->query($sql);

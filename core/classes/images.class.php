@@ -38,7 +38,7 @@ class rudi_graphics{
             $sresize_type,
             $watermark = false,
             $mwatermark = false,
-            $quality = 80,
+            $quality = 90,
             $new_sw,
             $new_sh,
             $new_mw,
@@ -98,7 +98,7 @@ class rudi_graphics{
                     UPLOAD_ERR_EXTENSION => $_LANG['UPLOAD_ERR_EXTENSION']
                 );
                 
-                if($_FILES[$image_file]['error'] !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])){
+                if ($_FILES[$image_file]['error'] !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])){
                     $_SESSION['file_upload_error'] = $uploadErrors[$errorCode];
                     return false;
                 }

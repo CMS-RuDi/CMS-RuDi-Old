@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -135,4 +135,4 @@ $_LANG['VIP_BILLING_INFO']              ='Для поддержки VIP-клуб
 $_LANG['VIP_BILLING_INFO1']             ='Подключив биллинг вы сможете присвоить VIP-статус любому клубу и установить размер оплаты за вступление в этот клуб.';
 $_LANG['ALL_MEMBER']                    ='Все';
 $_LANG['YOU_NO_SELECT_USER']            ='Вы не отметили ни одного пользователя!';
-?>
+$_LANG['MSG_CLUB_PHOTO_SUBMIT']         = 'Пользователь %s добавил фото "<b>%s</b>" в альбом клуба "<b>%s</b>".<br> Необходима модерация.';

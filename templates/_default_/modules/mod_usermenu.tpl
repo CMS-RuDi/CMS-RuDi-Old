@@ -45,6 +45,12 @@
         {/if}
 
     {/if}
+    
+    {if $is_music}
+        <span class="my_music">
+            <a href="/music/channel/{$id}">{$LANG.USERMENU_MUSIC} ({$music_count})</a>
+        </span>
+    {/if}
 
     {if $is_audio}
         <span class="my_audio">

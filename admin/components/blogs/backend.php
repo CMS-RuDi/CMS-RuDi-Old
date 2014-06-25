@@ -2,10 +2,10 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -60,7 +60,7 @@ if ($opt=='list_blogs'){
 
 if($opt=='saveconfig'){
 
-    if(!cmsCore::validateForm()) { cmsCore::error404(); }
+    if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cfg['perpage']             = cmsCore::request('perpage', 'int', 0);
     $cfg['perpage_blog'] 		= cmsCore::request('perpage_blog', 'int', 0);
@@ -95,7 +95,7 @@ if ($opt == 'delete_blog'){
 
 if ($opt == 'update_blog'){
 
-    if(!cmsCore::validateForm()) { cmsCore::error404(); }
+    if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $blog = $inBlog->getBlog(cmsCore::request('item_id', 'int', 0));
     if(!$blog) { cmsCore::error404(); }

@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -50,12 +50,12 @@ function users(){
 if ($do == 'view'){
 
     // если запрещен просмотр всех пользователей, 404
-    if($model->config['sw_search'] == 2){
+    if ($model->config['sw_search'] == 2) {
         cmsCore::error404();
     }
 
     //очищаем поисковые запросы если пришли со другой страницы
-    if(!mb_strstr(cmsCore::getBackURL(), '/users')){
+    if (!strstr(cmsCore::getBackURL(), '/users')) {
         cmsUser::sessionClearAll();
     }
 
@@ -70,7 +70,8 @@ if ($do == 'view'){
 	$orderto = cmsCore::request('orderto', array('asc', 'desc'), 'desc');
 	$age_to  = (int)cmsCore::getSearchVar('ageto', 'all');
 	$age_fr  = (int)cmsCore::getSearchVar('agefrom', 'all');
-
+        $group_id = cmsCore::request('group_id', 'int', 0);
+        
 	// Флаг о показе только онлайн пользователей
 	if (cmsCore::inRequest('online')) {
 		cmsUser::sessionPut('usr_online', (bool)cmsCore::request('online', 'int'));
@@ -85,6 +86,13 @@ if ($do == 'view'){
 	///////////////////////////////////////
 	//////////Условия выборки//////////////
 	///////////////////////////////////////
+        
+        // группа
+        if ($group_id){
+            $model->whereUserGroupIs($group_id);
+            $link['group'] = '/users/group/'. $group_id;
+            $_LANG['GROUP_SEARCH_NAME'] = cmsUser::getGroupTitle($group_id);
+        }
 
 	// Добавляем в выборку имя, если оно есть
 	if($name){
@@ -148,6 +156,11 @@ if ($do == 'view'){
 	if($orderby=='regdate') { $link['selected'] = 'latest'; }
 	if($orderby=='karma') { $link['selected'] = 'positive'; }
 	if($orderby=='rating') { $link['selected'] = 'rating'; }
+        $pagebar_link = '/users/'.$link['selected'].'%page%.html';
+        if ($group_id) {
+            $link['selected'] = 'group';
+            $pagebar_link = '/users/'.$link['selected'].'/'.$group_id.'-%page%';
+        }
 
 	cmsPage::initTemplate('components', 'com_users_view')->
             assign('stext', $stext)->
@@ -164,7 +177,7 @@ if ($do == 'view'){
             assign('age_fr', $age_fr)->
             assign('cfg', $model->config)->
             assign('link', $link)->
-            assign('pagebar', cmsPage::getPagebar($total, $page, $model->config['users_perpage'], '/users/'.$link['selected'].'%page%.html'))->
+            assign('pagebar', cmsPage::getPagebar($total, $page, $model->config['users_perpage'], $pagebar_link))->
             display('com_users_view.tpl');
 
 }
@@ -432,18 +445,18 @@ if ($do=='profile'){
 //============================================================================//
 if ($do=='messages'){
 
-	if (!$model->config['sw_msg']) { cmsCore::error404(); }
+    if (!$model->config['sw_msg']) { cmsCore::error404(); }
 
-	if (!$inUser->id || ($inUser->id != $id && !$inUser->is_admin)){ cmsUser::goToLogin(); }
+    if (!$inUser->id || ($inUser->id != $id && !$inUser->is_admin)){ cmsUser::goToLogin(); }
 
-	$usr = cmsUser::getShortUserData($id);
-	if (!$usr) { cmsCore::error404(); }
+    $usr = cmsUser::getShortUserData($id);
+    if (!$usr) { cmsCore::error404(); }
 
-	$inPage->setTitle($_LANG['MY_MESS']);
-	$inPage->addPathway($usr['nickname'], cmsUser::getProfileURL($usr['login']));
-	$inPage->addPathway($_LANG['MY_MESS'], '/users/'.$id.'/messages.html');
+    $inPage->setTitle($_LANG['MY_MESS']);
+    $inPage->addPathway($usr['nickname'], cmsUser::getProfileURL($usr['login']));
+    $inPage->addPathway($_LANG['MY_MESS'], '/users/'.$id.'/messages.html');
 
-	include 'components/users/messages.php';
+    include 'components/users/messages.php';
 
 }
 

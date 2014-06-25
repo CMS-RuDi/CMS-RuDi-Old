@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -49,12 +49,12 @@ function applet_users(){
     // подключаем язык компонента регистрации
     cmsCore::loadLanguage('components/registration');
 
-	global $_LANG;
-	global $adminAccess;
-	if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
+    global $_LANG;
+    global $adminAccess;
+    if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
 
-	cmsCore::c('page')->setAdminTitle($_LANG['AD_USERS']);
- 	cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
+    cmsCore::c('page')->setAdminTitle($_LANG['AD_USERS']);
+    cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
 
     $do = cmsCore::request('do', 'str', 'list');
 	$id = cmsCore::request('id', 'int', 0);
@@ -145,13 +145,13 @@ function applet_users(){
 	}
 
 	if ($do == 'delete'){
-        if (!isset($_REQUEST['item'])){
-			if ($id >= 0){
-				$model->deleteUser($id);
-			}
-		} else {
-			$model->deleteUsers($inCore->request('item', 'array_int', array()));
-		}
+            if (!isset($_REQUEST['item'])){
+                if ($id >= 0){
+                    $model->deleteUser($id);
+                }
+            } else {
+                $model->deleteUsers($inCore->request('item', 'array_int', array()));
+            }
 		cmsCore::redirectBack();
 	}
 
@@ -162,7 +162,7 @@ function applet_users(){
 
 	if ($do == 'submit' || $do == 'update'){
 
-        if (!cmsCore::validateForm()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $types = array('login'=>array('login', 'str', ''),
                        'nickname'=>array('nickname', 'str', '', 'htmlspecialchars'),
@@ -390,5 +390,3 @@ function applet_users(){
 	<?php
    }
 }
-
-?>

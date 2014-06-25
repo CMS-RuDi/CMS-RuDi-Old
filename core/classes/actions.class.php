@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -60,6 +60,8 @@ class cmsActions {
      * @return bool
      */
     public static function registerAction($component, $action){
+        if (self::getAction($action['name'], false)) { return true; }
+        
         $action['is_tracked'] = 1;
         $action['is_visible'] = 1;
         $action['component']  = $component;
@@ -279,7 +281,7 @@ class cmsActions {
         $sql = "SELECT 1
                     FROM cms_actions_log log
                     LEFT JOIN cms_actions a ON a.id = log.action_id AND a.is_visible = 1
-                    WHERE 1=1 {cmsCore::c('db')->where}
+                    WHERE 1=1 ". cmsCore::c('db')->where ."
                 ";
 
         $result = cmsCore::c('db')->query($sql);
@@ -312,12 +314,12 @@ class cmsActions {
                 FROM cms_actions_log log
                 LEFT JOIN cms_actions a ON a.id = log.action_id AND a.is_visible = 1
                 LEFT JOIN cms_users u ON u.id = log.user_id
-                WHERE 1=1 {cmsCore::c('db')->where}
+                WHERE 1=1 ". cmsCore::c('db')->where ."
                 ORDER BY log.id DESC
 				";
 
         if (cmsCore::c('db')->limit){
-            $sql .= "LIMIT {cmsCore::c('db')->limit}";
+            $sql .= "LIMIT ". cmsCore::c('db')->limit;
         }
 
         $result = cmsCore::c('db')->query($sql);

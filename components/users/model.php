@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -195,6 +195,10 @@ class cms_model_users{
 
 // ============================================================================ //
 // ============================================================================ //
+    public function whereUserGroupIs($group_id) {
+        $this->inDB->where("u.group_id = '". $group_id ."'");
+    }
+        
     public function whereNameIs($name) {
         $this->inDB->where("LOWER(u.nickname) LIKE '%$name%'");
     }
@@ -369,38 +373,38 @@ class cms_model_users{
 
         if ($user_id == 1) { return false; }
 
-		if ($is_delete) {
+        if ($is_delete) {
 
-			$avatar = $this->inDB->get_field('cms_user_profiles', "user_id = '$user_id'", 'imageurl');
+            $avatar = $this->inDB->get_field('cms_user_profiles', "user_id = '$user_id'", 'imageurl');
             if ($avatar && $avatar != 'nopic.jpg'){
                  @unlink(PATH.'/images/users/avatars/'.$avatar);
                  @unlink(PATH.'/images/users/avatars/small/'.$avatar);
             }
 
-			$this->inDB->query("DELETE FROM cms_users WHERE id = '$user_id' LIMIT 1");
-			$this->inDB->query("DELETE FROM cms_user_profiles WHERE user_id = '$user_id' LIMIT 1");
-			$this->inDB->query("DELETE FROM cms_user_wall WHERE user_id = '$user_id' AND usertype = 'user'");
-			$this->inDB->query("DELETE FROM cms_user_friends WHERE to_id = '$user_id' OR from_id = '$user_id'");
-			$this->inDB->query("DELETE FROM cms_user_clubs WHERE user_id = '$user_id'");
+            $this->inDB->query("DELETE FROM cms_users WHERE id = '$user_id' LIMIT 1");
+            $this->inDB->query("DELETE FROM cms_user_profiles WHERE user_id = '$user_id' LIMIT 1");
+            $this->inDB->query("DELETE FROM cms_user_wall WHERE user_id = '$user_id' AND usertype = 'user'");
+            $this->inDB->query("DELETE FROM cms_user_friends WHERE to_id = '$user_id' OR from_id = '$user_id'");
+            $this->inDB->query("DELETE FROM cms_user_clubs WHERE user_id = '$user_id'");
 
-			cmsCore::loadClass('blog');
-			$inBlog = cmsBlogs::getInstance();
-			$inBlog->owner = 'user';
+            cmsCore::loadClass('blog');
+            $inBlog = cmsBlogs::getInstance();
+            $inBlog->owner = 'user';
 
-			$user_blog = $inBlog->getBlogByUserId($user_id);
-			if($user_blog){
-				$inBlog->deleteBlog($user_blog['id']);
-			}
+            $user_blog = $inBlog->getBlogByUserId($user_id);
+            
+            if ($user_blog){
+                $inBlog->deleteBlog($user_blog['id']);
+            }
 
+        } else {
+            $this->inDB->query("UPDATE cms_users SET is_deleted = 1 WHERE id = '$user_id'");
+        }
 
-		} else {
-        	$this->inDB->query("UPDATE cms_users SET is_deleted = 1 WHERE id = '$user_id'");
-		}
+        $this->inDB->query("DELETE FROM cms_user_awards WHERE user_id = '$user_id'");
+        $this->inDB->query("DELETE FROM cms_subscribe WHERE user_id = '$user_id'");
 
-		$this->inDB->query("DELETE FROM cms_user_awards WHERE user_id = '$user_id'");
-		$this->inDB->query("DELETE FROM cms_subscribe WHERE user_id = '$user_id'");
-
-		cmsActions::removeUserLog($user_id);
+        cmsActions::removeUserLog($user_id);
 
     }
 

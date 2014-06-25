@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -14,7 +14,6 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function clubs(){
-
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
     $inDB   = cmsDatabase::getInstance();
@@ -24,7 +23,7 @@ function clubs(){
 
     $model = new cms_model_clubs();
 
-	$inPhoto = $model->initPhoto();
+    $inPhoto = $model->initPhoto();
 
     define('IS_BILLING', $inCore->isComponentInstalled('billing'));
     if (IS_BILLING) { cmsCore::loadClass('billing'); }
@@ -46,15 +45,14 @@ function clubs(){
 
 //////////////////////// КЛУБЫ ПОЛЬЗОВАТЕЛЯ/////////////////////////////////////
 if ($do == 'user_clubs') {
-
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if (!cmsCore::isAjax()) { return false; }
 
     $inPage->displayLangJS(array('CREATE','CREATE_CLUB'));
 
     $user_id = cmsCore::request('user_id', 'int', $inUser->id);
 
     $user = cmsUser::getShortUserData($user_id);
-    if (!$user) { cmsCore::halt(); }
+    if (!$user) { return false; }
 
     // получаем клубы, в которых пользователь админ
     $model->whereAdminIs($user['id']);
@@ -65,11 +63,11 @@ if ($do == 'user_clubs') {
     $inDB->addSelect('uc.role');
     $inDB->addJoin("INNER JOIN cms_user_clubs uc ON uc.club_id = c.id AND uc.user_id = '{$user['id']}'");
    	$inDB->orderBy('uc.role', 'DESC, uc.pubdate DESC');
-    $clubs += $model->getClubs();
+    $inclubs = $model->getClubs();
 
 	cmsPage::initTemplate('components', 'com_clubs_user')->
             assign('can_create', (($inUser->id == $user['id']) && ($model->config['cancreate'] || $inUser->is_admin)))->
-            assign('clubs', $clubs)->
+            assign('clubs', array_merge($clubs, $inclubs))->
             assign('user', $user)->
             assign('my_profile', $user['id'] == $inUser->id)->
             display('com_clubs_user.tpl');
@@ -84,7 +82,7 @@ if ($do=='view'){
 	$total = $model->getClubsCount();
 
         $clubs = $model->getClubs();
-	if(!$clubs && $page > 1){ cmsCore::error404(); }
+	if(!$clubs && $page > 1){ return false; }
 
 	cmsPage::initTemplate('components', 'com_clubs_view')->
             assign('pagetitle', $pagetitle)->
@@ -99,9 +97,9 @@ if ($do=='view'){
 if ($do=='club'){
 
 	$club = $model->getClub($id);
-	if(!$club){	cmsCore::error404(); }
+	if (!$club) { return false; }
 
-	if (!$club['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
     $inPage->setTitle($club['title']);
     $inPage->addPathway($club['title']);
@@ -209,9 +207,9 @@ if ($do=='club'){
 ///////////////////////// СОЗДАНИЕ КЛУБА ///////////////////////////////////////
 if ($do == 'create'){
 
-	if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if(!cmsCore::isAjax()) { return false; }
 
-	if(!$inUser->id){ cmsCore::error404(); }
+    if(!$inUser->id){ return false; }
 
     $can_create = $model->canCreate();
 
@@ -230,7 +228,7 @@ if ($do == 'create'){
 
     if (cmsCore::inRequest('create')){
 
-		if (!$can_create){ cmsCore::error404(); }
+        if (!$can_create){ return false; }
 
         $title    = $inCore->request('title', 'str');
         $clubtype = $inCore->request('clubtype', 'str');
@@ -243,7 +241,7 @@ if ($do == 'create'){
 			cmsCore::jsonOutput(array('error' => true, 'text' => $_LANG['CLUB_EXISTS']));
 		}
 
-		if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+		if(!cmsUser::checkCsrfToken()) { return false; }
 
 		$club_id = $model->addClub(array('admin_id'=>$inUser->id,
 										 'title'=>$title,
@@ -277,20 +275,20 @@ if ($do == 'create'){
 ///////////////////////// НАСТРОЙКИ КЛУБА //////////////////////////////////////
 if ($do == 'config'){
 
-	if (!$inUser->id){ cmsCore::error404(); }
+    if (!$inUser->id){ return false; }
 
-	$club = $model->getClub($id);
-	if(!$club){	cmsCore::error404(); }
+    $club = $model->getClub($id);
+    if (!$club){ return false; }
 
-	// Инициализируем участников клуба
-	$model->initClubMembers($club['id']);
-	// настраивать клуб могут только администраторы
+    // Инициализируем участников клуба
+    $model->initClubMembers($club['id']);
+    // настраивать клуб могут только администраторы
     $is_admin = $inUser->is_admin || ($inUser->id == $club['admin_id']);
-	if (!$is_admin){ cmsCore::error404(); }
+    if (!$is_admin){ return false; }
 
     if (cmsCore::inRequest('save')){
 
-        if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { return false; }
 
         $description = cmsCore::badTagClear(cmsCore::request('description', 'html', ''));
         $new_club['description'] 	 = $inDB->escape_string($description);
@@ -395,9 +393,9 @@ if ($do == 'config'){
 ///////////////////////// ВЫХОД ИЗ КЛУБА ///////////////////////////////////////////
 if ($do == 'leave'){
 
-    if(!$inUser->id) { cmsCore::error404(); }
+    if(!$inUser->id) { return false; }
 
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if(!cmsCore::isAjax()) { return false; }
 
 	$club = $model->getClub($id);
 	if(!$club){	cmsCore::halt(); }
@@ -530,9 +528,9 @@ if ($do == 'join'){
 ///////////////////// РАССЫЛКА СООБЩЕНИЯ УЧАСТНИКАМ ////////////////////////////
 if ($do == 'send_message'){
 
-    if(!$inUser->id) { cmsCore::error404(); }
+    if(!$inUser->id) { return false; }
 
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if(!cmsCore::isAjax()) { return false; }
 
 	$club = $model->getClub($id);
 	if(!$club){	cmsCore::halt(); }
@@ -571,7 +569,7 @@ if ($do == 'send_message'){
 			cmsCore::jsonOutput(array('error' => true, 'text'  => $_LANG['ERR_SEND_MESS_NO_MEMBERS']));
 		}
 
-        if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+        if (!cmsUser::checkCsrfToken()) { return false; }
 
 		$message = str_replace('%club%', '<a href="/clubs/'.$club['id'].'">'.$club['title'].'</a>', $_LANG['MESSAGE_FROM ADMIN']).$message;
 
@@ -588,9 +586,9 @@ if ($do == 'send_message'){
 ///////////////////////// ПРИГЛАСИТЬ ДРУЗЕЙ В КЛУБ /////////////////////////////
 if ($do == 'join_member'){
 
-    if(!$inUser->id) { cmsCore::error404(); }
+    if (!$inUser->id) { return false; }
 
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if (!cmsCore::isAjax()) { return false; }
 
 	$club = $model->getClub($id);
 	if(!$club){	cmsCore::halt(); }
@@ -632,7 +630,7 @@ if ($do == 'join_member'){
 
 	} else { // Приглашаем
 
-	  	$users = cmsCore::request('users', 'array_int');
+	  	$users = cmsCore::request('users', 'array_int', array());
 
 		if ($users){
 
@@ -656,9 +654,9 @@ if ($do == 'join_member'){
 if ($do=='members'){
 
 	$club = $model->getClub($id);
-	if(!$club){	cmsCore::error404(); }
+	if(!$club){ return false; }
 
-	if (!$club['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
     $inPage->setTitle($_LANG['CLUB_MEMBERS'].' - '.$club['title']);
 	$inPage->addPathway($club['title'], '/clubs/'.$club['id']);
@@ -673,7 +671,7 @@ if ($do=='members'){
 
 	// Приватный или публичный клуб
     if ($club['clubtype']=='private' && (!$is_admin && !$is_moder && !$is_member)){
-        cmsCore::error404();
+        return false;
     }
 
 	// Общее количество участников
@@ -683,8 +681,8 @@ if ($do=='members'){
 	if($total_members){
 		$inDB->limitPage($page, $model->config['member_perpage']);
 		$members = $model->getClubMembers($club['id']);
-		if(!$members) { cmsCore::error404(); }
-	} else { cmsCore::error404(); }
+		if(!$members) { return false; }
+	} else { return false; }
 
 	$pagebar = cmsPage::getPagebar($total_members, $page, $model->config['member_perpage'], '/clubs/%id%/members-%page%', array('id'=>$club['id']));
 
@@ -701,9 +699,9 @@ if ($do=='members'){
 if ($do=='view_albums'){
 
 	$club = $model->getClub($id);
-	if(!$club){	cmsCore::error404(); }
+	if(!$club){ return false; }
 
-	if (!$club['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
 	$pagetitle = $_LANG['PHOTOALBUMS'].' - '.$club['title'];
 
@@ -722,12 +720,12 @@ if ($do=='view_albums'){
 
 	// Приватный или публичный клуб
     if ($club['clubtype']=='private' && (!$is_admin && !$is_moder && !$is_member)){
-        cmsCore::error404();
+        return false;
     }
 
 	$inDB->orderBy('f.pubdate', 'DESC');
 	$club['photo_albums'] = $inPhoto->getAlbums(0, 'club'.$club['id']);
-	if(!$club['photo_albums']) { cmsCore::error404(); }
+	if(!$club['photo_albums']) { return false; }
 
 	cmsPage::initTemplate('components', 'com_clubs_albums')->
             assign('club', $club)->
@@ -744,16 +742,16 @@ if ($do=='view_album'){
 
 	// Получаем альбом
 	$album = $inDB->getNsCategory('cms_photo_albums', cmsCore::request('album_id', 'int', 0), null);
-	if (!$album) { cmsCore::error404(); }
+	if (!$album) { return false; }
 
 	// Неопубликованные альбомы показываем только админам
-	if (!$album['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$album['published'] && !$inUser->is_admin) { return false; }
 
 	// получаем клуб
 	$club = $model->getClub($album['user_id']);
-	if(!$club) { cmsCore::error404(); }
+	if(!$club) { return false; }
 
-	if (!$club['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
 	// Инициализируем участников клуба
 	$model->initClubMembers($club['id']);
@@ -764,7 +762,7 @@ if ($do=='view_album'){
 
 	// Приватный или публичный клуб
     if ($club['clubtype']=='private' && (!$is_admin && !$is_moder && !$is_member)){
-        cmsCore::error404();
+        return false;
     }
 
 	$hidden = (bool)($is_admin || $is_moder);
@@ -804,11 +802,11 @@ if ($do=='view_album'){
 ///////////////////////// УДАЛЕНИЕ АЛЬБОМА /////////////////////////////////////
 if ($do=='delete_album'){
 
-    if(!$inUser->id) { cmsCore::error404(); }
+    if(!$inUser->id) { return false; }
 
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if(!cmsCore::isAjax()) { return false; }
 
-    if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+    if(!cmsUser::checkCsrfToken()) { return false; }
 
 	$album = $inDB->getNsCategory('cms_photo_albums', cmsCore::request('album_id', 'int', 0), null);
 	if (!$album) { cmsCore::halt(); }
@@ -835,15 +833,15 @@ if ($do=='view_photo'){
 
 	// Получаем фото
 	$photo = $inPhoto->getPhoto(cmsCore::request('photo_id', 'int', 0));
-	if (!$photo) { cmsCore::error404(); }
+	if (!$photo) { return false; }
 
 	$photo = cmsCore::callEvent('VIEW_CLUB_PHOTO', $photo);
 
 	// получаем клуб
 	$club = $model->getClub($photo['auser_id']);
-	if(!$club) { cmsCore::error404(); }
+	if(!$club) { return false; }
 
-	if (!$club['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
 	// Инициализируем участников клуба
 	$model->initClubMembers($club['id']);
@@ -853,10 +851,10 @@ if ($do=='view_photo'){
     $is_member = $model->checkUserRightsInClub();
 	$is_author = $photo['user_id'] == $inUser->id;
 
-	if (!$photo['published'] && !$is_admin && !$is_moder) { cmsCore::error404(); }
+	if (!$photo['published'] && !$is_admin && !$is_moder) { return false; }
 
 	// Фото приватного клуба показываем только участникам
-    if ($club['clubtype']=='private' && !$is_member && !$is_admin){ cmsCore::error404(); }
+    if ($club['clubtype']=='private' && !$is_member && !$is_admin){ return false; }
 
     $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
 	$inPage->addPathway($photo['cat_title'], '/clubs/photoalbum'.$photo['album_id']);
@@ -894,11 +892,11 @@ if ($do=='view_photo'){
 ////////////////////////////// УДАЛИТЬ ФОТО ////////////////////////////////////
 if ($do=='delete_photo'){
 
-    if(!$inUser->id) { cmsCore::error404(); }
+    if(!$inUser->id) { return false; }
 
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if(!cmsCore::isAjax()) { return false; }
 
-	if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+	if(!cmsUser::checkCsrfToken()) { return false; }
 
 	$photo = $inPhoto->getPhoto(cmsCore::request('photo_id', 'int', 0));
 	if (!$photo) { cmsCore::halt(); }
@@ -926,9 +924,9 @@ if ($do=='delete_photo'){
 ///////////////////////// РЕДАКТИРОВАТЬ ФОТО ///////////////////////////////////
 if ($do=='edit_photo'){
 
-    if(!$inUser->id) { cmsCore::error404(); }
+    if(!$inUser->id) { return false; }
 
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if(!cmsCore::isAjax()) { return false; }
 
 	$photo = $inPhoto->getPhoto(cmsCore::request('photo_id', 'int', 0));
 	if (!$photo) { cmsCore::halt(); }
@@ -937,7 +935,7 @@ if ($do=='edit_photo'){
 	$club = $model->getClub($photo['auser_id']);
 	if(!$club) { cmsCore::halt(); }
 
-	if (!$club['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
 	// Инициализируем участников клуба
 	$model->initClubMembers($club['id']);
@@ -985,9 +983,9 @@ if ($do=='edit_photo'){
 /////////////////////////////// PHOTO PUBLISH //////////////////////////////////
 if ($do=='publish_photo'){
 
-    if(!$inUser->id) { cmsCore::error404(); }
+    if(!$inUser->id) { return false; }
 
-    if(!cmsCore::isAjax()) { cmsCore::error404(); }
+    if(!cmsCore::isAjax()) { return false; }
 
 	$photo = $inPhoto->getPhoto(cmsCore::request('photo_id', 'int', 0));
 	if (!$photo) { cmsCore::halt(); }
@@ -996,7 +994,7 @@ if ($do=='publish_photo'){
 	$club = $model->getClub($photo['auser_id']);
 	if(!$club) { cmsCore::halt(); }
 
-	if (!$club['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
 	// Инициализируем участников клуба
 	$model->initClubMembers($club['id']);
@@ -1034,15 +1032,15 @@ if ($do=='add_photo'){
 	$do_photo = cmsCore::request('do_photo', 'str', 'addphoto');
 
 	$album = $inDB->getNsCategory('cms_photo_albums', cmsCore::request('album_id', 'int', 0), null);
-	if (!$album) { cmsCore::error404(); }
+	if (!$album) { return false; }
 
-	if (!$album['published'] && !$inUser->is_admin) { cmsCore::error404(); }
+	if (!$album['published'] && !$inUser->is_admin) { return false; }
 
 	$club = $model->getClub($album['user_id']);
-	if(!$club) { cmsCore::error404(); }
+	if(!$club) { return false; }
 
 	// если фотоальбомы запрещены
-	if(!$club['enabled_photos']){ cmsCore::error404(); }
+	if(!$club['enabled_photos']){ return false; }
 
 	// Инициализируем участников клуба
 	$model->initClubMembers($club['id']);
@@ -1081,4 +1079,3 @@ if ($do=='club_blogs'){
 }
 
 }
-?>

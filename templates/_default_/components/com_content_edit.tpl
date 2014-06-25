@@ -53,7 +53,7 @@
                 <strong>{$LANG.IMAGE}:</strong>
             </td>
             <td>
-                {if $mod.image_small}
+                {if $mod.image}
                     <div style="padding-bottom:10px">
                         <img src="{$mod.image_small}" border="0" />
                     </div>

@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -12,12 +12,10 @@
 /******************************************************************************/
 
 function geo($do){
-
-    $inUser = cmsUser::getInstance();
     $model  = new cms_model_geo();
 
     // Определяем местоположение пользователя
-    $inUser->loadUserGeo();
+    cmsCore::c('user')->loadUserGeo();
 
     $do = isset($do) ? $do : cmsCore::getInstance()->do;
 
@@ -25,8 +23,7 @@ function geo($do){
     $city_id  = cmsCore::strClear(urldecode($_REQUEST['city_id'])); // можно передавать как id города, так и название
 
 //========================================================================================================================//
-    if ($do=='view'){
-
+    if ($do == 'view'){
         if (!cmsCore::isAjax()) { cmsCore::error404(); }
 
         $countries = $model->getCountries();
@@ -36,8 +33,8 @@ function geo($do){
         $region_id  = false;
         $country_id = false;
 
-        if (!$city_id && $inUser->city){
-            $city_id = $inUser->city;
+        if (!$city_id && cmsCore::c('user')->city) {
+            $city_id = cmsCore::c('user')->city;
         }
 
         if ($city_id){
@@ -73,7 +70,7 @@ function geo($do){
     }
 
 //========================================================================================================================//
-    if ($do=='get'){
+    if ($do == 'get'){
 
         if (!cmsCore::isAjax()) { cmsCore::error404(); }
 
@@ -103,4 +100,3 @@ function geo($do){
     }
 
 }
-?>

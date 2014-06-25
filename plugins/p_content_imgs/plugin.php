@@ -95,5 +95,3 @@ class p_content_imgs extends cmsPlugin {
     }
 
 }
-
-?>

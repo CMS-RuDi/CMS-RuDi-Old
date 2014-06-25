@@ -103,8 +103,9 @@ function addTagVideo(field_id){
 }
 
 function addImage(){
-	$('#albumimginsert').hide();
-	$('#imginsert').toggle();
+    $('#albumimginsert').hide();
+    $('#imginsert').toggle();
+    $('.usr_msg_bbcodebox').toggleClass('bbcodebox_height');
 }
 
 function loadImage(field_id, component, target, target_id){

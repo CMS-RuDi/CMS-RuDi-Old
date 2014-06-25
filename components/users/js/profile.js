@@ -79,7 +79,7 @@ $(function(){
             $.post('/users/'+user_id+'/friendship.html', { }, function(data){
                 users.deleteMessage(msg_id);
                 if(data.error == false) {
-                    core.alert(data.text, LANG_ERROR);
+                    core.alert(data.text, LANG_ATTENTION);
                 } else {
                     core.alert(data.text);
                 }

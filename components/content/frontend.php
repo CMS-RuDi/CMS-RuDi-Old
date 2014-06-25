@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -30,7 +30,7 @@ function content(){
     $page    = cmsCore::request('page', 'int', 1);
 
 ///////////////////////////////////// VIEW CATEGORY ////////////////////////////////////////////////////////////////////////////////
-if ($do=='view'){
+if ($do=='view') {
     $cat = cmsCore::c('db')->getNsCategory('cms_category', $seolink);
 
     // если не найдена категория и мы не на главной, 404
@@ -138,12 +138,10 @@ if ($do=='read'){
 
     $article = cmsCore::callEvent('GET_ARTICLE', $article);
 
-    if (cmsCore::c('user')->id) {
-        $is_admin      = cmsCore::c('user')->is_admin;
-        $is_author     = cmsCore::c('user')->id == $article['user_id'];
-        $is_author_del = cmsUser::isUserCan('content/delete');
-        $is_editor     = ($article['modgrp_id'] == cmsCore::c('user')->group_id && cmsUser::isUserCan('content/autoadd'));
-    }
+    $is_admin      = cmsCore::c('user')->is_admin;
+    $is_author     = cmsCore::c('user')->id == $article['user_id'];
+    $is_author_del = cmsUser::isUserCan('content/delete');
+    $is_editor     = ($article['modgrp_id'] == cmsCore::c('user')->group_id && cmsUser::isUserCan('content/autoadd'));
 
     // если статья не опубликована или дата публикации позже, 404
     if ((!$article['published'] || strtotime($article['pubdate']) > time()) && !$is_admin && !$is_editor && !$is_author) { cmsCore::error404(); }
@@ -163,7 +161,7 @@ if ($do=='read'){
     // Тело статьи в зависимости от настроек
     $article['content'] = cmsCore::m('content')->config['readdesc'] ? $article['description'].$article['content'] : $article['content'];
     // Дата публикации
-    $article['pubdate'] = cmsCore::dateformat($article['pubdate']);
+    $article['pubdate'] = cmsCore::dateFormat($article['pubdate']);
     // Шаблон статьи
     $article['tpl'] = $article['tpl'] ? $article['tpl'] : 'com_content_read.tpl';
 

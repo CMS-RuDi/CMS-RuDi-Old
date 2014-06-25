@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -43,7 +43,7 @@ $_LANG['AD_OPEN_BLOG']              = 'Открыть блог';
 $_LANG['AD_OPEN_CATEGORY']          = 'Открыть категорию каталога';
 $_LANG['AD_OPEN_ALBUM']             = 'Открыть альбом фотогалереи';
 $_LANG['AD_LINK']                   = 'Адрес ссылки';
-$_LANG['AD_LINK_HINT']              = 'для внешних ссылок не забывайте префикс';
+$_LANG['AD_LINK_HINT']              = 'Можно использовать в ссылках выражения типа {user.property}, где property поле текущего авторизованного пользователя. Для внешних ссылок не забывайте префикс';
 $_LANG['AD_CHECK_ARTICLE']          = 'Выберите статью';
 $_LANG['AD_CHECK_PARTITION']        = 'Выберите раздел';
 $_LANG['AD_CHECK_COMPONENT']        = 'Выберите компонент';
@@ -67,5 +67,5 @@ $_LANG['AD_BY_DEFAULT']             = 'По-умолчанию';
 $_LANG['AD_ICON_PICTURE']           = 'Иконка';
 $_LANG['AD_ICON_FILENAME']          = 'Название файла в папке "/images/menuicons"';
 $_LANG['AD_CHECK_ICON']             = 'Выбрать иконку';
-
-?>
+$_LANG['AD_ONLY_CHILD_ITEM']        = 'Только для дочерних ссылок';
+$_LANG['AD_CSS_CLASS']              = 'Css класс пункта меню';

@@ -1,77 +1,79 @@
 <?php Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
 
-    header('Content-Type: text/html; charset=utf-8');
-    header('X-Frame-Options: DENY');
-    
-    session_start();
+header('Content-Type: text/html; charset=utf-8');
+header('X-Frame-Options: DENY');
 
-    define("VALID_CMS", 1);
-    define("VALID_CMS_ADMIN", 1);
+session_start();
 
-    define('PATH', $_SERVER['DOCUMENT_ROOT']);
+define("VALID_CMS", 1);
+define("VALID_CMS_ADMIN", 1);
 
-    require("../core/cms.php");
-    require("includes/cp.php");
+define('PATH', $_SERVER['DOCUMENT_ROOT']);
 
-    require("../includes/tools.inc.php");
+require(PATH .'/core/cms.php'); 
+require(PATH .'/admin/includes/cp.php'); 
+require(PATH .'/includes/tools.inc.php');
 
-    $inCore = cmsCore::getInstance(false, true);
+$inCore = cmsCore::getInstance(false, true);
 
-    cmsCore::loadClass('page');
-    cmsCore::loadClass('user');
-    cmsCore::loadClass('actions');
+cmsCore::loadClass('page');
+cmsCore::loadClass('user');
+cmsCore::loadClass('actions');
 
-    if (!cmsCore::c('user')->update()) { cmsCore::error404(); }
+if (!cmsCore::c('user')->update()) { cmsCore::error404(); }
 
-    // проверяем доступ по Ip
-    if(!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
+// проверяем доступ по Ip
+if(!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
 
-    define('TEMPLATE_DIR', PATH .'/templates/'. cmsCore::c('config')->template .'/');
-    define('DEFAULT_TEMPLATE_DIR', PATH .'/templates/_default_/');
+define('TEMPLATE_DIR', PATH .'/templates/'. cmsCore::c('config')->template .'/');
+define('DEFAULT_TEMPLATE_DIR', PATH .'/templates/_default_/');
 
-    cmsCore::loadLanguage('admin/lang');
-    global $_LANG;
-    
-    //-------CHECK AUTHENTICATION--------------------------------------//
-    if (!cmsCore::c('user')->is_admin){
-        include PATH.'/admin/login.php';
-        cmsCore::halt();
-    }
-    
-    //--------LOAD ACCESS OPTIONS LIST---------------------------------//
+cmsCore::loadLanguage('admin/lang');
+global $_LANG;
 
-    $adminAccess = cmsUser::getAdminAccess();
+//-------CHECK AUTHENTICATION--------------------------------------//
+if (!cmsCore::c('user')->is_admin){
+    include PATH .'/admin/login.php';
+    cmsCore::halt();
+}
 
-    //------------------------------------------------------------------//
+//--------LOAD ACCESS OPTIONS LIST---------------------------------//
 
-    cmsCore::c('user')->onlineStats();
+$adminAccess = cmsUser::getAdminAccess();
 
-    $GLOBALS['applet'] = cmsCore::request('view', 'str', 'main');
-    if (!preg_match('/^[a-z0-9]+$/i', $GLOBALS['applet'])) { cmsCore::error404(); }
+//------------------------------------------------------------------//
 
-    cmsCore::c('page')->setAdminTitle();
-    cmsCore::c('page')->addHeadJS('admin/js/common.js');
-    cmsCore::c('page')->addHeadJS('includes/jquery/jquery.js');
-    $GLOBALS['cp_page_head']  = array();
-    $GLOBALS['cp_page_body']  = '';
+cmsCore::c('user')->onlineStats();
 
-    $GLOBALS['cp_pathway']             = array();
-    $GLOBALS['cp_pathway'][0]['title'] = $_LANG['PATH_HOME'];
-    $GLOBALS['cp_pathway'][0]['link']  = 'index.php';
+$GLOBALS['applet'] = cmsCore::request('view', 'str', 'main');
+if (!preg_match('/^[a-z0-9]+$/i', $GLOBALS['applet'])) { cmsCore::error404(); }
 
-    cpProceedBody();
+cmsCore::c('page')->setAdminTitle();
+cmsCore::c('page')->addHeadJS('admin/js/common.js');
+cmsCore::c('page')->addHeadJS('includes/jquery/jquery.js');
 
-    include("template.php");
+$GLOBALS['cp_page_title'] = '';
+$GLOBALS['cp_page_head']  = array();
+$GLOBALS['cp_page_body']  = '';
 
-?>
+$GLOBALS['cp_pathway'] = array(
+    array(
+        'title' => $_LANG['PATH_HOME'],
+        'link' => '/admin/'
+    )
+);
+
+cpProceedBody();
+
+include(PATH .'/admin/template.php');

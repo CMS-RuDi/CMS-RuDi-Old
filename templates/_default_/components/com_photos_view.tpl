@@ -1,6 +1,6 @@
 {if $album.id == $root_album_id && $cfg.showlat}
 <div class="float_bar">
-    <table border="0" cellspacing="0" cellpadding="0">
+    <table cellspacing="0" cellpadding="0">
       <tr>
         <td width="23"><img src="/templates/{template}/images/icons/calendar.png" /></td>
         <td style="padding-right: 10px"><a href="/photos/latest.html">{$LANG.LAST_UPLOADED}</a></td>
@@ -47,7 +47,7 @@
         {if $col==1}<div class="photo_row">{/if}
             <div class="photo_album_tumb">
                 <div class="photo_container">
-                    <a href="/photos/{$cat.id}"><img class="photo_album_img" src="/images/photos/small/{$cat.file}" alt="{$cat.title|escape:'html'}" border="0" width="{$cat.thumb1}px" /></a>
+                    <a href="/photos/{$cat.id}"><img class="photo_album_img" src="/images/photos/small/{$cat.file}" alt="{$cat.title|escape:'html'}" width="{$cat.thumb1}px" /></a>
                 </div>
                 <div class="photo_txt">
                     <ul>
@@ -68,7 +68,7 @@
 {if $photos}
 {assign var="col" value="1"}
 <div class="photo_gallery">
-    <table cellpadding="0" cellspacing="0" border="0">
+    <table cellpadding="0" cellspacing="0">
     {foreach key=tid item=photo from=$photos}
         {if $col==1} <tr> {/if}
         <td align="center" valign="middle" width="{math equation="100/x" x=$album.maxcols}%">
@@ -78,15 +78,15 @@
                 {else}
                 <a href="/photos/photo{$photo.id}.html" title="{$photo.title|escape:'html'}">
                 {/if}
-                    <img class="photo_thumb_img" src="/images/photos/small/{$photo.file}" alt="{$photo.title|escape:'html'}" border="0" />
+                    <img src="/images/photos/small/{$photo.file}" alt="{$photo.title|escape:'html'}" />
                 </a><br />
                 <a href="/photos/photo{$photo.id}.html" title="{$photo.title|escape:'html'}">{$photo.title|truncate:18}</a>
                 {if $album.showdate}
                     <div class="mod_lp_albumlink"><div class="mod_lp_details">
-                    <table cellpadding="2" cellspacing="0" align="center" border="0"><tr>
-                        <td><img src="/templates/{template}/images/icons/calendar.png" border="0"/></td>
+                    <table cellpadding="2" cellspacing="0" align="center"><tr>
+                        <td><img src="/templates/{template}/images/icons/calendar.png" /></td>
                         <td>{$photo.pubdate}</td>
-                        <td><img src="/templates/{template}/images/icons/comment-small.png" border="0"/></td>
+                        <td><img src="/templates/{template}/images/icons/comment-small.png" /></td>
                         <td><a href="/photos/photo{$photo.id}.html#c" title="{$photo.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}">{$photo.comments}</a></td>
                     </tr></table>
                     </div></div>

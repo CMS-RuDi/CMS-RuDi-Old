@@ -2,10 +2,10 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -14,7 +14,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
     $cfg = $inCore->loadComponentConfig('photos');
 
-	cmsCore::loadClass('photo');
+    cmsCore::loadClass('photo');
     cmsCore::loadModel('photos');
     $model = new cms_model_photos();
 
@@ -24,7 +24,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 	if($opt=='saveconfig'){
 
-		if(!cmsCore::validateForm()) { cmsCore::error404(); }
+		if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
 		$cfg = array();
 		$cfg['link']        = cmsCore::request('show_link', 'int', 0);
@@ -76,7 +76,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 		cpCheckWritable('/images/photos/medium', 'folder');
 		cpCheckWritable('/images/photos/small', 'folder'); ?>
 
-        <form action="index.php?view=components&amp;do=config&amp;id=<?php echo $id; ?>" method="post" enctype="multipart/form-data" name="optform">
+        <form action="index.php?view=components&amp;do=config&amp;id=<?php echo $id; ?>" method="post" enctype="multipart/form-data" name="addform">
         <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
         <table width="" border="0" cellpadding="10" cellspacing="0" class="proptable" style="width: 550px;">
             <tr>
@@ -167,7 +167,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 	if ($opt == 'submit_album'){
 
-		if(!cmsCore::validateForm()) { cmsCore::error404(); }
+		if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $album['title']         = cmsCore::request('title', 'str', 'NO_TITLE');
 		$album['description']   = cmsCore::request('description', 'str');
@@ -226,7 +226,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 	if ($opt == 'update_album'){
 
-		if(!cmsCore::validateForm()) { cmsCore::error404(); }
+		if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
 		if(cmsCore::inRequest('item_id')) {
 
@@ -340,7 +340,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
         <table width="610" border="0" cellspacing="5" class="proptable">
             <tr>
                 <td width="300"><?php echo $_LANG['AD_ALBUM_TITLE']; ?>:</td>
-                <td><input name="title" type="text" id="title" size="30" value="<?php echo htmlspecialchars($mod['title']); ?>"/></td>
+                <td><input name="title" type="text" id="title" style="width:280px" value="<?php echo htmlspecialchars($mod['title']); ?>"/></td>
             </tr>
             <tr>
                 <td valign="top"><?php echo $_LANG['AD_ALBUM_PARENT']; ?>:</td>
@@ -403,8 +403,8 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
                         <option value="hits" <?php if(@$mod['orderby']=='hits') { echo 'selected'; } ?>><?php echo $_LANG['AD_BY_VIEWS']; ?></option>
                     </select>
                     <select name="orderto" id="orderto" style="width:285px">
-                        <option value="desc" <?php if(@$mod['orderto']=='desc') { echo 'selected'; } ?>><?php echo $_LANG['AD_BY_INCREMENT']; ?></option>
-                        <option value="asc" <?php if(@$mod['orderto']=='asc') { echo 'selected'; } ?>><?php echo $_LANG['AD_BY_DECREMENT']; ?></option>
+                        <option value="desc" <?php if(@$mod['orderto']=='desc') { echo 'selected'; } ?>><?php echo $_LANG['AD_BY_DECREMENT']; ?></option>
+                        <option value="asc" <?php if(@$mod['orderto']=='asc') { echo 'selected'; } ?>><?php echo $_LANG['AD_BY_INCREMENT']; ?></option>
                     </select>
                 </td>
             </tr>
@@ -534,10 +534,4 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
             ?>
         </p>
     </form>
-		<?php
-	}
-
-//=================================================================================================//
-//=================================================================================================//
-
-?>
+<?php   }

@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.3                               //
+//                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2013                    //
+//                   written by InstantCMS Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -29,7 +29,7 @@ class cmsPage {
 
     private $modules;
     private $tpl_info;
-    private $default_tpl_info = array('author'=>'InstantCMS Team', 'renderer'=>'smartyTpl', 'ext'=>'tpl');
+    private $default_tpl_info = array('author' => 'InstantCMS Team', 'renderer' => 'phpTpl', 'ext' => 'php');
 
     public $captcha_count = 1;
 
@@ -55,15 +55,17 @@ class cmsPage {
      * для этого ищет в корне шаблона файл system.php
      * а в нем определенный массив с параметрами шаблона
      */
-    private function setTplInfo(){
-        $info_file = TEMPLATE_DIR.'system.php';
-        if(file_exists($info_file)){
+    private function setTplInfo() {
+        $info_file = TEMPLATE_DIR .'system.php';
+        
+        if (file_exists($info_file)) {
             include $info_file;
-            if(!empty($info)){
+            if (!empty($info)) {
                 $this->tpl_info = $info;
                 return;
             }
         }
+        
         $this->tpl_info = $this->default_tpl_info;
     }
 
@@ -93,13 +95,13 @@ class cmsPage {
 
         // если нет, считаем что файл лежит в дефолтном, используем оригинальное имя с расширением
         // если есть формируем полное имя файла с учетом параметров шаблона
-        if(!$is_exists_tpl_file){
+        if (!$is_exists_tpl_file){
             $tpl_info = $thisObj->default_tpl_info;
         }
         $tpl_file = $file_name.'.'.$tpl_info['ext'];
 
         // загружаем шаблонизатор текущего шаблона
-        if(!cmsCore::includeFile('core/tpl_classes/'.$tpl_info['renderer'].'.php') ||
+        if (!cmsCore::includeFile('core/tpl_classes/'.$tpl_info['renderer'].'.php') ||
             !class_exists($tpl_info['renderer'])){
             global $_LANG;
             cmsCore::halt(sprintf($_LANG['TEMPLATE_CLASS_NOTFOUND'], $tpl_info['renderer']));
@@ -129,22 +131,43 @@ class cmsPage {
     }
     
     /**
-     * Добавляет тег <script> с указанным путем
-     * @param string $src - Первый слеш не требуется
-     * @return $this
+     * Проверяет относительная или абсолютная ссылка, если относительная добавляет
+     * впереди слеш
+     * @param string $src
+     * @return string
      */
-    public function addHeadJS($src){
+    private function checkLink($src) {
         if (mb_substr($src, 0, 4) != 'http' && mb_substr($src, 0, 2) != '//'){
             $src = '/'. $src;
         }
+        return $src;
+    }
+    
+    /**
+     * Добавляет тег <script> с указанным путем
+     * @param string $src - Первый слеш не требуется
+     * @param boolean $prepend  - Добавлять или нет элемент в начало массива
+     * @return $this
+     */
+    public function addHeadJS($src, $prepend=false){
+        $src = $this->checkLink($src);
 
         if (!in_array($src, $this->page_js)){
-            $this->page_js[] = $src;
-            if ($this->is_ajax){ echo '<script type="text/javascript" src="'. $src .'"></script>'; }
+            if ($prepend) {
+                array_unshift($this->page_js, $src);
+            } else {
+                $this->page_js[] = $src;
+            }
+            
+            if ($this->is_ajax) { echo '<script type="text/javascript" src="'. $src .'"></script>'; }
         }
 
         return $this;
     }
+    
+    public function prependHeadJS($src){
+        return $this->addHeadJS($src, true);
+    } 
     
     /**
      * Добавляет тег <link> с указанным путем к CSS-файлу
@@ -152,9 +175,7 @@ class cmsPage {
      * @return $this
      */
     public function addHeadCSS($src){
-        if (mb_substr($src, 0, 4) != 'http' && mb_substr($src, 0, 2) != '//'){
-            $src = '/'. $src;
-        }
+        $src = $this->checkLink($src);
 
         if (!in_array($src, $this->page_css)){
             $this->page_css[] = $src;
@@ -286,7 +307,7 @@ class cmsPage {
             echo '<meta name="description" content="',htmlspecialchars($this->site_cfg->metadesc),'" />',"\n";
 
             //Генератор
-            echo '<meta name="generator" content="InstantCMS - www.instantcms.ru"/>',"\n";
+            echo '<meta name="generator" content="CMS RuDi v'. CMS_RUDI_V .'" />',"\n";
 
             //CSS
             $this->page_css = cmsCore::callEvent('PRINT_ADMIN_PAGE_CSS', $this->page_css);
@@ -329,7 +350,7 @@ class cmsPage {
         echo $indent,'<meta name="description" content="',htmlspecialchars($this->page_desc),'" />',"\n";
 
         //Генератор
-        echo $indent,'<meta name="generator" content="InstantCMS - www.instantcms.ru"/>',"\n";
+        echo $indent,'<meta name="generator" content="CMS RuDi" />',"\n";
 
         //CSS
         $this->page_css = cmsCore::callEvent('PRINT_PAGE_CSS', $this->page_css);
@@ -451,14 +472,7 @@ class cmsPage {
 
         global $_LANG;
 
-        $menu_template = $inCore->menuTemplate();
-
-        if ($menu_template && file_exists(PATH.'/templates/'.$menu_template.'/template.php')){
-            require(PATH .'/templates/'. $menu_template .'/template.php');
-            return;
-        }
-
-        if (file_exists(TEMPLATE_DIR.'template.php')){
+        if (file_exists(TEMPLATE_DIR.'template.php')) {
             require(TEMPLATE_DIR.'template.php');
             return;
         }
@@ -771,10 +785,10 @@ class cmsPage {
     public function initAjaxUpload($script = 'plupload', $options = array(), $files = false){
         switch ($script) {
             case 'plupload':
-                $this->addHeadJS('includes/jquery/plupload/plupload.full.min.js');
+                $this->addHeadJS('includes/plupload/plupload.full.min.js');
                 $this->addHeadCSS('includes/jqueryui/css/smoothness/jquery-ui.min.css');
-                if (file_exists(PATH .'/includes/jquery/plupload/langs/'. $this->site_cfg->lang .'.js')){
-                    $this->addHeadJS('includes/jquery/plupload/langs/'. $this->site_cfg->lang .'.js');
+                if (file_exists(PATH .'/includes/plupload/langs/'. $this->site_cfg->lang .'.js')){
+                    $this->addHeadJS('includes/plupload/langs/'. $this->site_cfg->lang .'.js');
                 }
                 
                 $options = array_merge(
@@ -784,14 +798,19 @@ class cmsPage {
                         'extensions' => 'jpg,gif,png',
                         'max_file_size' => '10',
                         
+                        'type' => 'images',
                         'component' => 'content',
                         'target' => '',
                         'target_id' => '0',
-                        'ses_id' => session_id(),
-                        'insertEditor' => false
+                        'insertEditor' => false,
+                        'editorName' => 'content',
+                        'title' => true,
+                        'description' => true
                     ),
                     $options
                 );
+                
+                $options['ses_id'] = session_id();
                 
                 ob_start();
                     self::includeTemplateFile('special/ajaxFileUpload.php', array('options' => $options, 'files' => $files));

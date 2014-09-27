@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['USERFILES_NO_FILES']           ='Нет файлов.';
 $_LANG['USERFILES_NEW_FILES']          ='Новые файлы';

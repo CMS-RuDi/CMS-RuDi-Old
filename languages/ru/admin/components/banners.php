@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['AD_UNTITLED_BANNER']        ='Баннер без названия';
 $_LANG['AD_INCORRECT_FILE_TYPE']    ='тип файла неверный';

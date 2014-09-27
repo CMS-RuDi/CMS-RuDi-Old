@@ -1,10 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           CMS RuDi v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
-//                   written by InstantCMS Team, 2007-2014                    //
+//                   written by CMS RuDi Team, 2007-2014                    //
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
@@ -27,16 +27,16 @@ $_LANG['INS_CHECK_FOLDER']               = 'Testing folders pemission';
 $_LANG['INS_INSTALL']                    = 'Installation';
 $_LANG['INS_DO_INSTALL']                 = 'Install';
 $_LANG['INS_WELCOME']                    = 'Welcome';
-$_LANG['INS_WELCOME_NOTES']              = '<p>Installation script will check the server for compliance with technical requirements and makes all the necessary steps to get started with InstantCMS.</p><p> InstantCMS can be installed only in the root directory of the site.</p><p> Before starting the installation create a new MySQL database on your hosting. Collation (COLLATION) must be any of utf8_* according to your needs. In most cases this is utf8_general_ci.</p><p> How to install the system on the local computer with OS Windows&trade; for testing: read <a href="http://www.instantcms.ru/wiki/doku.php/local_installation_denwer" target="_blank">instruction</a> at official site.</p><p>InstantCMS is licensed GNU/GPL version 2. You must accept the terms of the license to install the system.</p>';
+$_LANG['INS_WELCOME_NOTES']              = '<p>Installation script will check the server for compliance with technical requirements and makes all the necessary steps to get started with CMS RuDi.</p><p> CMS RuDi can be installed only in the root directory of the site.</p><p> Before starting the installation create a new MySQL database on your hosting. Collation (COLLATION) must be any of utf8_* according to your needs. In most cases this is utf8_general_ci.</p><p> How to install the system on the local computer with OS Windows&trade; for testing: read <a href="http://www.instantcms.ru/wiki/doku.php/local_installation_denwer" target="_blank">instruction</a> at official site.</p><p>CMS RuDi is licensed GNU/GPL version 2. You must accept the terms of the license to install the system.</p>';
 $_LANG['INS_ACCEPT_LICENSE']             = ' I accept the terms <a target="_blank" href="/license.rus.txt">of the license GNU/GPL</a> (<a target="_blank" href="http://www.gnu.org/licenses/gpl-2.0.html">original in english</a>).';
-$_LANG['INS_CHECKPHP_HINT']              = 'For the correct working of InstantCMS php interpreter is needed, version no older than 5.2.0, web server Apache + mod_rewrite (it is possible to use an empty nginx, however .htaccess must be rewritten according to the specifications), server MySQL database must be version 5 or later.<br> The current version of php is pointed out below, required extensions and their availability status are listed.';
+$_LANG['INS_CHECKPHP_HINT']              = 'For the correct working of CMS RuDi php interpreter is needed, version no older than 5.2.0, web server Apache + mod_rewrite (it is possible to use an empty nginx, however .htaccess must be rewritten according to the specifications), server MySQL database must be version 5 or later.<br> The current version of php is pointed out below, required extensions and their availability status are listed.';
 $_LANG['INS_PHP_VERSION']                = 'PHP version';
 $_LANG['INS_INSTALL_VERSION']            = 'Installed version';
 $_LANG['INS_NEED_EXTENTION']             = 'Required PHP extension';
 $_LANG['INS_PHPNET_HINT']                = 'See description on the PHP site';
 $_LANG['INS_INSTALL_OK']                 = 'Installed';
 $_LANG['INS_INSTALL_NOTFOUND']           = 'Not found';
-$_LANG['INS_FOLDERS_NOTES']              = '<p>For the correct working of InstantCMS folders that are pointed out below (and their included folders but with the exception of included in "/includes") must be available for recording. Change the permissions with the help of FTP-client or directly at the server using chmod.</p><p>For successful installation there must be permissions for recording at the directory "/includes". For other directories it is possible to ignore the warnings about inaccessibility of the rights for recording, but only at the time of installation.</p><p> We draw your attention to the fact that immediately after installation the directory "/includes" recording permissions should be removed for security reasons. And after the basic configuration of the site file /includes/config.inc.php must be inaccessible for the recording </p>';
+$_LANG['INS_FOLDERS_NOTES']              = '<p>For the correct working of CMS RuDi folders that are pointed out below (and their included folders but with the exception of included in "/includes") must be available for recording. Change the permissions with the help of FTP-client or directly at the server using chmod.</p><p>For successful installation there must be permissions for recording at the directory "/includes". For other directories it is possible to ignore the warnings about inaccessibility of the rights for recording, but only at the time of installation.</p><p> We draw your attention to the fact that immediately after installation the directory "/includes" recording permissions should be removed for security reasons. And after the basic configuration of the site file /includes/config.inc.php must be inaccessible for the recording </p>';
 
 $_LANG['INS_PERMISSION']                 = 'Current access permissions';
 $_LANG['INS_PERMISSION_OK']              = 'writable';
@@ -70,5 +70,5 @@ $_LANG['INS_DELETE_INST_MIGRATE']        = 'If the installation process has been
 $_LANG['INS_RELOAD_PAGE']                = 'Reload page';
 $_LANG['CFG_SITENAME']                   = 'My Social Network';
 $_LANG['CFG_OFFTEXT']                    = 'The site is under construction';
-$_LANG['CFG_KEYWORDS']                   = 'InstantCMS, management system of the site is a free CMS, site engine, CMS, social network engine';
-$_LANG['CFG_METADESC']                   = 'InstantCMS is a free management system with social functions';
+$_LANG['CFG_KEYWORDS']                   = 'CMS RuDi, management system of the site is a free CMS, site engine, CMS, social network engine';
+$_LANG['CFG_METADESC']                   = 'CMS RuDi is a free management system with social functions';

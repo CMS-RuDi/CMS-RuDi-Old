@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['BESTCONTENT_NOT_ARTICLES'] = 'Нет статей для отображения.';
 $_LANG['BESTCONTENT_FULL_RATING']  = 'Полный рейтинг';

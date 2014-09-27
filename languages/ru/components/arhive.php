@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['ARCHIVE_MATERIALS_FROM']    ='Материалы за ';
 $_LANG['ARHIVE_YEAR']               =' год';

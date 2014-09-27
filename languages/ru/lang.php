@@ -12,11 +12,8 @@
 //                                                                            //
 /* * *************************************************************************** */
 
-if (!defined('VALID_CMS')) {
-    die('ACCESS DENIED');
-}
+$_LANG = array();
 
-$_LANG                              = array();
 $_LANG['PATH_HOME']                 = 'Главная';
 $_LANG['DEBUG_TIME_GEN_PAGE']       = 'Время генерации страницы:';
 $_LANG['DEBUG_QUERY_DB']            = 'Запросы к базе:';
@@ -118,7 +115,7 @@ $_LANG['TEMPLATE_IN_FAVORITE']    = 'В избранное';
 $_LANG['TEMPLATE_MY_PROFILE']     = 'Мой профиль';
 $_LANG['TEMPLATE_MESS']           = 'Cообщения';
 $_LANG['SITE_IS_DISABLE']         = '<strong>Сайт отключен.</strong> Только администраторы видят его содержимое.';
-$_LANG['POWERED_BY_INSTANTCMS']   = 'Работает на InstantCMS';
+$_LANG['POWERED_BY_INSTANTCMS']   = 'Работает на CMS RuDi';
 $_LANG['MONTH_01']                = 'января';
 $_LANG['MONTH_02']                = 'февраля';
 $_LANG['MONTH_03']                = 'марта';

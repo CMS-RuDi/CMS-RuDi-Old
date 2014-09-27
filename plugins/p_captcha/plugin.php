@@ -51,11 +51,7 @@ class p_captcha extends cmsPlugin {
     private function insert_captcha() {
         cmsCore::c('page')->addHead('<script type="text/javascript"> function reloadCaptcha(captcha_id) { $(\'img#captcha\' + captcha_id).attr(\'src\', \'/plugins/p_captcha/codegen/cms_codegen.php?captcha_id=\'+ captcha_id +\'&rand=\' + Math.random()); } </script>');
 
-        ob_start();
-            cmsPage::initTemplate('plugins', 'p_captcha')->
-                assign('captcha_id', $this->getCaptchaId())->
-                display('p_captcha');
-        return ob_get_clean();
+        return cmsPage::initTemplate('plugins', 'p_captcha')->assign('captcha_id', $this->getCaptchaId())->fetch();
     }
     
     private function check_captcha() {

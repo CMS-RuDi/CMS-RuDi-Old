@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['AD_CREATE_CRON_MISSION']      		= 'Создать задачу';
 $_LANG['AD_SAVE_CRON_MISSION']      		= 'Сохранить задачу';

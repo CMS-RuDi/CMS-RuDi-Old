@@ -760,7 +760,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                                     if (!isset($action['confirm'])) {
                                         echo '<a href="'. $link .'" class="uittip" title="'. $title .'"'. (isset($action['target']) ? ' target="'. $action['target'] .'"' : '') .'><img hspace="2" src="images/actions/'. $icon .'" border="0" alt="'. $title .'"/></a>';
                                     } else {
-                                        echo '<a href="#" class="uittip" onclick="jsmsg(\''. $_actions[$key]['confirm'] .'\', \''. $link .'\')"  title="'. $title .'"><img hspace="2" src="images/actions/'. $icon .'" border="0" alt="'. $title .'"/></a>';
+                                        echo '<a href="#" class="uittip" onclick="jsmsg(\''. $action['confirm'] .'\', \''. $link .'\')"  title="'. $title .'"><img hspace="2" src="images/actions/'. $icon .'" border="0" alt="'. $title .'"/></a>';
                                     }
                                 }
                             }

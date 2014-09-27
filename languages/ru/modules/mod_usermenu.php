@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['USERMENU_MESS']       = 'Сообщения';
 $_LANG['USERMENU_BALANCE']    = 'Баланс';

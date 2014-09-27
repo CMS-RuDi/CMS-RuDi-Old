@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 /* 
  * Created by Firs Yuriy
  * e-mail: firs.yura@gmail.com

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['AD_EMPTY_FOLDER']           = 'Папка "/images/menuicons" пуста!';
 $_LANG['AD_NO_ICON']                = 'Без иконки';

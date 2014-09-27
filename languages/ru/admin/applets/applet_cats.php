@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['AD_TITLE_PARTITION']				= 'Название раздела';
 $_LANG['AD_TEMPLATE_PARTITION']				= 'Шаблон раздела';

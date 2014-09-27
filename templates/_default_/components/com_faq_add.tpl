@@ -22,7 +22,7 @@
 	<textarea name="message" id="faq_message" style="">{$message}</textarea>
 
     {if !$user_id}
-        <p style="margin-bottom:10px"><?php echo cmsPage::getCaptcha(); ?></p>
+        <p style="margin-bottom:10px">{captcha}</p>
     {/if}
 
 	<div>

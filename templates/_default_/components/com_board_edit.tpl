@@ -181,7 +181,7 @@
                 <div><strong>{$LANG.SECUR_SPAM}: </strong></div>
                 <div><small>{$LANG.SECUR_SPAM_TEXT}</small></div>
             </td>
-            <td valign="top" class=""><?php echo cmsPage::getCaptcha(); ?></td>
+            <td valign="top" class="">{captcha}</td>
         </tr>
         {/if}
         

@@ -19,7 +19,7 @@
                 <?php if ($anti_brute_force) { ?>
                     <div class="lf_title"><?php echo $_LANG['SECUR_SPAM']; ?></div>
                     <div class="lf_field">
-                        <?php cmsPage::getCaptcha(); ?>
+                        <?php echo cmsPage::getCaptcha(); ?>
                     </div>
                 <?php } ?>
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">

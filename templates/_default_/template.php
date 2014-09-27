@@ -136,8 +136,8 @@
                 <div id="copyright"><?php $this->printSitename(); ?> &copy; <?php echo date('Y'); ?></div>
             </div>
             <div class="grid_4 foot_right">
-                <a href="http://www.instantcms.ru/" title="<?php echo $_LANG['POWERED_BY_INSTANTCMS']; ?>" target="_blank">
-                    <img src="/templates/<?php echo cmsCore::c('config')->template; ?>/images/b88x31.gif" border="0"/>
+                <a href="http://cmsrudi.ru/" title="<?php echo $_LANG['POWERED_BY_INSTANTCMS']; ?>" target="_blank">
+                    <?php echo $_LANG['POWERED_BY_INSTANTCMS']; ?>
                 </a>
             </div>
         </div>

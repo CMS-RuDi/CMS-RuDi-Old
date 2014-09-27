@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+
 
 $_LANG['MOD_NEWSCOUNT']               = 'Количество вопросов';
 $_LANG['MOD_NEWSCOUNT_UNITS']         = 'шт.';

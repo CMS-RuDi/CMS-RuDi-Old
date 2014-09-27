@@ -117,7 +117,7 @@ if (cmsCore::inRequest('install')) {
 
     $installed = true;
 
-    cmsCore::getInstance();
+    cmsCore::getInstance(true);
 
     cmsCore::c('user')->update();
     cmsCore::c('user')->signInUser($admin_login, $admin_password, true);

@@ -31,3 +31,6 @@ $_LANG['USERMENU_ADD_MUSIC']  = 'Добавить песню';
 
 $_LANG['USERMENU_ADMININTER'] = 'Админка';
 $_LANG['USERMENU_EXIT']       = 'Выход';
+
+$_LANG['INVITE_FRIENDS']      = 'Пригласить Друзей';
+$_LANG['INVITE_FRIENDS_TO_APP'] = 'Пригласить друзей в приложение';

@@ -60,7 +60,7 @@ class cmsUser {
     public function update() {
         
         // привязка ip адреса к сессии
-        if (!$this->checkSpoofingSession()){
+        if (!$this->checkSpoofingSession()) {
             $this->logout();
             cmsCore::redirectBack();
         }
@@ -68,13 +68,13 @@ class cmsUser {
         $user_id = (int)(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
 
         // Свойства для гостя
-        if (!$user_id){
+        if (!$user_id) {
 
             self::setUserLogdate();
 
             $guest_info = self::getGuestInfo();
 
-            foreach($guest_info as $key=>$value){
+            foreach ($guest_info as $key => $value) {
                 $this->{$key} = $value;
             }
 
@@ -82,9 +82,9 @@ class cmsUser {
 
             // свойства для авторизованного пользователя
             $info = $this->loadUser($user_id);
-            if (!$info){ return false; }
+            if (!$info) { return false; }
 
-            foreach($info as $key=>$value){
+            foreach ($info as $key => $value) {
                 $this->{$key} = $value;
             }
             
@@ -99,7 +99,6 @@ class cmsUser {
         $this->checkBan();
 
         return true;
-
     }
 
     /**
@@ -124,8 +123,8 @@ class cmsUser {
                     $this->geo[$k] = $v;
                 }
                 // если пользователь город не указал или это гость
-                if(!$this->city){
-                    $this->city = $this->geo['city'];
+                if (!$this->city) {
+                    $this->city = isset($this->geo['city']) ? $this->geo['city'] : '';
                 }
 
                 $this->geo_is_loaded = true;
@@ -162,8 +161,8 @@ class cmsUser {
      * @return array
      */
     public function loadUser($user_id, $where='') {
-        if($user_id){
-            if(isset($this->loads_users[$user_id])) { return $this->loads_users[$user_id]; }
+        if ($user_id) {
+            if (isset($this->loads_users[$user_id])) { return $this->loads_users[$user_id]; }
         }
 
         $where = $user_id ? "u.id = '$user_id'" : $where;
@@ -173,7 +172,7 @@ class cmsUser {
            FROM cms_users u
                            INNER JOIN cms_user_groups g ON g.id = u.group_id
                            INNER JOIN cms_user_profiles p ON p.user_id = u.id
-           WHERE {$where} AND u.is_deleted = 0 AND u.is_locked = 0 LIMIT 1";
+           WHERE ". $where ." AND u.is_deleted = 0 AND u.is_locked = 0 LIMIT 1";
 
         $result = cmsCore::c('db')->query($sql);
 
@@ -237,14 +236,20 @@ $this->logout();
      * Проверяет наличие кукиса "запомнить меня" и если он найден - авторизует пользователя
      * @return bool
      */
-    public function autoLogin(){
-        $user_id = (int)(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0); 
+    public function autoLogin() {
+        $user_id = (int)(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
+        
+        if (cmsCore::c('config')->iframe_enable) {
+            $user_id = $this->iframeAuth($user_id);
+            if ($user_id) {
+                cmsCore::c('config')->iframe_session_id = session_id();
+            }
+        }
 
-        if (cmsCore::getCookie('userid') && !$user_id) {
+        if (cmsCore::getCookie('userid') && empty($user_id)) {
+            $cookie_code = (string)cmsCore::getCookie('userid');
 
-            $cookie_code = cmsCore::getCookie('userid');
-
-            if (!preg_match('/^[0-9a-f]{32}$/i', $cookie_code)){ return false; }
+            if (!preg_match('/^[0-9a-f]{32}$/i', $cookie_code)) { return false; }
 
             $user = $this->loadUser(0, "md5(CONCAT(u.id, u.password,'". cmsCore::c('db')->escape_string(PATH) ."')) = '". $cookie_code ."'");
 
@@ -253,12 +258,173 @@ $this->logout();
                 cmsCore::callEvent('USER_LOGIN', $_SESSION['user']);
                 self::setUserLogdate($user['id']);
             } else {
-                cmsCore::unsetCookie('user_id');
+                cmsCore::unsetCookie('userid');
             }
-
+        }
+        
+        if (cmsCore::c('config')->iframe_enable && !empty($_SESSION['user']['iframe_provider'])) {
+            cmsCore::c('config')->iframe_provider = $_SESSION['user']['iframe_provider'];
+            
+            $ifsid = cmsCore::request('IFSID', 'str', null, 'get');
+            if (empty(cmsCore::c('config')->iframe_session_id) && !empty($ifsid)) {
+                cmsCore::c('config')->iframe_session_id = $ifsid;
+            }
+  
+            switch ($_SESSION['user']['iframe_provider']) {
+                case 'vk':
+                        cmsCore::c('page')->addHead('<script type="text/javascript"> CoreData = { host:"'. cmsCore::c('config')->host .'", ifsid:"'. cmsCore::c('config')->iframe_session_id .'", iframe_provider:"vk", iframe_provider_id:"'. cmsCore::c('config')->vk_id .'", processed:false }; $(document).ready(function() { start_iframe_fn(); }); </script>')->addHeadJS('//vk.com/js/api/xd_connection.js?2')->addHeadJS('core/js/iframe.js');
+                    break;
+            }
+            unset($_SESSION['user_net']);
         }
 
         return true;
+    }
+    
+    private function iframeAuth($user_id = 0) {
+        $provider = '';
+
+        //VK.COM
+        if (mb_strstr(cmsCore::request('api_url', 'str', '', 'get'), 'api.vk.com')) {
+            if (cmsCore::c('config')->vk_enable && cmsCore::request('api_id', 'str', '', 'get') == cmsCore::c('config')->vk_id) {
+                if (md5(cmsCore::c('config')->vk_id .'_'. cmsCore::request('viewer_id', 'str', '', 'get') .'_'. cmsCore::c('config')->vk_private_key) == cmsCore::request('auth_key', 'str', '', 'get')){
+                    $provider = 'vk';
+                }
+            }
+        }
+        
+        if (!empty($provider) && $user_id) {
+            if (empty($_SESSION['user']['provider']) || $_SESSION['user']['provider'] != $provider) {
+                cmsCore::callEvent('USER_LOGOUT', $user_id);
+                
+                self::setUserLogdate($user_id);
+                
+		cmsCore::c('db')->query("DELETE FROM cms_online WHERE user_id = '". $user_id ."'");
+		cmsCore::c('db')->query("DELETE FROM cms_search WHERE session_id = '". session_id() ."'");
+                
+                $_SESSION = array();
+                
+                $user_id = 0;
+            }
+        }
+
+        switch ($provider) {
+            case 'vk': return $this->iframeVkAuth($user_id); break;
+            default: return false; break;
+        }
+    }
+    
+    private function iframeVkAuth($user_id = 0) {
+        $iframe_user_id = cmsCore::request('viewer_id', 'int', 0, 'get');
+
+        if ($user_id != 0) {
+            if ($_SESSION['user']['iframe_user_id'] == $iframe_user_id) {
+                return true;
+            }
+        }
+        
+        if (!empty($iframe_user_id)) {
+            $user = $this->loadUser(0, "u.iframe_provider = 'vk' and u.iframe_user_id = '". $iframe_user_id ."'");
+
+            if ($user) {
+                $_SESSION['user'] = $user;
+                cmsCore::callEvent('USER_LOGIN', $_SESSION['user']);
+                self::setUserLogdate($user['id']);
+            } else {
+                $opt = $options = array();
+                
+                $options['user_ids'] = $iframe_user_id;
+                $options['fields'] = 'city,country,screen_name,bdate,sex,photo_max_orig,photo_400_orig,photo_200_orig,photo_100';
+                $options['v'] = '5.8';
+                $options['lang'] = 'ru';
+                ksort($options);
+
+                foreach ($options as $k => $v){
+                    $opt[] = $k .'='. urlencode($v);
+                }
+                
+                $response = cmsCore::c('curl')->jsonGet('https://api.vk.com/method/users.get?'. implode('&', $opt), true);
+                
+                if (!empty($response) && !empty($response['response'][0]['id'])) {
+                    $response = $response['response'][0];
+                    
+                    $new_user = array(
+                        'nickname' => cmsCore::c('db')->escape_string($response['last_name'] .' '. $response['first_name']),
+                        'login' => preg_match('#^[0-9]+$#is', $response['screen_name']) ? cmsCore::strToURL($response['last_name'] .' '. $response['first_name']) : $response['screen_name']
+                    );
+                    
+                    if (isset($response['bdate']) && preg_match('#([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{4})#is', $response['bdate'], $bd)) {
+                        $new_user['birthdate'] = $bd[3] .'-'. (mb_strlen($bd[2])<2 ? '0'. $bd[2] : $bd[2]) .'-'. (mb_strlen($bd[1])<2 ? '0'. $bd[1] : $bd[1]);
+                    }
+                    
+                    $new_user['gender'] = ($response['sex'] == 2 ? 'm' : ($response['sex'] == 1 ? 'f' : 0));
+                    
+                    $new_user['city'] = '';
+                    if (isset($response['city'])) {
+                        $new_user['city'] = cmsCore::c('db')->escape_string($response['city']['title']);
+                    }
+                    
+                    $new_user['iframe_provider'] = 'vk';
+                    $new_user['iframe_user_id'] = $iframe_user_id;
+                    $new_user['regdate'] = date('Y-m-d H:i:s');
+                    $new_user['photo'] = isset($response['photo_max_orig']) ? $response['photo_max_orig'] : (isset($response['photo_400_orig']) ? $response['photo_400_orig'] : (isset($response['photo_200_orig']) ? $response['photo_200_orig'] : $response['photo_100']));
+                    
+                    $new_user['id'] = cmsCore::c('db')->insert('cms_users', $new_user);
+                    
+                    if (!$new_user['id']) { return false; }
+                    
+                    if (!empty($new_user['photo'])) {
+                        $d1 = ceil($new_user['id']/10000);
+                        $d2 = ceil($new_user['id']/100);
+                        
+                        if (!is_dir(PATH .'/images/users/avatars/'. $d1)) {
+                            mkdir(PATH .'/images/users/avatars/'. $d1, 0777, true);
+                        }
+                        if (!is_dir(PATH .'/images/users/avatars/'. $d1 .'/'. $d2)) {
+                            mkdir(PATH .'/images/users/avatars/'. $d1 .'/'. $d2, 0777, true);
+                        }
+                        if (!is_dir(PATH .'/images/users/avatars/small/'. $d1)) {
+                            mkdir(PATH .'/images/users/avatars/small/'. $d1, 0777, true);
+                        }
+                        if (!is_dir(PATH .'/images/users/avatars/small/'. $d1 .'/'. $d2)) {
+                            mkdir(PATH .'/images/users/avatars/small/'. $d1 .'/'. $d2, 0777, true);
+                        }
+
+                        cmsCore::c('images')->mresize_type = 'auto';
+                        cmsCore::c('images')->small_type = 'exact';
+                        
+                        cmsCore::c('images')->medium_dir = PATH .'/images/users/avatars/'. $d1 .'/'. $d2 .'/';
+                        cmsCore::c('images')->small_dir = PATH .'/images/users/avatars/small/'. $d1 .'/'. $d2 .'/';
+                        
+                        cmsCore::c('images')->new_mw = cmsCore::m('users')->config['medw'];
+                        cmsCore::c('images')->new_mh = cmsCore::m('users')->config['medh'];
+                        
+                        cmsCore::c('images')->new_sw = cmsCore::m('users')->config['smallw'];
+                        cmsCore::c('images')->new_sh = cmsCore::m('users')->config['smallw'];
+                        
+                        $new_user['imageurl'] = $d1 .'/'. $d2 .'/'. cmsCore::c('images')->resize($new_user['photo']);
+                    }
+                    
+                    $new_user['user_id'] = $new_user['id'];
+                    cmsCore::c('db')->insert('cms_user_profiles', $new_user);
+                    
+                    $user = $this->loadUser($new_user['id']);
+                    
+                    $_SESSION['user'] = $user;
+                    
+                    cmsCore::callEvent('USER_LOGIN', $_SESSION['user']);
+                    
+                    self::setUserLogdate($user['id']);
+                }
+            }
+            
+            $cookie_code = md5($user['id'] . $user['password'] . PATH);
+            cmsCore::setCookie('userid', $cookie_code, time()+2592000);
+            
+            return $user['id'];
+        }
+        
+        return false;
     }
 
 // ============================================================================ //
@@ -860,7 +1026,7 @@ $this->logout();
                 assign('component', $component)->
                 assign('total', $total)->
                 assign('pagebar', cmsPage::getPagebar($total, cmsCore::c('db')->page, cmsCore::c('db')->perpage, 'javascript:wallPage(%page%)'))->
-                display('com_users_wall.tpl');
+                display();
 
         return ob_get_clean();
 
@@ -966,7 +1132,7 @@ $this->logout();
         // если есть, возвращаем
         if($ses_logdate) { return date('Y-m-d H:i:s', $ses_logdate); }
         // Получаем время визита из куков
-        $cookie_logdate = cmsCore::getCookie('logdate');
+        $cookie_logdate = (int)cmsCore::getCookie('logdate');
         // если есть, возвращаем
         if($cookie_logdate) { return date('Y-m-d H:i:s', $cookie_logdate); }
         // Иначе возвращаем текущую дату
@@ -983,7 +1149,7 @@ $this->logout();
         // Если нет в сессии, кладем в сессию предыдущее значение
         // из куков, если там тоже нет, то текущее
         if(!$ses_logdate){
-            $cookie_logdate = cmsCore::getCookie('logdate');
+            $cookie_logdate = (int)cmsCore::getCookie('logdate');
             self::sessionPut('logdate', ($cookie_logdate ? $cookie_logdate : time()));
             cmsCore::setCookie('logdate', time(), time()+60*60*24*30);
         }
@@ -1104,30 +1270,25 @@ $this->logout();
      * @return bool
      */
     public static function isOnline($user_id){
-
-        if($user_id<=0) { return false; }
-
-        $inUser = self::getInstance();
+        if ($user_id <= 0) { return false; }
 
         $online_users = array();
 
-        if(!isset($inUser->online_users_ids)){
-
-            $ou = $inUser->online_users;
-            foreach ($ou as $data) {
-                if($data['user_id']){
-                    $online_users[] = $data['user_id'];
+        if (!isset(cmsCore::c('user')->online_users_ids)) {
+            if (cmsCore::c('user')->online_users) {
+                foreach (cmsCore::c('user')->online_users as $data) {
+                    if ($data['user_id']) {
+                        $online_users[] = $data['user_id'];
+                    }
                 }
             }
 
-            $inUser->online_users_ids = $online_users;
-
+            cmsCore::c('user')->online_users_ids = $online_users;
         } else {
-            $online_users = $inUser->online_users_ids;
+            $online_users = cmsCore::c('user')->online_users_ids;
         }
 
         return in_array($user_id, $online_users);
-
     }
 
 // ============================================================================ //
@@ -1489,11 +1650,11 @@ $this->logout();
 // ============================================================================ //
 
     public static function getProfileURL($user_login) {
-        if(!$user_login){
+        if (!$user_login) {
             global $_LANG;
             return 'javascript:core.alert(\''.$_LANG['USER_IS_DELETE'].'\',\''.$_LANG['ATTENTION'].'\');';
         }
-        return '/' . self::PROFILE_LINK_PREFIX . urlencode($user_login);
+        return '/'. self::PROFILE_LINK_PREFIX . urlencode($user_login);
     }
 
 // ============================================================================ //
@@ -1539,7 +1700,7 @@ $this->logout();
      * @return bool
      */
     public static function sessionGet($param, $box = 'icms'){
-        if (isset($_SESSION[$box][$param])){
+        if (isset($_SESSION[$box][$param])) {
             return $_SESSION[$box][$param];
         } else {
             return false;
@@ -1595,28 +1756,22 @@ $this->logout();
      * после всех проверок входных данных
      */
     public static function checkCsrfToken(){
-
-        if (isset($_POST['csrf_token'])) {
-
+        if (cmsCore::inRequest('csrf_token')) {
             $tokens = self::sessionGet('csrf_tokens', 'security');
 
-            if(is_array($tokens)){
+            if (is_array($tokens)) {
+                $key = array_search(cmsCore::request('csrf_token', 'str', '', 'post'), $tokens, true);
 
-                $key = array_search($_POST['csrf_token'], $tokens, true);
-
-                if ($key !== false){
+                if ($key !== false) {
                     unset($tokens[$key]);
                     ksort($tokens);
                     self::sessionPut('csrf_tokens', $tokens, 'security');
                     return true;
                 }
-
             }
-
         }
 
         return false;
-
     }
     /**
      * ====== DEPRECATED =========
@@ -1697,7 +1852,7 @@ $this->logout();
         if(is_numeric($id)){
             $where = "id = '$id'";
         } else {
-            if(preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $id)){
+            if (preg_match("/^(?:[a-z0-9\._\-]+)@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+(?:[a-z]{2,6})$/ui", $id)) {
                 $where = "email = '$id'";
             } else {
                 $where = "login = '$id'";
@@ -1838,7 +1993,7 @@ $this->logout();
         $inCore = cmsCore::getInstance();
 
         // Авторизация по логину или e-mail
-        if (!preg_match("/^([a-zA-Z0-9\._-]+)@([a-zA-Z0-9\._-]+)\.([a-zA-Z]{2,4})$/ui", $login)){
+        if (!preg_match("/^([a-z0-9\._-]+)@([a-z0-9\._-]+)\.([a-z]{2,4})$/ui", $login)){
             $where_login = "u.login = '". $login ."'";
         } else {
             $where_login = "u.email = '". $login ."'";
@@ -1926,6 +2081,7 @@ $this->logout();
         cmsCore::c('db')->query("DELETE FROM cms_online WHERE user_id = '{$this->id}'");
         cmsCore::c('db')->query("DELETE FROM cms_search WHERE session_id = '$sess_id'");
 
+        session_unset();
         session_destroy();
     }
 
@@ -2016,17 +2172,13 @@ $this->logout();
      * @return bool
      */
     public static function isAdminCan($access_type, $access_list){
-
-        $inUser = self::getInstance();
-
-        if (!$inUser->is_admin){ return false; }
-
-        if ($inUser->id==1) { return true; }
-
-        if (in_array($access_type, $access_list)){ return true; }
+        if (cmsCore::c('user')->is_admin) {
+            if (cmsCore::c('user')->id == 1 || in_array($access_type, $access_list)) {
+                return true;
+            }
+        }
 
         return false;
-
     }
 
 // ============================================================================ //

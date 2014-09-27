@@ -17,17 +17,15 @@
     </div>
 </form>
 
-{literal}
 <script type="text/javascript">
-function mod_text(){
-    if ($('#only_mod').prop('checked')){
-        $('#text_mes').html('{/literal}{$LANG.SEND_MESSAGE_TEXT_MOD} "{$club.title|escape:'html'}"{literal}.');
-    } else {
-        $('#text_mes').html('{/literal}{$LANG.SEND_MESSAGE_TEXT} "{$club.title|escape:'html'}".{literal}');
+    function mod_text() {
+        if ($('#only_mod').prop('checked')) {
+            $('#text_mes').html('{$LANG.SEND_MESSAGE_TEXT_MOD} "{$club.title|escape:'html'}".');
+        } else {
+            $('#text_mes').html('{$LANG.SEND_MESSAGE_TEXT} "{$club.title|escape:'html'}".');
+        }
     }
-}
-$(document).ready(function(){
-    $('.ajax_autogrowarea').focus();
-});
+    $(function() {
+        $('.ajax_autogrowarea').focus();
+    });
 </script>
-{/literal}

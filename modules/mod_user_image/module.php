@@ -40,7 +40,7 @@ function mod_user_image($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_user_image')->
             assign('users', $users)->
             assign('cfg', $cfg)->
-            display('mod_user_image.tpl');
+            display();
 
     return true;
 

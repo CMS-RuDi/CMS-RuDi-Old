@@ -12,10 +12,7 @@
 /******************************************************************************/
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function files(){
-
-    $inDB = cmsDatabase::getInstance();
-
+function files() {
     global $_LANG;
 
     $do = cmsCore::getInstance()->do;
@@ -23,68 +20,52 @@ function files(){
 //========================================================================================================================//
 //========================================================================================================================//
     // Скачивание
-    if ($do=='view'){
+    if ($do == 'view') {
+        $fileurl = cmsCore::request('fileurl', 'html', '');
 
-        $fileurl = cmsCore::request('fileurl', 'str', '');
-        if (!$fileurl) { cmsCore::error404(); }
-
-        $fileurl = (mb_strpos($fileurl, '-') === 0) ? htmlspecialchars_decode(base64_decode(ltrim($fileurl, '-'))) : $fileurl;
-
-        if(mb_strstr($fileurl, '..')){ cmsCore::error404(); }
-
-        if (mb_strstr($fileurl, 'http:/')){
-            if (!mb_strstr($fileurl, 'http://')){ $fileurl = str_replace('http:/', 'http://', $fileurl); }
+        if (mb_strpos($fileurl, '-') === 0) {
+            $fileurl = htmlspecialchars_decode(base64_decode(ltrim($fileurl, '-')));
         }
 
-        $downloads = cmsCore::fileDownloadCount($fileurl);
+        $fileurl = cmsCore::strClear($fileurl); 
 
-        if ($downloads == 0){
-            $sql = "INSERT INTO cms_downloads (fileurl, hits) VALUES ('$fileurl', '1')";
-            $inDB->query($sql);
-        } else {
-            $sql = "UPDATE cms_downloads SET hits = hits + 1 WHERE fileurl = '$fileurl'";
-            $inDB->query($sql);
+        if (!$fileurl || mb_strstr($fileurl, '..') || strpos($fileurl, '.') === 0) {
+            cmsCore::error404();
         }
 
-        if (mb_strstr($fileurl, 'http:/')){
+        if (strpos($fileurl, 'http') === 0) {
+            cmsCore::m('files')->increaseDownloadCount($fileurl);
             cmsCore::redirect($fileurl);
-        }
-
-        if (file_exists(PATH.$fileurl)){
-
-            header('Content-Disposition: attachment; filename='.basename($fileurl) . "\n");
-            header('Content-Type: application/x-force-download; name="'.$fileurl.'"' . "\n");
-            header('Location:'.$fileurl);
+        } else if (file_exists(PATH . $fileurl)) {
+            cmsCore::m('files')->increaseDownloadCount($fileurl);
+            header('Content-Disposition: attachment; filename='. basename($fileurl) . "\n");
+            header('Content-Type: application/x-force-download; name="'. $fileurl .'"' . "\n");
+            header('Location:'. $fileurl);
             cmsCore::halt();
-
         } else {
             cmsCore::halt($_LANG['FILE_NOT_FOUND']);
         }
-
     }
 
 //========================================================================================================================//
 //========================================================================================================================//
 
-    if ($do=='redirect'){
-
+    if ($do == 'redirect') {
     	$url = str_replace(array('--q--',' '), array('?','+'), cmsCore::request('url', 'str', ''));
-        if (!$url) { cmsCore::error404(); }
 
-        $url = (mb_strpos($url, '-') === 0) ? htmlspecialchars_decode(base64_decode(ltrim($url, '-'))) : $url;
-
-        if (mb_strstr($url, '..')) { cmsCore::error404(); }
-
-        if (mb_strstr($url, 'http:/')) {
-            if (!mb_strstr($url, 'http://')){ $url = str_replace('http:/', 'http://', $url); }
+        if (mb_strpos($url, '-') === 0) {
+            $url = htmlspecialchars_decode(base64_decode(ltrim($url, '-')));
         }
-        if (mb_strstr($url, 'https:/')) {
-            if (!mb_strstr($url, 'https://')){ $url = str_replace('https:/', 'https://', $url); }
+
+        $url = cmsCore::strClear($url);
+
+        if (!$url || mb_strstr($url, '..') || strpos($url, '.') === 0) {
+            cmsCore::error404();
         }
+        
         // кириллические домены
         $url_host = parse_url($url, PHP_URL_HOST);
-        if (preg_match('/^[а-яё]+/iu', $url_host)){
-
+        if (preg_match('/^[а-яё]+/iu', $url_host)) {
             cmsCore::loadClass('idna_convert');
 
             $IDN = new idna_convert();
@@ -92,10 +73,9 @@ function files(){
             $host = $IDN->encode($url_host);
 
             $url = str_ireplace($url_host, $host, $url);
-
         }
+        
         cmsCore::redirect($url);
-
     }
 
 //========================================================================================================================//

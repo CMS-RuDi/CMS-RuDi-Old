@@ -34,10 +34,11 @@
 {else}
 <p class="usr_photos_notice">{$LANG.BY_TAG} <strong>"{$query}"</strong> {$LANG.NOTHING_FOUND}. <a href="{$external_link}" target="_blank">{$LANG.CONTINUE_TO_SEARCH}?</a></p>
 {/if}
-{literal}
+
 <script type="text/javascript">
-function searchOtherTag(){
-$('#found_search').hide();$('#other_tag').fadeIn('slow');$('.text-input').focus();
-}
+    function searchOtherTag() {
+        $('#found_search').hide();
+        $('#other_tag').fadeIn('slow');
+        $('.text-input').focus();
+    }
 </script>
-{/literal}

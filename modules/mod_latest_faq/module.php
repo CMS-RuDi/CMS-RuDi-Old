@@ -46,7 +46,7 @@ function mod_latest_faq($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_latest_faq')->
             assign('faq', $faq)->
             assign('cfg', $cfg)->
-            display('mod_latest_faq.tpl');
+            display();
 
     return true;
 

@@ -41,30 +41,6 @@ function cpCheckWritable($file, $type='file'){
 	}
 }
 
-function cpWhoOnline(){
-    global $_LANG;
-	$people = cmsUser::getOnlineCount();
-
-	$html .= '<div>';
-
-		$html .= '<table width="100%" cellpadding="2" cellspacing="2"><tr>';
-
-			$html .= '<td width="24" valign="top">';
-				$html .= '<img src="images/user.gif"/>';
-			$html .= '</td>';
-
-			$html .= '<td width="" valign="top">';
-				$html .= '<div><strong>'.$_LANG['AD_FROM_USERS'].': </strong>'.$people['users'].'</div>';
-				$html .= '<div><strong>'.$_LANG['AD_FROM_GUESTS'].': </strong>'.$people['guests'].'</div>';
-			$html .= '</td>';
-
-		$html .= '</tr></table>';
-	$html .= '</div>';
-
-	return $html;
-
-}
-
 /////////////////////////// PAGE GENERATION ////////////////////////////////////////////////////////////////
 function cpHead(){
     /* Костыль скоро будет удален */
@@ -84,156 +60,291 @@ function cpHead(){
 
 function cpMenu(){
     global $_LANG;
-	global $adminAccess;
+    global $adminAccess;
 
     $inCore = cmsCore::getInstance();
 
     ob_start(); ?>
-	<div id="hmenu">
-		<ul id="nav">
-			<?php if (cmsUser::isAdminCan('admin/menu', $adminAccess)){ ?>
-			<li>
-				<a href="index.php?view=menu" class="menu"><?php echo $_LANG['AD_MENU']; ?></a>
-				<ul>
-					<li><a class="add" href="index.php?view=menu&do=add"><?php echo $_LANG['AD_MENU_POINT_ADD']; ?></a></li>
-					<li><a class="add" href="index.php?view=menu&do=addmenu"><?php echo $_LANG['AD_MENU_ADD']; ?></a></li>
-					<li><a class="list" href="index.php?view=menu"><?php echo $_LANG['AD_SHOW_ALL']; ?></a></li>
-				</ul>
-			</li>
-			<?php } ?>
-			<?php if (cmsUser::isAdminCan('admin/modules', $adminAccess)){ ?>
-			<li>
-				<a href="index.php?view=modules" class="modules"><?php echo $_LANG['AD_MODULES']; ?></a>
-				<ul>
-                	<li><a class="install" href="index.php?view=install&do=module"><?php echo $_LANG['AD_MODULES_SETUP']; ?></a></li>
-					<li><a class="add" href="index.php?view=modules&do=add"><?php echo $_LANG['AD_MODULE_ADD']; ?></a></li>
-					<li><a class="list" href="index.php?view=modules"><?php echo $_LANG['AD_SHOW_ALL']; ?></a></li>
-				</ul>
-			</li>
-			<?php } ?>
-			<?php if (cmsUser::isAdminCan('admin/content', $adminAccess)){ ?>
-			<li>
-				<a class="content" href="index.php?view=tree"><?php echo $_LANG['AD_ARTICLE_SITE']; ?></a>
-				<ul>
-					<li><a class="content" href="index.php?view=tree"><?php echo $_LANG['AD_ARTICLES']; ?></a></li>
-					<li><a class="arhive" href="index.php?view=arhive"><?php echo $_LANG['AD_ARTICLES_ARCHIVE']; ?></a></li>
-					<li><a class="add" href="index.php?view=cats&do=add"><?php echo $_LANG['AD_CREATE_SECTION']; ?></a></li>
-					<li><a class="add" href="index.php?view=content&do=add"><?php echo $_LANG['AD_CREATE_ARTICLE']; ?></a></li>
-				</ul>
-			</li>
-			<?php } ?>
-			<?php if (cmsUser::isAdminCan('admin/components', $adminAccess)){ ?>
-			<li>
-				<a href="index.php?view=components" class="components"><?php echo $_LANG['AD_COMPONENTS']; ?></a>
-				<ul>
-                <li><a class="install" href="index.php?view=install&do=component"><?php echo $_LANG['AD_INSTALL_COMPONENTS']; ?></a></li>
-                    <?php
 
-                        $components   = $inCore->getAllComponents();
-                        $showed_count = 0;
-                        $total_count  = count($components);
-
-                        if ($total_count){
-
-                            foreach ($components as $com){
-
-                                if ($com['published'] && (file_exists('components/'.$com['link'].'/backend.php')) && cmsUser::isAdminCan('admin/com_'.$com['link'], $adminAccess)){ ?>
-
-                                    <li>
-                                        <a style="margin-left:5px; background:url(/admin/images/components/<?php echo $com['link']; ?>.png) no-repeat 6px 6px;" href="index.php?view=components&do=config&link=<?php echo $com['link']; ?>">
-                                            <?php echo $com['title']; ?>
-                                        </a>
-                                    </li>
-
-                                <?php
-
-                                    $showed_count++;
-
-                                }
-
-                            }
-
-                        }
-
-                        if ($total_count != $showed_count && cmsCore::c('user')->id == 1){
-
-                    ?>
-                        <li><a class="list" href="index.php?view=components"><?php echo $_LANG['AD_SHOW_ALL']; ?>...</a></li>
-                    <?php
-
-                        }
-
-                    ?>
-
-				</ul>
-			</li>
-			<?php } ?>
-			<?php if (cmsUser::isAdminCan('admin/plugins', $adminAccess)){ ?>
-			<li>
-				<a class="plugins"><?php echo $_LANG['AD_ADDITIONS']; ?></a>
-				<ul>
-                	<li><a class="install" href="index.php?view=install&do=plugin"><?php echo $_LANG['AD_INSTALL_PLUGINS']; ?></a></li>
-                    <li><a href="index.php?view=plugins" class="plugins"><?php echo $_LANG['AD_PLUGINS']; ?></a></li>
-                    <?php if (cmsUser::isAdminCan('admin/filters', $adminAccess)){ ?>
-                        <li><a href="index.php?view=filters" class="filters"><?php echo $_LANG['AD_FILTERS']; ?></a></li>
-                    <?php } ?>
-				</ul>
-			</li>
-			<?php } ?>
-			<?php if (cmsUser::isAdminCan('admin/users', $adminAccess)){ ?>
-			<li>
-                <a href="index.php?view=users" class="users"><?php echo $_LANG['AD_USERS']; ?></a>
-                <ul>
-                    <li><a href="index.php?view=users" class="user"><?php echo $_LANG['AD_USERS']; ?></a></li>
-                    <li><a href="index.php?view=userbanlist" class="banlist"><?php echo $_LANG['AD_BANLIST']; ?></a></li>
-                    <li><a class="users" href="index.php?view=usergroups"><?php echo $_LANG['AD_USERS_GROUP']; ?></a></li>
-                    <li><a class="add" href="index.php?view=users&do=add"><?php echo $_LANG['AD_USER_ADD']; ?></a></li>
-                    <li><a class="add" href="index.php?view=usergroups&do=add"><?php echo $_LANG['AD_CREATE_GROUP']; ?></a></li>
-                    <li><a class="config" href="index.php?view=components&do=config&link=users"><?php echo $_LANG['AD_PROFILE_SETTINGS']; ?></a></li>
+    <nav class="navbar navbar-default navbar-collapse" role="navigation" style="margin-bottom:0;">
+        <ul class="nav navbar-nav">
+            <?php if (cmsUser::isAdminCan('admin/menu', $adminAccess)) { ?>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=menu">
+                    <i class="fa fa-list"></i>
+                    <?php echo $_LANG['AD_MENU']; ?>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="fa fa-plus-circle" href="index.php?view=menu&do=add">
+                            <?php echo $_LANG['AD_MENU_POINT_ADD']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-plus-circle" href="index.php?view=menu&do=addmenu">
+                            <?php echo $_LANG['AD_MENU_ADD']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-ellipsis-h" href="index.php?view=menu">
+                            <?php echo $_LANG['AD_SHOW_ALL']; ?>
+                        </a>
+                    </li>
                 </ul>
-			</li>
-			<?php } ?>
-			<?php if (cmsUser::isAdminCan('admin/config', $adminAccess)){ ?>
-			<li>
-				<a href="index.php?view=config" class="config"><?php echo $_LANG['AD_SETTINGS']; ?></a>
-				<ul>
-					<li><a class="config" href="index.php?view=config"><?php echo $_LANG['AD_SITE_SETTING']; ?></a></li>
-					<li><a class="repairnested" href="index.php?view=repairnested"><?php echo $_LANG['AD_CHECKING_TREES']; ?></a></li>
-                    <li><a class="cron" href="index.php?view=cron"><?php echo $_LANG['AD_CRON_MISSION']; ?></a></li>
-                    <li><a class="phpinfo" href="index.php?view=phpinfo"><?php echo $_LANG['AD_PHP_INFO']; ?></a></li>
-          			<li><a class="clearcache" href="index.php?view=clearcache"><?php echo $_LANG['AD_CLEAR_SYS_CACHE']; ?></a></li>
-				</ul>
-			</li>
-			<?php } ?>
-			<li>
-				<a href="http://www.instantcms.ru/wiki" target="_blank" class="help"><?php echo $_LANG['AD_DOCS']; ?></a>
-			</li>
-		</ul>
-	</div>
+            </li>
+            <?php } ?>
 
-	<?php echo ob_get_clean();
+            <?php if (cmsUser::isAdminCan('admin/modules', $adminAccess)) { ?>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=modules">
+                    <i class="fa fa-th"></i>
+                    <?php echo $_LANG['AD_MODULES']; ?>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="fa fa-cube" href="index.php?view=install&do=module">
+                            <?php echo $_LANG['AD_MODULES_SETUP']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-plus-circle" href="index.php?view=modules&do=add">
+                            <?php echo $_LANG['AD_MODULE_ADD']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-ellipsis-h" href="index.php?view=modules">
+                            <?php echo $_LANG['AD_SHOW_ALL']; ?>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <?php } ?>
 
-	return;
+            <?php if (cmsUser::isAdminCan('admin/content', $adminAccess)) { ?>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=tree">
+                    <i class="fa fa-folder-open"></i>
+                    <?php echo $_LANG['AD_ARTICLE_SITE']; ?>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="fa fa-file-text" href="index.php?view=tree">
+                            <?php echo $_LANG['AD_ARTICLES']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-archive" href="index.php?view=arhive">
+                            <?php echo $_LANG['AD_ARTICLES_ARCHIVE']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-plus-circle" href="index.php?view=cats&do=add">
+                            <?php echo $_LANG['AD_CREATE_SECTION']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-plus-circle" href="index.php?view=content&do=add">
+                            <?php echo $_LANG['AD_CREATE_ARTICLE']; ?>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <?php } ?>
+
+            <?php if (cmsUser::isAdminCan('admin/components', $adminAccess)) { ?>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=components">
+                    <i class="fa fa-cubes"></i>
+                    <?php echo $_LANG['AD_COMPONENTS']; ?>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="fa fa-cube" href="index.php?view=install&do=component">
+                            <?php echo $_LANG['AD_INSTALL_COMPONENTS']; ?>
+                        </a>
+                    </li>
+                <?php
+                    $components   = $inCore->getAllComponents();
+                    $showed_count = 0;
+                    $total_count  = count($components);
+
+                    if ($total_count) {
+                        foreach ($components as $com) {
+                            if ($com['published'] && (file_exists('components/'. $com['link'] .'/backend.php')) && cmsUser::isAdminCan('admin/com_'. $com['link'], $adminAccess)) { ?>
+
+                                <li>
+                                    <a class="fa" href="index.php?view=components&do=config&link=<?php echo $com['link']; ?>">
+                                        <img src="/admin/images/components/<?php echo $com['link']; ?>.png" class="com_icon" />
+                                        <?php echo $com['title']; ?>
+                                    </a>
+                                </li>
+
+                <?php
+                                $showed_count++;
+                            }
+                        }
+                    }
+
+                    if ($total_count != $showed_count && cmsCore::c('user')->id == 1) {
+                ?>
+                        <li>
+                            <a class="fa fa-ellipsis-h" href="index.php?view=components">
+                                <?php echo $_LANG['AD_SHOW_ALL']; ?>
+                            </a>
+                        </li>
+                <?php
+                    }
+                ?>
+                </ul>
+            </li>
+            <?php } ?>
+
+            <?php if (cmsUser::isAdminCan('admin/plugins', $adminAccess)) { ?>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-puzzle-piece"></i>
+                    <?php echo $_LANG['AD_ADDITIONS']; ?>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="fa fa-cube" href="index.php?view=install&do=plugin">
+                            <?php echo $_LANG['AD_INSTALL_PLUGINS']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-puzzle-piece" href="index.php?view=plugins">
+                            <?php echo $_LANG['AD_PLUGINS']; ?>
+                        </a>
+                    </li>
+                    <?php if (cmsUser::isAdminCan('admin/filters', $adminAccess)) { ?>
+                        <li>
+                            <a class="fa fa-filter" href="index.php?view=filters">
+                                <?php echo $_LANG['AD_FILTERS']; ?>
+                            </a>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </li>
+            <?php } ?>
+
+            <?php if (cmsUser::isAdminCan('admin/users', $adminAccess)) { ?>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=users">
+                    <i class="fa fa-users"></i>
+                    <?php echo $_LANG['AD_USERS']; ?>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="fa fa-user" href="index.php?view=users">
+                            <?php echo $_LANG['AD_USERS']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-ban" href="index.php?view=userbanlist">
+                            <?php echo $_LANG['AD_BANLIST']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-users" href="index.php?view=usergroups">
+                            <?php echo $_LANG['AD_USERS_GROUP']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-plus-circle" href="index.php?view=users&do=add">
+                            <?php echo $_LANG['AD_USER_ADD']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-plus-circle" href="index.php?view=usergroups&do=add">
+                            <?php echo $_LANG['AD_CREATE_GROUP']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-cogs" href="index.php?view=components&do=config&link=users">
+                            <?php echo $_LANG['AD_PROFILE_SETTINGS']; ?>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <?php } ?>
+
+            <?php if (cmsUser::isAdminCan('admin/config', $adminAccess)) { ?>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=config">
+                    <i class="fa fa-cogs"></i>
+                    <?php echo $_LANG['AD_SETTINGS']; ?>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a class="fa fa-cogs" href="index.php?view=config">
+                            <?php echo $_LANG['AD_SITE_SETTING']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-sitemap" href="index.php?view=repairnested">
+                            <?php echo $_LANG['AD_CHECKING_TREES']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-clock-o" href="index.php?view=cron">
+                            <?php echo $_LANG['AD_CRON_MISSION']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-info-circle" href="index.php?view=phpinfo">
+                            <?php echo $_LANG['AD_PHP_INFO']; ?>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fa fa-trash-o" href="index.php?view=clearcache">
+                            <?php echo $_LANG['AD_CLEAR_SYS_CACHE']; ?>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <?php } ?>
+        </ul>
+    </nav>
+    <?php echo ob_get_clean();
+
+    return;
 }
 
-function cpToolMenu($toolmenu_list){
+function cpToolMenu($toolmenu_list, $opt=false, $optname='opt') {
+    if ($toolmenu_list) {
+        $opt = cmsCore::request($optname, 'str', $opt);
+        
+        echo '<nav class="navbar navbar-default" role="navigation"><ul class="nav nav-tabs">';
 
-	if ($toolmenu_list){
-		echo '<table width="100%" cellpadding="2" border="0" class="toolmenu" style="margin:0px"><tr><td>';
-		foreach($toolmenu_list as $toolmenu){
-
-            if(!$toolmenu){
+        foreach ($toolmenu_list as $toolmenu) {
+            if (!$toolmenu) {
                 echo '<div class="toolmenuseparator"></div>'; continue;
             }
 
-            $class_selected = ('?'.$_SERVER['QUERY_STRING'] == $toolmenu['link']) ? 'toolmenuitem_sel' : '';
-            $target = isset($toolmenu['target']) ? 'target="'.$toolmenu['target'].'"' : '';
-			echo '<a class="'.$class_selected.' toolmenuitem uittip" href="'.$toolmenu['link'].'" title="'.$toolmenu['title'].'" '.$target.'><img src="images/toolmenu/'.$toolmenu['icon'].'" border="0" /></a>';
-		}
-		echo '</td></tr></table>';
-	}
+            $sel = '';
+            if (!empty($opt)) {
+                if (mb_strstr($toolmenu['link'], $optname .'='. $opt)) {
+                    $sel = ' class="active"';
+                    unset($opt);
+                }
+            }
+            
+            $target = isset($toolmenu['target']) ? 'target="'. $toolmenu['target'].'"' : '';
+            
+            echo '<li'. $sel .'><a href="'. $toolmenu['link'] .'" class="uittip" title="'. $toolmenu['title'] .'" '. $target .'><img src="images/toolmenu/'. $toolmenu['icon'] .'" /></a></li>';
+        }
 
-	return;
+        echo '</ul></nav>';
+    }
+
+    return;
 }
 
 function cpProceedBody(){
@@ -260,25 +371,14 @@ function cpBody(){
 }
 
 //////////////////////////////////////////////// PATHWAY ///////////////////////////////////////////////////////
-function cpPathway($separator='&raquo;'){
-
-    if(sizeof($GLOBALS['cp_pathway']) <= 1){
-        echo '<div class="pathway"></div>';
-        return;
-    }
-
-	echo '<div class="pathway">';
-	foreach($GLOBALS['cp_pathway'] as $key => $value){
-
-		echo '<a href="'.$GLOBALS['cp_pathway'][$key]['link'].'" class="pathwaylink">'.$GLOBALS['cp_pathway'][$key]['title'].'</a> ';
-
-		if ($key<sizeof($GLOBALS['cp_pathway'])-1) {
-			echo ' '.$separator.' ';
-		}
-
+function cpPathway() {
+    if (count($GLOBALS['cp_pathway']) <= 1) { return; }
+    
+    echo '<ol class="breadcrumb">';
+	foreach($GLOBALS['cp_pathway'] as $key => $value) {
+            echo '<li'. ($key == count($GLOBALS['cp_pathway']) ? ' class="active"' : '') .'><a href="'. $GLOBALS['cp_pathway'][$key]['link'] .'">'. $GLOBALS['cp_pathway'][$key]['title'] .'</a></li>';
 	}
-	echo '</div>';
-
+    echo '</ol>';
 }
 
 function cpAddPathway($title, $link){
@@ -325,305 +425,367 @@ function cpModulePositions($template){
 }
 
 function cpAddParam($query, $param, $value){
-	$new_query = '';
-	mb_parse_str($query, $params);
-	$l = 0; $added= false;
-	foreach($params as $key => $val){
-		$l ++;
-		if ($key != $param && $key!='nofilter'){ $new_query .= $key .'='.$val; } else {	$new_query .= $key .'='.$value; $added = true;	}
-		if ($l<sizeof($params)) { $new_query .= '&'; }
-	}
-	if (!$added) {
-		if (mb_strlen($new_query)>1){ $new_query .= '&'.$param . '=' . $value; } else {$new_query .= $param . '=' . $value; }
-	}
-	return $new_query;
+    if (is_array($param)) {
+        if (is_array($value)) {
+            if (count($value) != count($param)) {
+                return $query;
+            }
+            foreach ($param as $k => $v) {
+                if (isset($value[$k])) {
+                    $query = cpAddParam($query, $v, $value[$k]);
+                }
+            }
+        } else {
+            foreach ($param as $k => $v) {
+                $query = cpAddParam($query, $v, $value);
+            }
+        }
+        
+        return $query;
+    }
+    
+    $new_query = array();
+    mb_parse_str($query, $params);
+
+    foreach($params as $key => $val) {
+        if ($key != 'nofilter') {
+            $new_query[$key] = $key .'='. ($key == $param ? $value : $val);
+        }
+    }
+    
+    if (!isset($new_query[$param])) {
+        $new_query[$param] = $param .'='. $value;
+    }
+
+    return implode('&', $new_query);
 }
 
-function cpListTable($table, $_fields, $_actions, $where='', $orderby='title'){
+function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $perpage=22) {
     global $_LANG;
-
-	$perpage = 22;
-
-	$sql = 'SELECT *';
-	$is_actions = sizeof($_actions);
-
-	foreach($_fields as $key => $value){
-		if (isset($_fields[$key]['fdate'])){
-			$sql .= ", DATE_FORMAT(".$_fields[$key]['field'].", '".$_fields[$key]['fdate']."') as `".$_fields[$key]['field']."`" ;
-		}
-	}
-
-	$sql .= ' FROM '.$table;
-
-	if(isset($_SESSION['filter_table']) && $_SESSION['filter_table']!=$table){
-		unset($_SESSION['filter']);
-	}
-
-	if (cmsCore::inRequest('nofilter')){
-		unset($_SESSION['filter']);
-		cmsCore::redirect('/admin/index.php?'.str_replace('&nofilter', '', $_SERVER['QUERY_STRING']));
-	}
-
-	$filter = false;
-
-	if (cmsCore::inRequest('filter')) {
-		$filter = cmsCore::request('filter', 'array_str', '');
-		$_SESSION['filter'] = $filter;
-	} elseif (isset($_SESSION['filter'])) {
-		$filter = $_SESSION['filter'];
-	}
-
-	if ($filter){
-		$f = 0;
-		$sql .= ' WHERE 1=1';
-		foreach($filter as $key => $value){
-			if($filter[$key] && $filter[$key]!=-100){
-                $sql .= ' AND ';
-				if (!is_numeric($filter[$key])){
-                    $sql .= $key . " LIKE '%" . $filter[$key] . "%'";
-				} else {
-					$sql .= $key . " = '" . $filter[$key] . "'";
-				}
-				$f++;
-			}
-		}
-		if (!isset($_SESSION['filter'])) { $_SESSION['filter'] = $filter; }
-	}
-
-	if (mb_strlen($where)>3) {
-		if (mb_strstr($sql, 'WHERE')){ $sql .= ' AND '.$where; }
-		else { $sql .= ' WHERE '.$where; }
-	}
-
-    $sort = cmsCore::request('sort', 'str', '');
-
-	if ($sort == false){
-		if ($orderby) { $sort = $orderby; } else {
-			foreach($_fields as $key => $value){
-				if ($_fields[$key]['field'] == 'ordering' && $sort!='NSLeft'){ $sort = 'ordering'; $so = 'asc';}
-			}
-		}
-	}
-
-	if ($sort) {
-		$sql .= ' ORDER BY '.$sort;
-		if (cmsCore::inRequest('so')) { $sql .= ' '. cmsCore::request('so', 'str', ''); }
-	}
-
+    
     $page = cmsCore::request('page', 'int', 1);
 
-	$total_rs = cmsCore::c('db')->query($sql);
-	$total = cmsCore::c('db')->num_rows($total_rs);
+    $sql = 'SELECT *';
+    $is_actions = sizeof($_actions);
 
-	$sql .= " LIMIT ".($page-1)*$perpage.", $perpage";
+    foreach($_fields as $key => $value) {
+        if (isset($_fields[$key]['fdate'])) {
+            $sql .= ", DATE_FORMAT(".$_fields[$key]['field'].", '".$_fields[$key]['fdate']."') as `".$_fields[$key]['field']."`" ;
+        }
+    }
 
-	$result = cmsCore::c('db')->query($sql);
+    $sql .= ' FROM '. $table;
 
-	$_SESSION['filter_table'] = $table;
+    if (isset($_SESSION['filter_table']) && $_SESSION['filter_table']!=$table) {
+        unset($_SESSION['filter']);
+    }
 
-	if (cmsCore::c('db')->error()) {
-		unset($_SESSION['filter']);
-        cmsCore::redirect('/admin/index.php?'.$_SERVER['QUERY_STRING']);
-	}
+    if (cmsCore::inRequest('nofilter')) {
+        unset($_SESSION['filter']);
+        cmsCore::redirect('/admin/index.php?'. cpAddParam($_SERVER['QUERY_STRING'], 'page', 1));
+    }
 
-	$filters = 0; $f_html = '';
-	//Find and render filters
-	foreach($_fields as $key => $value){
-		 if (isset($_fields[$key]['filter'])){
-				$f_html .= '<td width="">'.$_fields[$key]['title'].': </td>';
-				if(!isset($filter[$_fields[$key]['field']])) { $initval = ''; }
-				else { $initval =  $filter[$_fields[$key]['field']]; }
-				$f_html .= '<td width="">';
-					$inputname = 'filter['.$_fields[$key]['field'].']';
-					if(!isset($_fields[$key]['filterlist'])){
-						$f_html .= '<input name="'.$inputname.'" type="text" size="'.$_fields[$key]['filter'].'" class="filter_input" value="'.$initval.'"/></td>';
-					} else {
-						$f_html .= cpBuildList($inputname, $_fields[$key]['filterlist'], $initval);
-					}
-				$f_html .= '</td>';
-				$filters += 1;
-                $_SERVER['QUERY_STRING'] = str_replace('filter['.$_fields[$key]['field'].']=', '', $_SERVER['QUERY_STRING']);
-		 }
-	}
-	//draw filters
-	if ($filters>0){
-		echo '<div class="filter">';
-		echo '<form name="filterform" action="index.php?'.$_SERVER['QUERY_STRING'].'" method="POST">';
-		echo '<table width="250"><tr>';
-		echo $f_html;
-		echo '<td width="80"><input type="submit" class="filter_submit" value="'.$_LANG['AD_FILTER'].'" /></td>';
-		if (@$f>0){
-			echo '<td width="80"><input type="button" onclick="window.location.href=\'index.php?'.$_SERVER['QUERY_STRING'].'&nofilter\'" class="filter_submit" value="'.$_LANG['AD_ALL'].'" /></td>';
-		}
-		echo '</tr></table>';
-		echo '</form>';
-		echo '</div>';
-	}
+    $filter = false;
+    
+    if (cmsCore::inRequest('filter')) {
+        $filter = cmsCore::request('filter', 'array_str', '');
+        
+        if (isset($_SESSION['filter']) && $_SESSION['filter'] != $filter) {
+            $page = 1;
+        }
+        
+        $_SESSION['filter'] = $filter;
+    } else if (isset($_SESSION['filter'])) {
+        $filter = $_SESSION['filter'];
+    }
 
-	if (cmsCore::c('db')->num_rows($result)){
+    if ($filter) {
+        $f = 0;
+        foreach ($filter as $key => $value) {
+            if (!empty($filter[$key]) && $filter[$key] != -100) {
+                if (!is_numeric($filter[$key])) {
+                    cmsCore::c('db')->where($key ." LIKE '%" . $filter[$key] ."%'");
+                } else {
+                    cmsCore::c('db')->where($key ." = '". $filter[$key] ."'");
+                }
+                $f++;
+            }
+        }
+        if (!isset($_SESSION['filter'])) { $_SESSION['filter'] = $filter; }
+    }
+    
+    if (mb_strlen($where) <= 3) {
+        $where = '1=1';
+    }
 
-		//DRAW LIST TABLE
-		echo '<form name="selform" action="index.php?view='.$GLOBALS['applet'].'&do=saveorder" method="post">';
-		echo '<table id="listTable" border="0" class="tablesorter" width="100%" cellpadding="0" cellspacing="0">';
-			//TABLE HEADING
-			echo '<thead>'."\n";
-				echo '<tr>'."\n";
-					echo '<th width="20" class="lt_header" align="center"><a class="lt_header_link" href="javascript:invert();" title="'.$_LANG['AD_INVERT_SELECTION'].'">#</a></th>'. "\n";
-					foreach($_fields as $key => $value){
-						echo '<th width="'.$_fields[$key]['width'].'" class="lt_header">';
-							echo $_fields[$key]['title'];
-						echo '</th>'. "\n";
-					}
-					if ($is_actions){
-						echo '<th width="80" class="lt_header" align="center">'.$_LANG['AD_ACTIONS'].'</th>'. "\n";
-					}
-				echo '</tr>'."\n";
-			echo '</thead><tbody>'."\n";
-			//TABLE BODY
-			$r = 0;
-			while ($item = cmsCore::c('db')->fetch_assoc($result)){
-				$r++;
-				if ($r % 2) { $row_class = 'lt_row1'; } else { $row_class = 'lt_row2'; }
-				echo '<tr id="lt_row2">'."\n";
-					echo '<td class="'.$row_class.'" align="center" valign="middle"><input type="checkbox" name="item[]" value="'.$item['id'].'" /></td>'. "\n";
-					foreach($_fields as $key => $value){
-						if (isset($_fields[$key]['link'])){
-							 $link = str_replace('%id%', $item['id'], $_fields[$key]['link']);
-							 $data = $item[$_fields[$key]['field']];
+    //Выставляем сортировку выборки данных в БД
+    $sort = cmsCore::request('sort', 'str', '');
+    $so = 'asc';
+    if (empty($sort)) {
+        if (!empty($orderby)) {
+            $orderby = trim($orderby);
+            
+            if (mb_strstr($orderby, ' ')) {
+                $sorta = explode(' ', $orderby);
+                $sort = $sorta[0];
+                
+                foreach ($sorta as $s) {
+                    $s = mb_strtolower(trim($s,' ,'));
+                    if ($s == 'asc' || $s == 'desc') {
+                        $so = $s;
+                        break;
+                    }
+                }
+            } else {
+                $sort = $orderby;
+            }
+            
+            cmsCore::c('db')->order_by = 'ORDER BY '. $orderby;
+        } else {
+            foreach($_fields as $key => $value) {
+                if ($_fields[$key]['field'] == 'ordering' && $sort != 'NSLeft') {
+                    $sort = 'ordering';
+                    cmsCore::c('db')->orderBy($sort, $so);
+                }
+            }
+        }
+    } else {
+        $so = cmsCore::request('so', array('asc', 'desc'), $so);
+        cmsCore::c('db')->orderBy($sort, $so);
+    }
 
-							 if (isset($_fields[$key]['maxlen'])){
-								if (mb_strlen($data)>$_fields[$key]['maxlen']){
-									$data = mb_substr($data, 0, $_fields[$key]['maxlen']).'...';
-								}
-							 }
-							 //nested sets otstup
-							if (isset($item['NSLevel']) && $_fields[$key]['field']=='title'){
-								$otstup = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($item['NSLevel']-1));
-								if ($item['NSLevel']-1 > 0){ $otstup .=  ' &raquo; '; }
-							} else { $otstup = ''; }
-                            if ($table != 'cms_components'){
-                                echo '<td class="'.$row_class.'" valign="middle">'.$otstup.'<a class="lt_link" href="'.$link.'">'.$data.'</a></td>'. "\n";
-                            } else {
-                                $data = function_exists('cpComponentHasConfig') && cpComponentHasConfig($item['link']) ?
-                                        '<a class="lt_link" href="'.$link.'">'.$data.'</a>' :
-                                        $data;
-                                echo '<td class="'.$row_class.'" valign="middle">
-                                            <span class="lt_link" style="padding:1px; padding-left:24px; background:url(/admin/images/components/'.$item['link'].'.png) no-repeat">'.$data.'</span>
-                                      </td>'. "\n";
-                            }
-						} else {
-							if ($_fields[$key]['field'] != 'ordering'){
-								if ($_fields[$key]['field'] == 'published'){
-									if (isset($_fields[$key]['do'])) { $do = $_fields[$key]['do']; } else { $do = 'do'; }
-									if (isset($_fields[$key]['do_suffix'])) { $dos = $_fields[$key]['do_suffix']; $ids = 'item_id'; } else { $dos = ''; $ids = 'id'; }
-									if ($item['published']){
-										$qs = cpAddParam($_SERVER['QUERY_STRING'], $do, 'hide'.$dos);
-										$qs = cpAddParam($qs, $ids, $item['id']);
-											$qs2 = cpAddParam($_SERVER['QUERY_STRING'], $do, 'show'.$dos);
-											$qs2 = cpAddParam($qs2, $ids, $item['id']);
-										$qs = "pub(".$item['id'].", '".$qs."', '".$qs2."', 'off', 'on');";
-										echo '<td class="'.$row_class.'" valign="middle">
-												<a title="'.$_LANG['HIDE'].'" class="uittip" id="publink'.$item['id'].'" href="javascript:'.$qs.'"><img id="pub'.$item['id'].'" src="images/actions/on.gif" border="0"/></a>
-											 </td>'. "\n";
-									} else {
-										$qs = cpAddParam($_SERVER['QUERY_STRING'], $do, 'show'.$dos);
-										$qs = cpAddParam($qs, $ids, $item['id']);
-											$qs2 = cpAddParam($_SERVER['QUERY_STRING'], $do, 'hide'.$dos);
-											$qs2 = cpAddParam($qs2, $ids, $item['id']);
-										$qs = "pub(".$item['id'].", '".$qs."', '".$qs2."', 'on', 'off');";
-										echo '<td class="'.$row_class.'" valign="middle">
-												<a title="'.$_LANG['SHOW'].'" class="uittip" id="publink'.$item['id'].'" href="javascript:'.$qs.'"><img id="pub'.$item['id'].'" src="images/actions/off.gif" border="0"/></a>
-											 </td>'. "\n";
-									}
-								} else {
-                                    if (isset($_fields[$key]['prc'])) {
-                                        // функция обработки под названием $_fields[$key]['prc']
-                                        // какие параметры передать функции - один ключ или произвольный массив ключей
-                                        if(is_array($_fields[$key]['field'])){
-                                            foreach ($_fields[$key]['field'] as $func_field) {
-                                                $in_func_array[$func_field] = $item[$func_field];
-                                            }
-                                            $data = call_user_func($_fields[$key]['prc'], $in_func_array);
-                                        } else {
-                                            $data = call_user_func($_fields[$key]['prc'], $item[$_fields[$key]['field']]);
-                                        }
-                                    } else {
-                                        $data = $item[$_fields[$key]['field']];
-                                         if (isset($_fields[$key]['maxlen'])){
-                                            if (mb_strlen($data)>$_fields[$key]['maxlen']){
-                                                $data = mb_substr($data, 0, $_fields[$key]['maxlen']).'...';
-                                            }
-                                         }
+    $total = cmsCore::c('db')->rows_count($table, $where .' '. cmsCore::c('db')->where);
+    cmsCore::c('db')->limitPage($page, $perpage);
+
+    $result = cmsCore::c('db')->query(
+        $sql . "\n" .'WHERE '. $where .' '. cmsCore::c('db')->where . "\n" . (empty(cmsCore::c('db')->order_by) ? '' : cmsCore::c('db')->order_by) .' LIMIT '. cmsCore::c('db')->limit
+    );
+
+    $_SESSION['filter_table'] = $table;
+
+    if (cmsCore::c('db')->error()) {
+        unset($_SESSION['filter']);
+        cmsCore::redirect('/admin/index.php?'. $_SERVER['QUERY_STRING']);
+    }
+
+    $filters = 0; $f_html = '';
+    //Find and render filters
+    foreach($_fields as $key => $value) {
+        if (isset($_fields[$key]['filter'])) {
+            $f_html .= '<div class="form-group"><label>'. $_fields[$key]['title'] .': </label>';
+            
+            $initval = false;
+            if (isset($filter[$_fields[$key]['field']])) {
+                $initval =  $filter[$_fields[$key]['field']];
+            }
+
+            $inputname = 'filter['.$_fields[$key]['field'].']';
+            if (!isset($_fields[$key]['filterlist'])) {
+                $f_html .= '<input type="text" class="form-control" style="margin-right:10px;margin-left:5px;" name="'. $inputname .'" size="'. $_fields[$key]['filter'] .'" value="'. ($initval === false ? '' : $initval) .'" />';
+            } else {
+                $f_html .= cpBuildList($inputname, $_fields[$key]['filterlist'], $initval);
+            }
+            
+            $f_html .= '</div>';
+
+            $filters += 1;
+            $_SERVER['QUERY_STRING'] = str_replace('filter['.$_fields[$key]['field'].']=', '', $_SERVER['QUERY_STRING']);
+        }
+    }
+    
+    //draw filters
+    if ($filters > 0) {
+        echo '<div class="panel panel-default"><div class="panel-body" style="padding:0;">';
+        echo '<form class="form-inline navbar-form navbar-left" name="filterform" action="index.php?'. $_SERVER['QUERY_STRING'] .'" method="POST" role="search">';
+        echo '';
+        echo $f_html;
+        echo '<button type="submit" class="btn btn-default">'. $_LANG['AD_FILTER'] .'</button>';
+        if (!empty($f)) {
+            echo '<button onclick="window.location.href=\'index.php?'. $_SERVER['QUERY_STRING'] .'&nofilter\'; return false;" class="btn btn-default" style="margin-left:10px;">'. $_LANG['AD_ALL'] .'</button>';
+        }
+        echo '</form>';
+        echo '</div></div>';
+    }
+
+    if (cmsCore::c('db')->num_rows($result)) {
+        //DRAW LIST TABLE
+        echo '<form name="selform" action="index.php?view='.$GLOBALS['applet'].'&do=saveorder" method="post">';
+            echo '<table class="table table-striped tablesorter">';
+                //TABLE HEADING
+                echo '<thead>'."\n";
+                    echo '<tr>'."\n";
+                        echo '<th width="20" class="lt_header" style="vertical-align:middle;"><a class="lt_header_link" href="javascript:invert();" title="'.$_LANG['AD_INVERT_SELECTION'].'">#</a></th>'. "\n";
+                        foreach($_fields as $key => $value) {
+                            echo '<th width="'.$_fields[$key]['width'].'" class="lt_header'. (is_array($_fields[$key]['field']) ? '' : ' header') .' '. ($_fields[$key]['field'] == $sort ? ( $so == 'asc' ? 'headerSortDown' : 'headerSortUp' ) : '') .'" style="vertical-align:middle;">';
+                                if (!is_array($_fields[$key]['field'])) {
+                                    echo '<a href="index.php?'. cpAddParam($_SERVER['QUERY_STRING'], array( 0 => 'sort', 1 => 'so'), array( 0 => $_fields[$key]['field'], 1 => ($so == 'asc' ? 'desc' : 'asc'))) .'">'. $_fields[$key]['title'] .'</a>';
+                                } else {
+                                    echo $_fields[$key]['title'];
+                                }
+                            echo '</th>'. "\n";
+                        }
+                        if ($is_actions) {
+                            echo '<th width="80" class="lt_header" style="vertical-align:middle;">'.$_LANG['AD_ACTIONS'].'</th>'. "\n";
+                        }
+                    echo '</tr>'."\n";
+                echo '</thead><tbody>'."\n";
+                //TABLE BODY
+                    $r = 0;
+                    while ($item = cmsCore::c('db')->fetch_assoc($result)) {
+                        $r++;
+                        if ($r % 2) { $row_class = 'lt_row1'; } else { $row_class = 'lt_row2'; }
+                        echo '<tr id="'. $row_class .'">'."\n";
+                        echo '<td class="'.$row_class.'" align="center" valign="middle"><input type="checkbox" name="item[]" value="'.$item['id'].'" /></td>'. "\n";
+                        foreach($_fields as $key => $value) {
+                            if (isset($_fields[$key]['link'])) {
+                                $link = str_replace('%id%', $item['id'], $_fields[$key]['link']);
+                                $data = $item[$_fields[$key]['field']];
+
+                                if (isset($_fields[$key]['maxlen'])) {
+                                    if (mb_strlen($data)>$_fields[$key]['maxlen']) {
+                                        $data = mb_substr($data, 0, $_fields[$key]['maxlen']).'...';
                                     }
-                                     //nested sets otstup
-                                    if (isset($item['NSLevel']) && $_fields[$key]['field']=='title'){
-                                        $otstup = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($item['NSLevel']-1));
-                                        if ($item['NSLevel']-1 > 0){ $otstup .=  ' &raquo; '; }
-                                    } else { $otstup = ''; }
-                                    echo '<td class="'.$row_class.'" valign="middle">'.$otstup.$data.'</td>'. "\n";
-                               }
-							} else {
-                                if (isset($_fields[$key]['do'])) { $do = 'do=config&id='.(int)$_REQUEST['id'].'&'.$_fields[$key]['do']; } else { $do = 'do'; }
-								if (isset($_fields[$key]['do_suffix'])) { $dos = $_fields[$key]['do_suffix']; $ids = 'item_id'; } else { $dos = ''; $ids = 'id'; }
-								echo '<td class="'.$row_class.'" valign="middle">
-									<a title="'.$_LANG['AD_DOWN'].'" href="?view='.$GLOBALS['applet'].'&'.$do.'=move_down&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/down.gif" border="0"/></a>';
-									if ($table != 'cms_menu' && $table != 'cms_category'){
-										echo '<input class="lt_input" type="text" size="4" name="ordering[]" value="'.$item['ordering'].'" />';
-										echo '<input name="ids[]" type="hidden" value="'.$item['id'].'" />';
-									} else {
-										echo '<input class="lt_input" type="text" size="4" name="ordering[]" value="'.$item['ordering'].'" disabled/>';
-									}
-									echo '<a title="'.$_LANG['AD_UP'].'" href="?view='.$GLOBALS['applet'].'&'.$do.'=move_up&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/top.gif" border="0"/></a>'.
-								'</td>'. "\n";
-							}
-						}
-					}
-					if ($is_actions){
-						echo '<td width="110" class="'.$row_class.'" align="right" valign="middle"><div style="padding-right:8px">';
-						foreach($_actions as $key => $value){
-							if (isset($_actions[$key]['condition'])){
-                                                            $print = $_actions[$key]['condition']($item); 
-                                                        }else{
-                                                            $print = true;
-                                                        }
-							if ($print){
-								$icon   = $_actions[$key]['icon'];
-								$title  = $_actions[$key]['title'];
-                                $link   = $_actions[$key]['link'];
-
-                                foreach($item as $f=>$v){
-                                    $link = str_replace('%'.$f.'%', $v, $link);
                                 }
 
-								if (!isset($_actions[$key]['confirm'])){
-									echo '<a href="'.$link.'" class="uittip" title="'.$title.'"><img hspace="2" src="images/actions/'.$icon.'" border="0" alt="'.$title.'"/></a>';
-								} else {
-									echo '<a href="#" class="uittip" onclick="jsmsg(\''.$_actions[$key]['confirm'].'\', \''.$link.'\')" title="'.$title.'"><img hspace="2" src="images/actions/'.$icon.'" border="0" alt="'.$title.'"/></a>';
-								}
-							}
-						}
-						echo '</div></td>'. "\n";
-					}
-				echo '</tr>'."\n";
-			}
+                                //nested sets otstup
+                                if (isset($item['NSLevel']) && $_fields[$key]['field']=='title') {
+                                    $otstup = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($item['NSLevel']-1));
+                                    if ($item['NSLevel']-1 > 0) { $otstup .=  ' &raquo; '; }
+                                } else { $otstup = ''; }
 
-		echo '</tbody></table></form>';
+                                if ($table != 'cms_components') {
+                                    echo '<td class="'.$row_class.'" valign="middle">'.$otstup.'<a class="lt_link" href="'.$link.'">'.$data.'</a></td>'. "\n";
+                                } else {
+                                    $data = function_exists('cpComponentHasConfig') && cpComponentHasConfig($item['link']) ?
+                                    '<a class="lt_link" href="'.$link.'">'.$data.'</a>' :
+                                    $data;
 
-		echo '<script type="text/javascript">highlightTableRows("listTable","hoverRow","clickedRow");</script>';
-		echo '<script type="text/javascript">activateListTable("listTable");</script>';
+                                    echo '<td class="'.$row_class.'" valign="middle">
+                                        <span class="lt_link" style="padding:1px; padding-left:24px; background:url(/admin/images/components/'.$item['link'].'.png) no-repeat">'.$data.'</span>
+                                  </td>'. "\n";
+                                }
+                            } else {
+                                if ($_fields[$key]['field'] != 'ordering') {
+                                    if ($_fields[$key]['field'] == 'published') {
+                                        if (isset($_fields[$key]['do'])) { $do = $_fields[$key]['do']; } else { $do = 'do'; }
+                                        if (isset($_fields[$key]['do_suffix'])) { $dos = $_fields[$key]['do_suffix']; $ids = 'item_id'; } else { $dos = ''; $ids = 'id'; }
+                                        if ($item['published']) {
+                                            $qs = cpAddParam($_SERVER['QUERY_STRING'], $do, 'hide'.$dos);
+                                            $qs = cpAddParam($qs, $ids, $item['id']);
+                                            $qs2 = cpAddParam($_SERVER['QUERY_STRING'], $do, 'show'.$dos);
+                                            $qs2 = cpAddParam($qs2, $ids, $item['id']);
+                                            $qs = "pub(".$item['id'].", '".$qs."', '".$qs2."', 'off', 'on');";
+                                            echo '<td class="'.$row_class.'" valign="middle">
+                                                    <a title="'.$_LANG['HIDE'].'" class="uittip" id="publink'.$item['id'].'" href="javascript:'.$qs.'"><img id="pub'.$item['id'].'" src="images/actions/on.gif" border="0"/></a>
+                                                  </td>'. "\n";
+                                        } else {
+                                            $qs = cpAddParam($_SERVER['QUERY_STRING'], $do, 'show'.$dos);
+                                            $qs = cpAddParam($qs, $ids, $item['id']);
+                                            $qs2 = cpAddParam($_SERVER['QUERY_STRING'], $do, 'hide'.$dos);
+                                            $qs2 = cpAddParam($qs2, $ids, $item['id']);
+                                            $qs = "pub(".$item['id'].", '".$qs."', '".$qs2."', 'on', 'off');";
+                                            echo '<td class="'.$row_class.'" valign="middle">
+                                                    <a title="'.$_LANG['SHOW'].'" class="uittip" id="publink'.$item['id'].'" href="javascript:'.$qs.'"><img id="pub'.$item['id'].'" src="images/actions/off.gif" border="0"/></a>
+                                                  </td>'. "\n";
+                                        }
+                                    } else {
+                                        if (isset($_fields[$key]['prc'])) {
+                                            // функция обработки под названием $_fields[$key]['prc']
+                                            // какие параметры передать функции - один ключ или произвольный массив ключей
+                                            if (is_array($_fields[$key]['field'])) {
+                                                foreach ($_fields[$key]['field'] as $func_field) {
+                                                    $in_func_array[$func_field] = $item[$func_field];
+                                                }
+                                                $data = call_user_func($_fields[$key]['prc'], $in_func_array);
+                                            } else {
+                                                $data = call_user_func($_fields[$key]['prc'], $item[$_fields[$key]['field']]);
+                                            }
+                                            if (is_array($data) && isset($data['link'])) {
+                                                $data = str_replace('%id%', $item['id'], $data['link']);
+                                            }
+                                        } else {
+                                            $data = $item[$_fields[$key]['field']];
+                                            if (isset($_fields[$key]['maxlen'])) {
+                                                if (mb_strlen($data)>$_fields[$key]['maxlen']) {
+                                                    $data = mb_substr($data, 0, $_fields[$key]['maxlen']).'...';
+                                                }
+                                            }
+                                        }
 
-		$link = '?view='.$GLOBALS['applet'];
+                                        //nested sets otstup
+                                        if (isset($item['NSLevel']) && $_fields[$key]['field']=='title') {
+                                            $otstup = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($item['NSLevel']-1));
+                                            if ($item['NSLevel']-1 > 0) { $otstup .=  ' &raquo; '; }
+                                        } else { $otstup = ''; }
 
-		if ($sort){
-                    $link .= '&sort='.$sort;
-                    if (cmsCore::inRequest('so')) { $link .= '&so='.cmsCore::request('so'); }
-		}
+                                        echo '<td class="'.$row_class.'" valign="middle">'.$otstup.$data.'</td>'. "\n";
+                                    }
+                                } else {
+                                    if (isset($_fields[$key]['do'])) { $do = 'do=config&id='.(int)$_REQUEST['id'].'&'.$_fields[$key]['do']; } else { $do = 'do'; }
+                                    if (isset($_fields[$key]['do_suffix'])) { $dos = $_fields[$key]['do_suffix']; $ids = 'item_id'; } else { $dos = ''; $ids = 'id'; }
+                                    echo '<td class="'.$row_class.'" valign="middle">
+                                            <a title="'.$_LANG['AD_DOWN'].'" href="?view='.$GLOBALS['applet'].'&'.$do.'=move_down&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/down.gif" border="0"/></a>';
+                                    if ($table != 'cms_menu' && $table != 'cms_category'){
+                                        echo '<input class="lt_input" type="text" size="4" name="ordering[]" value="'.$item['ordering'].'" />';
+                                        echo '<input name="ids[]" type="hidden" value="'.$item['id'].'" />';
+                                    } else {
+                                        echo '<input class="lt_input" type="text" size="4" name="ordering[]" value="'.$item['ordering'].'" disabled/>';
+                                    }
 
-        echo cmsPage::getPagebar($total, $page, $perpage, $_SERVER['PHP_SELF'].'?'.cpAddParam($_SERVER['QUERY_STRING'], 'page', '%page%'));
+                                    echo '<a title="'.$_LANG['AD_UP'].'" href="?view='.$GLOBALS['applet'].'&'.$do.'=move_up&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/top.gif" border="0"/></a>'.
+                                                        '</td>'. "\n";
+                                }
+                            }
+                        }
 
-	} else {
-		echo '<p class="cp_message">'.$_LANG['OBJECTS_NOT_FOUND'].'</p>';
-	}
+                        if ($is_actions) {
+                            echo '<td width="110" class="'.$row_class.'" align="right" valign="middle"><div style="padding-right:8px">';
+                            
+                            foreach($_actions as $action) {
+                                if (isset($action['condition'])) {
+                                    $print = $action['condition']($item);
+                                } else {
+                                    $print = true;
+                                }
+
+                                if ($print) {
+                                    $icon   = $action['icon'];
+                                    $title  = $action['title'];
+                                    $link   = $action['link'];
+
+                                    foreach($item as $f=>$v) {
+                                        $link = str_replace('%'.$f.'%', $v, $link);
+                                    }
+                                    
+                                    if (!isset($action['confirm'])) {
+                                        echo '<a href="'. $link .'" class="uittip" title="'. $title .'"'. (isset($action['target']) ? ' target="'. $action['target'] .'"' : '') .'><img hspace="2" src="images/actions/'. $icon .'" border="0" alt="'. $title .'"/></a>';
+                                    } else {
+                                        echo '<a href="#" class="uittip" onclick="jsmsg(\''. $_actions[$key]['confirm'] .'\', \''. $link .'\')"  title="'. $title .'"><img hspace="2" src="images/actions/'. $icon .'" border="0" alt="'. $title .'"/></a>';
+                                    }
+                                }
+                            }
+
+                            echo '</div></td>'. "\n";
+                        }
+
+                        echo '</tr>'."\n";
+                    }
+                    
+        echo '</tbody></table></form>';
+        echo '<style>tr#lt_row2{ background:#eeeeee !important; } tr#lt_row1:hover td,tr#lt_row2:hover{ background:#cccccc !important; }</style>';
+        echo '<script type="text/javascript">trClickChecked();</script>';
+
+        $link = '?view='. $GLOBALS['applet'];
+        
+        if ($sort) {
+            $link .= '&sort='.$sort;
+            if (cmsCore::inRequest('so')) { $link .= '&so='.cmsCore::request('so'); }
+        }
+
+        echo cmsPage::getPagebar($total, $page, $perpage, $_SERVER['PHP_SELF'] .'?'. cpAddParam($_SERVER['QUERY_STRING'], 'page', '%page%'));
+    } else {
+        echo '<p class="cp_message">'.$_LANG['OBJECTS_NOT_FOUND'].'</p>';
+    }
 }
 
 //////////////////////////////////////// LIST TABLE PROCESSORS ///////////////////////////////////////////////////////////////////
@@ -794,92 +956,92 @@ function dbDeleteList($table, $list){
 }
 
 ///////////////////////////////////////////// HTML GENERATORS ////////////////////////////////////////////////
-function insertPanel(){
+function insertPanel() {
     global $_LANG;
     $p_html = cmsCore::callEvent('REPLACE_PANEL', array('html' => ''));
 
-    if($p_html['html']){ return $p_html['html']; }
+    if ($p_html['html']) { return $p_html['html']; }
 
     $inCore=cmsCore::getInstance();
 
-    $submit_btn = '<input type="button" value="'.$_LANG['AD_INSERT'].'" style="width:100px" onClick="insertTag(document.addform.ins.options[document.addform.ins.selectedIndex].value)">';
+    $submit_btn = '<input type="button" class="btn btn-default" style="width:100px" value="'. $_LANG['AD_INSERT'] .'" onClick="insertTag(document.addform.ins.options[document.addform.ins.selectedIndex].value)">';
 
-echo '<table width="100%" border="0" cellspacing="0" cellpadding="8" class="proptable"><tr><td>';
-	echo '<table width="100%" border="0" cellspacing="0" cellpadding="2">';
+echo '<table border="0" class="table" style="margin:0;"><tr><td style="border:0;">';
+	echo '<table border="0" class="table" style="margin:0;">';
 	echo '<tr>';
 		echo '<td width="120">';
-			echo '<strong>'.$_LANG['AD_INSERT'].':</strong> ';
+			echo '<label>'. $_LANG['AD_INSERT'] .':</label> ';
 		echo '</td>';
 		echo '<td width="">';
-			echo '<select name="ins" id="ins" style="width:99%" onChange="showIns()">
+			echo '<select id="ins" style="width:99%" class="form-control" name="ins" onChange="showIns()">
 					<option value="frm" selected="selected">'.$_LANG['AD_FORM'].'</option>
 					<option value="include">'.$_LANG['FILE'].'</option>
 					<option value="filelink">'.$_LANG['AD_LINK_DOWNLOAD_FILE'].'</option>';
-                    if ($inCore->isComponentInstalled('banners')){
-                        echo '<option value="banpos">'.$_LANG['AD_BANNER_POSITION'].'</option>';
+                    if ($inCore->isComponentInstalled('banners')) {
+                        echo '<option value="banpos">'. $_LANG['AD_BANNER_POSITION'] .'</option>';
                     }
-		    echo   '<option value="pagebreak">-- '.$_LANG['AD_PAGEBREAK'].' --</option>
-					<option value="pagetitle">-- '.$_LANG['AD_PAGETITLE'].' --</option>
+		    echo   '<option value="pagebreak">-- '. $_LANG['AD_PAGEBREAK'] .' --</option>
+					<option value="pagetitle">-- '. $_LANG['AD_PAGETITLE'] .' --</option>
 				  </select>';
 		echo '</td>';
         echo '<td width="100">&nbsp;</td>';
 	echo '</tr>';
 	echo '<tr id="frm">';
 		echo '<td width="120">
-                    <strong>'.$_LANG['AD_FORM'].':</strong>
+                    <label>'. $_LANG['AD_FORM'] .':</label>
               </td>';
         echo '<td>
-                    <select name="fm" style="width:99%">'.$inCore->getListItems('cms_forms').'</select>
+                    <select class="form-control" style="width:99%" name="fm">'. $inCore->getListItems('cms_forms') .'</select>
               </td>';
-        echo '<td width="100">'.$submit_btn.'</td>';
+        echo '<td width="100">'. $submit_btn .'</td>';
     echo '</tr>';
 	echo '<tr id="include">';
 		echo '<td width="120">
-                    <strong>'.$_LANG['FILE'].':</strong>
+                    <label>'. $_LANG['FILE'] .':</label>
               </td>';
-        echo '<td>
-                    /includes/myphp/<input name="i" type="text" value="myscript.php" />
+        echo '<td style="vertical-align: middle;">
+                    /includes/myphp/<input type="text" class="form-control" style="width:300px;display:inline-block;" name="i" value="myscript.php" />
               </td>';
-        echo '<td width="100">'.$submit_btn.'</td>';
+        echo '<td width="100">'. $submit_btn .'</td>';
     echo '</tr>';
 	echo '<tr id="filelink">';
 		echo '<td width="120">
-                    <strong>'.$_LANG['FILE'].':</strong>
+                    <label>'. $_LANG['FILE'] .':</label>
               </td>';
         echo '<td>
-                    <input name="fl" type="text" value="/files/myfile.rar" />
+                    <input type="text" class="form-control" name="fl" value="/files/myfile.rar" />
               </td>';
-        echo '<td width="100">'.$submit_btn.'</td>';
+        echo '<td width="100">'. $submit_btn .'</td>';
     echo '</tr>';
     if ($inCore->isComponentInstalled('banners')){
         $inCore->loadModel('banners');
         echo '<tr id="banpos">';
             echo '<td width="120">
-                        <strong>'.$_LANG['AD_POSITION'].':</strong>
+                        <label>'. $_LANG['AD_POSITION'] .':</label>
                   </td>';
             echo '<td>
-                        <select name="ban" style="width:99%">'.cms_model_banners::getBannersListHTML().'</select>
+                        <select class="form-control" style="width:99%" name="ban">'. cms_model_banners::getBannersListHTML() .'</select>
                   </td>';
-            echo '<td width="100">'.$submit_btn.'</td>';
+            echo '<td width="100">'. $submit_btn .'</td>';
         echo '</tr>';
     }
 	echo '<tr id="pagebreak">';
 		echo '<td width="120">
-                    <strong>'.$_LANG['TAG'].':</strong>
+                    <label>'. $_LANG['TAG'] .':</label>
               </td>';
         echo '<td>
                     {pagebreak}
               </td>';
-        echo '<td width="100">'.$submit_btn.'</td>';
+        echo '<td width="100">'. $submit_btn .'</td>';
     echo '</tr>';
 	echo '<tr id="pagetitle">';
 		echo '<td width="120">
-                    <strong>'.$_LANG['AD_TITLE'].':</strong>
+                    <label>'. $_LANG['AD_TITLE'] .':</label>
               </td>';
         echo '<td>
-                    <input type="text" name="ptitle" style="width:99%" />
+                    <input type="text" class="form-control" style="width:99%" name="ptitle" />
               </td>';
-        echo '<td width="100">'.$submit_btn.'</td>';
+        echo '<td width="100">'. $submit_btn .'</td>';
     echo '</tr>';
 
 
@@ -893,67 +1055,67 @@ echo '<table width="100%" border="0" cellspacing="0" cellpadding="8" class="prop
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function cpBuildList($attr_name, $list, $selected_id=false){
     global $_LANG;
-	$html = '';
+    $html = '';
 
-	$html .= '<select name="'.$attr_name.'" id="'.$attr_name.'">' . "\n";
+    $html .= '<select id="'. $attr_name .'" class="form-control" style="margin-right:10px;margin-left:5px;" name="'. $attr_name .'">' . "\n";
 
-	$html .= '<option value="-100">-- '.$_LANG['AD_ALL'].' --</option>'."\n";
+    $html .= '<option value="-100">-- '. $_LANG['AD_ALL'] .' --</option>'."\n";
 
-	foreach($list as $key=>$value){
-		if ($selected_id == $list[$key]['id']) { $sel = 'selected'; } else { $sel = ''; }
-		$html .= '<option value="'.$list[$key]['id'].'" '.$sel.'>'.$list[$key]['title'].'</option>' . "\n";
-	}
+    foreach($list as $key=>$value) {
+        if ($selected_id === false || $selected_id != $list[$key]['id']) {
+            $sel = '';
+        } else {
+            $sel = 'selected="selected"';
+        }
 
-	$html .= '</select>' . "\n";
+        $html .= '<option value="'. $list[$key]['id'] .'" '. $sel .'>'. $list[$key]['title'] .'</option>' . "\n";
+    }
 
-	return $html;
+    $html .= '</select>' . "\n";
+
+    return $html;
 }
 
-function cpGetList($listtype, $field_name='title'){
-
+function cpGetList($listtype, $field_name='title') {
     global $_LANG;
-	$list = array();
+    $list = array();
 
-	// Позиции для модулей
-	if ($listtype == 'positions'){
-
+    // Позиции для модулей
+    if ($listtype == 'positions') {
         $pos = cpModulePositions(cmsConfig::getConfig('template'));
 
-        foreach($pos as $p){
-            $list[] = array('title'=>$p, 'id'=>$p);
+        foreach($pos as $p) {
+            $list[] = array( 'title' => $p, 'id' => $p);
         }
 
-		return $list;
+        return $list;
+    }
+    // Типы меню
+    if ($listtype == 'menu') {
+        $list[] = array( 'title' => $_LANG['AD_MAIN_MENU'], 'id' => 'mainmenu' );
+        $list[] = array( 'title' => $_LANG['AD_USER_MENU'], 'id' => 'usermenu' );
 
-	}
-	// Типы меню
-	if ($listtype == 'menu'){
-
-        $list[] = array('title'=>$_LANG['AD_MAIN_MENU'], 'id'=>'mainmenu');
-        $list[] = array('title'=>$_LANG['AD_USER_MENU'], 'id'=>'usermenu');
-        
-        for ($m=1; $m<=20; $m++){
-            $list[] = array('title'=>"{$_LANG['AD_SUBMENU']} {$m}", 'id'=>'menu'.$m);
+        for ($m=1; $m<=20; $m++) {
+            $list[] = array( 'title' => $_LANG['AD_SUBMENU'] .' '. $m, 'id' => 'menu'. $m );
         }
 
-		return $list;
+        return $list;
+    }
 
-	}
+    //...или записи из таблицы
+    $sql  = "SELECT id, ". $field_name ." FROM ". $listtype ." ORDER BY ". $field_name ." ASC";
+    $result = cmsCore::c('db')->query($sql) ;
 
-	//...или записи из таблицы
-	$sql  = "SELECT id, {$field_name} FROM $listtype ORDER BY {$field_name} ASC";
-	$result = cmsCore::c('db')->query($sql) ;
+    if (cmsCore::c('db')->num_rows($result)>0) {
+        while($item = cmsCore::c('db')->fetch_assoc($result)) {
+            $list[] = array(
+                'title' => $item[$field_name],
+                'id' => $item['id']
+            );
+        }
+    }
 
-	if (cmsCore::c('db')->num_rows($result)>0) {
-		while($item = cmsCore::c('db')->fetch_assoc($result)){
-			$next = sizeof($list);
-			$list[$next]['title'] = $item[$field_name];
-			$list[$next]['id'] = $item['id'];
-		}
-	}
-
-	return $list;
-
+    return $list;
 }
 
 function getFullAwardsList(){

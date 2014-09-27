@@ -96,7 +96,7 @@
             {/if}
         </td>
     </tr>
-    {assign var="num" value=`$num+1`}
+    {$num = $num + 1}
     {/foreach}
 </table>
 {if $page == $lastpage}<a name="new"></a>{/if}
@@ -184,27 +184,25 @@
 {/if}
 
 {if $user_id}
-{literal}
 <script type="text/javascript" language="JavaScript">
-    $(document).ready(function(){
-        $('.darkBlue-LightBlue .msg_links').css({opacity:0.4, filter:'alpha(opacity=40)'});
+    $(function() {
+        $('.darkBlue-LightBlue .msg_links').css({ opacity:0.4, filter:'alpha(opacity=40)' });
         $('.posts_table_tr').hover(
             function() {
-                $(this).prev().find('.msg_links').css({opacity:1.0, filter:'alpha(opacity=100)'});
+                $(this).prev().find('.msg_links').css({ opacity:1.0, filter:'alpha(opacity=100)' });
             },
             function() {
-                $(this).prev().find('.msg_links').css({opacity:0.4, filter:'alpha(opacity=40)'});
+                $(this).prev().find('.msg_links').css({ opacity:0.4, filter:'alpha(opacity=40)' });
             }
         );
         $('.msg_links').hover(
             function() {
-                $(this).css({opacity:1.0, filter:'alpha(opacity=100)'});
+                $(this).css({ opacity:1.0, filter:'alpha(opacity=100)' });
             },
             function() {
-                $(this).css({opacity:0.4, filter:'alpha(opacity=40)'});
+                $(this).css({ opacity:0.4, filter:'alpha(opacity=40)' });
             }
         );
     });
 </script>
-{/literal}
 {/if}

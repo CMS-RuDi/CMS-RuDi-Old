@@ -13,37 +13,28 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 	
-function search_catalog($query, $look){
+function search_catalog($query, $look) {
+    $sql = "SELECT i.*, c.title as cat, c.id as cat_id
+                    FROM cms_uc_items i
+                    INNER JOIN cms_uc_cats c ON c.id = i.category_id AND c.published = 1
+                    WHERE MATCH(i.title, i.fieldsdata) AGAINST ('". $query ."' IN BOOLEAN MODE) AND i.published = 1 LIMIT 100";
 
-        $inDB   = cmsDatabase::getInstance();
-		$searchModel = cms_model_search::initModel();
+    $result = cmsCore::c('db')->query($sql);
 
-		$sql = "SELECT i.*, c.title as cat, c.id as cat_id
-				FROM cms_uc_items i
-				INNER JOIN cms_uc_cats c ON c.id = i.category_id AND c.published = 1
-				WHERE MATCH(i.title, i.fieldsdata) AGAINST ('$query' IN BOOLEAN MODE) AND i.published = 1 LIMIT 100";
+    if (cmsCore::c('db')->num_rows($result)) {
+        while($item = cmsCore::c('db')->fetch_assoc($result)) {
+            $result_array = array(
+                'link' => '/catalog/item'. $item['id'] .'.html',
+                'place' => $item['cat'],
+                'placelink' => '/catalog/'. $item['cat_id'],
+                'title' => $item['title'],
+                'imageurl' => (file_exists(PATH .'/images/catalog/medium/'. $item['imageurl']) ? '/images/catalog/medium/'. $item['imageurl'] : ''),
+                'pubdate' => $item['pubdate']
+            );
+            
+            cmsCore::m('search')->addResult($result_array);			
+        }
+    }
 
-		$result = $inDB->query($sql);
-		
-		if ($inDB->num_rows($result)){
-
-			while($item = $inDB->fetch_assoc($result)){
-
-				$result_array = array();
-
-				$result_array['link']        = "/catalog/item".$item['id'].".html";
-				$result_array['place']       = $item['cat'];
-				$result_array['placelink']   = "/catalog/".$item['cat_id'];
-				$result_array['title']       = $item['title'];
-				$result_array['pubdate']     = $item['pubdate'];
-				$result_array['session_id']  = session_id();
-
-				$searchModel->addResult($result_array);			
-			}
-		}
-		
-		return;
+    return;
 }
-
-
-?>

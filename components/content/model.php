@@ -13,11 +13,11 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-class cms_model_content{
-    public function __construct(){
+class cms_model_content {
+    public $config;
+    
+    public function __construct() {
         $this->config = cmsCore::getInstance()->loadComponentConfig('content');
-        
-        cmsCore::loadLanguage('components/content');
         cmsCore::loadLib('tags');
         cmsCore::loadLib('karma');
     }
@@ -53,11 +53,12 @@ class cms_model_content{
         $result = array();
 
         switch($target){
-            case 'article': $article = cmsCore::c('db')->get_fields('cms_content', "id='{$target_id}'", 'seolink, title');
-                            if (!$article) { return false; }
-                            $result['link']  = $this->getArticleURL(null, $article['seolink']);
-                            $result['title'] = $article['title'];
-                            break;
+            case 'article': 
+                    $article = cmsCore::c('db')->get_fields('cms_content', "id='{$target_id}'", 'seolink, title');
+                    if (!$article) { return false; }
+                    $result['link']  = $this->getArticleURL(null, $article['seolink']);
+                    $result['title'] = $article['title'];
+                break;
         }
 
         return ($result ? $result : false);
@@ -67,8 +68,7 @@ class cms_model_content{
 /* ==================================================================================================== */
 
     public function updateRatingHook($target, $item_id, $points) {
-
-        if (!$item_id || abs($points)!=1) { return false; }
+        if (!$item_id || abs($points) != 1) { return false; }
 
         switch($target){
             case 'content':
@@ -81,7 +81,6 @@ class cms_model_content{
         cmsCore::c('db')->query($sql);
 
         return true;
-
     }
 
 /* ==================================================================================================== */
@@ -91,8 +90,7 @@ class cms_model_content{
      * @return array
      */
     public function getSubCats($parent_id, $recurse=false, $left_key=0, $right_key=0) {
-
-        if($recurse){
+        if ($recurse) {
             $where = "NSLeft > $left_key AND NSRight < $right_key";
         } else {
             $where = "parent_id = '$parent_id'";
@@ -106,19 +104,16 @@ class cms_model_content{
 
         if (!cmsCore::c('db')->num_rows($result)) { return false; }
 
-        while($subcat = cmsCore::c('db')->fetch_assoc($result)){
-
+        while ($subcat = cmsCore::c('db')->fetch_assoc($result)) {
             $subcat['content_count'] = $this->getArticleCountFromCat($subcat['NSLeft'], $subcat['NSRight']);
             $subcat['url']           = $this->getCategoryURL(null, $subcat['seolink']);
 
             $subcats[] = $subcat;
-
         }
 
         $subcats = cmsCore::callEvent('GET_CONTENT_SUBCATS', $subcats);
 
         return $subcats;
-
     }
 
 /* ==================================================================================================== */
@@ -128,7 +123,6 @@ class cms_model_content{
      * @return int
      */
     public function getArticleCountFromCat($left_key, $right_key) {
-
         $sql = "SELECT con.id
                         FROM cms_content con
                         INNER JOIN cms_category cat ON cat.id = con.category_id AND cat.NSLeft >= '$left_key' AND cat.NSRight <= '$right_key'
@@ -137,7 +131,6 @@ class cms_model_content{
         $result = cmsCore::c('db')->query($sql);
 
         return cmsCore::c('db')->num_rows($result);
-
     }
 
 /* ==================================================================================================== */
@@ -147,7 +140,6 @@ class cms_model_content{
      * @return array
      */
     public function getCatsTree() {
-
         $sql = "SELECT  cat.id as id,
                         cat.title as title,
                         cat.NSLeft as NSLeft,
@@ -162,16 +154,13 @@ class cms_model_content{
 
         if (!cmsCore::c('db')->num_rows($result)) { return false; }
 
-        while($subcat = cmsCore::c('db')->fetch_assoc($result)){
-
+        while ($subcat = cmsCore::c('db')->fetch_assoc($result)) {
             $subcats[] = $subcat;
-
         }
 
         $subcats = cmsCore::callEvent('GET_CONTENT_CATS_TREE', $subcats);
 
         return $subcats;
-
     }
 
 /* ==================================================================================================== */
@@ -181,7 +170,6 @@ class cms_model_content{
      * @return array
      */
     public function getPublicCats() {
-
         $inCore = cmsCore::getInstance();
 
         $nested_sets = $inCore->nestedSetsInit('cms_category');
@@ -189,11 +177,11 @@ class cms_model_content{
 
         $rs_rows = $nested_sets->SelectSubNodes($rootid);
 
-        if ($rs_rows){
-            while($node = cmsCore::c('db')->fetch_assoc($rs_rows)){
-                if(cmsCore::c('user')->is_admin || (cmsCore::checkUserAccess('afisha_category', $node['id']) &&
+        if ($rs_rows) {
+            while ($node = cmsCore::c('db')->fetch_assoc($rs_rows)) {
+                if (cmsCore::c('user')->is_admin || (cmsCore::checkUserAccess('afisha_category', $node['id']) &&
                   ($node['is_public'] ||
-                  ($node['modgrp_id'] && $node['modgrp_id'] == cmsCore::c('user')->group_id && cmsUser::isUserCan('content/autoadd'))))){
+                  ($node['modgrp_id'] && $node['modgrp_id'] == cmsCore::c('user')->group_id && cmsUser::isUserCan('content/autoadd'))))) {
                     $subcats[] = $node;
                 }
             }
@@ -202,7 +190,6 @@ class cms_model_content{
         $subcats = cmsCore::callEvent('GET_CONTENT_PUBCATS', $subcats);
 
         return $subcats;
-
     }
 
 /* ==================================================================================================== */
@@ -228,10 +215,9 @@ class cms_model_content{
      * @return array
      */
     public function getArticlesList($only_published=true) {
-
         $today = date("Y-m-d H:i:s");
 
-        if ($only_published){
+        if ($only_published) {
             cmsCore::c('db')->where("con.published = 1 AND con.pubdate <= '$today' AND (con.is_end=0 OR (con.is_end=1 AND con.enddate >= '$today'))");
         }
 
@@ -249,7 +235,7 @@ class cms_model_content{
                 ". cmsCore::c('db')->group_by ."
                 ". cmsCore::c('db')->order_by. "\n";
 
-        if (cmsCore::c('db')->limit){
+        if (cmsCore::c('db')->limit) {
             $sql .= "LIMIT ". cmsCore::c('db')->limit;
         }
 
@@ -259,19 +245,19 @@ class cms_model_content{
 
         if (!cmsCore::c('db')->num_rows($result)) { return false; }
 
-        while($article = cmsCore::c('db')->fetch_assoc($result)){
+        while ($article = cmsCore::c('db')->fetch_assoc($result)) {
             $article['fpubdate'] = cmsCore::dateFormat($article['fpubdate']);
             $article['tagline']  = cmsTagLine('content', $article['id'], true);
             $article['comments'] = cmsCore::getCommentsCount('article', $article['id']);
             $article['url']      = $this->getArticleURL(null, $article['seolink']);
             $article['cat_url']  = $this->getCategoryURL(null, $article['catseolink']);
             
-            if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')){
+            if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')) {
                 $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
                 $article['image_small'] = '/images/content/small/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
             }
             
-            if (!empty($article['images'])){ $article['images'] = json_decode($article['images'], true); }
+            if (!empty($article['images'])) { $article['images'] = json_decode($article['images'], true); }
             
             $articles[] = $article;
         }
@@ -279,7 +265,6 @@ class cms_model_content{
         $articles = cmsCore::callEvent('GET_ARTICLES', $articles);
 
         return $articles;
-
     }
 
 /* ==================================================================================================== */
@@ -289,10 +274,9 @@ class cms_model_content{
      * @return int
      */
     public function getArticlesCount($only_published=true) {
+        $today = date('Y-m-d H:i:s');
 
-        $today = date("Y-m-d H:i:s");
-
-        if ($only_published){
+        if ($only_published) {
             cmsCore::c('db')->where("con.published = 1 AND con.pubdate <= '$today'
                       AND (con.is_end=0 OR (con.is_end=1 AND con.enddate >= '$today'))");
         }
@@ -307,7 +291,6 @@ class cms_model_content{
         $result = cmsCore::c('db')->query($sql);
 
         return cmsCore::c('db')->num_rows($result);
-
     }
 
 /* ==================================================================================================== */
@@ -317,9 +300,7 @@ class cms_model_content{
      * @return bool
      */
     public function moveArticlesToArchive() {
-
         return cmsCore::c('db')->query("UPDATE cms_content SET is_arhive = 1 WHERE is_end = 1 AND enddate < NOW()");
-
     }
 
 /* ==================================================================================================== */
@@ -329,7 +310,7 @@ class cms_model_content{
      * @return array
      */
     public function getArticle($id_or_link) {
-        if(is_numeric($id_or_link)){
+        if (is_numeric($id_or_link)) {
             $where = "con.id = '$id_or_link'";
         } else {
             $where = "con.seolink = '$id_or_link'";
@@ -348,12 +329,12 @@ class cms_model_content{
 
         $article = cmsCore::c('db')->fetch_assoc($result);
         
-        if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')){
-            $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
-            $article['image_small'] = '/images/content/small/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
+        if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')) {
+            $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id'] .'.jpg';
+            $article['image_small'] = '/images/content/small/'. ceil($article['id']/100) .'/article'. $article['id'] .'.jpg';
         }
         
-        if (!empty($article['images'])){
+        if (!empty($article['images'])) {
             $article['images'] = json_decode($article['images'], true);
         }
 
@@ -367,14 +348,13 @@ class cms_model_content{
      * @return bool
      */
     public function moveItem($item_id, $cat_id, $dir) {
-
         $sign = $dir>0 ? '+' : '-';
 
         $current = cmsCore::c('db')->get_field('cms_content', "id={$item_id}", 'ordering');
 
-        if($current === false){ return false; }
+        if ($current === false) { return false; }
 
-        if ($dir>0){
+        if ($dir > 0) {
             //движение вверх
             //у элемента следующего за текущим нужно уменьшить порядковый номер
             $sql = "UPDATE cms_content
@@ -383,7 +363,7 @@ class cms_model_content{
                     LIMIT 1";
             cmsCore::c('db')->query($sql);
         }
-        if ($dir<0){
+        if ($dir < 0) {
             //движение вниз
             //у элемента предшествующего текущему нужно увеличить порядковый номер
             $sql = "UPDATE cms_content
@@ -399,7 +379,6 @@ class cms_model_content{
         cmsCore::c('db')->query($sql);
 
         return true;
-
     }
 
 /* ==================================================================================================== */
@@ -409,13 +388,12 @@ class cms_model_content{
      * Подразумевается, что заголовок категории или поле url изменен заранее
      * @return bool
      */
-    public function updateArticlesSeoLink($cat_id){
-
+    public function updateArticlesSeoLink($cat_id) {
         // получаем все статьи категории и вложенных в нее
         $art = $this->getNestedArticles($cat_id);
-        if(!$art) { return false; }
+        if (!$art) { return false; }
 
-        foreach($art as $a){
+        foreach ($art as $a) {
             $seolink = $this->getSeoLink($a);
             cmsCore::c('db')->query("UPDATE cms_content SET seolink='{$seolink}' WHERE id = '{$a['id']}'");
             $this->updateContentCommentsLink($a['id']);
@@ -425,7 +403,6 @@ class cms_model_content{
         $this->updateContentMenu();
 
         return true;
-
     }
 
 /* ==================================================================================================== */
@@ -435,23 +412,22 @@ class cms_model_content{
      * @param array $article Полный массив данных, включая id
      * @return str
      */
-    public function getSeoLink($article){
-
+    public function getSeoLink($article) {
         $seolink = '';
 
         $cat = cmsCore::c('db')->getNsCategory('cms_category', $article['category_id']);
 
         $path_list = cmsCore::c('db')->getNsCategoryPath('cms_category', $cat['NSLeft'], $cat['NSRight'], 'id, title, NSLevel, seolink, url');
 
-        if ($path_list){
-            foreach($path_list as $pcat){
+        if ($path_list) {
+            foreach ($path_list as $pcat) {
                 $seolink .= cmsCore::strToURL(($pcat['url'] ? $pcat['url'] : $pcat['title']), $this->config['is_url_cyrillic']) . '/';
             }
         }
 
         $seolink .= cmsCore::strToURL(($article['url'] ? $article['url'] : $article['title']), $this->config['is_url_cyrillic']);
 
-        if (!empty($article['id'])){
+        if (!empty($article['id'])) {
             $where = ' AND id<>'.$article['id'];
         } else {
             $where = '';
@@ -462,7 +438,6 @@ class cms_model_content{
         if ($is_exists) { $seolink .= '-'.(!empty($article['id']) ? $article['id'] : uniqid()); }
 
         return $seolink;
-
     }
 
 /* ==================================================================================================== */
@@ -472,18 +447,20 @@ class cms_model_content{
      * параметр $menuid устаревший, оставлен для совместимости
      * @return str
      */
-    public static function getArticleURL($menuid, $seolink, $page=1){
-
-        if((is_numeric($page) && $page>1) || is_string($page)){
+    public static function getArticleURL($menuid, $seolink, $page=1) {
+        if ((is_numeric($page) && $page>1) || is_string($page)) {
             $page_section = '/page-'.$page;
         } else {
             $page_section = '';
         }
 
-        $url = '/'.$seolink.$page_section.'.html';
+        $url = '/'. $seolink . $page_section .'.html';
+        
+        if (cmsCore::c('config')->com_without_name_in_url != 'content') {
+            $url = '/content'. $url;
+        }
 
         return $url;
-
     }
 
 /* ==================================================================================================== */
@@ -493,18 +470,20 @@ class cms_model_content{
      * параметр $menuid устаревший, оставлен для совместимости
      * @return str
      */
-    public static function getCategoryURL($menuid, $seolink, $page=1, $pagetag = false){
-
-        if (!$pagetag){
-            $page_section = ($page>1 ? '/page-'.$page : '');
+    public static function getCategoryURL($menuid, $seolink, $page=1, $pagetag = false) {
+        if (!$pagetag) {
+            $page_section = ($page > 1 ? '/page-'. $page : '');
         } else {
             $page_section = '/page-%page%';
         }
 
-        $url = '/'.$seolink.$page_section;
+        $url = '/'. $seolink . $page_section;
+        
+        if (cmsCore::c('config')->com_without_name_in_url != 'content') {
+            $url = '/content'. $url;
+        }
 
         return $url;
-
     }
 
 /* ==================================================================================================== */
@@ -513,8 +492,7 @@ class cms_model_content{
      * Удаляет статью
      * @return bool
      */
-    public function deleteArticle($id){
-
+    public function deleteArticle($id) {
         cmsCore::callEvent('DELETE_ARTICLE', $id);
 
         cmsCore::c('db')->delete('cms_content', "id='$id'", 1);
@@ -531,7 +509,6 @@ class cms_model_content{
         cmsCore::deleteComments('article', $id);
 
         return true;
-
     }
 
     /**
@@ -539,8 +516,8 @@ class cms_model_content{
      * @param array $id_list
      * @return bool
      */
-    public function deleteArticles($id_list){
-        foreach($id_list as $id){
+    public function deleteArticles($id_list) {
+        foreach ($id_list as $id) {
             $this->deleteArticle($id);
         }
         return true;
@@ -553,8 +530,7 @@ class cms_model_content{
      * @param array $article
      * @return int
      */
-    public function addArticle($article){
-
+    public function addArticle($article) {
         $article = cmsCore::callEvent('ADD_ARTICLE', $article);
 
         if ($article['url']) { $article['url'] = cmsCore::strToURL($article['url'], $this->config['is_url_cyrillic']); }
@@ -565,7 +541,7 @@ class cms_model_content{
 
         $article['id'] = cmsCore::c('db')->insert('cms_content', $article);
 
-        if ($article['id']){
+        if ($article['id']) {
 
             $article['seolink'] = $this->getSeoLink($article);
             cmsCore::c('db')->query("UPDATE cms_content SET seolink='{$article['seolink']}' WHERE id = '{$article['id']}'");
@@ -585,8 +561,8 @@ class cms_model_content{
         return $article['id'] ? $article['id'] : false;
     }
 
-    public function uploadArticeImage($id, $delete=false){
-        if ($delete){
+    public function uploadArticeImage($id, $delete=false) {
+        if ($delete) {
             @unlink(PATH .'/images/content/small/'. ceil($id/100). '/article'. $id .'.jpg');
             @unlink(PATH .'/images/content/medium/'. ceil($id/100). '/article'. $id .'.jpg');
         }
@@ -618,17 +594,16 @@ class cms_model_content{
      * Обновляет статью
      * @return bool
      */
-    public function updateArticle($id, $article, $not_upd_seo = false){
-
+    public function updateArticle($id, $article, $not_upd_seo = false) {
         $article['id']= $id;
         
         cmsCore::setIdUploadImage('', $article['id'], 'content');
         cmsCore::requestUploadImgTitles($article['id'], 'content');
         cmsCore::updateComImages($article['id'], 'content', '', 'cms_content', 'images');
 
-        if(!$not_upd_seo){
+        if (!$not_upd_seo) {
 
-            if (@$article['url']){
+            if (@$article['url']) {
                 $article['url'] = cmsCore::strToURL($article['url'], $this->config['is_url_cyrillic']);
             }
 
@@ -642,14 +617,13 @@ class cms_model_content{
 
         cmsCore::c('db')->update('cms_content', $article, $id);
 
-        if(!$not_upd_seo){
+        if (!$not_upd_seo) {
             $this->updateContentCommentsLink($id);
         }
 
         cmsInsertTags($article['tags'], 'content', $id);
 
         return true;
-
     }
 
 /* ==================================================================================================== */
@@ -658,28 +632,23 @@ class cms_model_content{
      * Обновляет ссылки меню на категории
      * @return bool
      */
-    public function updateCatMenu(){
-
+    public function updateCatMenu() {
         return cmsCore::c('db')->query("UPDATE cms_menu m, cms_category cat SET m.link = CONCAT('/', cat.seolink) WHERE m.linkid = cat.id AND m.linktype = 'category'");
-
     }
 
     /**
      * Обновляет ссылки меню на статьи
      * @return bool
      */
-    public function updateContentMenu(){
-
+    public function updateContentMenu() {
         return cmsCore::c('db')->query("UPDATE cms_menu m, cms_content con SET m.link = CONCAT('/', con.seolink, '.html') WHERE m.linkid = con.id AND m.linktype = 'content'");
-
     }
 
     /**
      * Обновляет ссылки меню на статьи
      * @return bool
      */
-    public function updateContentCommentsLink($article_id){
-
+    public function updateContentCommentsLink($article_id) {
         // Обновляем ссылки в комменатриях
         cmsCore::c('db')->query("UPDATE cms_comments c, cms_content a SET
                                    c.target_link = CONCAT('/', a.seolink, '.html')
@@ -688,16 +657,13 @@ class cms_model_content{
         // Обновляем ссылки в action
         $action = cmsActions::getAction('add_comment');
 
-        if($action){
-
+        if ($action) {
             cmsCore::c('db')->query("UPDATE cms_actions_log log, cms_content a SET
                                    log.target_url = CONCAT('/', a.seolink, '.html'), log.object_url = CONCAT('/', a.seolink, '.html#c', log.object_id)
                                    WHERE a.id = '$article_id' AND log.action_id='{$action['id']}' AND log.target_id='{$article_id}'");
-
         }
 
         return true;
-
     }
 /* ==================================================================================================== */
 /* ==================================================================================================== */
@@ -706,7 +672,6 @@ class cms_model_content{
      * @return array
      */
     public function getNestedArticles($category_id) {
-
         $cat = cmsCore::c('db')->getNsCategory('cms_category', $category_id);
 
         $sql = "SELECT con.id, con.title, con.seolink, con.url, con.category_id
@@ -719,12 +684,11 @@ class cms_model_content{
 
         $articles = array();
 
-        while($article = cmsCore::c('db')->fetch_assoc($result)){
+        while ($article = cmsCore::c('db')->fetch_assoc($result)) {
             $articles[] = $article;
         }
 
         return $articles ? $articles : false;
-
     }
 
 /* ==================================================================================================== */
@@ -734,13 +698,12 @@ class cms_model_content{
      * @return bool
      */
     public function deleteCategory($id, $is_with_content = false) {
-
         $articles = $this->getNestedArticles($id);
         $rootid   = cmsCore::c('db')->getNsRootCatId('cms_category');
-        if($articles){
-            foreach($articles as $article){
+        if ($articles) {
+            foreach ($articles as $article) {
                 // удаляем все вложенные статьи
-                if ($is_with_content){
+                if ($is_with_content) {
                     $this->deleteArticle($article['id']);
                 } else { // или переносим в корень и в архив
                     cmsCore::c('db')->query("UPDATE cms_content SET category_id = '$rootid', is_arhive = 1, seolink = SUBSTRING_INDEX(seolink, '/', -1) WHERE id = '{$article['id']}'");
@@ -749,7 +712,6 @@ class cms_model_content{
         }
 
         return cmsCore::c('db')->deleteNS('cms_category', $id);
-
     }
 
 /* ==================================================================================================== */
@@ -759,12 +721,11 @@ class cms_model_content{
      * @param str $album
      * @return array
      */
-    public function getCatPhotoAlbum($album){
-
-        if(!$album) { return array(); }
+    public function getCatPhotoAlbum($album) {
+        if (!$album) { return array(); }
 
         $album = @unserialize($album);
-        if(!$album || !is_array($album) || !@$album['id'])  { return array(); }
+        if (!$album || !is_array($album) || !@$album['id'])  { return array(); }
 
         $p_a = cmsCore::c('db')->getNsCategory('cms_photo_albums', (int)$album['id']);
         if (!$p_a) { return array(); }
@@ -774,8 +735,8 @@ class cms_model_content{
 
         cmsCore::c('photo')->whereAlbumIs((int)$album['id']);
 
-        if(!in_array($album['orderby'], array('title','pubdate','rating','hits'))) { $album['orderby'] = 'pubdate'; }
-        if(!in_array($album['orderto'], array('asc','desc'))) { $album['orderto'] = 'desc'; }
+        if (!in_array($album['orderby'], array('title','pubdate','rating','hits'))) { $album['orderby'] = 'pubdate'; }
+        if (!in_array($album['orderto'], array('asc','desc'))) { $album['orderto'] = 'desc'; }
         cmsCore::c('db')->orderBy('f.'.$album['orderby'], $album['orderto']);
 
         cmsCore::c('db')->limit((int)$album['max']);
@@ -784,16 +745,15 @@ class cms_model_content{
         if (!$photos) { return array(); }
 
         return array('album'=>$p_a, 'photos'=>$photos);
-
     }
     
     /**
      * Обновляет кеш прикрепленных изображений статьи
      * @param integer $target_id
      */
-    public function updateUploadImages($target_id){
+    public function updateUploadImages($target_id) {
         $item = $this->getArticle($target_id);
-        if (!empty($item)){
+        if (!empty($item)) {
             cmsCore::updateComImages($target_id, 'content', '', 'cms_content', 'images');
         }
     }
@@ -804,19 +764,19 @@ class cms_model_content{
      * @param string $target
      * @return boolean
      */
-    public function checkAccessAddImage($target_id, $target){
-        if (!cmsUser::isUserCan('content/add')){
+    public function checkAccessAddImage($target_id, $target) {
+        if (!cmsUser::isUserCan('content/add')) {
             return false;
         }
             
-        if ($target_id > 0){
+        if ($target_id > 0) {
             $item = $this->getArticle($target_id);
             
-            if (empty($item)){
+            if (empty($item)) {
                 return false;
             }
             
-            if(!cmsCore::c('user')->is_admin && ($item['user_id'] != cmsCore::c('user')->id) && !($item['modgrp_id'] == cmsCore::c('user')->group_id)){
+            if (!cmsCore::c('user')->is_admin && ($item['user_id'] != cmsCore::c('user')->id) && !($item['modgrp_id'] == cmsCore::c('user')->group_id)) {
                 return false;
             }
         }

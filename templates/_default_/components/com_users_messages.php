@@ -16,7 +16,7 @@
         <span class="usr_msgmenu_active out_span"><?php echo $page_title; ?></span>
         <a class="usr_msgmenu_link notices_link" href="/users/<?php echo $id; ?>/messages-notices.html"><?php echo $_LANG['NOTICES']; ?> <?php if ($new_messages['notices']) { ?>(<?php echo $new_messages['notices']; ?>)<?php } ?></a>
         <a class="usr_msgmenu_link history_link" href="/users/<?php echo $id; ?>/messages-history.html"><?php echo $_LANG['DIALOGS']; ?></a>
-    {elseif $opt == 'notices'}
+    <?php } else if ($opt == 'notices') { ?>
         <a class="usr_msgmenu_link in_link" href="/users/<?php echo $id; ?>/messages.html"><?php echo $_LANG['INBOX']; ?> <?php if ($new_messages['messages']) { ?>(<?php echo $new_messages['messages']; ?>)<?php } ?></a>
         <a class="usr_msgmenu_link out_link" href="/users/<?php echo $id; ?>/messages-sent.html"><?php echo $_LANG['SENT']; ?></a>
         <span class="usr_msgmenu_active notices_span"><?php echo $page_title; ?> <?php if ($new_messages['notices']) { ?>(<?php echo $new_messages['notices']; ?>)<?php } ?></span>

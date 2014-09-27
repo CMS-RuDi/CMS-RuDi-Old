@@ -1,6 +1,5 @@
-<p>
-    <strong>{$LANG.CLUBS}</strong> {$LANG.CLUBS_DESC}
-</p>
+<p><strong>{$LANG.CLUBS}</strong> {$LANG.CLUBS_DESC}</p>
+
 {if $can_create}
     <script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
     <form action="/clubs/create.html" method="post" id="create_club">
@@ -27,13 +26,11 @@
         </table>
     </form>
 
-    {literal}
     <script type="text/javascript">
-        $(document).ready(function(){
+        $(function(){
             $('#title').focus();
         });
     </script>
-    {/literal}
 {/if}
 <div class="sess_messages" {if !$last_message}style="display:none"{/if}>
     <div class="message_info" id="error_mess">{$last_message}</div>

@@ -111,7 +111,7 @@
                     <tr>
                         <td valign="top" class=""><strong><?php echo $_LANG['CITY']; ?>:</strong></td>
                         <td valign="top" class="">
-                            {city_input value=$item.city name="city" width="300px"}
+                            <?php echo cmsCore::city_input(array('value' => $item['city'], 'name' => 'city', 'width' => '300px')); ?>
                         </td>
                     </tr>
                 <?php } ?>
@@ -129,7 +129,32 @@
                             <div><strong><?php echo $_LANG['BIRTH']; ?>:</strong></div>
                             <div><small><?php echo $_LANG['NOPUBLISH_TEXT']; ?></small></div>
                         </td>
-                        <td valign="top" class="">{dateform seldate=$item.birthdate}</td>
+                        <td valign="top" class="">
+                            <?php
+                                $sel_day = 1; $sel_month = 1; $sel_year = 1980;
+                                if (!empty($item['birthdate'])){
+                                    $parts = explode('-', $item['birthdate']);
+                                    $sel_day = intval($parts[2]);
+                                    $sel_month = intval($parts[1]);
+                                    $sel_year = intval($parts[0]);
+                                }
+                            ?>
+                            <select name="birthdate[day]">
+                                <?php for ($i=1;$i<=31;$i++){ ?>
+                                    <option value="<?php echo ($i < 10 ? '0'. $i : $i); ?>"<?php if ($sel_day == $i) { echo ' selected="selected"'; }?>><?php echo ($i < 10 ? '0'. $i : $i); ?></option>
+                                <?php } ?>
+                            </select>
+                            <select name="birthdate[month]">
+                                <?php for ($i=1;$i<=12;$i++){ ?>
+                                    <option value="<?php echo ($i < 10 ? '0'. $i : $i); ?>"<?php if ($sel_month == $i) { echo ' selected="selected"'; }?>><?php echo ($i < 10 ? '0'. $i : $i); ?></option>
+                                <?php } ?>
+                            </select>
+                            <select name="birthdate[year]">
+                                <?php for ($i=1950;$i<=intval(date('Y'));$i++){ ?>
+                                    <option value="<?php echo $i; ?>"<?php if ($sel_year == $i) { echo ' selected="selected"'; }?>><?php echo $i; ?></option>
+                                <?php } ?>
+                            </select>
+                        </td>
                     </tr>
                 <?php } ?>
                 <tr>
@@ -137,7 +162,7 @@
                         <div><strong><?php echo $_LANG['SECUR_SPAM']; ?>: </strong></div>
                         <div><small><?php echo $_LANG['SECUR_SPAM_TEXT']; ?></small></div>
                     </td>
-                    <td valign="top" class="">{captcha}</td>
+                    <td valign="top" class=""><?php echo cmsPage::getCaptcha(); ?></td>
                 </tr>
                 <tr>
                     <td valign="top" class="">&nbsp;</td>

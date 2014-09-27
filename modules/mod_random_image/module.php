@@ -50,7 +50,7 @@ function mod_random_image($module_id, $cfg){
             assign('item', $item)->
             assign('is_img', $is_img)->
             assign('cfg', $cfg)->
-            display('mod_random_image.tpl');
+            display();
 
     return true;
 

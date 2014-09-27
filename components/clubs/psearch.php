@@ -13,73 +13,61 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 	
-function search_clubs($query, $look){
+function search_clubs($query, $look) {
+    global $_LANG;
 
-	$inDB   = cmsDatabase::getInstance();
-	$searchModel = cms_model_search::initModel();
+    cmsCore::m('clubs');
 
-	global $_LANG;
+    /////// поиск по клубным блогам //////////
 
-	cmsCore::loadModel('clubs');
-	$model = new cms_model_clubs();
+    $sql = "SELECT con.*, cat.title cat_title, cat.id cat_id, cat.owner owner, cat.user_id, img.fileurl
+                    FROM cms_blog_posts con
+                    INNER JOIN cms_blogs cat ON cat.id = con.blog_id AND cat.allow_who = 'all' AND cat.owner = 'club'
+                    LEFT JOIN cms_upload_images img ON img.target_id = con.id AND img.target = 'blog_post' AND img.component = 'clubs'
+                    WHERE MATCH(con.title, con.content) AGAINST ('". $query ."' IN BOOLEAN MODE) AND con.published = 1 LIMIT 100";
 
-	/////// поиск по клубным блогам //////////
+    $result = cmsCore::c('db')->query($sql);
 
-	$sql = "SELECT con.*, cat.title cat_title, cat.id cat_id, cat.owner owner, cat.user_id
-			FROM cms_blog_posts con
-			INNER JOIN cms_blogs cat ON cat.id = con.blog_id AND cat.allow_who = 'all' AND cat.owner = 'club'
-			WHERE MATCH(con.title, con.content) AGAINST ('$query' IN BOOLEAN MODE) AND con.published = 1 LIMIT 100";
+    if (cmsCore::c('db')->num_rows($result)) {
+        while($item = cmsCore::c('db')->fetch_assoc($result)) {
+            $result_array = array(
+                'link' => cmsCore::m('clubs')->getPostURL($item['user_id'], $item['seolink']),
+                'place' => ' &laquo;'. $item['cat_title'] .'&raquo;',
+                'placelink' => cmsCore::m('clubs')->getBlogURL($item['user_id']),
+                'description' => cmsCore::m('search')->getProposalWithSearchWord($item['content_html']),
+                'title' => $item['title'],
+                'imageurl' => $item['fileurl'],
+                'pubdate' => $item['pubdate']
+            );
 
-	$result = $inDB->query($sql);
-	
-	if ($inDB->num_rows($result)){
-		while($item = $inDB->fetch_assoc($result)){
+            cmsCore::m('search')->addResult($result_array);
+        }
+    }
 
-			$result_array = array();
+    /////// поиск по клубным фоткам //////////
 
-			$result_array['link']        = $model->getPostURL($item['user_id'], $item['seolink']);
-			$result_array['place']       = ' &laquo;'.$item['cat_title'].'&raquo;';
-			$result_array['placelink']   = $model->getBlogURL($item['user_id']);
-			$result_array['description'] = $searchModel->getProposalWithSearchWord($item['content_html']);
-			$result_array['title']       = $item['title'];
-			$result_array['pubdate']     = $item['pubdate'];
-			$result_array['session_id']  = session_id();
+    $sql = "SELECT f.*, a.title as cat, a.id as cat_id
+                    FROM cms_photo_files f
+                    INNER JOIN cms_photo_albums a ON a.id = f.album_id AND a.published = 1 AND a.NSDiffer != ''
+                    WHERE MATCH(f.title, f.description) AGAINST ('". $query ."' IN BOOLEAN MODE) AND f.published = 1";
 
-			$searchModel->addResult($result_array);
+    $result = cmsCore::c('db')->query($sql);
 
-		}
-	}
+    if (cmsCore::c('db')->num_rows($result)) {
+        while($item = cmsCore::c('db')->fetch_assoc($result)) {
+            $result_array = array(
+                'link' => '/clubs/photo'. $item['id'] .'.html',
+                'place' => $_LANG['CLUBS_PHOTOALBUM'] .' &laquo;'. $item['cat'] .'&raquo;',
+                'placelink' => '/clubs/photoalbum'. $item['cat_id'],
+                'description' => cmsCore::m('search')->getProposalWithSearchWord($item['description']),
+                'title' => $item['title'],
+                'imageurl' => (file_exists(PATH .'/images/photos/medium/'. $item['file']) ? '/images/photos/medium/'. $item['file'] : ''),
+                'pubdate' => $item['pubdate']
+            );
+            
+            cmsCore::m('search')->addResult($result_array);
+        }
+    }
 
-	/////// поиск по клубным фоткам //////////
-
-	$sql = "SELECT f.*, a.title as cat, a.id as cat_id
-			FROM cms_photo_files f
-			INNER JOIN cms_photo_albums a ON a.id = f.album_id AND a.published = 1 AND a.NSDiffer != ''
-			WHERE MATCH(f.title, f.description) AGAINST ('$query' IN BOOLEAN MODE) AND f.published = 1";
-
-	$result = $inDB->query($sql);
-	
-	if ($inDB->num_rows($result)){
-
-		while($item = $inDB->fetch_assoc($result)){
-
-			$result_array = array();
-
-			$result_array['link']        = "/clubs/photo".$item['id'].".html";
-			$result_array['place']       = $_LANG['CLUBS_PHOTOALBUM'] .' &laquo;'. $item['cat'].'&raquo;';
-			$result_array['placelink']   = '/clubs/photoalbum'.$item['cat_id'];
-			$result_array['description'] = $searchModel->getProposalWithSearchWord($item['description']);
-			$result_array['title']       = $item['title'];
-			$result_array['pubdate']     = $item['pubdate'];
-			$result_array['session_id']  = session_id();
-
-			$searchModel->addResult($result_array);
-		}
-	}
-
-	return;
-
+    return;
 }
-
-
-?>

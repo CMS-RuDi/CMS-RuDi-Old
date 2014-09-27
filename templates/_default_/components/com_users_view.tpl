@@ -1,5 +1,5 @@
 {if $cfg.sw_search}
-<div id="users_search_link" class="float_bar"><a href="javascript:void(0)" onclick="{literal}$('#users_sbar').slideToggle('fast');{/literal}"> <span>{$LANG.USERS_SEARCH}</span> </a> </div>
+<div id="users_search_link" class="float_bar"><a href="javascript:void(0)" onclick="$('#users_sbar').slideToggle('fast');"> <span>{$LANG.USERS_SEARCH}</span> </a> </div>
 {/if}
 <h1 class="con_heading">{$LANG.USERS}</h1>
 {if $cfg.sw_search}
@@ -37,7 +37,7 @@
       {if $stext}
       	<input type="button" value="{$LANG.CANCEL_SEARCH_SHOWALL}" onclick="centerLink('/users/all.html')" />
       {/if}
-      <input name="hide" type="button" id="hide" value="{$LANG.HIDE}" onclick="{literal}$('#users_sbar').slideToggle();{/literal}"/>
+      <input name="hide" type="button" id="hide" value="{$LANG.HIDE}" onclick="$('#users_sbar').slideToggle();"/>
     </p>
   </form>
 </div>

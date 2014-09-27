@@ -112,7 +112,7 @@ if ($do=='view'){
             assign('root_id', $model->root_cat['id'])->
             assign('is_user', $inUser->id)->
             assign('maxcols', $model->config['maxcols'])->
-            display('com_board_cats.tpl');
+            display();
 
 	$pagebar = cmsPage::getPagebar($total, $model->page, $category['perpage'], '/board/%catid%-%page%', array('catid'=>$category['id']));
     $order_form = $category['orderform'] ? $model->orderForm($orderby, $orderto, $category) : '';
@@ -127,7 +127,7 @@ if ($do=='view'){
             assign('maxcols', $category['maxcols'])->
             assign('colwidth', round(100/$category['maxcols']))->
             assign('pagebar', $pagebar)->
-            display('com_board_items.tpl');
+            display();
 
 }
 /////////////////////////////// VIEW USER ADV ///////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ if ($do=='by_user'){
             assign('maxcols', 1)->
             assign('colwidth', 100)->
             assign('pagebar', $pagebar)->
-            display('com_board_items.tpl');
+            display();
 
 }
 /////////////////////////////// VIEW ITEM ///////////////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +221,7 @@ if($do=='read'){
             assign('is_admin', $inUser->is_admin)->
             assign('formsdata', cmsForm::getFieldsValues($item['form_id'], $item['form_array']))->
             assign('is_moder', $model->is_moderator_by_group)->
-            display('com_board_item.tpl');
+            display();
 
 }
 /////////////////////////////// NEW BOARD ITEM /////////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +265,7 @@ if ($do=='additem'){
                 assign('is_user', $inUser->id)->
                 assign('catslist', $catslist)->
                 assign('is_billing', IS_BILLING)->assign('balance', $inUser->balance)->
-                display('com_board_edit.tpl');
+                display();
 
 		cmsUser::sessionClearAll();
         return;
@@ -313,7 +313,7 @@ if ($do=='additem'){
         if (!$title) { cmsCore::addSessionMessage($_LANG['NEED_TITLE'], 'error'); $errors = true; }
         if (!$content) { cmsCore::addSessionMessage($_LANG['NEED_TEXT_ADV'], 'error'); $errors = true; }
         if (!$city) { cmsCore::addSessionMessage($_LANG['NEED_CITY'], 'error'); $errors = true; }
-		if (!$inUser->id && !$inCore->checkCaptchaCode(cmsCore::request('code', 'str'))) { cmsCore::addSessionMessage($_LANG['ERR_CAPTCHA'], 'error'); $errors = true; }
+		if (!$inUser->id && !cmsCore::checkCaptchaCode()) { cmsCore::addSessionMessage($_LANG['ERR_CAPTCHA'], 'error'); $errors = true; }
 		// Проверяем значения формы
 		foreach ($form_input['errors'] as $field_error) {
 			if($field_error){ cmsCore::addSessionMessage($field_error, 'error'); $errors = true; }
@@ -435,7 +435,7 @@ if ($do=='edititem'){
                 assign('formsdata', cmsForm::getFieldsHtml($cat['form_id'], $item['form_array']))->
                 assign('is_user', $inUser->id)->
                 assign('is_billing', IS_BILLING)->assign('balance', $inUser->balance)->
-                display('com_board_edit.tpl');
+                display();
 
 		cmsUser::sessionClearAll();
 
@@ -608,7 +608,7 @@ if ($do == 'delete'){
 
 		cmsPage::initTemplate('components', 'action_confirm')->
                 assign('confirm', $confirm)->
-                display('action_confirm.tpl');
+                display();
 	}
 
 	if (cmsCore::inRequest('godelete')){

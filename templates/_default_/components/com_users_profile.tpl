@@ -1,14 +1,14 @@
 {add_js file='includes/jquery/tabs/jquery.ui.min.js'}
 {add_css file='includes/jquery/tabs/tabs.css'}
 
-{literal}
-    <script type="text/javascript">
-        $(function(){$(".uitabs").tabs();});
-    </script>
-{/literal}
+
+<script type="text/javascript">
+    $(function() {
+        $(".uitabs").tabs();
+    });
+</script>
 
 <div id="usertitle">
-
     <div id="user_ratings">
         <div class="karma" title="{$LANG.KARMA}">
         	<div class="{if $usr.karma >= 0}value-positive{else}value-negative{/if}" id="u_karma_cont">
@@ -211,7 +211,7 @@
                         {if $usr.city}
 						<div class="field">
 							<div class="title">{$LANG.CITY}:</div>
-                            <div class="value"><a href="/users/city/{$usr.cityurl|escape:'html'}">{$usr.city}</a></div>
+                            <div class="value"><a href="/users/city/{$usr.cityurl|escape:'html'}">{$usr.city}</a>{if $usr.country}, {$usr.country}{/if}</div>
 						</div>
                         {/if}
 
@@ -242,11 +242,9 @@
 								<div class="title">E-mail:</div>
 								<div class="value"><a href="#" rel="{$usr.email|NoSpam}" class="email">{$usr.email}</a></div>
 							</div>
-							{literal}
-								<script>
-										$('.email').nospam({ replaceText: true });
-								</script>
-							{/literal}
+                                                        <script>
+                                                            $('.email').nospam({ replaceText: true });
+                                                        </script>
 						{/if}
 
 						<div class="field">

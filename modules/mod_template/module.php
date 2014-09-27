@@ -16,7 +16,7 @@ function mod_template(){
     cmsPage::initTemplate('modules', 'mod_template')->
             assign('current_template', (isset($_SESSION['template']) ? $_SESSION['template'] : ''))->
             assign('templates', cmsCore::getDirsList('/templates'))->
-            display('mod_template.tpl');
+            display();
 
     return true;
 

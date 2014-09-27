@@ -24,7 +24,7 @@ html {
 }
 
 body {
-    background: url(../images/bg.jpg) no-repeat center top #1F3147;
+    background: url(/templates/_default_/images/bg.jpg) no-repeat center top #1F3147;
     height: 100%;
     word-wrap: break-word;
 }
@@ -64,8 +64,7 @@ a:hover {
     text-decoration: none;
 }
 .float_bar {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     background-color: #E0EAEF;
     float: right;
     margin-top: 6px;
@@ -73,8 +72,7 @@ a:hover {
 }
 
 .bar {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     background-color: #E0EAEF;
     padding: 5px 10px;
 }
@@ -98,14 +96,14 @@ a:hover {
 #header {
     height: 60px;
     line-height: 60px;
-    background: url(../images/headbg.png) repeat-x left bottom;
+    background: url(/templates/_default_/images/headbg.png) repeat-x left bottom;
 }
 
 #sitename a {
     display: block;
     width: 199px;
     height: 60px;
-    background: url(../images/logo.png) no-repeat left center;
+    background: url(/templates/_default_/images/logo.png) no-repeat left center;
 }
 
 #page {
@@ -117,11 +115,9 @@ a:hover {
 #topmenu {
     margin-top: 15px;
     margin-bottom: 10px;
-    background: url(../images/menubar.jpg) repeat-x center bottom;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    box-shadow: 0 0 5px #000;
-    -moz-box-shadow: 0 0 5px #000;
+    background: url(/templates/_default_/images/menubar.jpg) repeat-x center bottom;
+    border-radius: 4px;
+    box-shadow: 0 0 5px #333;
     width: 940px;
     clear: both;
     display: table;
@@ -150,7 +146,7 @@ a:hover {
 }
 
 #topmenu .menu li.selected {
-    background: url(../images/menubg.jpg) repeat-x left top #375E93;
+    background: url(/templates/_default_/images/menubg.jpg) repeat-x left top #375E93;
 }
 
 #topmenu .menu li.selected a.selected {
@@ -161,7 +157,7 @@ a:hover {
 
 #topmenu .menu li a:hover,
 #topmenu .menu li a.hover {
-    background: url(../images/menubg-hover.jpg) repeat-x center top #375E93;
+    background: url(/templates/_default_/images/menubg-hover.jpg) repeat-x center top #375E93;
     color: #000 !important;
     text-shadow: 0 1px 0px #FFF !important;
 }
@@ -183,8 +179,7 @@ a:hover {
     color: #000;
     padding: 0px;
     z-index: 1000;
-    box-shadow: 1px 1px 3px #000;
-    -moz-box-shadow: 1px 1px 3px #000;
+    box-shadow: 1px 1px 3px #333;
 }
 #topmenu ul li ul li ul {
     display: none;
@@ -235,16 +230,14 @@ a:hover {
 
 /*************************** Верхний широкий модуль ***************************/
 #topwide {
-    background: url(../images/topbg.jpg) repeat-x left bottom #FFF;
+    background: url(/templates/_default_/images/topbg.jpg) repeat-x left bottom #FFF;
     border: solid 1px #AEAEAE;
     display: block;
     overflow: hidden;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     margin-bottom: 20px;
     margin-top: 10px;
-    box-shadow: 0 0 5px #000;
-    -moz-box-shadow: 0 0 5px #000;
+    box-shadow: 0 0 5px #333;
     width: 940px !important;
 }
 
@@ -264,24 +257,21 @@ a:hover {
     margin-bottom: 10px;
     padding: 10px 20px 15px 20px;
     background: #FFF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    -moz-box-shadow: 0 2px 0 #000;
-    box-shadow: 0 2px 0 #000;
+    border-radius: 4px;
+    box-shadow: 0 2px 0 #333;
 }
 
 #main .moduletitle {
     font-size: 22px;
     height: 40px;
     line-height: 40px;
-    background: url(../images/modtop.jpg) repeat-x left;
+    background: url(/templates/_default_/images/modtop.jpg) repeat-x left;
     margin-top: -11px;
     margin-bottom: 10px;
     padding-left: 14px;
     text-shadow: 0 1px 0 #1F3147;
     color: #FFF;
-    border-radius: 0px 0px 8px 8px;
-    -moz-border-radius: 0px 0px 8px 8px;
+    border-radius: 0px 0px 4px 4px;
     display: block;
 }
 
@@ -295,11 +285,9 @@ a:hover {
     background: #E0EAEF;
     display: block;
     overflow: hidden;
-    border-radius: 10px;
-    -moz-border-radius: 10px;
+    border-radius: 4px;
     margin-bottom: 7px;
-    -moz-box-shadow: 0 2px 0 #000;
-    box-shadow: 0 2px 0 #000;
+    box-shadow: 0 2px 0 #333;
 }
 
 #sidebar .moduletitle {
@@ -355,8 +343,7 @@ span.fast_cfg_link img {
      margin-bottom:15px; 
      display:block; 
      clear:both; 
-     border-radius:8px; 
-     -moz-border-radius:8px; 
+     border-radius:4px;
 } 
 
 .sess_messages {
@@ -373,14 +360,14 @@ span.fast_cfg_link img {
 }
 
 .sess_messages .message_info {
-    background: url(../images/icons/info.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/info.png) no-repeat left center;
 }
 .sess_messages .message_success {
-    background: url(../images/icons/yes.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/yes.png) no-repeat left center;
     color: green;
 }
 .sess_messages .message_error {
-    background: url(../images/icons/no.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/no.png) no-repeat left center;
     color: red;
 }
 
@@ -457,7 +444,7 @@ ul.mod_cat_list li {
     margin: 2px 0;
 }
 ul.mod_cat_list li a.folder, ul.mod_cat_list li.folder, div.float_bar a.folder {
-    background: url("../images/icons/folder.png") no-repeat scroll 0 0 transparent;
+    background: url("/templates/_default_/images/icons/folder.png") no-repeat scroll 0 0 transparent;
     padding: 0 5px 0 20px;
 }
 ul.mod_cat_list li a.cat_plus, ul.mod_cat_list li a.cat_minus {
@@ -468,10 +455,10 @@ ul.mod_cat_list li a.cat_plus, ul.mod_cat_list li a.cat_minus {
     margin: 0 0 0 -16px;
 }
 ul.mod_cat_list li a.cat_plus {
-    background: url("../images/icons/cat_plus.png") no-repeat scroll left 2px transparent;
+    background: url("/templates/_default_/images/icons/cat_plus.png") no-repeat scroll left 2px transparent;
 }
 ul.mod_cat_list li a.cat_minus {
-    background: url("../images/icons/cat_minus.png") no-repeat scroll left 2px transparent;
+    background: url("/templates/_default_/images/icons/cat_minus.png") no-repeat scroll left 2px transparent;
 }
 /*----------------------- MODULE "LATEST ARTICLES" ---------------------------*/
 .mod_latest_entry {
@@ -498,23 +485,23 @@ ul.mod_cat_list li a.cat_minus {
 }
 .mod_latest_rating {
     padding: 1px;
-    background: url(../images/icons/rating.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rating.png) no-repeat left center;
     padding-left: 20px;
 }
 .mod_latest_comments {
     padding: 1px;
-    background: url(../images/icons/comment-small.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/comment-small.png) no-repeat left center;
     padding-left: 20px;
 }
 .mod_latest_hits {
     padding: 1px;
-    background: url(../images/icons/eye.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/eye.png) no-repeat left center;
     padding-left: 20px;
 }
 .mod_latest_rss {
     clear: both;
     padding-left: 20px;
-    background: url(../images/icons/rss.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rss.png) no-repeat left center;
     height: 16px;
     line-height: 16px;
     text-decoration: underline;
@@ -604,10 +591,10 @@ ul.mod_cat_list li a.cat_minus {
 }
 
 .login_form #login_field {
-    background: url(../images/icons/user.png) no-repeat 2px 5px;
+    background: url(/templates/_default_/images/icons/user.png) no-repeat 2px 5px;
 }
 .login_form #pass_field {
-    background: url(../images/icons/key.png) no-repeat 2px 5px;
+    background: url(/templates/_default_/images/icons/key.png) no-repeat 2px 5px;
 }
 
 /*------------------------------ PAGES BAR -----------------------------------*/
@@ -629,8 +616,7 @@ ul.mod_cat_list li a.cat_minus {
     padding: 4px;
     background-color: #375E93;
     color: #FFF;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
+    border-radius: 2px;
 }
 
 /*----------------------------- SITE SEARCH ----------------------------------*/
@@ -638,7 +624,6 @@ ul.mod_cat_list li a.cat_minus {
     background-color: #66CCFF;
     color: #FFF;
     border-radius: 2px;
-    -moz-border-radius: 2px;
     padding: 0 2px;
 }
 .search_date {
@@ -672,30 +657,39 @@ ul.mod_cat_list li a.cat_minus {
 .search_block {
     margin: 0 0 7px 0;
     clear: both;
-    padding: 0 5px 5px;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
+    padding: 6px 10px;
     clear: both;
     overflow: hidden;
+}
+.search_block:hover {
+    background: #E8FFDB;
 }
 .search_result_title {
     font-size: 16px;
     font-weight: bold;
 }
 .search_result_title span {
-    width: 25px;
+    width: 20px;
     display: block;
     float: left;
 }
 .search_result_desc {
     margin: 4px 0 0 20px;
+    clear:both;
+}
+.search_result_desc img {
+    margin: 2px 10px 0 0;
+    width: 70px;
+    float: left;
 }
 .search_result_desc p {
     color: #666;
-    clear: both;
 }
 .search_result_desc a {
     color: #666;
+}
+.search_result_link {
+    margin: 5px 0 0 0;
 }
 /*-------------------------------- FORMS -------------------------------------*/
 .userform_fieldtitle {
@@ -710,10 +704,8 @@ ul.mod_cat_list li a.cat_minus {
     padding: 20px;
     margin-bottom: 20px;
     background: #FFF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    -moz-box-shadow: 0 2px 0 #000;
-    box-shadow: 0 2px 0 #000;
+    border-radius: 4px;
+    box-shadow: 0 2px 0 #333;
     overflow: hidden;
 }
 .contentlist {
@@ -752,7 +744,7 @@ h3 {
 .con_subcat {
     font-size: 18px;
     padding-left: 23px;
-    background: url(../images/icons/folder.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/folder.png) no-repeat left center;
     height: 18px;
     line-height: 18px;
 }
@@ -788,8 +780,7 @@ h3 {
     display: block;
     border: solid 1px #C3D6DF;
     padding: 15px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     margin-right: 5px;
     margin-bottom: 5px;
 }
@@ -832,7 +823,7 @@ h3 {
 }
 .photo_add_link {
     padding-left: 20px;
-    background: url(../images/icons/addphoto.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/addphoto.png) no-repeat left center;
     font-size: 14px;
     margin: 0 0 0 8px;
 }
@@ -856,8 +847,7 @@ h3 {
     margin-bottom: 15px;
     border: solid 1px #C3D6DF;
     padding: 15px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 
 .photo_container {
@@ -908,13 +898,12 @@ h3 {
     margin-top: 10px;
 }
 .photo_larr {
-    background: url(../images/larr.jpg) no-repeat right 20px;
+    background: url(/templates/_default_/images/larr.jpg) no-repeat right 20px;
 }
 .photo_details {
     background: #E0EAEF;
     padding: 20px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     font-size: 14px;
 }
 .club_photo .karma_buttons {
@@ -995,7 +984,7 @@ h3 {
 .mod_com_all {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/comments.png) no-repeat;
+    background: url(/templates/_default_/images/icons/comments.png) no-repeat;
     color: #333;
 }
 /*--------------------- MODULE "LATEST FORUM WEB2.0" -------------------------*/
@@ -1149,8 +1138,7 @@ h3 {
     margin-bottom: 10px;
 }
 .uc_detailimg div {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     padding: 4px;
 }
@@ -1199,7 +1187,7 @@ h3 {
     color: #375E93;
     padding: 2px;
     padding-left: 20px;
-    background: url(../images/icons/edit.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/edit.png) no-repeat left center;
 }
 .uc_cat_search {
     margin: 15px 0px;
@@ -1220,7 +1208,7 @@ h3 {
 .uc_search_in_cat a {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/folder.png) no-repeat;
+    background: url(/templates/_default_/images/icons/folder.png) no-repeat;
 }
 
 /*----------------------MODULE "LATEST FROM CATALOG"--------------------------*/
@@ -1243,8 +1231,7 @@ h3 {
     list-style: square;
 }
 .uc_alpha_list {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     background-color: #E0EAEF;
     padding: 5px 10px;
     margin-bottom: 5px;
@@ -1282,63 +1269,60 @@ a.tag {
 .mod_user_menu span a:hover {
     color: #FFF;
     background-color: #5D90D1;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 
 .mod_user_menu .my_profile a {
-    background: url(../images/icons/user.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/user.png) no-repeat 6px center;
 }
 .mod_user_menu .my_messages a {
-    background: url(../images/icons/message.png) no-repeat 6px 6px;
+    background: url(/templates/_default_/images/icons/message.png) no-repeat 6px 6px;
 }
 .mod_user_menu .my_messages a.has_new {
     color: #FFE900;
 }
 .mod_user_menu .my_gifts a {
-    background: url(../images/icons/gift.png) no-repeat 6px 6px;
+    background: url(/templates/_default_/images/icons/gift.png) no-repeat 6px 6px;
 }
 .mod_user_menu .my_blog a {
-    background: url(../images/icons/blog.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/blog.png) no-repeat 6px center;
 }
 .mod_user_menu .my_photos a {
-    background: url(../images/icons/folder_picture.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/folder_picture.png) no-repeat 6px center;
 }
 .mod_user_menu .my_content a {
-    background: url(../images/icons/folder_page.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/folder_page.png) no-repeat 6px center;
 }
 .mod_user_menu .add_content a {
-    background: url(../images/icons/add.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/add.png) no-repeat 6px center;
 }
 .mod_user_menu .admin a {
-    background: url(../images/icons/cpanel.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/cpanel.png) no-repeat 6px center;
 }
 .mod_user_menu .logout a {
-    background: url(../images/icons/logout.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/logout.png) no-repeat 6px center;
 }
 .mod_user_menu .register a {
-    background: url(../images/icons/register.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/register.png) no-repeat 6px center;
 }
 .mod_user_menu .login a {
-    background: url(../images/icons/key.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/key.png) no-repeat 6px center;
 }
 .mod_user_menu .my_balance a {
-    background: url(../images/billing/balance.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/billing/balance.png) no-repeat 6px center;
 }
 
 .usr_msgmenu_bar {
     background-color: #E0EAEF;
     margin-bottom: 10px;
-    border-radius: 0px 0px 8px 8px;
-    -moz-border-radius: 0px 0px 8px 8px;
+    border-radius: 0px 0px 4px 4px;
     color: #375E93;
     clear: both;
     padding: 7px;
 }
 .usr_msgreply_source {
     padding: 7px;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     margin-bottom: 10px;
     overflow-y: auto;
@@ -1366,7 +1350,7 @@ a.tag {
 }
 .usr_msg_bbcodebox {
     padding: 0px;
-    background: url(../images/bbtoolbar.jpg) repeat-x left top #EFEFEF;
+    background: url(/templates/_default_/images/bbtoolbar.jpg) repeat-x left top #EFEFEF;
     overflow: hidden;
     _height: 1%;
     width: 100%;
@@ -1388,7 +1372,7 @@ a.tag {
 .usr_bb_button:hover {
     border: solid 1px #83BBD9;
     padding: 3px;
-    background: url(../images/bbbtn.jpg) repeat-x left bottom #DFF2F9;
+    background: url(/templates/_default_/images/bbbtn.jpg) repeat-x left bottom #DFF2F9;
 }
 .usr_bb_hint {
     display: block;
@@ -1477,8 +1461,7 @@ a.new_messages_link:hover {
     margin-bottom: 10px;
     padding: 10px;
     background: #ECECEC;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 .bb_img {
     max-width: 550px;
@@ -1489,8 +1472,7 @@ a.new_messages_link:hover {
     padding-bottom: 5px;
     background-color: #E0EAEF;
     margin-bottom: 10px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 .faq_cat_link {
     font-size: 18px;
@@ -1539,7 +1521,7 @@ a.new_messages_link:hover {
     margin-top: 2px;
     margin-right: 4px;
     float: right;
-    background: url(../images/icons/user.png) no-repeat;
+    background: url(/templates/_default_/images/icons/user.png) no-repeat;
 }
 .faq_questcat {
     padding: 2px;
@@ -1553,14 +1535,12 @@ a.new_messages_link:hover {
 }
 .faq_quest {
     margin-bottom: 4px;
-    border-radius: 8px 8px 8px 8px;
-    -moz-border-radius: 8px 8px 8px 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     padding: 8px;
 }
 .faq_send_quest {
-    border-radius: 8px 8px 8px 8px;
-    -moz-border-radius: 8px 8px 8px 8px;
+    border-radius: 4px;
     background-color: #E0EAEF;
     float: right;
     padding: 5px 8px;
@@ -1568,7 +1548,7 @@ a.new_messages_link:hover {
 .faq_send_quest a {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/add.png) no-repeat;
+    background: url(/templates/_default_/images/icons/add.png) no-repeat;
     text-decoration: underline;
     color: #375E93;
 }
@@ -1588,8 +1568,7 @@ a.new_messages_link:hover {
     text-align: center;
     padding: 10px;
     background-color: #E0EAEF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 .karma_form #karmavotes {
     color: #333;
@@ -1601,7 +1580,7 @@ a.new_messages_link:hover {
 }
 .taglinebar .label {
     padding-right: 18px;
-    background: url(../images/icons/tag.png);
+    background: url(/templates/_default_/images/icons/tag.png);
     background-repeat: no-repeat;
     background-position: right;
     font-weight: bold;
@@ -1647,7 +1626,7 @@ a.new_messages_link:hover {
 .new_board_items li {
     padding: 0px;
     padding-left: 20px;
-    background: url(../images/icons/note.png) no-repeat left;
+    background: url(/templates/_default_/images/icons/note.png) no-repeat left;
     list-style: none;
     margin: 0px;
     margin-bottom: 4px;
@@ -1730,8 +1709,7 @@ a.new_messages_link:hover {
     position: relative;
     background-color: #E0EAEF;
     padding: 5px 8px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     display: inline-block;
     float: right;
 }
@@ -1771,8 +1749,7 @@ a.new_messages_link:hover {
     padding: 2px;
     background-color: #E0EAEF;
     overflow: hidden;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     clear: both;
     overflow: hidden;
 }
@@ -1782,12 +1759,12 @@ a.new_messages_link:hover {
 }
 .blog_post_nav .next {
     float: right;
-    background: url(../images/icons/big/next.png) no-repeat right;
+    background: url(/templates/_default_/images/icons/big/next.png) no-repeat right;
     padding: 5px 30px 0 0;
 }
 .blog_post_nav .prev {
     float: left;
-    background: url(../images/icons/big/prev.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/prev.png) no-repeat;
     padding: 5px 0 0 30px;
 }
 .blog_btnlink {
@@ -1869,7 +1846,7 @@ a.new_messages_link:hover {
     color: #375E93;
 }
 .blog_entry_date {
-    background: url(../images/icons/calendar.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/calendar.png) no-repeat left center;
     padding: 1px;
     padding-left: 20px;
     margin-right: 10px;
@@ -1910,7 +1887,7 @@ a.new_messages_link:hover {
     text-align: center;
 }
 .post_karma {
-    background: url(../images/icons/rating.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rating.png) no-repeat left center;
     padding: 1px;
     padding-left: 20px;
     display: inline-block;
@@ -1920,7 +1897,7 @@ a.new_messages_link:hover {
 .blog_comments_link {
     font-size: 12px;font-weight: bold;
     text-decoration: underline;
-    background: url(../images/icons/comment.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/comment.png) no-repeat left center;
     padding: 1px;
     padding-left: 20px;
 }
@@ -1930,12 +1907,11 @@ a.new_messages_link:hover {
     padding: 5px 10px;
     border: solid 1px #C3D6DF;
     display: inline-block;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 .blog_comments .tagline {
     text-decoration: none;
-    background: url(../images/icons/tag.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/tag.png) no-repeat left center;
     padding: 1px;
     padding-left: 20px;
     margin-left: 10px;
@@ -1972,8 +1948,7 @@ a.new_messages_link:hover {
     text-decoration: none;
     background: #E0EAEF;
     padding: 5px 10px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 .blog_full_list .blog_title_td {
     padding-left: 0px;
@@ -1987,20 +1962,20 @@ a.new_messages_link:hover {
 }
 
 .blog_full_list .blog_title {
-    font-size: 16px; background: url(../images/icons/blog.png) no-repeat left center;
+    font-size: 16px; background: url(/templates/_default_/images/icons/blog.png) no-repeat left center;
 }
 .blog_user {
-    background: url(../images/icons/user.png) no-repeat left center; padding: 2px 10px 2px 20px;
+    background: url(/templates/_default_/images/icons/user.png) no-repeat left center; padding: 2px 10px 2px 20px;
 }
 .blog_full_list .blog_posts {
-    background: url(../images/icons/posts.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/posts.png) no-repeat left center;
 }
 .blog_full_list .blog_comm {
-    background: url(../images/icons/comment.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/comment.png) no-repeat left center;
 }
 
 .blog_full_list .blog_rss {
-    background: url(../images/icons/rss.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rss.png) no-repeat left center;
     width: 16px;
     height: 16px;
     display: block;
@@ -2009,7 +1984,7 @@ a.new_messages_link:hover {
     margin-top: 15px;
 }
 .blogs_full_rss a {
-    background: url(../images/icons/rss.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rss.png) no-repeat left center;
     padding: 1px;
     padding-left: 20px
 }
@@ -2028,8 +2003,7 @@ a.new_messages_link:hover {
     margin-bottom: 4px;
     border: solid 1px #C3D6DF;
     padding: 12px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 
 .bd_item_vip {
@@ -2037,8 +2011,7 @@ a.new_messages_link:hover {
     border: 1px solid #FFCC99;
     background: #FFFFD9;
     padding: 12px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 
 .board_toolbar {
@@ -2131,8 +2104,7 @@ div.bd_item_details span, div.bd_item_details_full span {
 .bd_text_full {
     padding: 20px 15px;
     font-size: 16px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     margin-top: 15px;
 }
@@ -2152,43 +2124,43 @@ div.bd_links span {
 }
 
 div.bd_links span.bd_message {
-    background: url(../images/icons/message.png) no-repeat 0px 2px;
+    background: url(/templates/_default_/images/icons/message.png) no-repeat 0px 2px;
 }
 div.bd_links span.bd_author {
-    background: url(../images/icons/posts.png) no-repeat 0px 2px;
+    background: url(/templates/_default_/images/icons/posts.png) no-repeat 0px 2px;
 }
 
 span.bd_item_is_vip {
-    background: url(../images/icons/vip.png) no-repeat;
+    background: url(/templates/_default_/images/icons/vip.png) no-repeat;
     color: #ED8115;
     font-weight: bold;
 }
 
 span.bd_item_date {
-    background: url(../images/icons/calendar.png) no-repeat;
+    background: url(/templates/_default_/images/icons/calendar.png) no-repeat;
 }
 
 span.bd_item_city {
-    background: url(../images/icons/city.png) no-repeat;
+    background: url(/templates/_default_/images/icons/city.png) no-repeat;
 }
 span.bd_item_hits {
-    background: url(../images/icons/eye.png) no-repeat scroll center left;
+    background: url(/templates/_default_/images/icons/eye.png) no-repeat scroll center left;
 }
 span.bd_item_edit {
-    background: url(../images/icons/edit.png) no-repeat;
+    background: url(/templates/_default_/images/icons/edit.png) no-repeat;
 }
 
 span.bd_item_delete {
-    background: url(../images/icons/no.png) no-repeat;
+    background: url(/templates/_default_/images/icons/no.png) no-repeat;
 }
 span.bd_item_publish {
-    background: url(../images/icons/yes.png) no-repeat;
+    background: url(/templates/_default_/images/icons/yes.png) no-repeat;
 }
 span.bd_item_user {
-    background: url(../images/icons/user.png) no-repeat;
+    background: url(/templates/_default_/images/icons/user.png) no-repeat;
 }
 span.bd_item_cat {
-    background: url(../images/icons/folder_table.png) no-repeat;
+    background: url(/templates/_default_/images/icons/folder_table.png) no-repeat;
 }
 span.bd_item_status_ok {
     color: green;
@@ -2216,8 +2188,7 @@ div.bd_cat_main_obtypes a {
 /* ========================================================================== */
 
 #shop_toollink_div {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     background-color: #E0EAEF;
     float: right;
     padding: 8px 8px;
@@ -2231,7 +2202,7 @@ div.bd_cat_main_obtypes a {
 
 #shop_cartlink {
     float: left;
-    background: url(../images/icons/cart.png) no-repeat 2px 2px;
+    background: url(/templates/_default_/images/icons/cart.png) no-repeat 2px 2px;
     font-weight: bold;
     padding-left: 25px;
     padding-right: 5px;
@@ -2239,13 +2210,13 @@ div.bd_cat_main_obtypes a {
 
 #shop_searchlink {
     float: left;
-    background: url(../images/icons/search.png) no-repeat 2px 2px;
+    background: url(/templates/_default_/images/icons/search.png) no-repeat 2px 2px;
     padding-left: 25px;
     padding-right: 5px;
 }
 #shop_addlink {
     float: left;
-    background: url(../images/icons/add.png) no-repeat 2px 2px;
+    background: url(/templates/_default_/images/icons/add.png) no-repeat 2px 2px;
     padding-left: 22px;
     padding-right: 5px;
 }
@@ -2325,8 +2296,7 @@ div.bd_cat_main_obtypes a {
 }
 
 .catalog_list_item {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     margin-bottom: 4px;
     padding: 8px;
@@ -2358,7 +2328,7 @@ ul.uc_cat_list {
 ul.uc_cat_list li.uc_cat_item {
     font-size: 18px;
     padding-left: 23px;
-    background: url(../images/icons/folder.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/folder.png) no-repeat left center;
     height: 18px;
     line-height: 18px;
     margin: 0px;
@@ -2387,10 +2357,9 @@ div.new_club {
    padding: 9px;
    padding-left: 30px;
    padding-right: 15px;
-   background: url(../images/icons/add.png) no-repeat 10px center #E0EAEF;
+   background: url(/templates/_default_/images/icons/add.png) no-repeat 10px center #E0EAEF;
    float: right;
-   -moz-border-radius: 8px 8px 8px 8px;
-   border-radius: 8px 8px 8px 8px;
+   border-radius: 4px;
    background-color: #E0EAEF;
 }
 div.new_club a {
@@ -2404,8 +2373,7 @@ div.club_entry_vip {
     margin-bottom: 5px;
     padding: 15px;
     border: solid 1px #C3D6DF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     clear: both;
     position: relative;
 }
@@ -2473,18 +2441,18 @@ div.club_entry_vip .data .details span {
 }
 div.club_entry .data .details span.rating,
 div.club_entry_vip .data .details span.rating {
-    background: url(../images/icons/rating.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rating.png) no-repeat left center;
 }
 div.club_entry_vip .data .details span.vip {
-    background: url(../images/icons/vip.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/vip.png) no-repeat left center;
 }
 div.club_entry .data .details span.date,
 div.club_entry_vip .data .details span.date {
-    background: url(../images/icons/calendar.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/calendar.png) no-repeat left center;
 }
 div.club_entry .data .details span.members,
 div.club_entry_vip .data .details span.members {
-    background: url(../images/icons/groups/registered.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/groups/registered.png) no-repeat left center;
 }
 
 table.club_full_entry {
@@ -2518,18 +2486,18 @@ table.club_full_entry .data .details span {
     height: 18px;
 }
 table.club_full_entry .data .details span.vip {
-    background: url(../images/icons/vip.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/vip.png) no-repeat left center;
     color: #ED8115;
     font-weight: bold;
 }
 table.club_full_entry .data .details span.rating {
-    background: url(../images/icons/rating.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rating.png) no-repeat left center;
 }
 table.club_full_entry .data .details span.date {
-    background: url(../images/icons/calendar.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/calendar.png) no-repeat left center;
 }
 table.club_full_entry .data .details span.members {
-    background: url(../images/icons/groups/registered.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/groups/registered.png) no-repeat left center;
 }
 
 table.club_full_entry .data .description {
@@ -2572,10 +2540,10 @@ table.club_full_entry .clubcontent div.title {
     font-size: 16px;
 }
 table.club_full_entry .clubcontent div.blog .title {
-    background: url(../images/icons/big/blog.png) 4px center no-repeat #E0EAEF;
+    background: url(/templates/_default_/images/icons/big/blog.png) 4px center no-repeat #E0EAEF;
 }
 table.club_full_entry .clubcontent div.album .title {
-    background: url(../images/icons/big/images.png) 4px center no-repeat #E0EAEF;
+    background: url(/templates/_default_/images/icons/big/images.png) 4px center no-repeat #E0EAEF;
 }
 table.club_full_entry .clubcontent ul li a.on_moder {
     color: #FF6600;
@@ -2625,23 +2593,23 @@ table.club_full_entry .clubmenu div {
 }
 table.club_full_entry .clubmenu div.join {
     padding-left: 32px;
-    background: url(../images/icons/clubs/join.png) 0px center no-repeat;
+    background: url(/templates/_default_/images/icons/clubs/join.png) 0px center no-repeat;
 }
 table.club_full_entry .clubmenu div.leave {
     padding-left: 32px;
-    background: url(../images/icons/clubs/leave.png) 0px center no-repeat;
+    background: url(/templates/_default_/images/icons/clubs/leave.png) 0px center no-repeat;
 }
 table.club_full_entry .clubmenu div.config {
     padding-left: 32px;
-    background: url(../images/icons/clubs/config.png) 0px center no-repeat;
+    background: url(/templates/_default_/images/icons/clubs/config.png) 0px center no-repeat;
 }
 table.club_full_entry .clubmenu div.invite {
     padding-left: 32px;
-    background: url(../images/icons/clubs/invite.png) 0px center no-repeat;
+    background: url(/templates/_default_/images/icons/clubs/invite.png) 0px center no-repeat;
 }
 table.club_full_entry .clubmenu div.messages {
     padding-left: 32px;
-    background: url(../images/icons/clubs/messages.png) 0px center no-repeat;
+    background: url(/templates/_default_/images/icons/clubs/messages.png) 0px center no-repeat;
 }
 
 table.club_full_entry .wall .header {
@@ -2668,7 +2636,6 @@ table.club_full_entry .wall #addwall {
     top: 0;
     left: 0;
     border-radius: 3px;
-    -moz-border-radius: 3px;
     width: 80%;
     opacity: 0.7;
     filter: alpha(opacity=70);
@@ -2688,16 +2655,16 @@ table.club_full_entry .wall #addwall {
     padding: 1px 10px 1px 20px;
 }
 .cmm_links span.add_comment {
-    background: url(../images/icons/comment.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/comment.png) no-repeat left center;
 }
 .cmm_links span.subscribe {
-    background: url(../images/icons/subscribe.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/subscribe.png) no-repeat left center;
 }
 .cmm_links span.unsubscribe {
-    background: url(../images/icons/unsubscribe.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/unsubscribe.png) no-repeat left center;
 }
 .cmm_links span.cmm_rss {
-    background: url(../images/icons/rss.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/rss.png) no-repeat left center;
 }
 .left_border {
     padding: 0 0 0 8px;
@@ -2750,7 +2717,7 @@ table.club_full_entry .wall #addwall {
     margin-right: 6px;
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/calendar.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/calendar.png) no-repeat left center;
 }
 .cmm_pagebar {
     background-color: #EBEBEB;
@@ -2776,14 +2743,13 @@ table.club_full_entry .wall #addwall {
 .cmm_avatar {
     padding: 5px;
     background: #EBEBEB;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 .cmm_content_av {
     padding: 10px;
     padding-left: 25px;
     padding-top: 7px;
-    background: url(../images/icons/comments/pointer.jpg) no-repeat;
+    background: url(/templates/_default_/images/icons/comments/pointer.jpg) no-repeat;
 
 }
 .cmm_content {
@@ -2833,8 +2799,7 @@ table.club_full_entry .wall #addwall {
 .cm_editor {
     border: 1px #CCC solid;
     padding: 4px;
-    border-radius: 0 0 6px 6px;
-    -moz-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 4px 4px;
 }
 .cm_codebar {
     margin: 6px 0 0;
@@ -2856,8 +2821,7 @@ div.cm_smiles {
     padding: 10px;
     margin-bottom: 10px;
     background: #E0EAEF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 
 div.con_forum_link {
@@ -3015,8 +2979,7 @@ div.con_forum_link a {
     border: solid 1px #A8C2CF;
     padding: 5px;
     background-color: white;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     width: 64px;
 }
 .post_userawards {
@@ -3108,8 +3071,7 @@ div.con_forum_link a {
 .bb_quote {
     background-color: #FFFFD9;
     border: 1px solid #FFCC99;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     color: gray;
     font-size: 12px;
     margin: 6px;
@@ -3145,8 +3107,7 @@ div.con_forum_link a {
 .forum_fa {
     margin: 6px 0 0 0;
     border: solid 1px #CCC;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
+    border-radius: 4px;
     padding: 7px;
 }
 .forum_fa_title {
@@ -3162,8 +3123,7 @@ div.con_forum_link a {
     border: 1px solid #FFCC99;
     padding: 8px;
     margin: 6px 0 0 0;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
+    border-radius: 4px;
     display: none;
 }
 .forum_postinfo {
@@ -3195,7 +3155,7 @@ div.con_forum_link a {
     margin-bottom: 4px;
     padding: 10px 0;
     padding-left: 20px;
-    background: url(../images/icons/edit.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/edit.png) no-repeat left center;
 }
 .forum_fast_submit {
     text-align: right;
@@ -3233,7 +3193,7 @@ div.con_forum_link a {
     height: 18px;
     line-height: 18px;
     padding-left: 22px;
-    background: url(../images/icons/users/upload.gif) no-repeat left center;
+    background: url(/templates/_default_/images/icons/users/upload.gif) no-repeat left center;
 }
 #usr_links {
     margin-top: 0px;
@@ -3262,8 +3222,7 @@ div.con_forum_link a {
     padding: 1px 5px;
     background-color: #00CC00;
     color: #FFF;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
+    border-radius: 2px;
     font-size: 11px;
 }
 
@@ -3284,7 +3243,7 @@ div.con_forum_link a {
 #users_search_link a {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/search.png) no-repeat;
+    background: url(/templates/_default_/images/icons/search.png) no-repeat;
     text-decoration: none;
 }
 
@@ -3294,8 +3253,7 @@ div.con_forum_link a {
 
 #users_sbar {
     padding: 15px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     color: #375E93;
     background: #E0EAEF;
@@ -3318,8 +3276,7 @@ div.con_forum_link a {
 
 .users_search_results {
     padding: 15px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     color: #375E93;
     background: #E0EAEF;
@@ -3340,8 +3297,7 @@ div.users_list_buttons {
     overflow: hidden;
 }
 div.users_list_buttons .button {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     display: block;
     float: left;
     font-size: 18px;
@@ -3365,9 +3321,10 @@ div.users_list_buttons .selected a {
 }
 
 div.users_list {
-    margin: 15px 0px; padding: 15px; border: 1px solid #C3D6DF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    margin: 15px 0px;
+    padding: 15px;
+    border: 1px solid #C3D6DF;
+    border-radius: 4px;
 }
 
 table.users_list div.avatar {
@@ -3387,7 +3344,7 @@ div.microstatus {
     color: #5F98BF; font-size: 11px;
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/comment-small.png) no-repeat left top;
+    background: url(/templates/_default_/images/icons/comment-small.png) no-repeat left top;
     clear: both;
     margin-top: 3px;
 }
@@ -3395,7 +3352,7 @@ div.microstatus {
     color: #5F98BF; font-size: 11px;
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/comment-small.png) no-repeat left top;
+    background: url(/templates/_default_/images/icons/comment-small.png) no-repeat left top;
     margin-top: 3px;
 }
 table.users_list div.karma,
@@ -3404,8 +3361,7 @@ table.users_list div.rating {
     float: right;
     overflow: hidden;
     padding: 2px 5px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     background: #E0EAEF;
 }
 table.users_list div.karma {
@@ -3434,8 +3390,7 @@ table.users_list div.status .online {
     background-color: #00CC00;
     color: #FFF;
     font-size: 11px;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
+    border-radius: 2px;
 }
 table.users_list div.status .offline {
     color: #999999;
@@ -3472,7 +3427,7 @@ table.users_list div.status .offline {
 #mod_user_stats div.stat_block_bday div.title {
     text-shadow: 0 2px 0 #FFFFFF;
     padding-left: 18px;
-    background: url(../images/icons/cake.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/cake.png) no-repeat left center;
     font-size: 16px;
     color: #1873AA;
     font-weight: bold;
@@ -3493,8 +3448,7 @@ div#user_ratings .value,
 div#user_ratings .value-positive,
 div#user_ratings .value-negative {
     font-size: 14px; padding: 4px; margin: 2px;
-    border-radius: 18px;
-    -moz-border-radius: 18px;
+    border-radius: 10px;
     cursor: pointer;
 }
 
@@ -3532,19 +3486,19 @@ div#user_ratings .rating .value {
 }
 
 .user_group_name .admin {
-    background-image:  url(../images/icons/groups/admin.png);
+    background-image:  url(/templates/_default_/images/icons/groups/admin.png);
 }
 .user_group_name .registered {
-    background-image: url(../images/icons/groups/registered.png);
+    background-image: url(/templates/_default_/images/icons/groups/registered.png);
 }
 .user_group_name .editors {
-    background-image: url(../images/icons/groups/editors.png);
+    background-image: url(/templates/_default_/images/icons/groups/editors.png);
 }
 .user_group_name .moderators {
-    background-image: url(../images/icons/groups/moderators.png);
+    background-image: url(/templates/_default_/images/icons/groups/moderators.png);
 }
 .user_group_name .vip {
-    background-image: url(../images/icons/groups/vip.png);
+    background-image: url(/templates/_default_/images/icons/groups/vip.png);
 }
 
 div#user_profile_url {
@@ -3553,8 +3507,7 @@ div#user_profile_url {
     padding: 5px;
     margin-top: 15px;
     text-align: center;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     background: none repeat scroll 0 0 #E0EAEF;
 }
 #user_profile_url div {
@@ -3582,7 +3535,7 @@ a.select-avatar {
     height: 16px;
     line-height: 16px;
     padding-left: 18px;
-    background: url(../images/icons/users/selectavatar.gif) no-repeat left center;
+    background: url(/templates/_default_/images/icons/users/selectavatar.gif) no-repeat left center;
 }
 
 div.user_profile_data {
@@ -3593,8 +3546,7 @@ div.user_profile_data {
 
 .offline {
     padding: 1px 3px;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
+    border-radius: 2px;
     background-color: #DD6C6C;
     color: #FFF;
     font-size: 11px;
@@ -3627,19 +3579,19 @@ div.user_profile_data .field .title {
 }
 
 #usr_board {
-    background: url(../images/icons/big/board.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/board.png) no-repeat;
 }
 #usr_files {
-    background: url(../images/icons/big/folder_ftp.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/folder_ftp.png) no-repeat;
 }
 #usr_blog {
-    background: url(../images/icons/big/blog.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/blog.png) no-repeat;
 }
 #usr_forum {
-    background: url(../images/icons/big/folder.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/folder.png) no-repeat;
 }
 #usr_comments {
-    background: url(../images/icons/big/faq_answer.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/faq_answer.png) no-repeat;
 }
 
 #upr_feed .action_entry {
@@ -3657,7 +3609,7 @@ div.user_profile_data .field .title {
 }
 
 .usr_friends_query {
-    -moz-border-radius: 8px 8px 8px 8px;
+    border-radius: 4px;
     background-color: #FFFFFF;
     border: 1px solid #65A1C2;
     padding: 10px;
@@ -3670,13 +3622,13 @@ div.user_profile_data .field .title {
     height: 16px;
     line-height: 16px;
     padding-left: 20px;
-    background: url(../images/icons/yes.png) no-repeat;
+    background: url(/templates/_default_/images/icons/yes.png) no-repeat;
 }
 .usr_friends_query_no {
     height: 16px;
     line-height: 16px;
     padding-left: 20px;
-    background: url(../images/icons/no.png) no-repeat;
+    background: url(/templates/_default_/images/icons/no.png) no-repeat;
 }
 
 .content_title {
@@ -3702,14 +3654,12 @@ div.user_profile_data .field .title {
 }
 
 .usr_wall_entry {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     margin: 5px 0;
     padding: 5px 0px;
 }
 .usr_wall_avatar {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     padding: 4px;
     background: #FFF;
@@ -3728,7 +3678,7 @@ div.user_profile_data .field .title {
     padding: 5px;
 }
 .usr_wall_delete a {
-    background: url(../images/icons/delete.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/delete.png) no-repeat left center;
     padding: 1px;
     padding-left: 20px;
     height: 16px;
@@ -3747,8 +3697,7 @@ div.user_profile_data .field .title {
 
 .usr_msg_entry {
     padding: 10px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     margin-bottom: 4px;
     border: solid 1px #C3D6DF;
 }
@@ -3778,32 +3727,31 @@ div.user_profile_data .field .title {
 .usr_article_add {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/add.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/add.png) no-repeat left center;
 }
 .usr_photo_add {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/addphoto.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/addphoto.png) no-repeat left center;
 }
 .usr_del_album {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/deletecat.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/deletecat.png) no-repeat left center;
     margin-left: 6px;
     text-decoration: none;
 }
 .usr_edit_album {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/edit.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/edit.png) no-repeat left center;
     margin-left: 6px;
     text-decoration: none;
 }
 
 #usr_photos_upload_album {
     background: #E0EAEF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     padding: 10px;
     margin-bottom: 5px;
 }
@@ -3827,13 +3775,12 @@ div.user_profile_data .field .title {
 .usr_photos_submit_one {
     padding: 10px;
     border: solid 1px #C3D6DF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     margin-bottom: 2px;
 }
 .usr_photos_submit_one .ph_thumb {
     border: solid 3px #E0EAEF;
-    -moz-border-radius: 5px;
+    border-radius: 3px;
     width: 96px;
     padding: 2px;
 }
@@ -3856,8 +3803,7 @@ div.user_profile_data .field .title {
     display: block;
     margin: 4px;
     margin-left: 0px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #C3D6DF;
     text-align: center;
 }
@@ -3876,7 +3822,7 @@ div.user_profile_data .field .title {
     margin: 10px 0px;
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/info.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/info.png) no-repeat left center;
     clear: both;
 }
 
@@ -3900,11 +3846,11 @@ div.user_profile_data .field .title {
 }
 
 .usr_photo_prev_link {
-    background: url(../images/icons/big/prev.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/prev.png) no-repeat;
     float: right;
 }
 .usr_photo_next_link {
-    background: url(../images/icons/big/next.png) no-repeat;
+    background: url(/templates/_default_/images/icons/big/next.png) no-repeat;
     float: left;
 }
 
@@ -3915,10 +3861,10 @@ div.user_profile_data .field .title {
 }
 
 .usr_photo_link_edit {
-    background: url(../images/icons/edit.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/edit.png) no-repeat left center;
 }
 .usr_photo_link_delete {
-    background: url(../images/icons/delete.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/delete.png) no-repeat left center;
     margin-left: 10px;
 }
 
@@ -4026,17 +3972,16 @@ div.user_profile_data .field .title {
     font-size: 14px;
 }
 .usr_wall_addlink {
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
     padding: 5px 8px;
     padding-left: 25px;
     display: inline-block;
-    background: url(../images/icons/add.png) no-repeat 6px center #E0EAEF;
+    background: url(/templates/_default_/images/icons/add.png) no-repeat 6px center #E0EAEF;
 }
 .club_wall_addlink {
     padding: 0 0 0 25px;
     float: right;
-    background: url(../images/icons/add.png) no-repeat 6px center #E0EAEF;
+    background: url(/templates/_default_/images/icons/add.png) no-repeat 6px center #E0EAEF;
 }
 .usr_wall_addlink a,
 .club_wall_addlink a {
@@ -4106,12 +4051,12 @@ div.user_profile_data .field .title {
 
 .user_gender_m,
 .user_gender_ {
-    background: url(../images/icons/male.png) no-repeat 0px 2px;
+    background: url(/templates/_default_/images/icons/male.png) no-repeat 0px 2px;
     padding-left: 20px;
     line-height: 18px;
 }
 .user_gender_f {
-    background: url(../images/icons/female.png) no-repeat 0px 2px;
+    background: url(/templates/_default_/images/icons/female.png) no-repeat 0px 2px;
     padding-left: 20px;
     line-height: 18px;
 }
@@ -4127,7 +4072,7 @@ div.awards_list_link {
 div.awards_list_link a {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/info.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/info.png) no-repeat left center;
 }
 
 #usr_profparams {
@@ -4180,8 +4125,7 @@ div.awards_list_link a {
     background-color: #E0EAEF;
     padding: 10px;
     font-weight: bold;
-    border-radius: 8px 8px 0 0;
-    -moz-border-radius: 8px 8px 0 0;
+    border-radius: 4px 4px 0 0;
     float: left;
 }
 .usr_msgmenu_link {
@@ -4192,44 +4136,44 @@ div.awards_list_link a {
 
 .in_link {
     padding-left: 26px;
-    background: url(../images/icons/users/message-in.png) no-repeat 6px center #FFF;
+    background: url(/templates/_default_/images/icons/users/message-in.png) no-repeat 6px center #FFF;
 }
 .in_span {
     padding-left: 26px;
-    background: url(../images/icons/users/message-in.png) no-repeat 6px center #E0EAEF;
+    background: url(/templates/_default_/images/icons/users/message-in.png) no-repeat 6px center #E0EAEF;
 }
 
 .out_link {
     padding-left: 26px;
-    background: url(../images/icons/users/message-out.png) no-repeat 6px center #FFF;
+    background: url(/templates/_default_/images/icons/users/message-out.png) no-repeat 6px center #FFF;
 }
 .out_span {
     padding-left: 26px;
-    background: url(../images/icons/users/message-out.png) no-repeat 6px center #E0EAEF;
+    background: url(/templates/_default_/images/icons/users/message-out.png) no-repeat 6px center #E0EAEF;
 }
 
 .notices_link {
     padding-left: 26px;
-    background: url(../images/icons/users/message_notice.png) no-repeat 6px center #FFF;
+    background: url(/templates/_default_/images/icons/users/message_notice.png) no-repeat 6px center #FFF;
 }
 .notices_span {
     padding-left: 26px;
-    background: url(../images/icons/users/message_notice.png) no-repeat 6px center #E0EAEF;
+    background: url(/templates/_default_/images/icons/users/message_notice.png) no-repeat 6px center #E0EAEF;
 }
 
 .new_link {
     padding-left: 26px;
-    background: url(../images/icons/users/message-new.png) no-repeat 6px center;
+    background: url(/templates/_default_/images/icons/users/message-new.png) no-repeat 6px center;
     text-decoration: none;
 }
 
 .history_link {
     padding-left: 26px;
-    background: url(../images/icons/users/message_history.png) no-repeat 6px center #FFF;
+    background: url(/templates/_default_/images/icons/users/message_history.png) no-repeat 6px center #FFF;
 }
 .history_span {
     padding-left: 26px;
-    background: url(../images/icons/users/message_history.png) no-repeat 6px center #E0EAEF;
+    background: url(/templates/_default_/images/icons/users/message_history.png) no-repeat 6px center #E0EAEF;
 }
 
 a.msg_delete:hover,
@@ -4256,16 +4200,16 @@ span.msg_new {
 }
 
 a.msg_delete {
-    background: url("../images/icons/delete.png") no-repeat left center;
+    background: url("/templates/_default_/images/icons/delete.png") no-repeat left center;
 }
 a.msg_reply {
-    background: url(../images/icons/users/message_reply.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/users/message_reply.png) no-repeat left center;
 }
 a.msg_history {
-    background: url(../images/icons/users/message_history.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/users/message_history.png) no-repeat left center;
 }
 span.msg_new {
-    background: url(../images/icons/new.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/new.png) no-repeat left center;
     color: red;
 }
 
@@ -4299,7 +4243,7 @@ table.feed td.date strong {
 
 .usr_status_text {
     color: #5F98BF;
-    background: url(../images/icons/comment.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/comment.png) no-repeat left center;
     padding-left: 20px;
     float: left;
 }
@@ -4319,21 +4263,20 @@ table.feed td.date strong {
 .usr_status_link a {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/edit.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/edit.png) no-repeat left center;
 }
 
 .usr_avatar {
     padding: 10px;
     border: solid 1px #65A1C2;
     background-color: #FFFFFF;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
+    border-radius: 4px;
 }
 
 .usr_avatars_lib_link {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/images.png) no-repeat left center;
+    background: url(/templates/_default_/images/icons/images.png) no-repeat left center;
 }
 
 .usr_friends_block {
@@ -4433,16 +4376,20 @@ table.feed td.date strong {
 .mod_act_all {
     padding: 1px;
     padding-left: 20px;
-    background: url(../images/icons/actions.png) no-repeat;
+    background: url(/templates/_default_/images/icons/actions.png) no-repeat;
     color: #333;
 }
 .actions_list {
     clear: both;
 }
 
+.actions_list h3 {
+    color: #000;
+}
 .action_entry {
-    padding-left: 25px;
+    border-bottom: 1px solid #ecf0f1;
     margin-bottom: 15px;
+    padding: 0 0 5px 25px;
 }
 
 .action_entry .is_new {
@@ -4478,75 +4425,75 @@ table.feed td.date strong {
 }
 
 .act_add_comment {
-    background: url(../images/icons/actions/add_comment.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_comment.png) no-repeat left 3px;
 }
 .act_add_photo, .act_add_photo_club {
-    background: url(../images/icons/actions/add_photo.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_photo.png) no-repeat left 3px;
 }
 .act_add_article {
-    background: url(../images/icons/actions/add_article.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_article.png) no-repeat left 3px;
 }
 .act_set_status {
-    background: url(../images/icons/actions/set_status.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/set_status.png) no-repeat left 3px;
 }
 .act_add_friend {
-    background: url(../images/icons/actions/add_friend.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_friend.png) no-repeat left 3px;
 }
 .act_add_blog {
-    background: url(../images/icons/actions/add_blog.png) no-repeat left 3px; }
+    background: url(/templates/_default_/images/icons/actions/add_blog.png) no-repeat left 3px; }
 .act_add_post {
-    background: url(../images/icons/actions/add_post.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_post.png) no-repeat left 3px;
 }
 .act_add_board {
-    background: url(../images/icons/actions/add_board.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_board.png) no-repeat left 3px;
 }
 .act_add_catalog {
-    background: url(../images/icons/actions/add_catalog.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_catalog.png) no-repeat left 3px;
 }
 .act_add_club {
-    background: url(../images/icons/actions/add_club.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_club.png) no-repeat left 3px;
 }
 .act_add_club_user {
-    background: url(../images/icons/actions/add_club_user.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_club_user.png) no-repeat left 3px;
 }
 .act_add_quest {
-    background: url(../images/icons/actions/add_quest.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_quest.png) no-repeat left 3px;
 }
 .act_add_fpost {
-    background: url(../images/icons/actions/add_fpost.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_fpost.png) no-repeat left 3px;
 }
 .act_add_thread {
-    background: url(../images/icons/actions/add_thread.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_thread.png) no-repeat left 3px;
 }
 .act_add_avatar {
-    background: url(../images/icons/actions/add_avatar.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_avatar.png) no-repeat left 3px;
 }
 .act_add_award {
-    background: url(../images/icons/actions/add_award.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_award.png) no-repeat left 3px;
 }
 .act_add_file {
-    background: url(../images/icons/actions/add_file.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_file.png) no-repeat left 3px;
 }
 .act_add_wall {
-    background: url(../images/icons/actions/add_wall.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_wall.png) no-repeat left 3px;
 }
 .act_add_wall_club {
-    background: url(../images/icons/actions/add_wall_club.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_wall_club.png) no-repeat left 3px;
 }
 .act_add_post_club {
-    background: url(../images/icons/actions/add_post_club.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_post_club.png) no-repeat left 3px;
 }
 .act_add_user_photo {
-    background: url(../images/icons/actions/add_user_photo.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_user_photo.png) no-repeat left 3px;
 }
 .act_add_user_photo_multi {
-    background: url(../images/icons/actions/add_user_photo_multi.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_user_photo_multi.png) no-repeat left 3px;
 }
 .act_add_user {
-    background: url(../images/icons/actions/add_user.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_user.png) no-repeat left 3px;
 }
 .act_add_wall_my {
-    background: url(../images/icons/actions/add_wall_my.png) no-repeat left 3px;
+    background: url(/templates/_default_/images/icons/actions/add_wall_my.png) no-repeat left 3px;
 }
 
 /** Core messages styles [AM][start] **/
@@ -4572,7 +4519,7 @@ input.button_no::-moz-focus-inner {
     border: 1px solid #45688E;
 }
 .button_yes {
-    background: url('../images/core/button.png') repeat-x scroll 0 -16px #6181A6;
+    background: url('/templates/_default_/images/core/button.png') repeat-x scroll 0 -16px #6181A6;
     border-color: #789ABF #5980A9 #5980A9;
     color: #FFF;
     text-shadow: 0 1px 0 #45688E;
@@ -4590,7 +4537,7 @@ input.button_no::-moz-focus-inner {
     border: 1px solid #B3B3B3;
 }
 .button_no {
-    background: url('../images/core/button.png') repeat-x scroll 0 -54px #DDDDDD;
+    background: url('/templates/_default_/images/core/button.png') repeat-x scroll 0 -54px #DDDDDD;
     border-color: #FFFFFF #E7E7E7 #E5E5E5;
     color: #444444;
     text-shadow: 0 1px 0 #FFFFFF;
@@ -4647,7 +4594,7 @@ input.button_no::-moz-focus-inner {
 }
 #popup_container .popup_x_button,
 #noteform .popup_x_button {
-    background: url("../images/core/close_btn.png") no-repeat center center;
+    background: url("/templates/_default_/images/core/close_btn.png") no-repeat center center;
     cursor: pointer;
     float: right;
     height: 16px; 
@@ -4690,7 +4637,7 @@ input.button_no::-moz-focus-inner {
     margin: 0.5em 0
 }
 span.ajax-loader {
-    background: url('../images/core/ajax-loader.gif') no-repeat;
+    background: url('/templates/_default_/images/core/ajax-loader.gif') no-repeat;
     display: none;
     float: left;
     left: 6px;
@@ -5006,7 +4953,7 @@ span.ajax-loader {
     border-color: #FFF;
 }
 .filelink a {
-    background: url('../images/icons/download.gif') no-repeat center left;
+    background: url('/templates/_default_/images/icons/download.gif') no-repeat center left;
     padding: 0 0 0 20px;
 }
 .city_block {

@@ -74,4 +74,3 @@ if ($cfg['comments']) {
     cmsCore::includeComments();
     comments('boarditem', $item['id']);
 }
-?>

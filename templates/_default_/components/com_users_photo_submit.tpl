@@ -1,9 +1,8 @@
 <h1 class="con_heading">{$LANG.PHOTOS_CONFIG}</h1>
 
 <script type="text/javascript">
-    {literal}
-    function togglePhoto(id){
-        if ($('#delete'+id).prop('checked')){
+    function togglePhoto(id) {
+        if ($('#delete'+id).prop('checked')) {
             $('#photo'+id+' .text-input').prop('disabled', true);
             $('#photo'+id+' select').prop('disabled', true);
         } else {
@@ -11,11 +10,9 @@
             $('#photo'+id+' select').prop('disabled', false);
         }
     }
-    {/literal}
 </script>
 
 <form action="" method="post">
-
     <div id="usr_photos_upload_album">
         <table border="0" cellpadding="0" cellspacing="0">
             {if $albums}

@@ -98,7 +98,7 @@ if ($do == 'view' && !$target && !$target_id){
             assign('page_title', $page_title)->
             assign('cfg', $model->config)->
             assign('is_admin', $is_moder)->
-            display('com_comments_list_all.tpl');
+            display();
 
 }
 
@@ -130,7 +130,7 @@ if (!in_array($do, array('add', 'edit', 'delete')) && $target && $target_id){
                 assign('labels', $model->labels)->
                 assign('target', $target)->
                 assign('target_id', $target_id)->
-                display('com_comments_list.tpl');
+                display();
 
 		$html = ob_get_clean();
 
@@ -154,7 +154,7 @@ if (!in_array($do, array('add', 'edit', 'delete')) && $target && $target_id){
             assign('html', isset($html) ? $html : '')->
             assign('add_comment_js', "addComment('".$target."', '".$target_id."', 0)")->
             assign('user_subscribed', cmsUser::isSubscribed($inUser->id, $target, $target_id))->
-            display('com_comments_view.tpl');
+            display();
 
 }
 
@@ -201,7 +201,7 @@ if ($do=='add'){
 	if (!$comment['content']) { cmsCore::jsonOutput(array('error' => true, 'text' => $_LANG['ERR_COMMENT_TEXT'])); }
 	// проверяем каптчу
 	$need_captcha = $model->config['regcap'] ? true : ($inUser->id ? false : true);
-	if ($need_captcha && !cmsCore::checkCaptchaCode(cmsCore::request('code', 'str', ''))) { cmsCore::jsonOutput(array('error' => true, 'is_captcha' => true, 'text' => $_LANG['ERR_CAPTCHA'])); }
+	if ($need_captcha && !cmsCore::checkCaptchaCode()) { cmsCore::jsonOutput(array('error' => true, 'is_captcha' => true, 'text' => $_LANG['ERR_CAPTCHA'])); }
 
 	// получаем массив со ссылкой и заголовком цели комментария
 	// для этого:

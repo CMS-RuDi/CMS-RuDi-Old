@@ -6,31 +6,29 @@
         <td class="darkBlue-LightBlue">{$LANG.LAST_POST}</td>
     </tr>
 {if $threads}
-    {assign var="row" value=1}
     {foreach key=id item=thread from=$threads}
-        {if $row % 2}{assign var="class" value='row1'}{else}{assign var="class" value='row2'}{/if}
-        <tr>
+        <tr class="{cycle values="row11,row2"}">
             {if $thread.pinned}
-                <td width="30" class="{$class}" align="center" valign="middle"><img alt="{$LANG.ATTACHED_THREAD}" src="/templates/{template}/images/icons/forum/pinned.png" border="0" title="{$LANG.ATTACHED_THREAD}" /></td>
+                <td width="30" align="center" valign="middle"><img alt="{$LANG.ATTACHED_THREAD}" src="/templates/{template}/images/icons/forum/pinned.png" border="0" title="{$LANG.ATTACHED_THREAD}" /></td>
             {else}
                 {if $thread.closed}
-                    <td width="30" class="{$class}" align="center" valign="middle"><img alt="{$LANG.THREAD_CLOSE}" src="/templates/{template}/images/icons/forum/closed.png" border="0" title="{$LANG.THREAD_CLOSE}" /></td>
+                    <td width="30" align="center" valign="middle"><img alt="{$LANG.THREAD_CLOSE}" src="/templates/{template}/images/icons/forum/closed.png" border="0" title="{$LANG.THREAD_CLOSE}" /></td>
                 {else}
                     {if $thread.is_new}
-                        <td width="30" class="{$class}" align="center" valign="middle"><img alt="{$LANG.HAVE_NEW_MESS}" src="/templates/{template}/images/icons/forum/new.png" border="0" title="{$LANG.HAVE_NEW_MESS}" /></td>
+                        <td width="30" align="center" valign="middle"><img alt="{$LANG.HAVE_NEW_MESS}" src="/templates/{template}/images/icons/forum/new.png" border="0" title="{$LANG.HAVE_NEW_MESS}" /></td>
                     {else}
-                        <td width="30" class="{$class}" align="center" valign="middle"><img alt="{$LANG.NOT_NEW_MESS}" src="/templates/{template}/images/icons/forum/old.png" border="0" title="{$LANG.NOT_NEW_MESS}" /></td>
+                        <td width="30" align="center" valign="middle"><img alt="{$LANG.NOT_NEW_MESS}" src="/templates/{template}/images/icons/forum/old.png" border="0" title="{$LANG.NOT_NEW_MESS}" /></td>
                     {/if}
                 {/if}
             {/if}
-            <td width="" class="{$class}" align="left">
+            <td width="" align="left">
                 <div class="thread_link"><a href="/forum/thread{$thread.id}.html">{$thread.title}</a>
                     {if $thread.pages>1}
                         <span class="thread_pagination" title="{$LANG.PAGES}"> (
                             {section name=foo start=1 loop=$thread.pages+1 step=1}
                                 {if $smarty.section.foo.index > 5 && $thread.pages > 6}
                                     ...<a href="/forum/thread{$thread.id}-{$thread.pages}.html" title="{$LANG.LAST}">{$thread.pages}</a>
-                                    {php}break;{/php}
+                                    {break}
                                 {else}
                                     <a href="/forum/thread{$thread.id}-{$smarty.section.foo.index}.html" title="{$LANG.PAGE} {$smarty.section.foo.index}">{$smarty.section.foo.index}</a>
                                     {if $smarty.section.foo.index < $thread.pages}, {/if}
@@ -43,12 +41,12 @@
                     <div class="thread_desc">{$thread.description}</div>
                 {/if}
             </td>
-            <td width="120" style="font-size:12px" class="{$class}"><a href="{profile_url login=$thread.login}">{$thread.nickname}</a></td>
-            <td width="120" style="font-size:12px; color:#375E93" class="{$class}">
+            <td width="120" style="font-size:12px"><a href="{profile_url login=$thread.login}">{$thread.nickname}</a></td>
+            <td width="120" style="font-size:12px; color:#375E93">
                 <strong>{$LANG.HITS}:</strong> {$thread.hits}<br/>
                 <strong>{$LANG.REPLIES}:</strong> {$thread.answers}
             </td>
-            <td width="200" style="font-size:12px" class="{$class}">
+            <td width="200" style="font-size:12px">
                 {if $thread.last_msg_array}
                     <a href="/forum/thread{$thread.last_msg_array.thread_id}-{$thread.last_msg_array.lastpage}.html#{$thread.last_msg_array.id}"><img class="last_post_img" title="{$LANG.GO_LAST_POST}" alt="{$LANG.GO_LAST_POST}" src="/templates/{template}/images/icons/anchor.png"></a>
                     {$LANG.FROM} {$thread.last_msg_array.user_link}<br/>
@@ -58,14 +56,11 @@
                 {/if}
             </td>
         </tr>
-        {assign var="row" value=`$row+1`}
     {/foreach}
-
 {else}
     <td colspan="7" align="center" valign="middle" class="row1">
         <p style="margin: 5px">{$LANG.NOT_THREADS_IN_FORUM}.</p>
     </td>
-
 {/if}
 </table>
 {$pagination}

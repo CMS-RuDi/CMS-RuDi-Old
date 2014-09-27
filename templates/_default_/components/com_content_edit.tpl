@@ -75,60 +75,62 @@
     </div>
 
     <table width="100%" border="0">
-            <tr>
-                    <td>
-            <h3>{$LANG.ARTICLE_ANNOUNCE}</h3>
-                            <div>{wysiwyg name='description' value=$mod.description height=200 width='100%'}</div>
-
-                            <h3>{$LANG.ARTICLE_TEXT}</h3>
-                            <div>{wysiwyg name='content' value=$mod.content height=450 width='100%'}</div>
-                    </td>
-            </tr>
+        <tr>
+            <td>
+                <h3>{$LANG.ARTICLE_ANNOUNCE}</h3>
+                <div>{wysiwyg name='description' value=$mod.description height=200 width='100%'}</div>
+                <h3>{$LANG.ARTICLE_TEXT}</h3>
+                <div>{wysiwyg name='content' value=$mod.content height=450 width='100%'}</div>
+            </td>
+        </tr>
     </table>
 
     {if $cfg.img_on && $ajaxUploader}
     <div class="bar" style="padding:10px 10px;margin-top: 10px;">
-    <table width="100%" cellspacing="5" cellpadding="3" class="proptable">
-        <tr valign="top">
-            <td width="230" style="padding-top:8px">
-                <strong>{$LANG.IMAGES}:</strong>
-                <div class="hinttext">
-                    {$LANG.IMAGES_INSERT_HINT_TEXT}
-                </div>
-            </td>
-            <td>
-                {$ajaxUploader}
-            </td>
-        </tr>
-    </table>
+        <table width="100%" cellspacing="5" cellpadding="3" class="proptable">
+            <tr valign="top">
+                <td width="230" style="padding-top:8px">
+                    <strong>{$LANG.IMAGES}:</strong>
+                    <div class="hinttext">
+                        {$LANG.IMAGES_INSERT_HINT_TEXT}
+                    </div>
+                </td>
+                <td>
+                    {$ajaxUploader}
+                </td>
+            </tr>
+        </table>
     </div>
     {/if}
     
-    <script type="text/javascript">
-        var LANG_SELECT_CAT = '{$LANG.SELECT_CAT}';
-        var LANG_REQ_TITLE  = '{$LANG.REQ_TITLE}';
-        var LANG_ERROR      = '{$LANG.ERROR}';
-        {literal}
-            function submitArticle(){
-                if (!$('input#title').val()){ core.alert(LANG_REQ_TITLE, LANG_ERROR); return false; }
-        {/literal}
-            {if $do=='addarticle'}
-                {literal}
-                    if (!$('select#category_id').val()){ core.alert(LANG_SELECT_CAT, LANG_ERROR); return false; }
-                {/literal}
-            {/if}
-        {literal}
-                $('form#addform').submit();
+<script type="text/javascript">
+    var LANG_SELECT_CAT = '{$LANG.SELECT_CAT}';
+    var LANG_REQ_TITLE  = '{$LANG.REQ_TITLE}';
+    var LANG_ERROR      = '{$LANG.ERROR}';
+
+    function submitArticle() {
+        if (!$('input#title').val()) {
+            core.alert(LANG_REQ_TITLE, LANG_ERROR);
+            return false;
+        }
+
+        {if $do=='addarticle'}
+            if (!$('select#category_id').val()) {
+                core.alert(LANG_SELECT_CAT, LANG_ERROR);
+                return false;
             }
-        {/literal}
-    </script>
+        {/if}
+
+        $('form#addform').submit();
+    }
+</script>
 
     <p style="margin-top:15px">
-    <input name="add_mod" type="hidden" value="1" />
-            <input name="savebtn" type="button" onclick="submitArticle()" id="add_mod" {if $do=='addarticle'} value="{$LANG.ADD_ARTICLE}" {else} value="{$LANG.SAVE_CHANGES}" {/if} />
-            <input name="back" type="button" id="back" value="{$LANG.CANCEL}" onclick="window.history.back();"/>
-            {if $do=='editarticle'}
-                    <input name="id" type="hidden" value="{$mod.id}" />
-            {/if}
+        <input name="add_mod" type="hidden" value="1" />
+        <input name="savebtn" type="button" onclick="submitArticle()" id="add_mod" {if $do=='addarticle'} value="{$LANG.ADD_ARTICLE}" {else} value="{$LANG.SAVE_CHANGES}" {/if} />
+        <input name="back" type="button" id="back" value="{$LANG.CANCEL}" onclick="window.history.back();"/>
+        {if $do=='editarticle'}
+            <input name="id" type="hidden" value="{$mod.id}" />
+        {/if}
     </p>
 </form>

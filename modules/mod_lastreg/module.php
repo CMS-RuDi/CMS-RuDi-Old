@@ -33,7 +33,7 @@ function mod_lastreg($module_id, $cfg){
             assign('cfg', $cfg)->
             assign('total_all', $total_all)->
             assign('total', sizeof($users))->
-            display('mod_lastreg.tpl');
+            display();
 
     return true;
 

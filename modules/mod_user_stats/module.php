@@ -74,7 +74,7 @@ function mod_user_stats($module_id, $cfg){
             assign('usr_online', cmsUser::sessionGet('usr_online'))->
             assign('people', $people)->
             assign('bday', $bday)->
-            display('mod_user_stats.tpl');
+            display();
 
     return true;
 

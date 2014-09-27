@@ -54,7 +54,7 @@ if ($do=='view'){
             assign('forum', array())->
             assign('user_id', $inUser->id)->
             assign('cfg', $model->config)->
-            display('com_forum_list.tpl');
+            display();
 
 }
 //============================================================================//
@@ -106,7 +106,7 @@ if ($do=='forum'){
             assign('forum', $forum)->
             assign('cfg', $model->config)->
             assign('user_id', $inUser->id)->
-            display('com_forum_list.tpl');
+            display();
 
     // Получим темы
     if($daysprune){
@@ -127,7 +127,7 @@ if ($do=='forum'){
             assign('daysprune', $daysprune)->
             assign('moderators', $moderators)->
             assign('pagination', cmsPage::getPagebar($forum['thread_count'], $page, $model->config['pp_forum'], '/forum/'.$forum['id'].'-%page%'))->
-            display('com_forum_view.tpl');
+            display();
 
 }
 //============================================================================//
@@ -194,7 +194,7 @@ if ($do=='thread'){
             assign('cfg', $model->config)->
             assign('bb_toolbar', ($inUser->id && $model->config['fast_on'] && $model->config['fast_bb']) ? cmsPage::getBBCodeToolbar('message', $model->config['img_on']) : '')->
             assign('smilies', ($inUser->id && $model->config['fast_on'] && $model->config['fast_bb']) ? cmsPage::getSmilesPanel('message') : '')->
-            display('com_forum_view_thread.tpl');
+            display();
 
 }
 //============================================================================//
@@ -350,7 +350,7 @@ if (in_array($do, array('newthread','newpost','editpost'))){
 
         cmsPage::initTemplate('components', 'com_forum_add')->
                 assign('pagetitle', $pagetitle)->
-                assign('is_first_post', $first_post_id == $last_post['id'])->
+                assign('is_first_post', (isset($last_post['id']) ? $first_post_id == $last_post['id'] : true))->
                 assign('thread_poll', $thread_poll)->
                 assign('cfg', $model->config)->
                 assign('do', $do)->
@@ -363,7 +363,7 @@ if (in_array($do, array('newthread','newpost','editpost'))){
                 assign('is_allow_attach', cmsCore::checkContentAccess($model->config['group_access']) && $is_allow_attach)->
                 assign('bb_toolbar', cmsPage::getBBCodeToolbar('message', $model->config['img_on'], 'forum', 'post', @$last_post['id']))->
                 assign('smilies', cmsPage::getSmilesPanel('message'))->
-                display('com_forum_add.tpl');
+                display();
 
     } else {
     /////////////////////////
@@ -611,7 +611,7 @@ if ($do=='deletepost'){
 //============================================================================//
 if(in_array($do, array('movethread','renamethread','deletethread','close','pin','pin_post', 'move_post'))){
 
-    if (!$inUser->id){ cmsCore::halt(); }
+    if (!$inUser->id){ cmsCore::error404(); }
 
     $thread = $model->getThread($id);
     if(!$thread) { cmsCore::halt(); }
@@ -636,7 +636,7 @@ if(in_array($do, array('movethread','renamethread','deletethread','close','pin',
             cmsPage::initTemplate('components', 'com_forum_move_thread')->
                     assign('thread', $thread)->
                     assign('forums', $model->getForums())->
-                    display('com_forum_move_thread.tpl');
+                    display();
 
             cmsCore::jsonOutput(array('error' => false,
                                       'html' => ob_get_clean()));
@@ -695,7 +695,7 @@ if(in_array($do, array('movethread','renamethread','deletethread','close','pin',
 
             cmsPage::initTemplate('components', 'com_forum_rename_thread')->
                     assign('thread', $thread)->
-                    display('com_forum_rename_thread.tpl');
+                    display();
 
             cmsCore::jsonOutput(array('error' => false,
                                       'html' => ob_get_clean()));
@@ -795,7 +795,7 @@ if(in_array($do, array('movethread','renamethread','deletethread','close','pin',
                     assign('thread', $thread)->
                     assign('post_id', $post_id)->
                     assign('threads', cmsCore::getListItems('cms_forum_threads', $thread['id'], 'title', 'ASC', "forum_id = '{$thread['forum_id']}'"))->
-                    display('com_forum_move_post.tpl');
+                    display();
 
             cmsCore::jsonOutput(array('error' => false,
                                       'html' => ob_get_clean()));
@@ -958,7 +958,7 @@ if(in_array($do, array('download','delfile','reloadfile'))){
             cmsPage::initTemplate('components', 'com_forum_file_reload')->
                     assign('file', $file)->
                     assign('cfg', $model->config)->
-                    display('com_forum_file_reload.tpl');
+                    display();
 
             cmsCore::jsonOutput(array('error' => false,
                                       'html' => ob_get_clean()));
@@ -977,7 +977,7 @@ if(in_array($do, array('download','delfile','reloadfile'))){
                         assign('is_moder', $is_forum_moder)->
                         assign('is_admin', $inUser->is_admin)->
                         assign('cfg', $model->config)->
-                        display('com_forum_attached_files.tpl');
+                        display();
 
                 cmsCore::jsonOutput(array('error' => false,
                                           'post_id' => $post['id'],
@@ -1035,7 +1035,7 @@ if ($do=='view_poll'){
             assign('do', $thread_poll['show_result'] ? $do : 'thread')->
             assign('is_moder', $is_forum_moder)->
             assign('is_admin', $inUser->is_admin)->
-            display('com_forum_thread_poll.tpl');
+            display();
 
     cmsCore::halt(ob_get_clean());
 
@@ -1122,7 +1122,7 @@ if ($do=='latest_posts'){
             assign('user_id', $inUser->id)->
             assign('pagetitle', $_LANG['LATEST_POSTS_ON_FORUM'])->
             assign('pagebar', cmsPage::getPagebar($total, $page, 15, '/forum/latest_posts/page-%page%'))->
-            display('com_forum_actions.tpl');
+            display();
 
 }
 //============================================================================//
@@ -1157,7 +1157,7 @@ if ($do=='latest_thread'){
             assign('user_id', $inUser->id)->
             assign('pagetitle', $_LANG['NEW_THREADS_ON_FORUM'])->
             assign('pagebar', cmsPage::getPagebar($total, $page, 15, '/forum/latest_thread/page-%page%'))->
-            display('com_forum_actions.tpl');
+            display();
 
 }
 //============================================================================//
@@ -1181,7 +1181,7 @@ if ($do=='view_cat'){
             assign('forum', array())->
             assign('cfg', $model->config)->
             assign('user_id', false)->
-            display('com_forum_list.tpl');
+            display();
 
     $inDB->addJoin('INNER JOIN cms_forums f ON f.id = t.forum_id');
     $inDB->where("t.is_hidden = 0");
@@ -1192,7 +1192,7 @@ if ($do=='view_cat'){
 
     cmsPage::initTemplate('components', 'com_forum_view')->
             assign('threads', $threads)->
-            display('com_forum_view.tpl');
+            display();
 
 }
 //============================================================================//
@@ -1271,7 +1271,7 @@ if ($do=='user_activity'){
             assign('page', $page)->
             assign('pagination', $pagination)->
             assign('link', '/forum/'.$user['login'].'_activity.html')->
-            display('com_forum_user_activity.tpl');
+            display();
 
 }
 ////////////////////////////////////////////////////////////////////////////////

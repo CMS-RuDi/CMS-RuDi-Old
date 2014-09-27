@@ -23,37 +23,35 @@ function addComment(target, target_id, parent_id){
 		}
 	});
 }
-function showResponseAdd(result, statusText, xhr, $form){
+function showResponseAdd(result, statusText, xhr, $form) {
+    $('.sess_messages').fadeOut();
 
-	$('.sess_messages').fadeOut();
-
-	if(statusText == 'success'){
-		if(result.error == true){
-			$('#error_mess').html(result.text);
-			$('.sess_messages').fadeIn();
-			if(result.is_captcha){
-				reloadCaptcha('kcaptcha1');
-			}
-			$('#submit_cmm').prop('disabled', false);
+    if (statusText == 'success') {
+        if (result.error == true) {
+            $('#error_mess').html(result.text);
+            $('.sess_messages').fadeIn();
+            if (result.is_captcha && $('input[name=captcha_id]').length > 0) {
+                reloadCaptcha($('input[name=captcha_id]').val());
+            }
+            $('#submit_cmm').prop('disabled', false);
             $('.submit_cmm img').remove();
             $('#cancel_cmm').show();
-		} else {
-			if(result.is_premod){
-				core.alert(result.is_premod);
+        } else {
+            if (result.is_premod) {
+                core.alert(result.is_premod);
                 $('.cm_addentry').remove();
                 $('.cm_add_link').show();
-			} else {
+            } else {
                 $('.cm_addentry').remove();
                 $('.cm_add_link').show();
-				loadComments(result.target, result.target_id, false);
-				total_page = Number($('#comments_count').html());
-				$('#comments_count').html(total_page+1);
-			}
-		}
-	} else {
-		core.alert(statusText, LANG_ERROR);
-	}
-
+                loadComments(result.target, result.target_id, false);
+                total_page = Number($('#comments_count').html());
+                $('#comments_count').html(total_page+1);
+            }
+        }
+    } else {
+        core.alert(statusText, LANG_ERROR);
+    }
 }
 
 function showResponseEdit(result, statusText, xhr, $form){

@@ -15,7 +15,7 @@
 // задача для CRON выглядит примерно так: php -f /path_to_site/cron.php site.ru
 // где site.ru - имя вашего домена
 // Если планируете запускать задачи CRON через curl или иные http запросы, закомментируйте строку ниже
-if(PHP_SAPI != 'cli') die('Access denied');
+if (PHP_SAPI != 'cli') { die('Access denied'); }
 
 Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
@@ -31,8 +31,7 @@ cmsCore::loadClass('actions');
 $jobs = cmsCron::getJobs();
 
 // если есть задачи
-if(is_array($jobs)){
-
+if (is_array($jobs)) {
     // выполняем их
     foreach($jobs as $job){
         // проверяем интервал запуска
@@ -41,7 +40,6 @@ if(is_array($jobs)){
             cmsCron::executeJob($job);
         }
     }
-
 }
 
 cmsCore::halt();

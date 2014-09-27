@@ -13,43 +13,33 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 	
-function search_content($query, $look){
+function search_content($query, $look) {
+    global $_LANG;
 
-        $inDB   = cmsDatabase::getInstance();
-		$searchModel = cms_model_search::initModel();
+    $sql = "SELECT con.*, cat.title cat_title, cat.id cat_id, cat.seolink as cat_seolink, cat.parent_id as cat_parent_id
+                FROM cms_content con
+                INNER JOIN cms_category cat ON cat.id = con.category_id AND cat.published = 1
+                WHERE MATCH(con.title, con.content) AGAINST ('". $query ."' IN BOOLEAN MODE) AND con.is_end = 0 AND con.published = 1 LIMIT 100";
 
-        global $_LANG;
+    $result = cmsCore::c('db')->query($sql);
 
-		$sql = "SELECT con.*, cat.title cat_title, cat.id cat_id, cat.seolink as cat_seolink, cat.parent_id as cat_parent_id
-				FROM cms_content con
-				INNER JOIN cms_category cat ON cat.id = con.category_id AND cat.published = 1
-				WHERE MATCH(con.title, con.content) AGAINST ('$query' IN BOOLEAN MODE) AND con.is_end = 0 AND con.published = 1 LIMIT 100";
+    if (cmsCore::c('db')->num_rows($result)) {
+        cmsCore::loadLanguage('components/content');
 
-		$result = $inDB->query($sql);
-	
-		if ($inDB->num_rows($result)){
-			
-			cmsCore::loadLanguage('components/content');
-			
-			while($item = $inDB->fetch_assoc($result)){
+        while ($item = cmsCore::c('db')->fetch_assoc($result)) {
+            $result_array = array(
+                'link' => '/'. $item['seolink'] .'.html',
+                'place' => $_LANG['CATALOG_ARTICLES'],
+                'placelink' => $item['cat_parent_id']>0 ? '/'. $item['cat_seolink'] : '/'. $item['attrs']['seolink'] .'.html',
+                'description' => cmsCore::m('search')->getProposalWithSearchWord($item['content']),
+                'title' => $item['title'],
+                'imageurl' => (file_exists(PATH .'/images/content/medium/'. ceil($item['id']/100) .'/article'. $item['id' ] .'.jpg') ? '/images/content/medium/'. ceil($item['id']/100) .'/article'. $item['id' ] .'.jpg' : ''),
+                'pubdate' => $item['pubdate']
+            );
 
-				$result_array = array();
+            cmsCore::m('search')->addResult($result_array);
+        }
+    }
 
-				$result_array['link']        = "/".$item['seolink'].".html";
-				$result_array['place']       = $_LANG['CATALOG_ARTICLES'];
-				$result_array['placelink']   = $item['cat_parent_id']>0 ? "/".$item['cat_seolink'] : $link;
-				$result_array['description'] = $searchModel->getProposalWithSearchWord($item['content']);
-				$result_array['title']       = $item['title'];
-				$result_array['pubdate']     = $item['pubdate'];
-				$result_array['session_id']  = session_id();
-
-				$searchModel->addResult($result_array);			
-			}
-		}
-
-		return;
-
+    return;
 }
-
-
-?>

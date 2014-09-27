@@ -34,7 +34,7 @@ function mod_category($module_id, $cfg){
             assign('cfg', $cfg)->
             assign('current_seolink', $current_seolink)->
             assign('subcats_list', $subcats_list)->
-            display('mod_content_cats.tpl');
+            display();
 
 	return true;
 

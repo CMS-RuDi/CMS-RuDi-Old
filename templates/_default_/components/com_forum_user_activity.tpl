@@ -72,7 +72,7 @@
                     {/if}
                 </td>
             </tr>
-            {assign var="num" value=`$num+1`}
+            {$num = $num+1}
         {/foreach}
     </table>
     {$pagination}

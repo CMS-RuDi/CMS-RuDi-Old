@@ -30,7 +30,7 @@ class cmsAdmin extends cmsCore {
      * @return int
      */
     public function installPlugin($plugin, $events, $config) {
-        if (!@$plugin['type']) { $plugin['type'] = 'plugin'; }
+        if (empty($plugin['type'])) { $plugin['type'] = 'plugin'; }
 
         $config_yaml = self::arrayToYaml($config);
         if (!$config_yaml) { $config_yaml = ''; }
@@ -40,10 +40,10 @@ class cmsAdmin extends cmsCore {
         $plugin_id = self::c('db')->insert('cms_plugins', $plugin);
 
         //возвращаем ложь, если плагин не установился
-        if (!$plugin_id)    { return false; }
+        if (!$plugin_id) { return false; }
 
         //добавляем хуки событий для плагина
-        foreach($events as $event){
+        foreach($events as $event) {
             self::c('db')->insert('cms_event_hooks', array('event'=>$event, 'plugin_id'=>$plugin_id));
         }
 
@@ -106,10 +106,12 @@ class cmsAdmin extends cmsCore {
     /**
      * Удаляет установленный плагин
      * @param array $plugin
-     * @param array $events
      * @return bool
      */
-    public function removePlugin($plugin_id){
+    public function removePlugin($plugin) {
+        //находим ID установленной версии
+        $plugin_id = $this->getPluginId($plugin['plugin']);
+        
         //если плагин не был установлен, выходим
         if (!$plugin_id) { return false; }
 
@@ -216,7 +218,20 @@ class cmsAdmin extends cmsCore {
     public function getPluginVersion($plugin){
         return self::c('db')->get_field('cms_plugins', "plugin='{$plugin}'", 'version');
     }
-
+    
+    /**
+     * Возвращает кофигурацию плагина в виде массива из БД
+     * @param string $plugin
+     * @return float
+     */
+    public function loadPluginConfig($plugin_name){
+        $config = self::c('db')->get_field('cms_plugins', "plugin='". $plugin_name ."'", 'config');
+        
+        if (!empty($config)) { $config = self::yamlToArray($config); }
+        
+        return $config;
+    }
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Устанавливает компонент

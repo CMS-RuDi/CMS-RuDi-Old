@@ -15,5 +15,3 @@ if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 $_LANG['P_PING_YANDEX'] = 'Отправлен ping Яндексу';
 $_LANG['P_PING_GOOGLE'] = 'Отправлен ping Google';
-
-?>

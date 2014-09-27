@@ -58,7 +58,7 @@ function mod_invite($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_invite')->
             assign('user_id', $inUser->id)->
             assign('is_redirect', $is_redirect)->
-            display('mod_invite.tpl');
+            display();
 
     return true;
 

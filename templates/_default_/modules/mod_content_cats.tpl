@@ -33,29 +33,22 @@
 </ul>
 
 <script type="text/javascript">    
+    {if !$cfg.expand_all}
+        $('ul.mod_cat_list li > ul').hide();
+    {/if}
 
-        {if !$cfg.expand_all}
-            {literal}
-                $('ul.mod_cat_list li > ul').hide();
-            {/literal}
-        {/if}
+    $('.cat_plus').click(function() {
+        $(this).fadeOut();
+        $(this).parent('li').find('.cat_minus').eq(0).show();
+        $(this).parent('li').find('ul').eq(0).fadeIn();
+    });
 
-        {literal}
-
-        $('.cat_plus').click(function(){
-            $(this).fadeOut();
-            $(this).parent('li').find('.cat_minus').eq(0).show();
-            $(this).parent('li').find('ul').eq(0).fadeIn();
-        });
-
-        $('.cat_minus').click(function(){
-            $(this).fadeOut();
-            $(this).parent('li').find('.cat_plus').eq(0).show();
-            $(this).parent('li').find('ul').hide();
-            $(this).parent('li').find('ul').find('.cat_minus').hide();
-            $(this).parent('li').find('ul').find('.cat_plus').show();
-        });
-
-    {/literal}
+    $('.cat_minus').click(function() {
+        $(this).fadeOut();
+        $(this).parent('li').find('.cat_plus').eq(0).show();
+        $(this).parent('li').find('ul').hide();
+        $(this).parent('li').find('ul').find('.cat_minus').hide();
+        $(this).parent('li').find('ul').find('.cat_plus').show();
+    });
 </script>
 {/if}

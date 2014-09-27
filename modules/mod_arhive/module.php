@@ -28,7 +28,7 @@ function mod_arhive($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_arhive')->
             assign('arhives', $items)->
             assign('date', array('year'=>$model->year,'month'=>$model->month,'day'=>$model->day))->
-            display('mod_arhive.tpl');
+            display();
 
     return true;
 

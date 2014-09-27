@@ -36,11 +36,16 @@ class cmsgeo {
         if (!function_exists('curl_setopt') || !function_exists('curl_init')) { return false; }
 
         // если уже получали данные, возвращаем их сразу
-        $cookie_data = cmsCore::getCookie('geodata');
+        $cookie_data = (string)cmsCore::getCookie('geodata');
         if (!empty(self::$data[$ip])) {
             $data = self::$data[$ip];
-        } elseif ($cookie_data && $cache) {
+        } else if ($cookie_data && $cache) {
             $data = unserialize($cookie_data);
+            if (is_array($data)) {
+                $data = cmsCore::cleanVar($data, 'array_str', null);
+            } else {
+                unset($data);
+            }
         }
 
         if (!isset($data)) {
@@ -67,7 +72,7 @@ class cmsgeo {
         }
 
         // что возвращаем
-        if($key){
+        if ($key && isset($data[$key])) {
             return $data[$key];
         } else {
             return $data;
@@ -84,7 +89,7 @@ class cmsgeo {
         $out = cmsCore::c('curl', array(
             'header' => 0,
             'connect_timeout' => 2,
-            'user_agent' => 'InstantCMS'
+            'user_agent' => 'CMS RuDi'
         ))->xmlGet($this->url.$this->ip);
         
         foreach ($out->ip[0] as $key=>$value) {

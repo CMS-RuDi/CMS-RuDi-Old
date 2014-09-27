@@ -44,10 +44,9 @@
         </div>
     </div>
 </form>
-{literal}
+
 <script type="text/javascript">
-		function toggleInput(id){
-			$('#from_search label#'+id).toggleClass('selected');
-		}
+    function toggleInput(id) {
+        $('#from_search label#'+id).toggleClass('selected');
+    }
 </script>
-{/literal}

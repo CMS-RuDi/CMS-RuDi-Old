@@ -69,11 +69,10 @@
     {/if}
 
 </div>
-{literal}
+
 <script type="text/javascript">
-function searchGender(gender){
-	$('body').append('<form id="sform" style="display:none" method="post" action="/users"><input type="hidden" name="gender" value="'+gender+'"/></form>');
-	$('form#sform').submit();
-}
+    function searchGender(gender) {
+        $('body').append('<form id="sform" style="display:none" method="post" action="/users"><input type="hidden" name="gender" value="'+gender+'"/></form>');
+        $('form#sform').submit();
+    }
 </script>
-{/literal}

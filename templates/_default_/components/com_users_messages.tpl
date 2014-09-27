@@ -94,14 +94,12 @@
     <p style="padding:20px 10px">{$LANG.NOT_MESS_IN_CAT}</p>
 {/if}
 
-{literal}
-	<script type="text/javascript">
-        function changeFriend(){
-            fr_id = $("#with_id option:selected").val();
-            if(fr_id != 0) {
-                $("#history").attr("action", '/users/{/literal}{$id}{literal}/messages-history'+fr_id+'.html');
-                $('#history').submit();
-            }
+<script type="text/javascript">
+    function changeFriend() {
+        fr_id = $("#with_id option:selected").val();
+        if (fr_id != 0) {
+            $("#history").attr("action", '/users/{$id}/messages-history'+fr_id+'.html');
+            $('#history').submit();
         }
-	</script>
-{/literal}
+    }
+</script>

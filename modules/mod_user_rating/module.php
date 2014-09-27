@@ -31,7 +31,7 @@ function mod_user_rating($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_user_rating')->
             assign('users', $users)->
             assign('cfg', $cfg)->
-            display('mod_user_rating.tpl');
+            display();
 
     return true;
 

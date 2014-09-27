@@ -70,7 +70,7 @@ if ($do == 'user_clubs') {
             assign('clubs', array_merge($clubs, $inclubs))->
             assign('user', $user)->
             assign('my_profile', $user['id'] == $inUser->id)->
-            display('com_clubs_user.tpl');
+            display();
 
 }
 //////////////////////// ВСЕ КЛУБЫ /////////////////////////////////////////////
@@ -90,7 +90,7 @@ if ($do=='view'){
             assign('clubs', $clubs)->
             assign('total', $total)->
             assign('pagination', cmsPage::getPagebar($total, $page, $model->config['perpage'], '/clubs/page-%page%'))->
-            display('com_clubs_view.tpl');
+            display();
 
 }
 /////////////////////// ПРОСМОТР КЛУБА /////////////////////////////////////////
@@ -201,7 +201,7 @@ if ($do=='club'){
             assign('is_photo_karma_enabled', ((($inUser->karma >= $club['photo_min_karma']) && $is_member) ? true : false))->
             assign('is_blog_karma_enabled', ((($inUser->karma >= $club['blog_min_karma']) && $is_member) ? true : false))->
             assign('cfg', $model->config)->
-            display('com_clubs_view_club.tpl');
+            display();
 
 }
 ///////////////////////// СОЗДАНИЕ КЛУБА ///////////////////////////////////////
@@ -219,7 +219,7 @@ if ($do == 'create'){
         cmsPage::initTemplate('components', 'com_clubs_create')->
                 assign('can_create', $can_create)->
                 assign('last_message', $model->last_message)->
-                display('com_clubs_create.tpl');
+                display();
 
 		cmsCore::jsonOutput(array('error' => false,
 								  'can_create' => (bool)$can_create,
@@ -385,7 +385,7 @@ if ($do == 'config'){
                 assign('fr_members_list', $fr_members_list)->
                 assign('is_billing', IS_BILLING)->
                 assign('is_admin', $inUser->is_admin)->
-                display('com_clubs_config.tpl');
+                display();
 
     }
 
@@ -549,7 +549,7 @@ if ($do == 'send_message'){
                 assign('club', $club)->
                 assign('bbcodetoolbar', cmsPage::getBBCodeToolbar('message'))->
                 assign('smilestoolbar', cmsPage::getSmilesPanel('message'))->
-                display('com_clubs_messages_member.tpl');
+                display();
 
 		cmsCore::jsonOutput(array('error' => false,'html'  => ob_get_clean()));
 
@@ -624,7 +624,7 @@ if ($do == 'join_member'){
 		cmsPage::initTemplate('components', 'com_clubs_join_member')->
                 assign('club', $club)->
                 assign('friends', $friends)->
-                display('com_clubs_join_member.tpl');
+                display();
 
 		cmsCore::jsonOutput(array('error' => false,'html'  => ob_get_clean()));
 
@@ -692,7 +692,7 @@ if ($do=='members'){
             assign('members', $members)->
             assign('club', $club)->
             assign('total_members', $total_members)->
-            display('com_clubs_view_member.tpl');
+            display();
 
 }
 ////////////////////////////// ВСЕ АЛЬБОМЫ КЛУБА  //////////////////////////////
@@ -734,7 +734,7 @@ if ($do=='view_albums'){
             assign('is_karma_enabled', $is_karma_enabled)->
             assign('show_title', true)->
             assign('pagetitle', $pagetitle)->
-            display('com_clubs_albums.tpl');
+            display();
 
 }
 ///////////////////////// ПРОСМОТР АЛЬБОМА КЛУБА ///////////////////////////////
@@ -796,7 +796,7 @@ if ($do=='view_album'){
             assign('is_member', $is_member)->
             assign('cfg', $model->config)->
             assign('pagebar', cmsPage::getPagebar($total, $page, $model->config['photo_perpage'], '/clubs/photoalbum'.$album['id'].'/page-%page%'))->
-            display('com_clubs_view_album.tpl');
+            display();
 
 }
 ///////////////////////// УДАЛЕНИЕ АЛЬБОМА /////////////////////////////////////
@@ -880,7 +880,7 @@ if ($do=='view_photo'){
             assign('is_admin', $is_admin)->
             assign('is_moder', $is_moder)->
             assign('is_author', $is_author)->
-            display('com_clubs_view_photo.tpl');
+            display();
 
 	//если есть, выводим комментарии
 	if($photo['comments'] && $inCore->isComponentInstalled('comments')){
@@ -953,7 +953,7 @@ if ($do=='edit_photo'){
                 assign('form_action', '/clubs/editphoto'.$photo['id'].'.html')->
                 assign('no_tags', true)->
                 assign('is_admin', ($is_admin || $is_moder))->
-                display('com_photos_edit.tpl');
+                display();
 
 		cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
 

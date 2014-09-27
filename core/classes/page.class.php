@@ -28,10 +28,10 @@ class cmsPage {
     private $is_ajax   = false;
 
     private $modules;
-    private $tpl_info;
-    private $default_tpl_info = array('author' => 'InstantCMS Team', 'renderer' => 'phpTpl', 'ext' => 'php');
-
-    public $captcha_count = 1;
+    private $tpl_info = array(
+        '_default_' => array( 'author' => 'InstantCMS Team', 'renderer' => 'phpTpl', 'ext' => 'php' )
+    );
+    private $default_tpl_info = array( 'author' => 'InstantCMS Team', 'renderer' => 'smartyTpl', 'ext' => 'tpl' );
 
     private static $instance;
 
@@ -56,17 +56,19 @@ class cmsPage {
      * а в нем определенный массив с параметрами шаблона
      */
     private function setTplInfo() {
-        $info_file = TEMPLATE_DIR .'system.php';
+        if (!isset($this->tpl_info[cmsCore::c('config')->template])) {
+            $info_file = cmsCore::c('config')->template_dir .'system.php';
         
-        if (file_exists($info_file)) {
-            include $info_file;
-            if (!empty($info)) {
-                $this->tpl_info = $info;
-                return;
+            if (file_exists($info_file)) {
+                include $info_file;
             }
+            
+            if (empty($info)) {
+                $info = $this->default_tpl_info;
+            }
+
+            $this->tpl_info[cmsCore::c('config')->template] = $info;
         }
-        
-        $this->tpl_info = $this->default_tpl_info;
     }
 
     /**
@@ -85,27 +87,28 @@ class cmsPage {
         $thisObj = self::getInstance();
 
         // чтобы не перезаписать
-        $tpl_info = $thisObj->tpl_info;
+        $tpl_info = $thisObj->tpl_info[cmsCore::c('config')->template];
 
         // имя файла без расширения (для совместимости)
         $file_name = pathinfo($tpl_file, PATHINFO_FILENAME);
-
+        
         // есть ли файл в текущем шаблоне
-        $is_exists_tpl_file = file_exists(TEMPLATE_DIR . $tpl_folder .'/'. $file_name .'.'. $tpl_info['ext']);
+        $is_exists_tpl_file = file_exists(cmsCore::c('config')->template_dir . $tpl_folder .'/'. $file_name .'.'. $tpl_info['ext']);
 
         // если нет, считаем что файл лежит в дефолтном, используем оригинальное имя с расширением
         // если есть формируем полное имя файла с учетом параметров шаблона
         if (!$is_exists_tpl_file) {
-            $tpl_info = $thisObj->default_tpl_info;
-            $tpl_folder = DEFAULT_TEMPLATE_DIR . $tpl_folder;
+            $tpl_info = $thisObj->tpl_info['_default_'];
+            $tpl_folder = cmsCore::c('config')->default_template_dir . $tpl_folder;
         } else {
-            $tpl_folder = TEMPLATE_DIR . $tpl_folder;
+            $tpl_folder = cmsCore::c('config')->template_dir . $tpl_folder;
         }
-        $tpl_file = $file_name.'.'.$tpl_info['ext'];
+        $tpl_file = $file_name .'.'. $tpl_info['ext'];
 
         // загружаем шаблонизатор текущего шаблона
-        if (!cmsCore::includeFile('core/tpl_classes/'.$tpl_info['renderer'].'.php') ||
-            !class_exists($tpl_info['renderer'])) {
+        if (!cmsCore::includeFile('core/tpl_classes/'. $tpl_info['renderer'] .'.php') ||
+            !class_exists($tpl_info['renderer'])
+        ) {
             global $_LANG;
             cmsCore::halt(sprintf($_LANG['TEMPLATE_CLASS_NOTFOUND'], $tpl_info['renderer']));
         }
@@ -118,7 +121,8 @@ class cmsPage {
      * @return \cmsPage
      */
     public function setRequestIsAjax() {
-        $this->is_ajax = true; return $this;
+        $this->is_ajax = true;
+        return $this;
     }
 
     /**
@@ -126,9 +130,9 @@ class cmsPage {
      * @param string $tag
      * @return $this
      */
-    public function addHead($tag){
-        if (!in_array($tag, $this->page_head)){
-            if($this->is_ajax) { echo $tag; } else { $this->page_head[] = $tag; }
+    public function addHead($tag) {
+        if (!in_array($tag, $this->page_head)) {
+            if ($this->is_ajax) { echo $tag; } else { $this->page_head[] = $tag; }
         }
         return $this;
     }
@@ -140,7 +144,11 @@ class cmsPage {
      * @return string
      */
     private function checkLink($src) {
-        if (mb_substr($src, 0, 4) != 'http' && mb_substr($src, 0, 2) != '//'){
+        if (
+            mb_substr($src, 0, 7) != 'http://' &&
+            mb_substr($src, 0, 8) != 'https://' &&
+            mb_substr($src, 0, 2) != '//'
+        ){
             $src = '/'. $src;
         }
         return $src;
@@ -152,23 +160,23 @@ class cmsPage {
      * @param boolean $prepend  - Добавлять или нет элемент в начало массива
      * @return $this
      */
-    public function addHeadJS($src, $prepend=false){
+    public function addHeadJS($src, $prepend=false) {
         $src = $this->checkLink($src);
 
-        if (!in_array($src, $this->page_js)){
+        if (!in_array($src, $this->page_js)) {
             if ($prepend) {
                 array_unshift($this->page_js, $src);
             } else {
                 $this->page_js[] = $src;
             }
-            
+
             if ($this->is_ajax) { echo '<script type="text/javascript" src="'. $src .'"></script>'; }
         }
 
         return $this;
     }
     
-    public function prependHeadJS($src){
+    public function prependHeadJS($src) {
         return $this->addHeadJS($src, true);
     } 
     
@@ -177,12 +185,17 @@ class cmsPage {
      * @param string $src - Первый слеш не требуется
      * @return $this
      */
-    public function addHeadCSS($src){
+    public function addHeadCSS($src, $prepend=false) {
         $src = $this->checkLink($src);
 
-        if (!in_array($src, $this->page_css)){
-            $this->page_css[] = $src;
-            if ($this->is_ajax){ echo '<link href="'. $src .'" rel="stylesheet" type="text/css" />'; }
+        if (!in_array($src, $this->page_css)) {
+            if ($prepend) {
+                array_unshift($this->page_css, $src);
+            } else {
+                $this->page_css[] = $src;
+            }
+
+            if ($this->is_ajax) { echo '<link href="'. $src .'" rel="stylesheet" type="text/css" />'; }
         }
 
         return $this;
@@ -195,13 +208,13 @@ class cmsPage {
      * @param string $name
      * @return \cmsPage
      */
-    public function addHeadMeta($property='', $content='', $name='', $html=false){
-        if (!empty($property) or !empty($name)){
+    public function addHeadMeta($property='', $content='', $name='', $html=false) {
+        if (!empty($property) or !empty($name)) {
             $content = $html ? '<![CDATA[ '. $content .' ]]>' : str_replace('"',' ',$content);
 
             $meta = '<meta '. (!empty($property) ? 'property="'. $property .'"' : 'name="'. $name .'"') .' content="'. $content .'"/>';
 
-            if (!in_array($meta, $this->page_meta)){
+            if (!in_array($meta, $this->page_meta)) {
                 $this->page_meta[] = $meta;
             }
         }
@@ -214,8 +227,8 @@ class cmsPage {
      * @param array $metas
      * @return \cmsPage
      */
-    public function addHeadMetas($metas){
-        foreach ($metas as $meta){
+    public function addHeadMetas($metas) {
+        foreach ($metas as $meta) {
             $this->addHeadMeta($meta['property'], $meta['content'], $meta['name'], $meta['html']);
         }
 
@@ -226,7 +239,7 @@ class cmsPage {
      * Возвращает заголовок главной страницы
      * @return string
      */
-    public function homeTitle(){
+    public function homeTitle() {
         return !empty($this->site_cfg->hometitle) ? $this->site_cfg->hometitle : $this->site_cfg->sitename;
     }
     
@@ -235,15 +248,15 @@ class cmsPage {
      * @param string
      * @return $this
      */
-    public function setAdminTitle($title=''){
-        if (defined('VALID_CMS_ADMIN')){
+    public function setAdminTitle($title='') {
+        if (defined('VALID_CMS_ADMIN')) {
             global $_LANG;
             
             $title = strip_tags($title);
             
-            $this->title = $_LANG['AD_ADMIN_PANEL'] .' v '. CORE_VERSION;
+            $this->title = $_LANG['AD_ADMIN_PANEL'] .' v '. CMS_RUDI_V;
             
-            if (!empty($title)){
+            if (!empty($title)) {
                 $this->title = $title .' - '. $this->title ;
             }
         }
@@ -255,12 +268,12 @@ class cmsPage {
      * @param string
      * @return $this
      */
-    public function setTitle($title=''){
-        if (cmsCore::getInstance()->menuId()==1 || empty($title)) {
+    public function setTitle($title='') {
+        if (cmsCore::getInstance()->menuId() == 1 || empty($title)) {
             return $this;
         }
 
-        $this->title = strip_tags($title).($this->site_cfg->title_and_sitename ? ' — '.$this->site_cfg->sitename : '');
+        $this->title = strip_tags($title) . ($this->site_cfg->title_and_sitename ? ' — '. $this->site_cfg->sitename : '');
 
         return $this;
     }
@@ -270,7 +283,7 @@ class cmsPage {
      * @param string
      * @return $this
      */
-    public function setKeywords($keywords){
+    public function setKeywords($keywords) {
         $this->page_keys = trim(strip_tags($keywords));
         return $this;
     }
@@ -280,7 +293,7 @@ class cmsPage {
      * @param string
      * @return $this
      */
-    public function setDescription($text){
+    public function setDescription($text) {
         $this->page_desc = trim(strip_tags($text));
         return $this;
     }
@@ -289,15 +302,15 @@ class cmsPage {
      * Печатает название сайта из конфига
      * @return true
      */
-    public static function printSitename(){
+    public static function printSitename() {
         echo cmsConfig::getConfig('sitename');
     }
     
     /**
      * Печатает головную область страницы в админке
      */
-    public function printAdminHead(){
-        if (defined('VALID_CMS_ADMIN')){
+    public function printAdminHead() {
+        if (defined('VALID_CMS_ADMIN')) {
             self::displayLangJS(array('AD_NO_SELECT_OBJECTS','AD_SWITCH_EDITOR','CANCEL','CONTINUE','CLOSE','ATTENTION'));
             
             // Заголовок страницы
@@ -314,11 +327,15 @@ class cmsPage {
 
             //CSS
             $this->page_css = cmsCore::callEvent('PRINT_ADMIN_PAGE_CSS', $this->page_css);
-            foreach ($this->page_css as $value){ echo '<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n"; }
+            foreach ($this->page_css as $value) {
+                echo '<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n";
+            }
 
             //JS
             $this->page_js = cmsCore::callEvent('PRINT_ADMIN_PAGE_JS', $this->page_js);
-            foreach ($this->page_js as $value){ echo '<script type="text/javascript" src="'. $value .'"></script>',"\n"; }
+            foreach ($this->page_js as $value) {
+                echo '<script type="text/javascript" src="'. $value .'"></script>',"\n";
+            }
 
             //Оставшиеся теги
             $this->page_head = cmsCore::callEvent('PRINT_ADMIN_PAGE_HEAD', $this->page_head);
@@ -329,15 +346,15 @@ class cmsPage {
     /**
      * Печатает головную область страницы
      */
-    public function printHead($indent = ''){
+    public function printHead($indent = '') {
         $this->addHeadJsLang(array('SEND','CONTINUE','CLOSE','SAVE','CANCEL','ATTENTION','CONFIRM','LOADING','ERROR', 'ADD','SELECT_CITY','SELECT'));
 
         // Если есть пагинация и страница больше первой, добавляем "страница №"
-        if($this->site_cfg->title_and_page){
+        if ($this->site_cfg->title_and_page) {
             $page = cmsCore::request('page', 'int', 1);
-            if($page > 1){
+            if ($page > 1) {
                 global $_LANG;
-                $this->title = $this->title.' — '.$_LANG['PAGE'].' №'.$page;
+                $this->title = $this->title .' — '. $_LANG['PAGE'] .' №'. $page;
             }
         }
 
@@ -357,7 +374,27 @@ class cmsPage {
 
         //CSS
         $this->page_css = cmsCore::callEvent('PRINT_PAGE_CSS', $this->page_css);
-        foreach ($this->page_css as $value){ echo $indent,'<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n"; }
+        if (cmsCore::c('config')->collect_css == 1) {
+            $data = '';
+            foreach ($this->page_css as $key => $value) {
+                if (mb_substr($value, 0, 1) != '/' || mb_substr($value, 0, 2) == '//') { continue; }
+                
+                if (file_exists(PATH . $value)) {
+                    $data .= "\n\n". file_get_contents(PATH . $value);
+                    unset($this->page_css[$key]);
+                }
+            }
+            
+            if (!empty($data)) {
+                file_put_contents(PATH .'/upload/system.css', $data);
+                $this->addHeadCSS('upload/system.css', true);
+            }
+            
+            unset($data);
+        }
+        foreach ($this->page_css as $value){
+            echo $indent,'<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n";
+        }
 
         //Meta
         $this->page_meta = cmsCore::callEvent('PRINT_PAGE_META', $this->page_meta);
@@ -365,14 +402,32 @@ class cmsPage {
 
         //JS
         $this->page_js = cmsCore::callEvent('PRINT_PAGE_JS', $this->page_js);
-        foreach ($this->page_js as $value){ echo $indent,'<script type="text/javascript" src="'. $value .'"></script>',"\n"; }
+        if (cmsCore::c('config')->collect_js == 1) {
+            $data = '';
+            foreach ($this->page_js as $key => $value) {
+                if (mb_substr($value, 0, 1) != '/' || mb_substr($value, 0, 2) == '//') { continue; }
+                
+                if (file_exists(PATH . $value)) {
+                    $data .= "\n\n". file_get_contents(PATH . $value);
+                    unset($this->page_js[$key]);
+                }
+            }
+            
+            if (!empty($data)) {
+                file_put_contents(PATH .'/upload/system.js', $data);
+                $this->addHeadJS('upload/system.js', true);
+            }
+            
+            unset($data);
+        }
+        foreach ($this->page_js as $value) { echo $indent,'<script type="text/javascript" src="'. $value .'"></script>',"\n"; }
 
         //Оставшиеся теги
         $this->page_head = cmsCore::callEvent('PRINT_PAGE_HEAD', $this->page_head);
         foreach($this->page_head as $value) { echo $indent,$value,"\n"; }
 
         // LANG переменные
-        echo $indent,'<script type="text/javascript">'; foreach($this->page_lang as $value) { echo $value; }; echo '</script>',"\n";
+        echo $indent,'<script type="text/javascript">'; foreach($this->page_lang as $value) { echo $value; } echo '</script>',"\n";
     }
     
     /**
@@ -414,18 +469,11 @@ class cmsPage {
         }
 
         if ($this->pathway){
-            echo '<div class="pathway">';
-            foreach($this->pathway as $key=>$pathway){
-                if(!isset($pathway['is_last'])){
-                    echo '<a href="',$pathway['link'],'" class="pathwaylink">',$pathway['title'],'</a>';
-                } else {
-                    echo '<span class="pathwaylink">',$pathway['title'],'</span>';
-                }
-                if($key<$count-1){
-                    echo ' ',$separator,' ';
-                }
-            }
-            echo '</div>';
+            $this->initTemplate('special', 'pathway')->
+                assign('pathway', $this->pathway)->
+                assign('separator', $separator)->
+                assign('count', $count)->
+                display();
         }
     }
     
@@ -465,18 +513,19 @@ class cmsPage {
     public function showTemplate(){
         // Инициализируем нужные объекты
         $inCore = cmsCore::getInstance();
-        $inUser = cmsUser::getInstance();
+        $inUser = cmsCore::c('user');
         $inPage = $this;
         $inConf = $this->site_cfg;
-        $inDB   = cmsDatabase::getInstance();
+        $inDB   = cmsCore::c('db');
+        $tpl_cfgs = cmsCore::getTplCfg();
 
         // Формируем модули заранее
         $this->loadModulesForMenuItem();
 
         global $_LANG;
 
-        if (file_exists(TEMPLATE_DIR.'template.php')) {
-            require(TEMPLATE_DIR.'template.php');
+        if (file_exists(TEMPLATE_DIR. 'template.php')) {
+            require(TEMPLATE_DIR. 'template.php');
             return;
         }
 
@@ -532,7 +581,8 @@ class cmsPage {
 
         $inCore = cmsCore::getInstance();
 
-        if (!$inCore->isMenuIdStrict()){ $strict_sql = "AND (m.is_strict_bind = 0)"; } else { $strict_sql = ''; }
+        $is_strict = $inCore->isMenuIdStrict();
+        if (!$is_strict){ $strict_sql = "AND (m.is_strict_bind = 0)"; } else { $strict_sql = ''; }
 
         $menuid = $inCore->menuId();
 
@@ -544,10 +594,20 @@ class cmsPage {
 
         $result = cmsCore::c('db')->query($sql);
 
-        if(!cmsCore::c('db')->num_rows($result)){ $this->modules = $modules; return true; }
+        if (!cmsCore::c('db')->num_rows($result)){ $this->modules = $modules; return true; }
 
         while ($mod = cmsCore::c('db')->fetch_assoc($result)){
             if (!cmsCore::checkContentAccess($mod['access_list'])) { continue; }
+            
+            // не показывать модуль на определенных пунктах меню
+            if ($mod['hidden_menu_ids']) {
+                $mod['hidden_menu_ids'] = cmsCore::yamlToArray($mod['hidden_menu_ids']);
+                if (in_array($menuid, $mod['hidden_menu_ids'])) {
+                    if ($is_strict || !$mod['is_strict_bind_hidden']) {
+                        continue;
+                    }
+                }
+            }
 
             // формируем html модуля
             $m = $this->renderModule($mod);
@@ -615,8 +675,8 @@ class cmsPage {
         }
 
         // выводим модуль в шаблоне если модуль вернул true
-        if ($callback){
-            $module_tpl = file_exists(TEMPLATE_DIR.'modules/'.$mod['template']) ? $mod['template'] : 'module.tpl';
+        if ($callback) {
+            $module_tpl = file_exists(TEMPLATE_DIR .'modules/'. $mod['template']) ? $mod['template'] : 'module';
             $cfglink = (cmsConfig::getConfig('fastcfg') && cmsUser::getInstance()->is_admin) ? true : false;
 
             ob_start();
@@ -624,7 +684,7 @@ class cmsPage {
             self::initTemplate('modules', $module_tpl)->
                     assign('cfglink', $cfglink)->
                     assign('mod', $mod)->
-                    display($module_tpl);
+                    display();
 
             $html = ob_get_clean();
         }
@@ -678,16 +738,17 @@ class cmsPage {
     
     /**
      * Возвращает html-код каптчи
-     * @param string $input_name
      * @return html
      */
-    public static function getCaptcha($input_name='code'){
-        ob_start();
-        $captcha_count = self::getInstance()->captcha_count;
-        $input_id = 'kcaptcha' . $captcha_count;
-        self::includeTemplateFile('special/captcha.php', array('input_id' => $input_id, 'input_name' => $input_name));
-        self::getInstance()->captcha_count += 1;
-        return ob_get_clean();
+    public static function getCaptcha($var=false){
+        $captcha_code = cmsCore::callEvent('INSERT_CAPTCHA', false);
+        
+        if ($captcha_code === false) {
+            global $_LANG;
+            return $_LANG['INSERT_CAPTCHA_ERROR'];
+        }
+        
+        return $captcha_code;
     }
     
     /**
@@ -864,87 +925,57 @@ class cmsPage {
      * @param array $params
      * @return html
      */
-    public static function getPagebar($total, $page, $perpage, $link, $params=array()){
+    public static function getPagebar($total, $page, $perpage, $link, $params=array()) {
         $pagebar = cmsCore::callEvent('GET_PAGEBAR', array($total, $page, $perpage, $link, $params));
 
-        if (!is_array($pagebar) && $pagebar){ return $pagebar; }
+        if (!is_array($pagebar) && $pagebar) { return $pagebar; }
 
         global $_LANG;
 
-        $html  = '<div class="pagebar">';
-        $html .= '<span class="pagebar_title"><strong>'.$_LANG['PAGES'].': </strong></span>';
-
         $total_pages = ceil($total / $perpage);
 
-        if ($total_pages < 2){ return; }
+        if ($total_pages == 1) { return; }
 
         //configure for the starting links per page
-        $max = 3;
+        $max = 10;
 
         //used in the loop
-        $max_links = $max+1;
-        $h=1;
+        $max_links = $max + 1;
+        $current =1;
 
         //if page is above max link
-        if($page>$max_links){
+        if ($page > $max_links) {
             //start of loop
-            $h=(($h+$page)-$max_links);
+            $current = (($current + $page) - $max_links);
         }
 
         //if page is not page one
-        if($page>=1){
+        if ($page >= 1) {
             //top of the loop extends
-            $max_links = $max_links+($page-1);
+            $max_links = $max_links + ($page-1);
         }
 
         //if the top page is visible then reset the top of the loop to the $total_pages
-        if($max_links>$total_pages){
-            $max_links=$total_pages+1;
+        if ($max_links > $total_pages) {
+            $max_links = $total_pages + 1;
         }
 
-        //next and prev buttons
-        if($page>1){
-            $href = $link;
-            if (is_array($params)){
-                foreach($params as $param=>$value){
-                    $href = str_replace('%'.$param.'%', $value, $href);
-                }
-            }
-            $html .= ' <a href="'.str_replace('%page%', 1, $href).'" class="pagebar_page">'.$_LANG['FIRST'].'</a> ';
-            $html .= ' <a href="'.str_replace('%page%', ($page-1), $href).'" class="pagebar_page">'.$_LANG['PREVIOUS'].'</a> ';
+        $href = $link;
+        if (is_array($params)) { 
+            foreach($params as $param => $value) {
+                $href = str_replace('%'.$param.'%', $value, $href);
+            } 
         }
-
-        //create the page links
-        for ($i=$h;$i<$max_links;$i++){
-            if($i==$page){
-                $html .= '<span class="pagebar_current">'.$i.'</span>';
-            }else{
-                $href = $link;
-                if (is_array($params)){
-                    foreach($params as $param=>$value){
-                        $href = str_replace('%'.$param.'%', $value, $href);
-                    }
-                }
-                $href = str_replace('%page%', $i, $href);
-                $html .= ' <a href="'.$href.'" class="pagebar_page">'.$i.'</a> ';
-            }
-        }
-
-        //Next and last buttons
-        if(($page >= 1)&&($page!=$total_pages)){
-            $href = $link;
-            if (is_array($params)){
-                foreach($params as $param=>$value){
-                    $href = str_replace('%'.$param.'%', $value, $href);
-                }
-            }
-            $html .= ' <a href="'.str_replace('%page%', ($page+1), $href).'" class="pagebar_page">'.$_LANG['NEXT'].'</a> ';
-            $html .= ' <a href="'.str_replace('%page%', $total_pages, $href).'" class="pagebar_page">'.$_LANG['LAST'].'</a> ';
-        }
-
-        $html.='</div>';
-
-        return $html;
+        
+        return self::initTemplate('special', 'pagebar')->
+                assign('LANG', $_LANG)->
+                assign('pagebar', $pagebar)->
+                assign('total_pages', $total_pages)->
+                assign('max_links', $max_links)->
+                assign('page', $page)->
+                assign('current', $current)->
+                assign('href', $href)->
+                fetch();
     }
     
     /**

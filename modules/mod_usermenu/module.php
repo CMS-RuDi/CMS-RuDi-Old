@@ -39,8 +39,10 @@ function mod_usermenu($module_id, $cfg){
         assign('video_count', $is_video ? cmsCore::c('user')->video_count : 0)->
         assign('music_count', $is_music ? cmsCore::c('user')->music_count : 0)->
         assign('balance', $is_billing ? cmsCore::c('user')->balance : 0)->
+            
+        assign('iframe_provider', cmsCore::c('config')->iframe_enable ? (!empty(cmsCore::c('config')->iframe_session_id) ? cmsCore::c('user')->iframe_provider : false) : false)->
 
-        display('mod_usermenu.tpl');
+        display();
 
     return true;
 }

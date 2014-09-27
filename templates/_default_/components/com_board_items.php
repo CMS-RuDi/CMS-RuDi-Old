@@ -56,7 +56,7 @@
                             </table>
                         </div>
                     </td>
-                <?php if ($col == $maxcols) { $col = 1; echo '</tr>'; } else { $col++; } ?> ?>
+                <?php if ($col == $maxcols) { $col = 1; echo '</tr>'; } else { $col++; } ?>
             <?php } ?>
             <?php if ($col > 1) { ?>
                 <td colspan="<?php echo (($maxcols + 1) - $col); ?>">&nbsp;</td></tr>

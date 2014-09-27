@@ -16,10 +16,9 @@
     </table>
 </form>
 <script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
-{literal}
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $('#title').focus();
-        });
-    </script>
-{/literal}
+
+<script type="text/javascript">
+    $(function() {
+        $('#title').focus();
+    });
+</script>

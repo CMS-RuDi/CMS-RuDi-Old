@@ -13,25 +13,25 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function cpComponentHasConfig($item){ 
-    return file_exists('components/'. $item['link'] .'/backend.php');
+function cpComponentHasConfig($item) {
+    return (file_exists(PATH .'/admin/components/'. $item['link'] .'/backend.php') || file_exists(PATH .'/admin/components/'. $item['link'] .'/backend_cfg.php') || file_exists(PATH .'/components/'. $item['link'] .'/backend_cfg.json'));
 }
 
-function cpComponentCanRemove($item){ 
+function cpComponentCanRemove($item) {
     if($item['system']) { return false; }
 
     global $adminAccess;
 
-    return cmsUser::isAdminCan('admin/com_'.$item['link'], $adminAccess);
+    return cmsUser::isAdminCan('admin/com_'. $item['link'], $adminAccess);
 }
 
-function applet_components(){
+function applet_components() {
     $inCore = cmsCore::getInstance();
     $inDB   = cmsCore::c('db');
     $inUser = cmsCore::c('user');
-        
+
     global $_LANG;
-    
+
     global $adminAccess;
     
     if (!cmsUser::isAdminCan('admin/components', $adminAccess)) { cpAccessDenied(); }
@@ -44,61 +44,119 @@ function applet_components(){
     $id   = cmsCore::request('id', 'int', 0);
     $link = cmsCore::request('link', 'str', '');
     
-    if ($link){ $_REQUEST['id'] = $id = $inCore->getComponentId($link); }
+    if ($link) { $_REQUEST['id'] = $id = $inCore->getComponentId($link); }
 
-    if ($do != 'list'){
+    if ($do != 'list') {
         $com = $inCore->getComponent($id);
-        if(!$com){ cmsCore::error404(); }
-        if (!cmsUser::isAdminCan('admin/com_'.$com['link'], $adminAccess)) { cpAccessDenied(); }
+        if (!$com) { cmsCore::error404(); }
+        if (!cmsUser::isAdminCan('admin/com_'. $com['link'], $adminAccess)) { cpAccessDenied(); }
     }
 
-    if ($do == 'show'){
+    if ($do == 'show') {
         cmsCore::c('db')->setFlag('cms_components', $id, 'published', '1');
         cmsCore::halt('1');
     }
     
-    if ($do == 'hide'){
+    if ($do == 'hide') {
         cmsCore::c('db')->setFlag('cms_components', $id, 'published', '0');
         cmsCore::halt('1');
     }
     
-    if ($do == 'config'){
-        $file = PATH .'/admin/components/'. $com['link'] .'/backend.php';
+    if ($do == 'config') {
+        $file      = PATH .'/admin/components/'. $com['link'] .'/backend.php';
+        $file_cfg  = PATH .'/admin/components/'. $com['link'] .'/backend_cfg.php';
+        $file_json = PATH .'/admin/components/'. $com['link'] .'/backend_cfg.json';
+        
+        cmsCore::loadLanguage('components/'. $com['link']);
+        cmsCore::loadLanguage('admin/components/'. $com['link']);
+        
+        cpAddPathway($com['title'] .' v'. $com['version'], '?view=components&do=config&id='. $com['id']);
 
-        if (file_exists($file)){
-            cpAddPathway($com['title'] .' v'. $com['version'], '?view=components&do=config&id='. $com['id']);
-            cmsCore::loadLanguage('components/'. $com['link']);
-            cmsCore::loadLanguage('admin/components/'. $com['link']);
-            include $file; return;
-        } else {
-            cmsCore::redirect('index.php?view=components');
+        if (file_exists($file)) {
+            include($file);
+            return;
+        } else if (file_exists($file_cfg) || file_exists($file_json)) {
+            echo '<h3>'. $_LANG['AD_SETTINGS'] .': '. $com['title'] .'</h3>';
+            
+            if (file_exists($file_cfg)) {
+                include($file_cfg);
+            } else {
+                $com_cfg = json_decode(file_get_contents($file_json));
+            }
+            
+            if (!empty($com_cfg)) {
+                echo '<form action="index.php?view=components&do=save_config&id='. $com['id'] .'" method="POST">';
+                    echo '<div style="width:650px;">'. cmsCore::c('form_gen')->generateForm($com_cfg, $inCore->loadComponentConfig($com['link'])) .'</div>';
+                    echo '<div style="margin-top:6px;">';
+                        echo '<input type="submit" class="btn btn-primary" name="save" value="'. $_LANG['SAVE'] .'" /> ';
+                        echo '<input type="button" class="btn btn-default" name="back" value="'. $_LANG['CANCEL'] .'" onclick="window.history.go(-1)" />';
+                    echo '</div>';
+                echo '</form>';
+            }
+            
+            return;
         }
+        
+        cmsCore::redirect('index.php?view=components');
+    }
+
+    if ($do == 'save_config') {
+        if (cmsUser::checkCsrfToken()) {
+            $file_cfg  = PATH .'/admin/components/'. $com['link'] .'/backend_cfg.php';
+            $file_json = PATH .'/admin/components/'. $com['link'] .'/backend_cfg.json';
+
+            if (file_exists($file_cfg) || file_exists($file_json)) {
+                if (file_exists($file_cfg)) {
+                    include($file_cfg);
+                } else {
+                    $com_cfg = json_decode(file_get_contents($file_json), true);
+                }
+                
+                if (!empty($com_cfg)) {
+                    $config = cmsCore::c('form_gen')->requestForm($com_cfg);
+                    
+                    $inCore->saveComponentConfig($com['link'], $config);
+
+                    cmsCore::addSessionMessage($_LANG['AD_CONFIG_SAVE_SUCCESS'], 'success');
+
+                    cmsCore::redirect('?view=components&do=config&id='. $id);
+                }
+            }
+        }
+        
+        cmsCore::error404();
     }
     
-    if ($do == 'list'){
-        $toolmenu[] = array('icon'=>'install.gif', 'title'=>$_LANG['AD_INSTALL_COMPONENTS'], 'link'=>'?view=install&do=component');
-        $toolmenu[] = array('icon'=>'help.gif', 'title'=>$_LANG['AD_HELP'], 'link'=>'?view=help&topic=components');
+    if ($do == 'list') {
+        $toolmenu = array(
+            array( 'icon' => 'install.gif', 'title' => $_LANG['AD_INSTALL_COMPONENTS'], 'link' => '?view=install&do=component' ),
+            array( 'icon' => 'help.gif', 'title' => $_LANG['AD_HELP'], 'link' => '?view=help&topic=components' )
+        );
         
         cpToolMenu($toolmenu);
 
-        $fields[] = array('title'=>'id', 'field'=>'id', 'width'=>'30');
-        $fields[] = array('title'=>$_LANG['TITLE'], 'field'=>'title','link'=>'?view=components&do=config&id=%id%', 'width'=>'');
-        $fields[] = array('title'=>$_LANG['AD_VERSION'], 'field'=>'version', 'width'=>'60');
-        $fields[] = array('title'=>$_LANG['AD_ENABLE'], 'field'=>'published', 'width'=>'65');
-        $fields[] = array('title'=>$_LANG['AD_AUTHOR'], 'field'=>'author', 'width'=>'200');
-        $fields[] = array('title'=>$_LANG['AD_LINK'], 'field'=>'link', 'width'=>'100');
+        $fields = array(
+            array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
+            array( 'title' => $_LANG['TITLE'], 'field' => 'title','link' => '?view=components&do=config&id=%id%', 'width' => '' ),
+            array( 'title' => $_LANG['AD_VERSION'], 'field' => 'version', 'width' => '80' ),
+            array( 'title' => $_LANG['AD_ENABLE'], 'field' => 'published', 'width' => '80' ),
+            array( 'title' => $_LANG['AD_AUTHOR'], 'field' => 'author', 'width' => '200' ),
+            array( 'title' => $_LANG['AD_LINK'], 'field' => 'link', 'width' => '100' )
+        );
 
-        $actions[] = array('title'=>$_LANG['AD_CONFIG'], 'icon'=>'config.gif', 'link'=>'?view=components&do=config&id=%id%', 'condition'=>'cpComponentHasConfig');
-        $actions[] = array('title'=>$_LANG['DELETE'], 'icon'=>'delete.gif', 'link'=>'?view=install&do=remove_component&id=%id%', 'condition'=>'cpComponentCanRemove', 'confirm'=>$_LANG['AD_DELETED_COMPONENT_FROM']);
+        $actions = array(
+            array( 'title' => $_LANG['AD_CONFIG'], 'icon' => 'config.gif', 'link' => '?view=components&do=config&id=%id%', 'condition' => 'cpComponentHasConfig'),
+            array( 'title' => $_LANG['DELETE'], 'icon' => 'delete.gif', 'link' => '?view=install&do=remove_component&id=%id%', 'condition' => 'cpComponentCanRemove', 'confirm' => $_LANG['AD_DELETED_COMPONENT_FROM'])
+        );
         
         $where = '';
 
-        if (cmsCore::c('user')->id > 1){
-            foreach($adminAccess as $key=>$value){
-                if (mb_strstr($value, 'admin/com_')){
+        if (cmsCore::c('user')->id > 1) {
+            foreach($adminAccess as $key => $value){
+                if (mb_strstr($value, 'admin/com_')) {
                     if ($where) { $where .= ' OR '; }
                     $value = str_replace('admin/com_', '', $value);
-                    $where .= "link='{$value}'";
+                    $where .= "link='". $value ."'";
                 }
             }
         }
@@ -108,5 +166,3 @@ function applet_components(){
         cpListTable('cms_components', $fields, $actions, $where);
     }
 }
-
-?>

@@ -19,14 +19,8 @@
  * @param string
  * @return string
  */
-function smarty_modifier_default($string, $default = '')
-{
-    if (!isset($string) || $string === '')
-        return $default;
-    else
-        return $string;
+function smarty_modifier_default($string, $default = '') {
+    return empty($string) ? $default : $string;
 }
 
 /* vim: set expandtab: */
-
-?>

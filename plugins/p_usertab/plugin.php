@@ -99,10 +99,10 @@ class p_usertab extends cmsPlugin {
 
         ob_start();
 
-        cmsPage::initTemplate('plugins', 'p_usertab.tpl')->
+        cmsPage::initTemplate('plugins', 'p_usertab')->
                 assign('total', $total)->
                 assign('articles', $content_list)->
-                display('p_usertab.tpl');
+                display();
 
         return ob_get_clean();
 

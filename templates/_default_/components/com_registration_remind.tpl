@@ -19,10 +19,8 @@
     </table>
 
     <input type="submit" id="submit" name="submit" value="{$LANG.CHANGE_PASS}" />
-
 </form>
+    
 <script type="text/javascript">
-    {literal}
-        $('input[name=pass]').focus();
-    {/literal}
+    $('input[name=pass]').focus();
 </script>

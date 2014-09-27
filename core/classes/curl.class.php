@@ -1,9 +1,9 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v1.0.0                                //
-//                         http://www.cmsrudi.ru/                             //
-//              Copyright (c) 2013 DS-Soft (http://ds-soft.ru/)               //
+//                             CMS RuDi v0.0.7                                //
+//                            http://cmsrudi.ru/                              //
+//              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
@@ -11,10 +11,10 @@
 /**
  * Класс обертка для методов CURL
  * 
- * @author DS-Soft <support@ds-soft.ru>
- * @version 1.2.3
+ * @author DS Soft <support@ds-soft.ru>
+ * @version 1.2.4
  */
-class miniCurl{
+class miniCurl {
     public static $Server = false;
     
     private $key = '';
@@ -36,8 +36,8 @@ class miniCurl{
     public $result_body = '';
     public $postdata;
     
-    public function __construct($cfg=array()){
-        if (!function_exists('curl_setopt') || !function_exists('curl_init')){
+    public function __construct($cfg=array()) {
+        if (!function_exists('curl_setopt') || !function_exists('curl_init')) {
             return self::echoError('Библиотека CURL не установлена');
         }
         
@@ -46,15 +46,15 @@ class miniCurl{
         return $this;
     }
     
-    public function __destruct(){
-        if ($this->ch){
+    public function __destruct() {
+        if ($this->ch) {
             curl_close($this->ch);
             $this->ch = null;
         }
     }
     
-    public function reInit($cfg=array()){
-        if ($this->ch){
+    public function reInit($cfg=array()) {
+        if ($this->ch) {
             curl_close($this->ch);
             $this->ch = null;
         }
@@ -73,7 +73,7 @@ class miniCurl{
         $this->config = array_merge(self::getDefaultConfig(), $cfg);
         
         $this->ch = curl_init();
-        if (!$this->ch){
+        if (!$this->ch) {
             $this->error = curl_error($this->ch);
             return;
         }
@@ -87,7 +87,7 @@ class miniCurl{
         $this->set_option(CURLOPT_AUTOREFERER,    $this->config['auto_referer']);
     }
     
-    private static function getDefaultConfig(){
+    private static function getDefaultConfig() {
         return array(
             'header' => true,
             'return_transfer' => true,
@@ -109,26 +109,26 @@ class miniCurl{
         );
     }
     
-    public function set_option($option, $value){
-        if (!curl_setopt($this->ch, $option, $value)){
+    public function set_option($option, $value) {
+        if (!curl_setopt($this->ch, $option, $value)) {
             $this->error = curl_error($this->ch);
             return false;
         }
         return true;
     }
     
-    private function setProxy(){
-        if (!empty($this->config['proxy'])){
+    private function setProxy() {
+        if (!empty($this->config['proxy'])) {
             $this->set_option(CURLOPT_PROXY, $this->config['proxy']);
             $this->set_option(CURLOPT_PROXYTYPE, $this->config['proxy_type']);
-            if (!empty($this->config['proxy_user']) and !empty($this->config['proxy_password'])){
+            if (!empty($this->config['proxy_user']) && !empty($this->config['proxy_password'])) {
                 $this->set_option(CURLOPT_PROXYUSERPWD, $this->config['proxy_user'] .':'. $this->config['proxy_password']);
             }
         }
     }
 
-    private function setInterface(){
-        if (!empty($this->config['interface'])){
+    private function setInterface() {
+        if (!empty($this->config['interface'])) {
             curl_setopt($this->ch, CURLOPT_INTERFACE, $this->config['interface']);
         }
         return true;
@@ -137,94 +137,80 @@ class miniCurl{
     private function https(){
         $scheme = parse_url($this->current_url,PHP_URL_SCHEME);
         $scheme = strtolower($scheme);
-        if ($scheme == 'https'){
+        if ($scheme == 'https') {
             $this->set_option(CURLOPT_SSL_VERIFYHOST, $this->config['verify_host']);
             $this->set_option(CURLOPT_SSL_VERIFYPEER, $this->config['verify_peer']);
         }
     }
     
-    private static function echoError($msg){
-        if (class_exists('cmsCore')){
+    private static function echoError($msg) {
+        if (class_exists('cmsCore')) {
             cmsCore::addsessionmessage($msg, 'error');
-        }else{
+        } else {
             echo $msg;
         }
         return false;
     }
     
-    private function getPostRawData($post_data=false){
+    private function getPostRawData($post_data=false) {
         $multipart = false; $raw_data = array();
         
-        if (!empty($post_data)){
-            if (is_array($post_data)){
-                foreach ($post_data as $k=>$v){
-                    if (mb_substr($v, 0, 1) == '@'){
+        if (!empty($post_data)) {
+            if (is_array($post_data)) {
+                foreach ($post_data as $k => $v) {
+                    if (mb_substr($v, 0, 1) == '@') {
                         $multipart = true;
                         break;
                     }
                     $raw_data[] = $k .'='. urlencode($v);
                 }
-            }else{
+            } else {
                 return $post_data;
             }
-        }else{
+        } else {
             return '';
         }
         
         return $multipart === false ? implode('&', $raw_data) : $post_data;
     }
     
-    public function getCurrentUrl(){
+    public function getCurrentUrl() {
         return $this->current_url;
     }
     
-    public function get($url, $header = ''){
+    public function get($url, $header = array(), $type = '') {
         $this->current_url = $url;
-        if (!$this->current_url){ 
+        
+        if (!$this->current_url) { 
             return self::echoError('Не указан URL');
         }
-        $this->header = $header;
+        
+        $this->header = empty($header) ? '' : $header;
         $this->set_option(CURLOPT_URL, $this->current_url);
         $this->set_option(CURLOPT_POST, false);
         $this->set_option(CURLOPT_HTTPGET, true);
+        
         $this->https();
-        return $this->exec();
-    }
-    
-    public function ajaxGet($url, $header = array()){
-        $header[] = 'X-Requested-With: XMLHttpRequest';
-        return $this->get($url, $header);
-    }
-    
-    public function jsonGet($url, $assoc=false, $header = array()){
-        if ($this->get($url, $header)){
-            return json_decode($this->result_body, $assoc);
-        }
-        return false;
-    }
-    
-    public function xmlGet($url, $header = array()){
-        if ($this->get($url, $header)){
-            return simplexml_load_string($this->result_body);
-        }
-        return false;
+        
+        return $this->exec($type);
     }
     
     public function saveFile($src, $dist, $header = '') {
         $file = fopen($dist, 'w');
-        if (!$file){
+        if (!$file) {
             self::echoError('Не возможно открыть(создать файл) '. $dist);
             return false;
         }
         
+        $this->set_option(CURLOPT_HEADER, false);
         $this->set_option(CURLOPT_URL, $src);
         $this->set_option(CURLOPT_FILE, $file);
         
         if (!empty($header)) { $this->set_option(CURLOPT_HTTPHEADER, $header); }
         
-        if ($this->cookies){
+        if ($this->cookies) {
             $cookies = array();
-            foreach ($this->cookies as $k => $v){
+            foreach ($this->cookies as $k => $v) {
                 $cookies[] = $k .'='. $v;
             }
             $this->set_option(CURLOPT_COOKIE, implode('; ', $cookies));
@@ -237,8 +223,8 @@ class miniCurl{
         
         fclose($file);
         
-        if ($result === false){
-            self::echoError('Не уалось получить файл '. $src);
+        if ($result === false) {
+            self::echoError('Не удалось получить файл '. $src);
             $this->error = curl_error($this->ch);
             return false;
         }
@@ -248,46 +234,27 @@ class miniCurl{
         return true;
     }
 
-    public function post($url, $postdata = null, $header = ''){
+    public function post($url, $postdata = null, $header = array(), $type = '') {
         $this->current_url = $url;
         $this->postdata = $this->getPostRawData($postdata);
         
-        if (empty($this->current_url)){
+        if (empty($this->current_url)) {
             return self::echoError('Не указан URL');
         }
         
-        $this->header = $header;
+        $this->header = empty($header) ? '' : $header;;
         $this->set_option(CURLOPT_URL, $this->current_url);
         $this->set_option(CURLOPT_POST, true);
         $this->set_option(CURLOPT_POSTFIELDS, $this->postdata);
         
         $this->https();
-        return $this->exec();
-    }
-    
-    public function ajaxPost($url, $postdata = null, $header = array()){
-        $header[] = 'X-Requested-With: XMLHttpRequest';
-        return $this->post($url, $postdata, $header);
-    }
-    
-    public function jsonPost($url, $assoc = false, $postdata = null, $header = array()){
-        if ($this->post($url, $postdata, $header)){
-            return json_decode($this->result_body, $assoc);
-        }
-        return false;
-    }
-    
-    public function xmlPost($url, $postdata = null, $header = array()){
-        if ($this->post($url, $postdata, $header)){
-            return simplexml_load_string($this->result_body);
-        }
-        return false;
+        return $this->exec($type);
     }
     
     public function put($url, $file = false, $data = null, $header = ''){
         $this->current_url = $url;
         
-        if (!$this->current_url){
+        if (!$this->current_url) {
             return self::echoError('Не указан URL');
         }
 
@@ -298,7 +265,7 @@ class miniCurl{
         $this->set_option(CURLOPT_URL, $this->current_url);
         $this->set_option(CURLOPT_PUT, true);
 
-        if (!empty($file) && file_exists($file)){
+        if (!empty($file) && file_exists($file)) {
             $fp = fopen($file, 'r');
 
             $this->set_option(CURLOPT_INFILE, $fp);
@@ -312,7 +279,7 @@ class miniCurl{
     public function delete($url, $header = ''){
         $this->current_url = $url;
         
-        if (!$this->current_url){
+        if (!$this->current_url) {
             return self::echoError('Не указан URL');
         }
         
@@ -323,14 +290,21 @@ class miniCurl{
         return $this->exec();
     }
     
-    private function exec(){
-        if ($this->header){
+    private function exec($type) {
+        if (mb_strstr($type, 'ajax')) {
+            if (empty($this->header) || !is_array($this->header)) {
+                $this->header = array();
+            }
+            $this->header[] = 'X-Requested-With: XMLHttpRequest';
+        }
+        
+        if ($this->header) {
             $this->set_option(CURLOPT_HTTPHEADER, $this->header);
         }
         
-        if ($this->cookies){
+        if ($this->cookies) {
             $cookies = array();
-            foreach ($this->cookies as $k => $v){
+            foreach ($this->cookies as $k => $v) {
                 $cookies[] = $k .'='. $v;
             }
             $this->set_option(CURLOPT_COOKIE, implode('; ', $cookies));
@@ -341,7 +315,7 @@ class miniCurl{
         
         $this->result = curl_exec($this->ch);
         
-        if ($this->result === false){
+        if ($this->result === false) {
             $this->error = curl_error($this->ch);
             return false;
         }
@@ -349,12 +323,23 @@ class miniCurl{
         $this->info = curl_getinfo($this->ch);
         $this->processHeaders();
         $this->processBody();
+
+        if (mb_strstr($type, 'json')) {
+            return json_decode(
+                $this->result_body,
+                mb_strstr($type, 'json:array') ? true : false
+            );
+        }
+
+        if (mb_strstr($type, 'xml')) {
+            return simplexml_load_string($this->result_body);
+        }
         
         return true;
     }
     
     private function processHeaders(){
-        if ($this->config['header']){
+        if ($this->config['header']) {
             $this->result_headers = array();
             $this->result_headers[0] = substr($this->result,0,$this->info['header_size']);
             $headers = explode("\r\n",$this->result_headers[0]);
@@ -377,27 +362,27 @@ class miniCurl{
         }
     }
     
-    private function processCookies($string){
+    private function processCookies($string) {
         $cookie	= explode(';',$string);
         $cookie = explode('=',$cookie[0]);
         
         $cookie[0] = trim($cookie[0]);
         $cookie[1] = trim($cookie[1]);
         
-        if ($cookie[1] == 'DELETED' or $cookie[1] == 'deleted'){
+        if ($cookie[1] == 'DELETED' || $cookie[1] == 'deleted') {
             unset($this->cookies[$cookie[0]]);
-        }else{
+        } else {
             $this->cookies[$cookie[0]] = $cookie[1];
         }
     }
     
-    private function processContentType($string){
+    private function processContentType($string) {
         $pos = strpos($string,'charset');
         if ($pos !== false) {
             $endpos = strpos($string,';',$pos);
             if ($endpos === false) {
                 $charset = substr($string,$pos);
-            }else{
+            } else {
                 $length = $endpos - $pos;
                 $charset = substr($string,$pos,$length);
             }
@@ -406,70 +391,74 @@ class miniCurl{
         return true;
     }
     
-    private function processBody(){
-        if ($this->config['meta'] === true and preg_match('#<hea[^>]+>(.*)</head.+?<bod[^>]+>(.*)</body>#is', $this->result, $html)){
+    private function processBody() {
+        $html = array();
+        
+        if ($this->config['header']) {
+            $this->result_body = substr($this->result, $this->info['header_size']);
+        } else {
+            $this->result_body = $this->result;
+        }
+            
+        if ($this->config['meta'] === true && preg_match('#<head[^>]{0,}>(.+?)</head.+?<body[^>]{0,}>(.*)$#is', $this->result_body, $html)) {
             $this->result_head = $html[1];
             $this->result_body = $html[2];
-        }else{
-            if ($this->config['header']){
-                $this->result_body = substr($this->result, $this->info['header_size']);
-            }else{
-                $this->result_body = $this->result;
-            }
         }
-        if (!$this->result_encoding and $this->config['encoding'] === true){
+        
+        if (!$this->result_encoding && $this->config['encoding'] === true) {
             if (preg_match("#<meta\b[^<>]*?\bcontent=['\"]?text/html;\s*charset=([^>\s\"']+)['\"]?#is", (empty($this->result_head) ? $this->result_body : $this->result_head), $match)) {
                 $this->result_encoding = strtoupper($match[1]);
             }
         }
-        if ($this->config['encoding'] !== false) $this->processEncoding();
-        if ($this->config['meta'] === true) $this->processMetaSearch();
+        
+        if ($this->config['encoding'] !== false) { $this->processEncoding(); }
+        if ($this->config['meta'] === true) { $this->processMetaSearch(); }
     }
     
-    private function processEncoding(){
-        if ($this->config['encoding'] !== true){
+    private function processEncoding() {
+        if ($this->config['encoding'] !== true) {
             $this->result_encoding = $this->config['encoding'];
         }
-        if ($this->result_encoding != $this->default_encoding){
+        if ($this->result_encoding != $this->default_encoding) {
             $this->result_body = iconv($this->result_encoding, $this->default_encoding, $this->result_body);
-            if ($this->config['meta'] === true){
+            if ($this->config['meta'] === true) {
                 $this->result_head = iconv($this->result_encoding, $this->default_encoding, $this->result_head);
             }
         }
-        if ($this->config['meta'] === true){
+        if ($this->config['meta'] === true) {
             $this->result_body = preg_replace('#\s+#is', ' ', $this->result_body);
             $this->result_head = preg_replace('#\s+#is', ' ', $this->result_head);
         }
     }
     
-    private function processMetaSearch(){
+    private function processMetaSearch() {
         $this->meta_tags = array();
-        if (!empty($this->result_head)){
+        if (!empty($this->result_head)) {
             preg_match_all('#<meta(.+?)>#is', $this->result_head, $matches);
-            foreach ($matches[1] as $val){
+            foreach ($matches[1] as $val) {
                 preg_match_all('#([a-z0-9\-\_]+)="([^"]+)"#is', trim($val), $match);
                 $name = ''; $item = array();
-                foreach($match[1] as $k=>$v){
-                    if ($v == 'name' or $v == 'property' or $v == 'itemprop'){
+                foreach ($match[1] as $k => $v) {
+                    if ($v == 'name' || $v == 'property' || $v == 'itemprop') {
                         $name = $match[2][$k];
-                    }else{
+                    } else {
                         $item[$v] = $match[2][$k];
                     }
                 }
-                if (!empty($name)){
-                    if (!isset($this->meta_tags[$name])){
+                if (!empty($name)) {
+                    if (!isset($this->meta_tags[$name])) {
                         $this->meta_tags[$name] = array();
                     }
                     $this->meta_tags[$name][] = $item;
-                }else{
+                } else {
                     $this->meta_tags[] = $item;
                 }
             }
         }
     }
     
-    public function startServer(){
-        if (!empty($this->key) and $this->key != md_5($_POST['key'])){
+    public function startServer() {
+        if (!empty($this->key) && $this->key != md_5($_POST['key'])) {
             header("HTTP/1.0 404 Not Found");
             header("HTTP/1.1 404 Not Found");
             header("Status: 404 Not Found");
@@ -483,7 +472,7 @@ class miniCurl{
         $this->reInit($request['config']);
         $this->cookies = $request['cookies'];
         
-        switch ($request['type']){
+        switch ($request['type']) {
             case 'get':
                     $this->get($request['url'], $request['header']);
                 break;
@@ -520,7 +509,7 @@ class miniCurl{
         echo $data;
     }
     
-    public function getServer($sUrl, $type, $url, $postdata=false, $header=false){
+    public function getServer($sUrl, $type, $url, $postdata=false, $header=false) {
         $data = array(
             'type' => $type,
             'url' => $url,
@@ -539,7 +528,7 @@ class miniCurl{
         $this->post($sUrl, array('request' => $data));
         $this->config = $config;
         
-        if (!empty($this->result_body)){
+        if (!empty($this->result_body)) {
             $request = $this->result_body;
             $request = base64_decode($request);
             $request = json_decode($request, true);
@@ -553,9 +542,50 @@ class miniCurl{
             $this->result_body = $request['result_body'];
         }
     }
+    
+    //==========================================================================
+    public function ajaxGet($url, $header = array()) {
+        return $this->get($url, $header, 'ajax');
+    }
+    
+    public function jsonGet($url, $assoc=false, $header = array()) {
+        return $this->get($url, $header, 'json'. ($assoc ? ':array' : ''));
+    }
+    
+    public function ajaxJsonGet($url, $assoc=false, $header = array()) {
+        return $this->get($url, $header, 'ajax json'. ($assoc ? ':array' : ''));
+    }
+
+    public function xmlGet($url, $header = array()) {
+        return $this->get($url, $header, 'xml');
+    }
+    
+    public function ajaxXmlGet($url, $header = array()) {
+        return $this->get($url, $header, 'ajax xml');
+    }
+    //==========================================================================
+    public function ajaxPost($url, $postdata = null, $header = array()){
+        return $this->post($url, $postdata, $header, 'ajax');
+    }
+    
+    public function jsonPost($url, $assoc = false, $postdata = null, $header = array()){
+        return $this->post($url, $postdata, $header, 'json'. ($assoc ? ':array' : ''));
+    }
+    
+    public function ajaxJsonPost($url, $assoc = false, $postdata = null, $header = array()) {
+        return $this->post($url, $postdata, $header, 'ajax json'. ($assoc ? ':array' : ''));
+    }
+    
+    public function xmlPost($url, $postdata = null, $header = array()){
+        return $this->post($url, $postdata, $header, 'xml');
+    }
+    
+    public function ajaxXmlPost($url, $postdata, $header = array()) {
+        return $this->post($url, $postdata, $header, 'ajax xml');
+    }
 }
 
-if (miniCurl::$Server === true and !empty($_POST['request'])){
+if (miniCurl::$Server === true && !empty($_POST['request'])) {
     $inCurl = new miniCurl();
     $inCurl->startServer();
 }

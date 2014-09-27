@@ -20,7 +20,7 @@
         </div>
         <?php if ($do == 'add') { ?>
             <?php if ($need_captcha) { ?>
-                <div class="cm_codebar">{captcha}</div>
+                <div class="cm_codebar"><?php echo cmsPage::getCaptcha(); ?></div>
             <?php } ?>
             <div class="submit_cmm">
                 <input id="submit_cmm" type="button" value="<?php echo $_LANG['SEND']; ?>"/>

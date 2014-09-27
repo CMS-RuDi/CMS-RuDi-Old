@@ -13,7 +13,7 @@
                     <?php if (!$comment['is_profile']) { ?>
                         <span class="cmm_author"><?php echo $comment['author']; ?> <?php if ($is_admin && $comment['ip']) { ?>(<?php echo $comment['ip']; ?>)<?php } ?></span>
                     <?php } else { ?>
-                        <span class="cmm_author"><a href="{profile_url login=$comment.author.login}"><?php echo $comment['author']['nickname']; ?></a> <?php if ($is_admin && $comment['ip']) { ?>(<?php echo $comment['ip']; ?>)<?php } ?></span>
+                        <span class="cmm_author"><a href="<?php echo cmsUser::getProfileURL($comment['author']['login']); ?>"><?php echo $comment['author']['nickname']; ?></a> <?php if ($is_admin && $comment['ip']) { ?>(<?php echo $comment['ip']; ?>)<?php } ?></span>
                     <?php } ?>
                     <a class="cmm_anchor" href="#c<?php echo $comment['id']; ?>" title="<?php echo $_LANG['LINK_TO_COMMENT']; ?>">#</a>
                     <span class="cmm_date"><?php if ($comment['published']) { ?><?php echo $comment['fpubdate']; ?><?php } else { ?><span style="color:#F00"><?php echo $_LANG['WAIT_MODERING']; ?></span><?php } ?></span>

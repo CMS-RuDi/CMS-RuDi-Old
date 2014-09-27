@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.4                                //
+//                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -93,12 +93,12 @@ class p_insert_video extends cmsPlugin {
         $id = empty($item['id']) ? 0 : $item['id'];
         
         ob_start();
-        cmsPage::initTemplate('plugins', 'p_insert_video.tpl')->
+        cmsPage::initTemplate('plugins', 'p_insert_video')->
             assign('target', 'content')->
             assign('target_id', $id)->
             assign('videos', cmsCore::c('db')->get_table('cms_content_videos', "`target` = 'content' AND `target_id` = '". $id ."'". ($id == 0 ? " AND `user_id` = '". cmsCore::c('user')->id ."'" : "")))->
             assign('cfg', $this->config)->
-            display('p_insert_video.tpl');
+            display();
         $html = ob_get_clean();
         
         return $html;

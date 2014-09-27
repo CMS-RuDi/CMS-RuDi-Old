@@ -48,7 +48,7 @@ function mod_respect($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_respect')->
             assign('users', $users)->
             assign('cfg', $cfg)->
-            display('mod_respect.tpl');
+            display();
 
     return true;
 

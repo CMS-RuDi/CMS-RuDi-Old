@@ -47,7 +47,7 @@ function mod_comments($module_id, $cfg){
 	cmsPage::initTemplate('modules', 'mod_comments')->
             assign('comments', $comments)->
             assign('cfg', $cfg)->
-            display('mod_comments.tpl');
+            display();
 
 	return true;
 

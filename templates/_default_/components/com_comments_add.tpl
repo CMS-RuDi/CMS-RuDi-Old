@@ -9,7 +9,7 @@
         <input type="hidden" name="target_id" value="{$target_id}"/>
         {if !$is_user}
             <div class="cm_guest_name"><label>{$LANG.YOUR_NAME}: <input type="text" maxchars="20" size="30" name="guestname" class="text-input" value="" id="guestname" /></label></div>
-            <script type="text/javascript">{literal}$(document).ready(function(){ $('#guestname').focus(); });{/literal}</script>
+            <script type="text/javascript">$(function(){ $('#guestname').focus(); });</script>
         {/if}
         {if $is_can_bbcode}
             <div class="usr_msg_bbcodebox">{$bb_toolbar}</div>
@@ -20,7 +20,7 @@
         </div>
         {if $do=='add'}
             {if $need_captcha}
-                <div class="cm_codebar">{captcha}</div>
+                <div class="cm_codebar"><?php echo cmsPage::getCaptcha(); ?></div>
             {/if}
             <div class="submit_cmm">
                 <input id="submit_cmm" type="button" value="{$LANG.SEND}"/>
@@ -36,7 +36,7 @@
         {/if}
 	</form>
     <div class="sess_messages" {if !$notice}style="display:none"{/if}>
-      <div class="message_info" id="error_mess">{$notice}</div>
+        <div class="message_info" id="error_mess">{$notice}</div>
     </div>
     {else}
         {if $is_user}

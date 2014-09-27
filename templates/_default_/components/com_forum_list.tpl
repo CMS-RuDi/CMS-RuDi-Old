@@ -7,7 +7,6 @@
 
 {if $forums}
 <table class="forums_table" width="100%" cellspacing="0" cellpadding="8" border="0" bordercolor="#999999" >
-    {assign var="row" value=1}
     {foreach key=fid item=forum from=$forums}
         {if $forum.cat_title != $last_cat_title}
             <tr>
@@ -16,10 +15,9 @@
               <td width="250" class="darkBlue-LightBlue">{$LANG.LAST_POST}</td>
             </tr>
         {/if}
-        {if $row % 2}{assign var="class" value='row11'}{else}{assign var="class" value='row2'}{/if}
-        <tr>
-            <td width="32" class="{$class}" align="center" valign="top"><img src="{$forum.icon_url}" border="0" /></td>
-            <td width="" class="{$class}" align="left" valign="top">
+        <tr class="{cycle values="row11,row2"}">
+            <td width="32" align="center" valign="top"><img src="{$forum.icon_url}" border="0" /></td>
+            <td width="" align="left" valign="top">
                 <div class="forum_link"><a href="/forum/{$forum.id}">{$forum.title}</a></div>
                 <div class="forum_desc">{$forum.description}</div>
                 {if $forum.sub_forums}
@@ -33,7 +31,7 @@
                     </div>
                 {/if}
             </td>
-            <td class="{$class}" style="font-size:11px" valign="top">
+            <td style="font-size:11px" valign="top">
                 {if $forum.thread_count}
                     <strong>{$LANG.THREADS}:</strong> {$forum.thread_count}
                 {else}
@@ -42,7 +40,7 @@
                 <br/><strong>{$LANG.MESSAGES}:</strong> {$forum.post_count}
 
             </td>
-            <td style="font-size:11px" class="{$class}" valign="top">
+            <td style="font-size:11px" valign="top">
                 {if $forum.last_msg_array}
                     <strong>{$LANG.IN_THREAD}: {$forum.last_msg_array.thread_link}</strong><br/>
                     {$forum.last_msg_array.fpubdate} {$LANG.FROM} {$forum.last_msg_array.user_link}
@@ -52,8 +50,7 @@
 
             </td>
         </tr>
-        {assign var="last_cat_title" value=$forum.cat_title}
-        {assign var="row" value=`$row+1`}
+        {$last_cat_title=$forum.cat_title}
     {/foreach}
 </table>
 {/if}

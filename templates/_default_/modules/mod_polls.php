@@ -7,7 +7,7 @@
     <input type="hidden" name="module_id" value="<?php echo $module_id; ?>" />
     <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
     <table class="mod_poll_answers">
-    <?php foreach($poll['answers'] as $num) { ?>
+    <?php foreach($poll['answers'] as $answer => $num) { ?>
         <tr>
           <td class="mod_poll_answer">
               <label>

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function geo($do){
+function geo($do=null) {
     $model  = new cms_model_geo();
 
     // Определяем местоположение пользователя
@@ -20,7 +20,7 @@ function geo($do){
     $do = isset($do) ? $do : cmsCore::getInstance()->do;
 
     $field_id = cmsCore::request('field_id', 'int', 0);
-    $city_id  = cmsCore::strClear(urldecode($_REQUEST['city_id'])); // можно передавать как id города, так и название
+    $city_id  = cmsCore::strClear(urldecode(cmsCore::request('city_id', 'html', 0))); // можно передавать как id города, так и название
 
 //========================================================================================================================//
     if ($do == 'view'){
@@ -31,7 +31,13 @@ function geo($do){
         $cities    = array();
 
         $region_id  = false;
-        $country_id = false;
+        
+        // определяем страну
+        if (isset(cmsCore::c('user')->geo['country'])) {
+            $country_id = cmsCore::c('db')->get_field('cms_geo_countries', "alpha2 = '". cmsCore::c('user')->geo['country'] ."'", 'id');
+        } else {
+            $country_id = false;
+        } 
 
         if (!$city_id && cmsCore::c('user')->city) {
             $city_id = cmsCore::c('user')->city;
@@ -65,7 +71,7 @@ function geo($do){
                 assign('countries', $countries)->
                 assign('regions', $regions)->
                 assign('cities', $cities)->
-                display('com_geo_view.tpl');
+                display();
 
     }
 

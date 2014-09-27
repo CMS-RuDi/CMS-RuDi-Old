@@ -12,8 +12,6 @@ $(document).ready(function(){
 	//$('#hmenu li:has(ul)').find('a:first').append(' &raquo;');
 	$('#hmenu ul li ul li').find('ul:first').addClass("fleft");
 	
-	$('.jclock').jclock();
-	
 	$('input[type=button]').addClass('button');
 	$('input[type=submit]').addClass('button');
 

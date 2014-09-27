@@ -29,22 +29,22 @@
 
 {if $cfg.fa_on && $is_allow_attach}
     {add_js file='includes/jquery/multifile/jquery.multifile.js'}
-    {literal}
+
     <script type="text/javascript">
-        $(function(){ $('#upfile').MultiFile({ max: '{/literal}{$cfg.fa_max}', accept:'{$cfg.fa_ext}{literal}', max:3, STRING: { remove:LANG_CANCEL, selected:LANG_FILE_SELECTED, denied:LANG_FILE_DENIED, duplicate:LANG_FILE_DUPLICATE } }); });
+        $(function() { $('#upfile').MultiFile({ max: '{$cfg.fa_max}', accept:'{$cfg.fa_ext}', max:3, STRING: { remove:LANG_CANCEL, selected:LANG_FILE_SELECTED, denied:LANG_FILE_DENIED, duplicate:LANG_FILE_DUPLICATE } }); });
     </script>
-    {/literal}
+
     <input type="hidden" name="fa_count" value="1"/>
     <div class="forum_fa">
         <div class="forum_fa_title"><a href="javascript:" onclick="$('#fa_entries').toggle();">{$LANG.ATTACH_FILES}</a></div>
-            <div class="forum_fa_entries" id="fa_entries">
-                <div class="forum_fa_desc">
-                    <div><strong>{$LANG.MAX_SIZE_FILE}:</strong> {$cfg.fa_size} {$LANG.KBITE}.</div>
-                    <div><strong>{$LANG.MUST_FILE_TYPE}:</strong> {$cfg.fa_ext}</div>
-                    <div><strong>{$LANG.SELECT_FILES} {$cfg.fa_max}:</strong></div>
-                </div>
-                <input type="file" name="fa[]" id="upfile" size="30" />
+        <div class="forum_fa_entries" id="fa_entries">
+            <div class="forum_fa_desc">
+                <div><strong>{$LANG.MAX_SIZE_FILE}:</strong> {$cfg.fa_size} {$LANG.KBITE}.</div>
+                <div><strong>{$LANG.MUST_FILE_TYPE}:</strong> {$cfg.fa_ext}</div>
+                <div><strong>{$LANG.SELECT_FILES} {$cfg.fa_max}:</strong></div>
             </div>
+            <input type="file" name="fa[]" id="upfile" size="30" />
+        </div>
     </div>
 {/if}
 
@@ -68,7 +68,8 @@
             </tr>
             <tr>
                 <td>{$LANG.SHOW_RESULT}: </td>
-                <td><select name="poll[result]" class="text-input">
+                <td>
+                    <select name="poll[result]" class="text-input">
                         <option value="0" {if !$thread_poll.options.result}selected="selected"{/if}>{$LANG.FOR_ALL_EVER}</option>
                         <option value="1" {if $thread_poll.options.result==1}selected="selected"{/if}>{$LANG.ONLY_VOTERS}</option>
                         <option value="2" {if $thread_poll.options.result==2}selected="selected"{/if}>{$LANG.ONLY_END_POLL}</option>
@@ -77,7 +78,8 @@
             </tr>
             <tr>
                 <td>{$LANG.CHANGE_VOTE_USER}: </td>
-                <td><select name="poll[change]" class="text-input">
+                <td>
+                    <select name="poll[change]" class="text-input">
                         <option value="0" {if !$thread_poll.options.change}selected="selected"{/if}>{$LANG.PROHIBITING}</option>
                         <option value="1" {if $thread_poll.options.change}selected="selected"{/if}>{$LANG.ALLOWING}</option>
                     </select>
@@ -109,22 +111,19 @@
         {/section}
 </div></div>
 
-{literal}
-    <script type="text/javascript">
-        function showPaEntry(id){
-            $('#pa_entry'+id).fadeIn();
-            $('#pa_entry_btn'+(id - 1)).hide();
-            $('#pa_entry_input'+id).focus();
-        }
-        function hidePaEntry(id){
-            $('#pa_entry'+id).hide();
-            $('#pa_entry_btn'+(id - 1)).fadeIn();
-            $('#pa_entry_input'+(id - 1)).focus();
-            $('#pa_entry_input'+id).val('');
-        }
-    </script>
-{/literal}
-
+<script type="text/javascript">
+    function showPaEntry(id) {
+        $('#pa_entry'+id).fadeIn();
+        $('#pa_entry_btn'+(id - 1)).hide();
+        $('#pa_entry_input'+id).focus();
+    }
+    function hidePaEntry(id) {
+        $('#pa_entry'+id).hide();
+        $('#pa_entry_btn'+(id - 1)).fadeIn();
+        $('#pa_entry_input'+(id - 1)).focus();
+        $('#pa_entry_input'+id).val('');
+    }
+</script>
 {/if}
 <div style="margin-top:6px;">
     <input type="button" value="{$LANG.SEND}" onclick="$(this).prop('disabled', true);$('#msgform').submit();" style="font-size:16px"/>
@@ -140,20 +139,8 @@
 </tr></table>
 </form>
 
-{if $do == 'newthread'}
-    {literal}
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $('#title').focus();
-            });
-        </script>
-    {/literal}
-{else}
-    {literal}
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $('#message').focus();
-            });
-        </script>
-    {/literal}
-{/if}
+<script type="text/javascript">
+    $(function() {
+        {if $do == 'newthread'} $('#title').focus(); {else} $('#message').focus(); {/if}
+    });
+</script>

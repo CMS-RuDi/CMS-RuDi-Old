@@ -2,6 +2,9 @@
 <?php if ($actions) { ?>
     <div class="actions_list">
         <?php foreach($actions as $action) { ?>
+            <?php if ($action['item_date']) { ?>
+                <h3><?php echo $action['item_date']; ?></h3>
+            <?php } ?>
             <div class="action_entry act_<?php echo $action['name']; ?>">
                 <div class="action_date<?php if ($action['is_new'] && $user_id != $action['user_id']) { ?> is_new<?php } ?>"><?php echo $action['pubdate']; ?> <?php echo $_LANG['BACK']; ?></div>
                 <div class="action_title">

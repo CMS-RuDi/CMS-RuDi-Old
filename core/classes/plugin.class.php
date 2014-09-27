@@ -12,7 +12,6 @@
 /******************************************************************************/
 
 class cmsPlugin {
-
     protected $inDB;
     protected $inCore;
     protected $inPage;
@@ -20,8 +19,6 @@ class cmsPlugin {
     public $info;
     public $events;
     public $config;
-
-// ================================================================== //
 
     public function __construct(){
 
@@ -34,23 +31,23 @@ class cmsPlugin {
 
     public function __clone() {}
 
-// ================================================================== //
-
     public function install() {
 
         return $this->inCore->installPlugin($this->info, $this->events, $this->config);
 
     }
 
-// ================================================================== //
-
     public function upgrade() {
 
         return $this->inCore->upgradePlugin($this->info, $this->events, $this->config);
 
     }
-
-// ================================================================== //
+    
+    public function uninstall() {
+        
+        return $this->inCore->removePlugin($this->info);
+        
+    }
 
     public function execute($event='', $item=array()) {
 
@@ -58,14 +55,9 @@ class cmsPlugin {
 
     }
 
-// ================================================================== //
-
     public function saveConfig() {
 
         $this->inCore->savePluginConfig( $this->info['plugin'], $this->config );
 
     }
-
-// ================================================================== //
-
 }

@@ -2,7 +2,7 @@
     <div>
         <strong><?php echo $_LANG['VIDEOS']; ?>:</strong>
         <div class="hinttext">
-            <?php echo $_LANG['VIDEOS_INSERT_HINT_TEXT']; ?> <b><?php echo $cfg['PIV_DOMENS']; ?></b>
+            <?php echo $_LANG['VIDEOS_HINT']; ?> <b><?php echo $cfg['PIV_DOMENS']; ?></b>
         </div>
     </div>
     <div style="margin-top:10px;">

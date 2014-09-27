@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.4                                //
+//                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -16,5 +16,3 @@ $_LANG['PCI_SLIDER_OPT'] = 'Режим карусели (слайдера). По
 $_LANG['PCI_jCarousel_1']= 'jCarousel Слайдер с нумерацией';
 $_LANG['PCI_jCarousel_2']= 'jCarousel Слайдер с превьюшками';
 $_LANG['PCI_jCarousel_3']= 'jCarousel Карусель с увеличением в Colorbox';
-
-?>

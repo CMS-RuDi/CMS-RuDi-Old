@@ -105,7 +105,7 @@ function mod_userfiles($module_id, $cfg){
             assign('popular', $popular)->
             assign('stats', $stats)->
             assign('cfg', $cfg)->
-            display('mod_userfiles.tpl');
+            display();
 
     return true;
 

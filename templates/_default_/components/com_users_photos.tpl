@@ -4,7 +4,7 @@
             <a href="/users/addphoto.html" class="usr_photo_add">{$LANG.ADD_PHOTO}</a>
         {/if}
         <a href="javascript:void(0)" onclick="$('#usr_photos_upload_album').show();" class="usr_edit_album"><span class="ajaxlink">{$LANG.EDIT_ALBUM}</span></a>
-        <a href="/users/{$user_id}/delalbum{$album.id}.html" onclick="if(!confirm('{$LANG.DELETE_ALBUM_CONFIRM}')){literal}{ return false; }{/literal}" class="usr_del_album"><span class="ajaxlink">{$LANG.DELETE_ALBUM}</span></a>
+        <a href="/users/{$user_id}/delalbum{$album.id}.html" onclick="if(!confirm('{$LANG.DELETE_ALBUM_CONFIRM}')) { return false; }" class="usr_del_album"><span class="ajaxlink">{$LANG.DELETE_ALBUM}</span></a>
     </div>
 {/if}
 
@@ -33,7 +33,7 @@
         </table>
         <div class="usr_photo_sel_bar bar">
            <input type="submit" name="save_album" value="{$LANG.SAVE}"/>
-           <input name="Button" type="button" value="{$LANG.CANCEL}" onclick="{literal}$('#usr_photos_upload_album').hide();{/literal}"/>
+           <input name="Button" type="button" value="{$LANG.CANCEL}" onclick="$('#usr_photos_upload_album').hide();"/>
         </div>
       </form>
     </div>
@@ -50,8 +50,7 @@
         <form action="/users/{$user_id}/photos/editlist" method="post">
             <input type="hidden" name="album_id" value="{$album.id}" />
             <script type="text/javascript">
-                {literal}
-                function toggleButtons(){
+                function toggleButtons() {
                     var is_sel = $('.photo_id:checked').length;
                     if (is_sel > 0) {
                         $('#edit_btn, #delete_btn').prop('disabled', false);
@@ -59,7 +58,6 @@
                         $('#edit_btn, #delete_btn').prop('disabled', true);
                     }
                 }
-                {/literal}
             </script>
         {/if}
 

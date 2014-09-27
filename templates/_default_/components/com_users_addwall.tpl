@@ -12,10 +12,9 @@
 </form>
 
 <script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
-{literal}
+
 <script type="text/javascript">
-    $(document).ready(function(){
+    $(function() {
         $('#message').focus();
     });
 </script>
-{/literal}

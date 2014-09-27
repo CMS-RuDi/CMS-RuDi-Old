@@ -15,7 +15,7 @@ Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
 header('Content-Type: text/html; charset=utf-8');
 header('X-Powered-By: CMS RuDi');
-define('PATH', $_SERVER['DOCUMENT_ROOT']);
+define('PATH', dirname(__FILE__));
 define('VALID_CMS', 1);
 
 // Проверяем, что система установлена
@@ -24,15 +24,17 @@ if (!file_exists(PATH .'/includes/config.inc.php')) {
     die();
 }
 
+include('core/cms.php');
+
+$ifsid = cmsCore::request('IFSID', 'str', null, 'get');
+if (!empty($ifsid)) { session_id($ifsid); }
+
 session_start();
 
-include('core/cms.php');
 $inCore = cmsCore::getInstance();
 
-// Включаем таймер
-$inCore->startGenTimer();
-
 // Загружаем нужные классы
+cmsCore::loadClass('page');
 cmsCore::loadClass('actions');
 
 // Проверяем что директории установки и миграции удалены
@@ -47,15 +49,15 @@ cmsCore::callEvent('GET_INDEX', '');
 cmsCore::c('user')->autoLogin();
 
 // проверяем что пользователь не удален и не забанен и загружаем его данные
-if (!cmsCore::c('user')->update() && !$_SERVER['REQUEST_URI']!=='/logout') { cmsCore::halt(); }
+if (!cmsCore::c('user')->update() && !$_SERVER['REQUEST_URI'] !== '/logout') { cmsCore::halt(); }
 
 //Если сайт выключен и пользователь не администратор,
 //то показываем шаблон сообщения о том что сайт отключен
 if (cmsCore::c('config')->siteoff &&
     !cmsCore::c('user')->is_admin &&
-    $_SERVER['REQUEST_URI']!='/login' &&
-    $_SERVER['REQUEST_URI']!='/logout'
-){
+    $_SERVER['REQUEST_URI'] != '/login' &&
+    $_SERVER['REQUEST_URI'] != '/logout'
+) {
     cmsPage::includeTemplateFile('special/siteoff.php');
     cmsCore::halt();
 }
@@ -72,9 +74,9 @@ cmsCore::c('page')->addPathway($_LANG['PATH_HOME'], '/');
 if ($inCore->checkMenuAccess()) { $inCore->proceedBody(); }
 
 //Проверяем нужно ли показать входную страницу (splash)
-if($inCore->isSplash()){
+if ($inCore->isSplash()) {
     //Показываем входную страницу
-    if (!cmsCore::c('page')->showSplash()){
+    if (!cmsCore::c('page')->showSplash()) {
         //Если шаблон входной страницы не был найден,
         //показываем обычный шаблон сайта
         cmsCore::c('page')->showTemplate();

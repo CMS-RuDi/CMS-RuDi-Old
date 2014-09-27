@@ -97,7 +97,7 @@ function mod_uc($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_uc')->
             assign('items', $items)->
             assign('cfg', $cfg)->
-            display('mod_uc.tpl');
+            display();
 
     return true;
 

@@ -205,7 +205,7 @@ function subCatsList($parent_id=0, $left_key=0, $right_key=0){
         cmsPage::initTemplate('components', 'com_catalog_cats')->
                 assign('cfg', $inCore->loadComponentConfig('catalog'))->
                 assign('cats', $cats)->
-                display('com_catalog_cats.tpl');
+                display();
 
         $html = ob_get_clean();
     }
@@ -336,7 +336,7 @@ function catalog(){
                         assign('id', $id)->
                         assign('cat', $cat)->
                         assign('fstruct', $fstruct_ready)->
-                        display('com_catalog_search.tpl');
+                        display();
 
             } else { cmsCore::error404(); }
         }//search form
@@ -392,7 +392,7 @@ function catalog(){
                 assign('cfg', $cfg)->
                 assign('title', $pagetitle)->
                 assign('cats_html', $cats_html)->
-                display('com_catalog_index.tpl');
+                display();
 
     }
 
@@ -582,7 +582,7 @@ function catalog(){
                       assign('pagebar', $pagebar);
             }
 
-            $tpl->display('com_catalog_view.tpl');
+            $tpl->display();
 
         } else { cmsCore::error404(); }
 
@@ -710,7 +710,7 @@ function catalog(){
                     assign('cat', $cat)->
                     assign('fields', $fields)->
                     assign('ratingForm', (isset($ratingForm) ? $ratingForm : ''))->
-                    display('com_catalog_item.tpl');
+                    display();
 
             if($item['is_comments'] && $inCore->isComponentInstalled('comments')){
                 cmsCore::includeComments();
@@ -863,7 +863,7 @@ function catalog(){
                 assign('cfg', $cfg)->
                 assign('is_admin', $inUser->is_admin)->
                 assign('cat_id', $cat['id'])->
-                display('com_catalog_add.tpl');
+                display();
 
         return;
 

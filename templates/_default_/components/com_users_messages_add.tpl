@@ -37,10 +37,10 @@
             {/foreach}
         </select>
         <input type="hidden" name="send_to_group" id="send_to_group" value="0" />
-        <a href="javascript:" class="s_usr ajaxlink" onclick="{literal}$('.s_grp').fadeIn();$('.s_usr').hide();$('#send_to_group').val(1);{/literal}">
+        <a href="javascript:" class="s_usr ajaxlink" onclick="$('.s_grp').fadeIn();$('.s_usr').hide();$('#send_to_group').val(1);">
             {$LANG.SEND_TO_GROUP}
         </a>
-        <a href="javascript:" class="s_grp ajaxlink" onclick="{literal}$('.s_grp').hide();$('.s_usr').fadeIn();$('#send_to_group').val(0);{/literal}" style="display:none">
+        <a href="javascript:" class="s_grp ajaxlink" onclick="$('.s_grp').hide();$('.s_usr').fadeIn();$('#send_to_group').val(0);" style="display:none">
             {$LANG.SEND_TO_FRIEND}
         </a>
         {/if}
@@ -52,14 +52,12 @@
     </div>
 </form>
 
-{literal}
 <script type="text/javascript">
-$(document).ready(function(){
-	$('.ajax_autogrowarea').focus();
-});
-function changeFriendTo(){
-    fr_to = $("#user_id option:selected").html();
-    $('#popup_title').html('{/literal}{$LANG.WRITE_MESS}{literal}: '+fr_to);
-}
+    $(function() {
+        $('.ajax_autogrowarea').focus();
+    });
+    function changeFriendTo() {
+        fr_to = $("#user_id option:selected").html();
+        $('#popup_title').html('{$LANG.WRITE_MESS}: '+fr_to);
+    }
 </script>
-{/literal}

@@ -38,3 +38,10 @@
         </select>
     </div>
 </div>
+<?php if ($country_id && !$city_id) { ?>
+    <script type="text/javascript">
+        $(function(){
+            $('#geo_window select[name=countries]').trigger('change');
+        });
+    </script>
+<?php }

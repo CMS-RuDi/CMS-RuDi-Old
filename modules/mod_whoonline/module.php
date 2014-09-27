@@ -61,7 +61,7 @@ function mod_whoonline($module_id, $cfg){
             assign('users', $users)->
             assign('guests', $online_count['guests'])->
             assign('today_users', $today_users)->
-            display('mod_whoonline.tpl');
+            display();
 
     return true;
 

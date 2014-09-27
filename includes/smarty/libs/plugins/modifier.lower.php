@@ -18,9 +18,6 @@
  * @param string
  * @return string
  */
-function smarty_modifier_lower($string)
-{
+function smarty_modifier_lower($string) {
     return mb_strtolower($string);
 }
-
-?>

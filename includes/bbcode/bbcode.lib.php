@@ -1205,7 +1205,7 @@ class bbcode {
         $src = preg_replace ('/[^a-zа-я0-9\-_\.\/\:]/uis', '', $src);
         $src = $this->cleanAttrValue(str_replace ('..', '.', $src));
 
-        if (!mb_strstr($src, 'http://')){
+        if (mb_strpos($src, 'http') === false) {
             global $_LANG;
             
             if(file_exists(PATH.$src)){

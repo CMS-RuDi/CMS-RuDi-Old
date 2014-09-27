@@ -8,5 +8,3 @@
 function smarty_function_captcha($params, &$smarty){
     return cmsPage::getCaptcha();
 }
-
-?>

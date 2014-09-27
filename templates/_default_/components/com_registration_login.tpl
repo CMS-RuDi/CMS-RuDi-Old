@@ -19,7 +19,7 @@
                 {if $anti_brute_force}
                     <div class="lf_title">{$LANG.SECUR_SPAM}</div>
                     <div class="lf_field">
-                        {captcha}
+                        <?php echo cmsPage::getCaptcha(); ?>
                     </div>
                 {/if}
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -36,17 +36,13 @@
             </form>
         </td>
         <td valign="top">
-
-            {php}cmsCore::callEvent('LOGINZA_BUTTON', array());{/php}
-
+            {callEvent event='LOGINZA_BUTTON'}
         </td>
     </tr>
 </table>
 
 <script type="text/javascript">
-    {literal}
-    $(document).ready(function(){
+    $(function() {
         $('.login_form #login_field').focus();
     });
-    {/literal}
 </script>

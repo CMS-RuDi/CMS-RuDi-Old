@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.4                                //
+//                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -67,18 +67,20 @@ class p_content_imgs extends cmsPlugin {
     }
     
     private function insertSlider($images, $title){
-        
-        if (!file_exists(PATH .'/templates/_default_/plugins/p_content_imgs_'. $this->config['PCI_SLIDER'] .'.tpl')){
+        if (
+            !file_exists(cmsCore::c('config')->default_template_dir . 'p_content_imgs_'. $this->config['PCI_SLIDER']) .'.tpl' &&
+            !file_exists(cmsCore::c('config')->default_template_dir . 'p_content_imgs_'. $this->config['PCI_SLIDER']) .'.php'
+        ) {
             $this->config['PCI_SLIDER'] = 'jCarousel';
             $this->config['PCI_SLIDER_OPT'] = 1;
         }
         
         ob_start();
-            cmsPage::initTemplate('plugins', 'p_content_imgs_'. $this->config['PCI_SLIDER'] .'.tpl')->
+            cmsPage::initTemplate('plugins', 'p_content_imgs_'. $this->config['PCI_SLIDER'])->
                 assign('images', $images)->
                 assign('title', $title)->
                 assign('slide_opt', $this->config['PCI_SLIDER_OPT'])->
-                display('p_content_imgs_'. $this->config['PCI_SLIDER'] .'.tpl');
+                display();
         return ob_get_clean();
         
     }

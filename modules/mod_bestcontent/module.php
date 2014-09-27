@@ -44,7 +44,7 @@ function mod_bestcontent($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_bestcontent')->
         assign('articles', $content_list)->
         assign('cfg', $cfg)->
-        display('mod_bestcontent.tpl');
+        display();
 
     return true;
 }

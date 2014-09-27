@@ -1,6 +1,6 @@
 <?php
 
-function smarty_modifier_nospam($email, $filterLevel = 'normal'){
+function smarty_modifier_nospam($email, $filterLevel = 'normal') {
     $email = strrev($email);
     $email = preg_replace('[\.]', '/', $email, 1);
     $email = preg_replace('[@]', '/', $email, 1);

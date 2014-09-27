@@ -19,6 +19,12 @@
         {/if}
     </span>
     {/if}
+    
+    {if $iframe_provider == 'vk'}
+        <span class="showInviteBox">
+            <a href="#" title="{$LANG.INVITE_FRIENDS_TO_APP}" onclick="VK.callMethod('showInviteBox');">{$LANG.INVITE_FRIENDS}</a>
+        </span>
+    {/if}
 
     {if $users_cfg.sw_blogs}
     <span class="my_blog">

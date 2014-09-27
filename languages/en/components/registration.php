@@ -77,3 +77,4 @@ $_LANG['YOU_WILL_BE_REDIRECTED']      = 'You will be redirected after a few seco
 $_LANG['REGISTRATION_COMPLETE']       = 'Registration complete';
 $_LANG['REGISTRATION_COMPLETE_HINT']  = 'Instructions for how to activate your account have been sent to your e-mail';
 $_LANG['REGISTRATION_COMPLETE_HINT1'] = 'After activation you will be able to login using your username(login) and password';
+$_LANG['NOT_ADMIN_SENDREMIND']        = 'Administrators password recovery is impossible';

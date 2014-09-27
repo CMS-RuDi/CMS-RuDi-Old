@@ -497,14 +497,12 @@ class cms_model_users{
             if ($inv_period && !$user['is_time']){ continue; }
 
             for($c=1; $c<=$count; $c++){
-
-                $invite['code']     = md5($user['id'] .'$'. rand(10000,65535) . '$' . time() . '$' . $c);
+                $invite['code']     = md5($user['id'] .'$'. microtime() .'$'. mb_substr(md5(mt_rand(0,9999)), 0, mt_rand(8,32)) .'$'. $c);
                 $invite['owner_id'] = $user['id'];
 
                 $this->addInvite($invite);
 
                 $given++;
-
             }
 
             $this->inDB->query("UPDATE cms_users SET invdate = NOW() WHERE id = '{$user['id']}'");

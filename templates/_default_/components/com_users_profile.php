@@ -210,7 +210,7 @@
                         <?php if ($usr['city']) { ?>
                             <div class="field">
                                 <div class="title"><?php echo $_LANG['CITY']; ?>:</div>
-                                <div class="value"><a href="/users/city/<?php echo $this->escape($usr['cityurl']); ?>"><?php echo $usr['city']; ?></a></div>
+                                <div class="value"><a href="/users/city/<?php echo $this->escape($usr['cityurl']); ?>"><?php echo $usr['city']; ?></a><?php if ($usr['country']) { echo ', '. $usr['country']; } ?></div>
                             </div>
                         <?php } ?>
                         

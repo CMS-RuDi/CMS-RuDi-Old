@@ -306,6 +306,7 @@ class cmsActions {
                        log.target,
                        log.target_url,
                        log.pubdate,
+                       log.pubdate as orig_pubdate,
                        log.description,
                        a.message,
                        a.name,
@@ -316,7 +317,7 @@ class cmsActions {
                 LEFT JOIN cms_users u ON u.id = log.user_id
                 WHERE 1=1 ". cmsCore::c('db')->where ."
                 ORDER BY log.id DESC
-				";
+	";
 
         if (cmsCore::c('db')->limit){
             $sql .= "LIMIT ". cmsCore::c('db')->limit;
@@ -330,34 +331,49 @@ class cmsActions {
         if (!cmsCore::c('db')->num_rows($result)){ return false; }
 
         $actions = array();
+        
+        global $_LANG;
+        $last_date      = '';
+        $today_date     = date('j F Y');
+        $yesterday_date = date('j F Y', time()-3600*24);
 
-        while($action = cmsCore::c('db')->fetch_assoc($result)){
-
+        while ($action = cmsCore::c('db')->fetch_assoc($result)) {
+            $action['item_date'] = '';
+            $item_date = date('j F Y', strtotime($action['orig_pubdate']));
+            
+            if ($item_date != $last_date) {
+                switch ($item_date) {
+                    case $today_date: $date = icms_ucfirst($_LANG['TODAY']); break;
+                    case $yesterday_date: $date = icms_ucfirst($_LANG['YESTERDAY']); break;
+                    default: $date = cmsCore::dateFormat($item_date, true, false, false);
+                }
+                
+                $action['item_date'] = $date;
+                $last_date = $item_date;
+            }
+            
             $action['object_link'] = $action['target_link'] = '';
 
-            if ($action['object']){
+            if ($action['object']) {
                 $action['object_link'] = $action['object_url'] ? '<a href="'.$action['object_url'].'" class="act_obj_'.$action['name'].'">'.$action['object'].'</a>' : $action['object'];
             }
-            if ($action['target']){
+            
+            if ($action['target']) {
                 $action['target_link'] = '<a href="'.$action['target_url'].'" class="act_tgt_'.$action['name'].'">'.$action['target'].'</a>';
             }
 
-            if($action['message']){
-
+            if ($action['message']) {
                 $target_pos = mb_strpos($action['message'], '|');
 
-                if($target_pos !== false){
-
-                    if (!$this->show_targets || !$action['target']){
+                if ($target_pos !== false) {
+                    if (!$this->show_targets || !$action['target']) {
                         $action['message'] = mb_substr($action['message'], 0, $target_pos);
                     } else {
                         $action['message'] = str_replace('|', '', $action['message']);
                     }
-
                 }
 
                 $action['message'] = sprintf($action['message'], $action['object_link'], $action['target_link']);
-
             }
 
             $action['is_new']   = (bool) (strtotime($action['pubdate']) > strtotime(cmsCore::c('user')->logdate));
@@ -365,7 +381,6 @@ class cmsActions {
             $action['pubdate']  = cmsCore::dateDiffNow($action['pubdate']);
 
             $actions[] = $action;
-
         }
 
         return cmsCore::callEvent('GET_ACTIONS', $actions);

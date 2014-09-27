@@ -33,7 +33,7 @@ function mod_polls($module_id, $cfg){
             assign('is_voted', $model->isUserVoted($poll['id']))->
             assign('module_id', $module_id)->
             assign('cfg', $cfg)->
-            display('mod_polls.tpl');
+            display();
 
     return true;
 

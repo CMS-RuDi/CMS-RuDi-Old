@@ -179,7 +179,7 @@
                 <div><strong><?php echo $_LANG['SECUR_SPAM']; ?>: </strong></div>
                 <div><small><?php echo $_LANG['SECUR_SPAM_TEXT']; ?></small></div>
             </td>
-            <td valign="top" class="">{captcha}</td>
+            <td valign="top" class=""><?php echo cmsPage::getCaptcha(); ?></td>
         </tr>
         <?php } ?>
         <tr>

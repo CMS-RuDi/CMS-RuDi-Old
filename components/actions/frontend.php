@@ -54,7 +54,7 @@ function actions(){
         cmsCore::c('db')->limitPage($page, cmsCore::m('actions')->config['perpage']);
 
         $actions = cmsCore::c('actions')->getActionsLog();
-        if(!$actions && $page > 1){ cmsCore::error404(); }
+        if (!$actions && $page > 1) { cmsCore::error404(); }
 
         cmsPage::initTemplate('components', 'com_actions_view')->
             assign('actions', $actions)->
@@ -62,7 +62,7 @@ function actions(){
             assign('total', $total)->
             assign('user_id', cmsCore::c('user')->id)->
             assign('pagebar', cmsPage::getPagebar($total, $page, cmsCore::m('actions')->config['perpage'], '/actions/page-%page%'))->
-            display('com_actions_view.tpl');
+            display();
     }
 
 //======================================================================================================================//
@@ -79,10 +79,10 @@ function actions(){
 
         // нам нужно только определенное количество друзей
         $friends = array_slice($friends, ($page-1)*$perpage, $perpage, true);
-
+        $actions  = array();
+        
         if ($friends){
             cmsCore::c('actions')->onlyMyFriends();
-
             cmsCore::c('actions')->showTargets(cmsCore::m('actions')->config['show_target']);
             cmsCore::c('db')->limitIs(cmsCore::m('actions')->config['perpage_tab']);
             $actions = cmsCore::c('actions')->getActionsLog();
@@ -96,7 +96,7 @@ function actions(){
             assign('cfg', cmsCore::m('actions')->config)->
             assign('total_pages', ceil($friends_total / $perpage))->
             assign('friends_total', $friends_total)->
-            display('com_actions_view_tab.tpl');
+            display();
     }
 //======================================================================================================================//
     if ($inCore->do == 'view_user_feed_only'){
@@ -115,14 +115,18 @@ function actions(){
         cmsCore::c('db')->limitIs(cmsCore::m('actions')->config['perpage_tab']);
         $actions = cmsCore::c('actions')->getActionsLog();
         // получаем последний элемент массива для выборки имя пользователя и ссылки на профиль.
-        $user = end($actions);
+        if ($actions) {
+            $user = end($actions);
+        } else {
+            $user = cmsUser::getShortUserData($user_id);
+        } 
 
         cmsPage::initTemplate('components', 'com_actions_tab')->
             assign('actions', $actions)->
             assign('user_id', $user_id)->
             assign('user', $user)->
             assign('cfg', cmsCore::m('actions')->config)->
-            display('com_actions_tab.tpl');
+            display();
     }
 //======================================================================================================================//
     if ($inCore->do == 'view_user_friends_only'){
@@ -144,8 +148,7 @@ function actions(){
             assign('user_id', $user_id)->
             assign('total_pages', ceil($friends_total / $perpage))->
             assign('friends_total', $friends_total)->
-            display('com_actions_friends.tpl');
+            display();
     }
 
 }
-?>

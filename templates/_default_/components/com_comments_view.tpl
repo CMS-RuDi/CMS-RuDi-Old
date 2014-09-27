@@ -1,20 +1,18 @@
 <div class="cmm_heading">
-	{$labels.comments} (<span id="comments_count">{$comments_count}</span>)
+    {$labels.comments} (<span id="comments_count">{$comments_count}</span>)
 </div>
 
 <div class="cm_ajax_list">
 {if $cfg.cmm_ajax}
-	<script type="text/javascript">
-        {literal}
-            var anc = '';
-            if (window.location.hash){
-                var anc = window.location.hash;
-            }
-        {/literal}
+    <script type="text/javascript">
+        var anc = '';
+        if (window.location.hash) {
+            var anc = window.location.hash;
+        }
         loadComments('{$target}', {$target_id}, anc);
     </script>
 {else}
-	{$html}
+    {$html}
 {/if}
 </div>
 

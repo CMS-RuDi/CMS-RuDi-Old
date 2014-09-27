@@ -8,7 +8,7 @@
 //                                                                                           //
 /*********************************************************************************************/
 
-function smarty_function_dateform($params, &$smarty){
+function smarty_function_dateform($params, $template){
 
     if (empty($params['element'])) {
         $params['element'] = 'birthdate';
@@ -75,5 +75,3 @@ function smarty_function_dateform($params, &$smarty){
     return $html;
 
 }
-
-?>

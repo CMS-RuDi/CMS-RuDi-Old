@@ -13,9 +13,7 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-$_LANG['AD_PLUGIN_DISABLE']     = 'Плагин отключен или не имеет конфигурации';
+$_LANG['AD_PLUGIN_DISABLE']     = 'Плагин не имеет конфигурации';
 $_LANG['AD_ENABLE_PLUGIN']      = 'Включите его, для начала работы';
 $_LANG['AD_REMOVE_PLUGIN_OK']   = 'Плагин успешно удален из системы';
 $_LANG['AD_REMOVE_PLUGIN_FROM'] = 'Удалить плагин из системы?';
-
-?>

@@ -13,7 +13,7 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function applet_config(){
+function applet_config() {
     // получаем оригинальный конфиг
     $config = cmsConfig::getDefaultConfig();
     
@@ -29,7 +29,7 @@ function applet_config(){
 
     $do = cmsCore::request('do', 'str', 'list');
 
-    if ($do == 'save'){
+    if ($do == 'save') {
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $newCFG = array();
@@ -39,6 +39,7 @@ function applet_config(){
 
         $newCFG['hometitle'] 	      = stripslashes(cmsCore::request('hometitle', 'str', ''));
         $newCFG['homecom']            = cmsCore::request('homecom', 'str', '');
+        $newCFG['com_without_name_in_url'] = cmsCore::request('com_without_name_in_url', 'str', '');
 
         $newCFG['siteoff']            = cmsCore::request('siteoff', 'int', 0);
         $newCFG['debug']              = cmsCore::request('debug', 'int', 0);
@@ -53,6 +54,8 @@ function applet_config(){
         $newCFG['sitemail_name']      = cmsCore::request('sitemail_name', 'str', '');
         $newCFG['wmark']              = cmsCore::request('wmark', 'str', '');
         $newCFG['template']           = cmsCore::request('template', 'str', '');
+        $newCFG['collect_css']         = cmsCore::request('collect_css', 'int', 0);
+        $newCFG['collect_js']         = cmsCore::request('collect_js', 'int', 0);
         $newCFG['splash']             = cmsCore::request('splash', 'int', 0);
         $newCFG['slight']             = cmsCore::request('slight', 'int', 0);
         $newCFG['db_host']            = $config['db_host'];
@@ -76,24 +79,44 @@ function applet_config(){
         $newCFG['timezone']           = cmsCore::request('timezone', 'str', '');
         $newCFG['timediff']           = cmsCore::request('timediff', 'str', '');
         $newCFG['user_stats']         = cmsCore::request('user_stats', 'int', 0);
-
+        
+        $newCFG['seo_url_count']      = cmsCore::request('seo_url_count', 'int', 0);
         $newCFG['allow_ip']           = cmsCore::request('allow_ip', 'str', '');
         
-        if (cmsConfig::saveToFile($newCFG)){
+        $newCFG['iframe_enable']      = cmsCore::request('iframe_enable', 'int', 0);
+        $newCFG['vk_enable']          = cmsCore::request('vk_enable', 'int', 0);
+        $newCFG['vk_id']              = cmsCore::request('vk_id', 'str', '');
+        $newCFG['vk_private_key']     = cmsCore::request('vk_private_key', 'str', '');
+        
+        if (cmsConfig::saveToFile($newCFG)) {
             cmsCore::addSessionMessage($_LANG['AD_CONFIG_SAVE_SUCCESS'] , 'success');
         } else {
             cmsCore::addSessionMessage($_LANG['AD_CONFIG_SITE_ERROR'], 'error');
+        }
+        
+        $tpl_cfgs = cmsCore::c('form_gen')->requestForm($tpl_cfgs, cmsCore::getTplCfg());
+        
+        if (file_exists(PATH .'/templates/'. cmsCore::c('config')->template .'/config.php')) {
+            include_once PATH .'/templates/'. cmsCore::c('config')->template .'/config.php';
+            if (function_exists('get_template_cfg_fields')) {
+                $tpl_cfgs  = get_template_cfg_fields();
+                if (!empty($tpl_cfgs)) {
+                    $tpl_cfgs = cmsCore::c('form_gen')->requestForm($tpl_cfgs);
+                    cmsCore::saveTplCfg($tpl_cfgs);
+                }
+            }
         }
 
         cmsCore::clearCache();
         cmsCore::redirect('index.php?view=config');
     }
 
+    cpCheckWritable('/includes/config.inc.php');
 ?>
-<div>
-    <?php cpCheckWritable('/includes/config.inc.php'); ?>
-
-    <div id="config_tabs" class="uitabs">
+<form class="form-horizontal" role="form" action="/admin/index.php?view=config" method="post" name="CFGform" target="_self" id="CFGform" style="margin-bottom:30px">
+    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
+    
+    <div class="uitabs">
         <ul id="tabs">
             <li><a href="#basic"><span><?php echo $_LANG['AD_SITE']; ?></span></a></li>
             <li><a href="#home"><span><?php echo $_LANG['AD_MAIN']; ?></span></a></li>
@@ -103,418 +126,576 @@ function applet_config(){
             <li><a href="#mail"><span><?php echo $_LANG['AD_POST']; ?></span></a></li>
             <li><a href="#other"><span><?php echo $_LANG['AD_PATHWAY']; ?></span></a></li>
             <li><a href="#seq"><span><?php echo $_LANG['AD_SECURITY']; ?></span></a></li>
+            <li><a href="#soc_apps"><span><?php echo $_LANG['AD_SOC_APPS']; ?></span></a></li>
         </ul>
+        
+        <div id="basic">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SITENAME']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="sitename" value="<?php echo htmlspecialchars($config['sitename']);?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_USE_HEADER']; ?></div>
+                    </div>
+                </div>
 
-	<form action="/admin/index.php?view=config" method="post" name="CFGform" target="_self" id="CFGform" style="margin-bottom:30px">
-            <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
-            <div id="basic">
-                <table width="720" border="0" cellpadding="5">
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_SITENAME']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_USE_HEADER']; ?></div>
-                        </td>
-                        <td width="350" valign="top">
-                            <input name="sitename" type="text" id="sitename" value="<?php echo htmlspecialchars($config['sitename']);?>" style="width:358px" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_TAGE_ADD']; ?></strong>
-                        </td>
-                        <td valign="top">
-                            <label><input name="title_and_sitename" type="radio" value="1" <?php if ($config['title_and_sitename']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="title_and_sitename" type="radio" value="0" <?php if (!$config['title_and_sitename']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_TAGE_ADD_PAGINATION'] ; ?></strong>
-                        </td>
-                        <td valign="top">
-                            <label><input name="title_and_page" type="radio" value="1" <?php if ($config['title_and_page']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="title_and_page" type="radio" value="0" <?php if (!$config['title_and_page']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['TEMPLATE_INTERFACE_LANG']; ?>:</strong>
-                        </td>
-                        <td width="350" valign="top">
-                            <select name="lang" id="lang" style="width:364px">
-                                <?php $langs = cmsCore::getDirsList('/languages');
-                                foreach ($langs as $lng) {
-                                    echo '<option value="'.$lng.'" '.($config['lang'] == $lng ? 'selected="selected"': '').'>'.$lng.'</option>';
-                                }
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TAGE_ADD']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['title_and_sitename']) { echo 'active'; } ?>">
+                            <input type="radio" name="title_and_sitename" <?php if ($config['title_and_sitename']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['title_and_sitename']) { echo 'active'; } ?>">
+                            <input type="radio" name="title_and_sitename" <?php if (!$config['title_and_sitename']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TAGE_ADD_PAGINATION']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['title_and_page']) { echo 'active'; } ?>">
+                            <input type="radio" name="title_and_page" <?php if ($config['title_and_page']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['title_and_page']) { echo 'active'; } ?>">
+                            <input type="radio" name="title_and_page" <?php if (!$config['title_and_page']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_COM_WITHOUT_NAME_IN_URL']; ?></label>
+                    <div class="col-sm-7">
+                        <select class="form-control" name="com_without_name_in_url">
+                            <?php echo cmsCore::getListItems('cms_components', $config['com_without_name_in_url'], 'title', 'ASC', 'internal=0', 'link'); ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['TEMPLATE_INTERFACE_LANG']; ?></label>
+                    <div class="col-sm-7">
+                        <select class="form-control" name="lang">
+                        <?php
+                            $langs = cmsCore::getDirsList('/languages');
+                            foreach ($langs as $lng) {
+                                echo '<option value="'. $lng .'" '. ($config['lang'] == $lng ? 'selected="selected"' : '') .'>'. $lng .'</option>';
+                            }
+                        ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SITE_LANGUAGE_CHANGE']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['is_change_lang']) { echo 'active'; } ?>">
+                            <input type="radio" name="is_change_lang" <?php if ($config['is_change_lang']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['is_change_lang']) { echo 'active'; } ?>">
+                            <input type="radio" name="is_change_lang" <?php if (!$config['is_change_lang']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block"><?php echo $_LANG['AD_VIEW_FORM_LANGUAGE_CHANGE']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SITE_ON']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if (!$config['siteoff']) { echo 'active'; } ?>">
+                            <input type="radio" name="siteoff" <?php if (!$config['siteoff']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if ($config['siteoff']) { echo 'active'; } ?>">
+                            <input type="radio" name="siteoff" <?php if ($config['siteoff']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block"><?php echo $_LANG['AD_ONLY_ADMINS']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_DEBUG_ON']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['debug']) { echo 'active'; } ?>">
+                            <input type="radio" name="debug" <?php if ($config['debug']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['debug']) { echo 'active'; } ?>">
+                            <input type="radio" name="debug" <?php if (!$config['debug']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block"><?php echo $_LANG['AD_WIEW_DB_ERRORS']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_WHY_STOP']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="offtext" value="<?php echo htmlspecialchars($config['offtext']); ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_VIEW_WHY_STOP']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_WATERMARK']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="wmark" value="<?php echo $config['wmark']; ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_WATERMARK_NAME']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_QUICK_CONFIG']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['fastcfg']) { echo 'active'; } ?>">
+                            <input type="radio" name="fastcfg" <?php if ($config['fastcfg']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['fastcfg']) { echo 'active'; } ?>">
+                            <input type="radio" name="fastcfg" <?php if (!$config['fastcfg']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block"><?php echo $_LANG['AD_MODULE_CONFIG']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_ONLINESTATS']; ?></label>
+                    <div class="col-sm-7">
+                        <select class="form-control" name="user_stats">
+                            <option value="0" <?php if (!$config['user_stats']) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_NO_ONLINESTATS']; ?></option>
+                            <option value="1" <?php if ($config['user_stats'] == 1) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_YES_ONLINESTATS']; ?></option>
+                            <option value="2" <?php if ($config['user_stats'] == 2) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_CRON_ONLINESTATS']; ?></option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SEO_URL_COUNT']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="number" class="form-control" name="seo_url_count" value="<?php echo $config['seo_url_count']; ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_SEO_URL_COUNT_HINT']; ?></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="home">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_MAIN_PAGE']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="hometitle" value="<?php echo htmlspecialchars($config['hometitle']); ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_MAIN_SITENAME']; ?></div>
+                        <div class="help-block"><?php echo $_LANG['AD_BROWSER_TITLE']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_KEY_WORDS']; ?></label>
+                    <div class="col-sm-7">
+                        <textarea class="form-control" name="keywords" rows="3"><?php echo $config['keywords']; ?></textarea>
+                        <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+                        <div class="help-block"><a style="color:#09C" href="http://tutorial.semonitor.ru/#5" target="_blank"><?php echo $_LANG['AD_WHAT_KEY_WORDS']; ?></a></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_DESCRIPTION']; ?></label>
+                    <div class="col-sm-7">
+                        <textarea class="form-control" name="metadesc" rows="3"><?php echo $config['metadesc']; ?></textarea>
+                        <div class="help-block"><?php echo $_LANG['AD_LESS_THAN']; ?></div>
+                        <div class="help-block"><a style="color:#09C" href="http://tutorial.semonitor.ru/#219" target="_blank"><?php echo $_LANG['AD_WHAT_DESCRIPTION']; ?></a></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_MAIN_PAGE_COMPONENT']; ?></label>
+                    <div class="col-sm-7">
+                        <select class="form-control" name="homecom">
+                            <option value="" <?php if (!$config['homecom']) { ?>selected="selected"<?php } ?>><?php echo $_LANG['AD_ONLY_MODULES']; ?></option>
+                            <?php echo cmsCore::getListItems('cms_components', $config['homecom'], 'title', 'ASC', 'internal=0', 'link'); ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_GATE_PAGE']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['splash']) { echo 'active'; } ?>">
+                            <input type="radio" name="splash" <?php if ($config['splash']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['SHOW']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['splash']) { echo 'active'; } ?>">
+                            <input type="radio" name="splash" <?php if (!$config['splash']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['HIDE']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block"><?php echo $_LANG['AD_FIRST_VISIT']; ?></div>
+                        <div class="help-block"><?php echo $_LANG['AD_FIRST_VISIT_TEMPLATE']; ?></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="design">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['TEMPLATE']; ?></label>
+                    <div class="col-sm-7">
+                        <select id="template" class="form-control" name="template" onchange="document.CFGform.submit();">
+                        <?php
+                            $templates = cmsCore::getDirsList('/templates');
+                            foreach ($templates as $template) {
+                                echo '<option value="'. $template .'" '. ($config['template'] == $template ? 'selected="selected"' : '') .'>'. $template .'</option>';
+                            }
+
+                            $tpl_info = cmsCore::c('page')->getCurrentTplInfo();
+                        ?>
+                        </select>
+                        <div class="help-block"><?php echo $_LANG['AD_TEMPLATE_FOLDER']; ?></div>
+
+                        <?php if (file_exists(PATH .'/templates/'. cmsCore::c('config')->template .'/positions.jpg')) { ?>
+                            <a href="#myModal" role="button" class="btn btn-sm btn-default" data-toggle="modal"><?php echo $_LANG['AD_TPL_POS']; ?></a>
+                            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            <h4 class="modal-title" id="myModalLabel"><?php echo $_LANG['AD_TPL_POS']; ?></h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <img src="/templates/<?php echo cmsCore::c('config')->template; ?>/positions.jpg" alt="<?php echo $_LANG['AD_TPL_POS']; ?>" style="width:100%;height:auto;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                            
+                        <?php
+                            if (file_exists(PATH .'/templates/'. cmsCore::c('config')->template .'/config.php')) {
+                                include PATH .'/templates/'. cmsCore::c('config')->template .'/config.php';
+                                if (function_exists('get_template_cfg_fields')) {
+                                    $tpl_cfgs  = get_template_cfg_fields();
+                                    if (!empty($tpl_cfgs)) {
+                                        $tpl_cfgs_val = cmsCore::getTplCfg();
+                                        
                                 ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_SITE_LANGUAGE_CHANGE']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_VIEW_FORM_LANGUAGE_CHANGE']; ?></div>
-                        </td>
-                        <td valign="top">
-                            <label><input name="is_change_lang" type="radio" value="1" <?php if ($config['is_change_lang']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="is_change_lang" type="radio" value="0" <?php if (!$config['is_change_lang']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_SITE_ON']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_ONLY_ADMINS'] ; ?></div>
-                        </td>
-                        <td valign="top">
-                            <label><input name="siteoff" type="radio" value="0" <?php if (!$config['siteoff']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="siteoff" type="radio" value="1" <?php if ($config['siteoff']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_DEBUG_ON']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_WIEW_DB_ERRORS']; ?></div>
-                        </td>
-                        <td valign="top">
-                            <label><input name="debug" type="radio" value="1" <?php if ($config['debug']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="debug" type="radio" value="0" <?php if (!$config['debug']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td valign="middle">
-                            <strong><?php echo $_LANG['AD_WHY_STOP'] ; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_VIEW_WHY_STOP']; ?></div>
-                        </td>
-                        <td valign="top"><input name="offtext" type="text" id="offtext" value="<?php echo htmlspecialchars($config['offtext']);?>" style="width:358px" /></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_WATERMARK']; ?> </strong><br/>
-                            <span class="hinttext"><?php echo $_LANG['AD_WATERMARK_NAME']; ?></span>
-                        </td>
-                        <td>
-                            <input name="wmark" type="text" id="wmark" value="<?php echo $config['wmark'];?>" style="width:358px" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_QUICK_CONFIG'] ; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_MODULE_CONFIG'] ; ?></div>
-                        </td>
-                        <td valign="top">
-                            <label><input name="fastcfg" type="radio" value="1" <?php if ($config['fastcfg']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="fastcfg" type="radio" value="0" <?php if (!$config['fastcfg']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_ONLINESTATS'] ; ?></strong>
-                        </td>
-                        <td valign="top">
-                            <label><input name="user_stats" type="radio" value="0" <?php if (!$config['user_stats']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['AD_NO_ONLINESTATS']; ?></label><br>
-                            <label><input name="user_stats" type="radio" value="1" <?php if ($config['user_stats']==1) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['AD_YES_ONLINESTATS']; ?></label><br>
-                            <label><input name="user_stats" type="radio" value="2" <?php if ($config['user_stats']==2) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['AD_CRON_ONLINESTATS']; ?></label>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div id="home">
-                <table width="720" border="0" cellpadding="5">
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_MAIN_PAGE']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_MAIN_SITENAME']; ?></div>
-                            <div class="hinttext"><?php echo $_LANG['AD_BROWSER_TITLE']; ?></div>
-                        </td>
-                        <td width="350" valign="top">
-                            <input name="hometitle" type="text" id="hometitle" value="<?php echo htmlspecialchars($config['hometitle']);?>" style="width:358px" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td valign="top">
-                            <strong><?php echo $_LANG['AD_KEY_WORDS']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
-                            <div class="hinttext" style="margin-top:4px"><a style="color:#09C" href="http://tutorial.semonitor.ru/#5" target="_blank"><?php echo $_LANG['AD_WHAT_KEY_WORDS']; ?></a></div>
-                        </td>
-                        <td>
-                            <textarea name="keywords" style="width:350px" rows="3" id="keywords"><?php echo $config['keywords'];?></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td valign="top">
-                            <strong><?php echo $_LANG['AD_DESCRIPTION']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_LESS_THAN']; ?></div>
-                            <div class="hinttext" style="margin-top:4px"><a style="color:#09C" href="http://tutorial.semonitor.ru/#219" target="_blank"><?php echo $_LANG['AD_WHAT_DESCRIPTION']; ?></a></div>
-                        </td>
-                        <td>
-                            <textarea name="metadesc" style="width:350px" rows="3" id="metadesc"><?php echo $config['metadesc'];?></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_MAIN_PAGE_COMPONENT']; ?></strong>
-                        </td>
-                        <td width="350" valign="top">
-                            <select name="homecom" style="width:358px">
-                                <option value="" <?php if(!$config['homecom']){ ?>selected="selected"<?php } ?>><?php echo $_LANG['AD_ONLY_MODULES']; ?></option>
-                                <?php echo cmsCore::getListItems('cms_components', $config['homecom'], 'title', 'ASC', 'internal=0', 'link'); ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_GATE_PAGE']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_FIRST_VISIT']; ?></div>
-                            <div class="hinttext"><?php echo $_LANG['AD_FIRST_VISIT_TEMPLATE']; ?></strong></div>
-                        </td>
-                        <td valign="top">
-                            <label><input name="splash" type="radio" value="0" <?php if (!$config['splash']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['HIDE']; ?></label>
-                            <label><input name="splash" type="radio" value="1" <?php if ($config['splash']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['SHOW']; ?></label>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div id="design">
-                <table width="720" border="0" cellpadding="5">
-                    <tr>
-                        <td valign="top">
-                            <div style="margin-top:2px">
-                                <strong><?php echo $_LANG['TEMPLATE']; ?>:</strong>
-                                <div class="hinttext"><?php echo $_LANG['AD_TEMPLATE_FOLDER'] ; ?> </div>
-                            </div>
-                        </td>
-                        <td>
-                            <select name="template" id="template" style="width:350px" onchange="document.CFGform.submit();">
-                                <?php $templates = cmsCore::getDirsList('/templates');
-                                foreach ($templates as $template) {
-                                    echo '<option value="'.$template.'" '.($config['template'] == $template ? 'selected="selected"': '').'>'.$template.'</option>';
+                                        <a href="#tplCfgModal" role="button" class="btn btn-sm btn-default" data-toggle="modal"><?php echo $_LANG['AD_TEMPLATE_CONFIG']; ?></a>
+                                        <?php echo cmsCore::c('form_gen')->generateForm($tpl_cfgs, $tpl_cfgs_val, 'tplCFG.php'); ?>
+                                <?php
+                                    }
                                 }
-                                $tpl_info = cmsCore::c('page')->getCurrentTplInfo();
-                                ?>
-                            </select>
-                            <?php if(file_exists(PATH.'/templates/'.TEMPLATE.'/positions.jpg')){ ?>
-                            <script>
-                                $(function() {
-                                    $('#pos').dialog({modal: true, autoOpen: false, closeText: LANG_CLOSE, width: 'auto'});
-                                });
-                            </script>
-                            <a onclick="$('#pos').dialog('open');return false;" href="#" class="ajaxlink"><?php echo $_LANG['AD_TPL_POS']; ?></a>
-                            <div id="pos" title="<?php echo $_LANG['AD_TPL_POS']; ?>"><img src="/templates/<?php echo TEMPLATE; ?>/positions.jpg" alt="<?php echo $_LANG['AD_TPL_POS']; ?>" /></div>
-                            <?php } ?>
-                            <div style="margin-top:5px" class="hinttext">
-                                <?php echo sprintf($_LANG['AD_TEMPLATE_INFO'], $tpl_info['author'], $tpl_info['renderer'], $tpl_info['ext']); ?>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong><?php echo $_LANG['AD_SEARCH_RESULT']; ?></strong></td>
-                        <td valign="top">
-                                <label><input name="slight" type="radio" value="1" <?php if ($config['slight']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                                <label><input name="slight" type="radio" value="0" <?php if (!$config['slight']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                </table>
+                            }
+                        ?>
+                            
+                        <div class="help-block">
+                            <?php echo sprintf($_LANG['AD_TEMPLATE_INFO'], $tpl_info['author'], $tpl_info['renderer'], $tpl_info['ext']); ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_COLLECT_CSS']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['collect_css']) { echo 'active'; } ?>">
+                            <input type="radio" name="collect_css" <?php if ($config['collect_css']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['collect_css']) { echo 'active'; } ?>">
+                            <input type="radio" name="collect_css" <?php if (!$config['collect_css']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block">
+                            <?php echo $_LANG['AD_COLLECT_CSS_INFO']; ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_COLLECT_JS']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['collect_js']) { echo 'active'; } ?>">
+                            <input type="radio" name="collect_js" <?php if ($config['collect_js']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['collect_js']) { echo 'active'; } ?>">
+                            <input type="radio" name="collect_js" <?php if (!$config['collect_js']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block">
+                            <?php echo $_LANG['AD_COLLECT_JS_INFO']; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SEARCH_RESULT']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['slight']) { echo 'active'; } ?>">
+                            <input type="radio" name="slight" <?php if ($config['slight']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['SHOW']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['slight']) { echo 'active'; } ?>">
+                            <input type="radio" name="slight" <?php if (!$config['slight']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['HIDE']; ?>
+                        </label>
+                    </div>
+                </div>
             </div>
-            <div id="time">
-                <table width="720" border="0" cellpadding="5">
-                    <tr>
-                        <td valign="top" width="100">
-                            <div style="margin-top:2px">
-                                <strong><?php echo $_LANG['AD_TIME_ARREA']; ?></strong>
-                            </div>
-                        </td>
-                        <td>
-                            <select name="timezone" id="timezone" style="width:350px">
-                                <?php include(PATH.'/admin/includes/timezones.php'); ?>
-                                <?php foreach($timezones as $tz) { ?>
+        </div>
+        
+        <div id="time">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TIME_ARREA']; ?></label>
+                    <div class="col-sm-7">
+                        <select id="timezone" class="form-control" name="timezone">
+                            <?php include(PATH .'/admin/includes/timezones.php'); ?>
+                            <?php foreach($timezones as $tz) { ?>
                                 <option value="<?php echo $tz; ?>" <?php if ($tz == $config['timezone']) { ?>selected="selected"<?php } ?>><?php echo $tz; ?></option>
-                                <?php } ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_TIME_SLIP']; ?></strong>
-                        </td>
-                        <td width="350">
-                            <select name="timediff" id="timediff" style="width:60px">
-                                <?php for($h=-12; $h<=12; $h++) { ?>
-                                    <option value="<?php echo $h; ?>" <?php if ($h == $config['timediff']) { ?>selected="selected"<?php } ?>><?php echo ($h > 0 ? '+'.$h : $h); ?></option>
-                                <?php } ?>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TIME_SLIP']; ?></label>
+                    <div class="col-sm-7">
+                        <select id="timediff" class="form-control" name="timediff">
+                            <?php for ($h=-12; $h<=12; $h++) { ?>
+                                <option value="<?php echo $h; ?>" <?php if ($h == $config['timediff']) { ?>selected="selected"<?php } ?>><?php echo ($h > 0 ? '+'.$h : $h); ?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div id="database">
-                <table width="720" border="0" cellpadding="5" style="margin-top:15px;">
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_DB_SIZE']; ?></strong>
-                        </td>
-                        <td width="350">
-                            <?php
-                            $result = cmsCore::c('db')->query("SELECT (sum(data_length)+sum(index_length))/1024/1024 as size FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = '{$config['db_base']}'", true);
-                            if(!cmsCore::c('db')->error()){
+        </div>
+        
+        <div id="database">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_DB_SIZE']; ?></label>
+                    <div class="col-sm-7">
+                        <?php
+                            $result = cmsCore::c('db')->query("SELECT (sum(data_length)+sum(index_length))/1024/1024 as size FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = '". $config['db_base'] ."'", true);
+                            if (!cmsCore::c('db')->error()) {
                                 $s = cmsCore::c('db')->fetch_assoc($result);
-                                echo round($s['size'], 2).' '.$_LANG['SIZE_MB'];
+                                echo round($s['size'], 2) .' '. $_LANG['SIZE_MB'];
                             } else {
                                 echo $_LANG['AD_DB_SIZE_ERROR'];
                             }
-                            ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><span class="hinttext"><?php echo $_LANG['AD_MYSQL_CONFIG']; ?></span></td>
-                    </tr>
-                </table>
+                        ?>
+                        <div class="help-block"><?php echo $_LANG['AD_MYSQL_CONFIG']; ?></div>
+                    </div>
+                </div>
             </div>
-            <div id="mail">
-                <table width="720" border="0" cellpadding="5" style="margin-top:15px;">
-                    <tr>
-                        <td width="250">
-                            <strong><?php echo $_LANG['AD_SITE_EMAIL']; ?> </strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_SITE_EMAIL_POST']; ?></div>
-                        </td>
-                        <td>
-                            <input name="sitemail" type="text" id="sitemail" value="<?php echo $config['sitemail'];?>" style="width:358px" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td width="250">
-                            <strong><?php echo $_LANG['AD_SENDER_EMAIL']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_IF_NOT_HANDLER']; ?></div>
-                        </td>
-                        <td>
-                            <input name="sitemail_name" type="text" id="sitemail_name" value="<?php echo $config['sitemail_name'];?>" style="width:358px" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo  $_LANG['AD_SEND_METHOD']; ?></strong>
-                        </td>
-                        <td>
-                            <select name="mailer" style="width:354px">
-                                <option value="mail" <?php if ($config['mailer']=='mail') { echo 'selected="selected"'; } ?>><?php echo  $_LANG['AD_PHP_MAILER']; ?></option>
-                                <option value="sendmail" <?php if ($config['mailer']=='sendmail') { echo 'selected="selected"'; } ?>><?php echo  $_LANG['AD_SEND_MAILER']; ?></option>
-                                <option value="smtp" <?php if ($config['mailer']=='smtp') { echo 'selected="selected"'; } ?>><?php echo  $_LANG['AD_SMTP_MAILER']; ?></option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo  $_LANG['AD_ENCRYPTING']; ?></strong>
-                        </td>
-                        <td>
-                            <label><input name="smtpsecure" type="radio" value="" <?php if (!$config['smtpsecure']) { echo 'checked="checked"'; } ?>/><?php echo  $_LANG['NO']; ?></label>
-                            <label><input name="smtpsecure" type="radio" value="tls" <?php if ($config['smtpsecure']=='tls') { echo 'checked="checked"'; } ?>/> tls</label>
-                            <label><input name="smtpsecure" type="radio" value="ssl" <?php if ($config['smtpsecure']=='ssl') { echo 'checked="checked"'; } ?>/> ssl</label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo  $_LANG['AD_SMTP_LOGIN']; ?></strong>
-                        </td>
-                        <td>
-                            <label><input name="smtpauth" type="radio" value="1" <?php if ($config['smtpauth']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="smtpauth" type="radio" value="0" <?php if (!$config['smtpauth']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo  $_LANG['AD_SMTP_USER']; ?></strong>
-                        </td>
-                        <td>
-                            <?php if(!$config['smtpuser']){ ?>
-                                <input name="smtpuser" type="text" id="smtpuser" value="<?php echo $config['smtpuser'];?>" style="width:350px" />
-                            <?php } else { ?>
-                                <span class="hinttext"><?php echo  $_LANG['AD_IF_CHANGE_USER']; ?></span>
-                            <?php } ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo  $_LANG['AD_SMTP_PASS']; ?></strong>
-                        </td>
-                        <td>
-                            <?php if(!$config['smtppass']){ ?>
-                                <input name="smtppass" type="password" id="smtppass" value="<?php echo $config['smtppass'];?>" style="width:350px" />
-                            <?php } else { ?>
-                                <span class="hinttext"><?php echo  $_LANG['AD_IF_CHANGE_PASS']; ?></span>
-                            <?php } ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo  $_LANG['AD_SMTP_HOST']; ?></strong>
-                            <div class="hinttext"><?php echo  $_LANG['AD_SOME_HOST']; ?></div>
-                        </td>
-                        <td>
-                            <input name="smtphost" type="text" id="smtphost" value="<?php echo $config['smtphost'];?>" style="width:350px" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_SMTP_PORT']; ?></strong>
-                        </td>
-                        <td>
-                            <input name="smtpport" type="text" id="smtpport" value="<?php echo $config['smtpport'];?>" style="width:350px" />
-                        </td>
-                    </tr>
-                </table>
+        </div>
+        
+        <div id="mail">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SITE_EMAIL']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="sitemail" value="<?php echo $config['sitemail']; ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_SITE_EMAIL_POST']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SENDER_EMAIL']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="sitemail_name" value="<?php echo $config['sitemail_name']; ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_IF_NOT_HANDLER']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SEND_METHOD']; ?></label>
+                    <div class="col-sm-7">
+                        <select class="form-control" name="mailer">
+                            <option value="mail" <?php if ($config['mailer'] == 'mail') { echo 'selected="selected"'; } ?>><?php echo  $_LANG['AD_PHP_MAILER']; ?></option>
+                            <option value="sendmail" <?php if ($config['mailer'] == 'sendmail') { echo 'selected="selected"'; } ?>><?php echo  $_LANG['AD_SEND_MAILER']; ?></option>
+                            <option value="smtp" <?php if ($config['mailer'] == 'smtp') { echo 'selected="selected"'; } ?>><?php echo  $_LANG['AD_SMTP_MAILER']; ?></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_ENCRYPTING']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if (!$config['smtpsecure']) { echo 'active'; } ?>">
+                            <input type="radio" name="smtpsecure" <?php if (!$config['smtpsecure']) { echo 'checked="checked"'; } ?> value="" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+
+                        <label class="btn btn-default <?php if ($config['smtpsecure'] == 'tls') { echo 'active'; } ?>">
+                            <input type="radio" name="smtpsecure" <?php if ($config['smtpsecure'] == 'tls') { echo 'checked="checked"'; } ?> value="tls" /> tls
+                        </label>
+
+                        <label class="btn btn-default <?php if ($config['smtpsecure'] == 'ssl') { echo 'active'; } ?>">
+                            <input type="radio" name="smtpsecure" <?php if ($config['smtpsecure'] == 'ssl') { echo 'checked="checked"'; } ?> value="ssl" /> ssl
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SMTP_LOGIN']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['smtpauth']) { echo 'active'; } ?>">
+                            <input type="radio" name="smtpauth" <?php if ($config['smtpauth']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['smtpauth']) { echo 'active'; } ?>">
+                            <input type="radio" name="smtpauth" <?php if (!$config['smtpauth']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SMTP_USER']; ?></label>
+                    <div class="col-sm-7">
+                        <?php if (!$config['smtpuser']) { ?>
+                            <input type="text" class="form-control" name="smtpuser" value="<?php echo $config['smtpuser']; ?>" />
+                        <?php } else { ?>
+                            <div class="help-block"><?php echo $_LANG['AD_IF_CHANGE_USER']; ?></div>
+                        <?php } ?>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SMTP_PASS']; ?></label>
+                    <div class="col-sm-7">
+                        <?php if (!$config['smtppass']) { ?>
+                            <input type="text" class="form-control" name="smtppass" value="<?php echo $config['smtppass']; ?>" />
+                        <?php } else { ?>
+                            <div class="help-block"><?php echo $_LANG['AD_IF_CHANGE_PASS']; ?></div>
+                        <?php } ?>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SMTP_HOST']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="smtphost" value="<?php echo $config['smtphost']; ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_SOME_HOST']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SMTP_PORT']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="smtpport" value="<?php echo $config['smtpport']; ?>" />
+                    </div>
+                </div>
             </div>
-            <div id="other">
-                <table width="720" border="0" cellpadding="5">
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_VIEW_PATHWAY']; ?></strong>
-                            <div class="hinttext">
-                                <?php echo $_LANG['AD_PATH_TO_CATEGORY']; ?>
-                            </div>
-                        </td>
-                        <td>
-                            <label><input name="show_pw" type="radio" value="1" <?php if ($config['show_pw']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="show_pw" type="radio" value="0" <?php if (!$config['show_pw']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong><?php echo $_LANG['AD_MAINPAGE_PATHWAY']; ?></strong></td>
-                        <td>
-                            <label><input name="index_pw" type="radio" value="1" <?php if ($config['index_pw']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['YES']; ?></label>
-                            <label><input name="index_pw" type="radio" value="0" <?php if (!$config['index_pw']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['NO']; ?></label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong><?php echo $_LANG['AD_PAGE_PATHWAY']; ?></strong></td>
-                        <td>
-                            <label><input name="last_item_pw" type="radio" value="0" <?php if (!$config['last_item_pw']) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['HIDE']; ?></label>
-                            <label><input name="last_item_pw" type="radio" value="1" <?php if ($config['last_item_pw'] == 1) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['AD_PAGE_PATHWAY_LINK']; ?></label>
-                            <label><input name="last_item_pw" type="radio" value="2" <?php if ($config['last_item_pw'] == 2) { echo 'checked="checked"'; } ?>/><?php echo $_LANG['AD_PAGE_PATHWAY_TEXT']; ?></label>
-                        </td>
-                    </tr>
-                </table>
+        </div>
+        
+        <div id="other">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_VIEW_PATHWAY']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['show_pw']) { echo 'active'; } ?>">
+                            <input type="radio" name="show_pw" <?php if ($config['show_pw']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['show_pw']) { echo 'active'; } ?>">
+                            <input type="radio" name="show_pw" <?php if (!$config['show_pw']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block"><?php echo $_LANG['AD_PATH_TO_CATEGORY']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_MAINPAGE_PATHWAY']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['index_pw']) { echo 'active'; } ?>">
+                            <input type="radio" name="index_pw" <?php if ($config['index_pw']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['index_pw']) { echo 'active'; } ?>">
+                            <input type="radio" name="index_pw" <?php if (!$config['index_pw']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_PAGE_PATHWAY']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if (!$config['last_item_pw']) { echo 'active'; } ?>">
+                            <input type="radio" name="last_item_pw" <?php if (!$config['last_item_pw']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['HIDE']; ?>
+                        </label>
+
+                        <label class="btn btn-default <?php if ($config['last_item_pw'] == 1) { echo 'active'; } ?>">
+                            <input type="radio" name="last_item_pw" <?php if (!$config['last_item_pw'] == 1) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['AD_PAGE_PATHWAY_LINK']; ?>
+                        </label>
+
+                        <label class="btn btn-default <?php if ($config['last_item_pw'] == 2) { echo 'active'; } ?>">
+                            <input type="radio" name="last_item_pw" <?php if (!$config['last_item_pw'] == 2) { echo 'checked="checked"'; } ?> value="2" /> <?php echo $_LANG['AD_PAGE_PATHWAY_TEXT']; ?>
+                        </label>
+                    </div>
+                </div>
             </div>
-            <div id="seq">
-                <table width="720" border="0" cellpadding="5">
-                    <tr>
-                        <td>
-                            <strong><?php echo $_LANG['AD_IP_ADMIN']; ?></strong>
-                            <div class="hinttext"><?php echo $_LANG['AD_IP_COMMA']; ?></div>
-                        </td>
-                        <td valign="top">
-                            <input name="allow_ip" type="text" id="allow_ip" value="<?php echo htmlspecialchars($config['allow_ip']);?>" style="width:358px" />
-                        </td>
-                    </tr>
-                </table>
+        </div>
+        
+        <div id="seq">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_IP_ADMIN']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" name="allow_ip" value="<?php echo htmlspecialchars($config['allow_ip']); ?>" />
+                        <div class="help-block"><?php echo $_LANG['AD_IP_COMMA']; ?></div>
+                    </div>
+                </div>
+
                 <p style="color:#900"><?php echo $_LANG['AD_ATTENTION']; ?></p>
             </div>
-            
-            <div align="left">
-                <input name="do" type="hidden" id="do" value="save" />
-                <input name="save" type="submit" id="save" value="<?php echo $_LANG['SAVE']; ?>" />
-                <input name="back" type="button" id="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.history.back();" />
+        </div>     
+    
+        <div id="soc_apps">
+            <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_IFRAME_ENABLE']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if (cmsCore::getArrVal($config, 'iframe_enable')) { echo 'active'; } ?>">
+                            <input type="radio" name="iframe_enable" <?php if (cmsCore::getArrVal($config, 'iframe_enable')) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!cmsCore::getArrVal($config, 'iframe_enable')) { echo 'active'; } ?>">
+                            <input type="radio" name="iframe_enable" <?php if (!cmsCore::getArrVal($config, 'iframe_enable')) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                    </div>
+                </div>
+
+                <fieldset>
+                    <legend>VK.COM</legend>
+                    
+                    <div class="form-group">
+                        <label class="col-sm-5 control-label"><?php echo $_LANG['AD_ENABLE']; ?></label>
+                        <div class="col-sm-7 btn-group" data-toggle="buttons">
+                            <label class="btn btn-default <?php if ($config['vk_enable']) { echo 'active'; } ?>">
+                                <input type="radio" name="vk_enable" <?php if ($config['vk_enable']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                            </label>
+                            <label class="btn btn-default <?php if (!$config['vk_enable']) { echo 'active'; } ?>">
+                                <input type="radio" name="vk_enable" <?php if (!$config['vk_enable']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="col-sm-5 control-label"><?php echo $_LANG['AD_IFRAME_APP_ID']; ?></label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" name="vk_id" value="<?php echo $config['vk_id']; ?>" />
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="col-sm-5 control-label"><?php echo $_LANG['AD_IFRAME_APP_PRIVATE_KEY']; ?></label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" name="vk_private_key" value="<?php echo $config['vk_private_key']; ?>" />
+                        </div>
+                    </div>
+                </fieldset>
             </div>
-        </form>
+        </div>
     </div>
-</div>
-<?php } ?>
+    
+    <div>
+        <input type="hidden" name="do" value="save" />
+        
+        <input type="submit" class="btn btn-primary" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
+        <input type="button" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.history.back();" />
+    </div>
+</form>
+<?php
+}

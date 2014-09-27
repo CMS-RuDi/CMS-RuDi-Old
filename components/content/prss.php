@@ -10,78 +10,63 @@
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
+if (!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
+function rss_content($item_id, $cfg) {
+    if (!cmsCore::getInstance()->isComponentEnable('content')) { return false; }
+    
+    global $_LANG;
 
-function rss_content($item_id, $cfg){
+    $channel = array();
+    $items   = array();
 
-    if(!cmsCore::getInstance()->isComponentEnable('content')) { return false; }
+    if ($item_id) {
+        $cat = cmsCore::c('db')->getNsCategory('cms_category', (int)$item_id);
+        if (!$cat) { return false; }
 
-	$inDB = cmsDatabase::getInstance();
+        $cat = cmsCore::callEvent('GET_CONTENT_CAT', $cat);
 
-	global $_LANG;
+        if (!$cat['published']) { return false; }
 
-	cmsCore::loadModel('content');
-	$model = new cms_model_content();
+        if (!cmsCore::checkUserAccess('category', $cat['id']) ) {
+            return false;
+        }
 
-	$channel = array();
-	$items   = array();
+        cmsCore::m('content')->whereThisAndNestedCats($cat['NSLeft'], $cat['NSRight']);
 
-	if ($item_id){
+        $channel['title'] = $cat['title'] ;
+        $channel['description'] = $cat['description'];
+        $channel['link'] = HOST . cmsCore::m('content')->getCategoryURL(0, $cat['seolink']);
+    } else {
+        $channel['title'] = $_LANG['NEW_MATERIALS'];
+        $channel['description'] = $_LANG['LAST_ARTICLES_NEWS'];
+        $channel['link'] = HOST .'/content';
+    }
 
-		$cat = $inDB->getNsCategory('cms_category', (int)$item_id);
-		if (!$cat) { return false; }
+    cmsCore::c('db')->where('con.showlatest = 1');
 
-		$cat = cmsCore::callEvent('GET_CONTENT_CAT', $cat);
+    cmsCore::c('db')->orderBy('con.pubdate', 'DESC');
+    cmsCore::c('db')->limit($cfg['maxitems']);
 
-		if (!$cat['published']) { return false; }
+    $content = cmsCore::m('content')->getArticlesList();
 
-		if(!cmsCore::checkUserAccess('category', $cat['id']) ){
-			return false;
-		}
+    if ($content) {
+        foreach($content as $con){
+            $con['link']     = HOST . $con['url'];
+            $con['comments'] = $con['link'].'#c';
+            $con['category'] = $con['cat_title'];
 
-		$model->whereThisAndNestedCats($cat['NSLeft'], $cat['NSRight']);
+            if ($con['image']) {
+                $con['size']  = round(filesize(PATH . $con['image']));
+                $con['image'] = HOST . $con['image'];
+            }
 
-		$channel['title'] = $cat['title'] ;
-		$channel['description'] = $cat['description'];
-		$channel['link'] = HOST . $model->getCategoryURL(0, $cat['seolink']);
+            $items[] = $con;
+        }
+    }
 
-	} else {
-
-		$channel['title'] = $_LANG['NEW_MATERIALS'];
-		$channel['description'] = $_LANG['LAST_ARTICLES_NEWS'];
-		$channel['link'] = HOST.'/content';
-
-	}
-
-	$inDB->where("con.showlatest = 1");
-
-	$inDB->orderBy('con.pubdate', 'DESC');
-	$inDB->limit($cfg['maxitems']);
-
-	$content = $model->getArticlesList();
-
-	if($content){
-		foreach($content as $con){
-
-			$con['link']     = HOST . $con['url'];
-			$con['comments'] = $con['link'].'#c';
-			$con['category'] = $con['cat_title'];
-
-			if($con['image']){
-				$con['size']  = round(filesize(PATH.'/images/photos/small/'.$con['image']));
-				$con['image'] = HOST . '/images/photos/small/'.$con['image'];
-			}
-
-			$items[] = $con;
-
-		}
-	}
-
-	return array('channel' => $channel,
-				 'items' => $items);
-
+    return array(
+        'channel' => $channel,
+        'items' => $items
+    );
 }
-
-
-?>

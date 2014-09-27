@@ -28,7 +28,7 @@ class phpTpl{
      * Показывает файл шаблона
      * параметр $tpl_file оставлен для совместимости
      */
-    public function display($tpl_file){
+    public function display($tpl_file=false){
         global $_LANG;
         
         extract($this->tpl_vars);
@@ -37,17 +37,26 @@ class phpTpl{
     }
     
     /**
+     * Возвращает результат выполнения файла шаблона без вывода в браузер
+     */
+    public function fetch() {
+        ob_start();
+            $this->display();
+        return ob_get_clean();
+    }
+    
+    /**
      * Добавляет переменную в набор
      */
     public function assign($tpl_var, $value){
-        if (is_array($tpl_var)){
+        if (is_array($tpl_var)) {
             foreach ($tpl_var as $key => $val) {
                 if ($key) {
                     $this->tpl_vars[$key] = $val;
                 }
             }
         } else {
-            if ($tpl_var){
+            if ($tpl_var) {
                 $this->tpl_vars[$tpl_var] = $value;
             }
         }

@@ -19,7 +19,7 @@
  * @param Smarty
  * @return string
  */
-function smarty_function_popup_init($params, &$smarty)
+function smarty_function_popup_init($params, $template)
 {
     $zindex = 1000;
     
@@ -31,10 +31,8 @@ function smarty_function_popup_init($params, &$smarty)
         return '<div id="overDiv" style="position:absolute; visibility:hidden; z-index:'.$zindex.';"></div>' . "\n"
          . '<script type="text/javascript" language="JavaScript" src="'.$params['src'].'"></script>' . "\n";
     } else {
-        $smarty->trigger_error("popup_init: missing src parameter");
+        $template->trigger_error("popup_init: missing src parameter");
     }
 }
 
 /* vim: set expandtab: */
-
-?>

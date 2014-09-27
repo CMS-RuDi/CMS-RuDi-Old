@@ -36,6 +36,7 @@ $_LANG['AD_COMPONENT']            = 'Component';
 $_LANG['AD_INSTALL_COMPONENTS']   = 'Install components';
 $_LANG['AD_HELP']                 = 'Help';
 $_LANG['AD_DOCS']                 = 'Help';
+$_LANG['AD_TICKETS']              = 'Tickets';
 $_LANG['AD_PHP_INFO']             = 'PHP information';
 $_LANG['AD_CONFIG_SAVE_SUCCESS']  = 'Settings are successfully saved';
 $_LANG['AD_DO_SUCCESS']           = 'Action is successfully completed';

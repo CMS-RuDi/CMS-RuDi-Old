@@ -22,15 +22,16 @@ function registration(){
     $do = $inCore->do;
 
 //============================================================================//
-if ($do=='sendremind'){
-
+if ($do == 'sendremind') {
+    if (cmsCore::c('user')->id) { cmsCore::error404(); }
+    
     cmsCore::c('page')->setTitle($_LANG['REMINDER_PASS']);
     cmsCore::c('page')->addPathway($_LANG['REMINDER_PASS']);
 
     if (!cmsCore::inRequest('goremind')){
 
         cmsPage::initTemplate('components', 'com_registration_sendremind')->
-                display('com_registration_sendremind.tpl');
+                display();
 
     } else {
 
@@ -40,13 +41,21 @@ if ($do=='sendremind'){
         if(!$email) { cmsCore::addSessionMessage($_LANG['ERR_EMAIL'], 'error'); cmsCore::redirectBack(); }
 
         $usr = cmsUser::getShortUserData($email);
-        if(!$usr) {
+        if(!$usr || $usr['is_locked'] || $usr['is_deleted']) {
             cmsCore::addSessionMessage($_LANG['ADRESS'].' "'.$email.'" '.$_LANG['NOT_IN_OUR_BASE'], 'error');
             cmsCore::redirectBack();
         }
+        
+        if (cmsUser::userIsAdmin($usr['id'])) {
+            cmsCore::addSessionMessage($_LANG['NOT_ADMIN_SENDREMIND'], 'error');
+            cmsCore::redirectBack();
+        }
 
-        $usercode = md5($usr['id'] . '-' . $usr['login'] . '-' . $usr['password'] . '-' . PATH);
-        $newpass_link = HOST.'/registration/remind/' . $usercode;
+        $usercode = md5($usr['id'] . '-' . uniqid() . '-' . microtime() . '-' . PATH);
+        $sql = "INSERT cms_users_activate (pubdate, user_id, code) VALUES (NOW(), '". $usr['id'] ."', '". $usercode ."')";
+        cmsCore::c('db')->query($sql);
+        
+        $newpass_link = HOST .'/registration/remind/'. $usercode;
 
         $mail_message = $_LANG['HELLO'].', ' . $usr['nickname'] . '!'. "\n\n";
         $mail_message .= $_LANG['REMINDER_TEXT'].' "'.cmsCore::c('config')->sitename.'".' . "\n\n";
@@ -67,16 +76,24 @@ if ($do=='sendremind'){
 }
 
 //============================================================================//
-if ($do=='remind'){
-
+if ($do == 'remind') {
+    if (cmsCore::c('user')->id) { cmsCore::error404(); }
+    
     $usercode = cmsCore::request('code', 'str', '');
     //проверяем формат кода
-    if (!preg_match('/^([a-z0-9]{32})$/ui', $usercode)) { cmsCore::error404(); }
-
+    if (!preg_match('/^[0-9a-f]{32}$/i', $usercode)){ cmsCore::error404(); }
+    
+    // проверяем код
+    $user_id = cmsCore::c('db')->get_field('cms_users_activate', "code = '". $usercode ."'", 'user_id');
+    if (!$user_id) { cmsCore::error404(); }
+    
     //получаем пользователя
-    $user = cmsCore::c('db')->get_fields('cms_users',
-            "MD5(CONCAT(id,'-',login,'-',password,'-','". cmsCore::c('db')->escape_string(PATH) ."')) = '{$usercode}'", '*');
-    if (!$user){ cmsCore::error404(); }
+    $user = cmsCore::c('db')->get_fields('cms_users', "id = '". $user_id ."'", '*');
+    if (!$user) { cmsCore::error404(); }
+    
+    if (cmsUser::userIsAdmin($user['id'])) {
+        cmsCore::error404();
+    }
 
     if (cmsCore::inRequest('submit')){
 
@@ -96,14 +113,13 @@ if ($do=='remind'){
 
         $md5_pass = md5($pass);
 
-        cmsCore::c('db')->query("UPDATE cms_users SET password = '{$md5_pass}', logdate = NOW() WHERE id = '{$user['id']}'");
+        cmsCore::c('db')->query("UPDATE cms_users SET password = '". $md5_pass ."', logdate = NOW() WHERE id = '". $user['id'] ."'");
+        cmsCore::c('db')->query("DELETE FROM cms_users_activate WHERE code = '". $usercode ."'");
 
         cmsCore::addSessionMessage($_LANG['CHANGE_PASS_COMPLETED'], 'info');
 
-        $back_url = cmsCore::c('user')->signInUser($user['login'], $pass, true);
-
-        cmsCore::redirect($back_url);
-
+        cmsCore::c('user')->signInUser($user['login'], $pass, true);
+        cmsCore::redirect(cmsUser::getProfileURL($user['login']));
     }
 
     cmsCore::c('page')->setTitle($_LANG['RECOVER_PASS']);
@@ -112,7 +128,7 @@ if ($do=='remind'){
     cmsPage::initTemplate('components', 'com_registration_remind')->
             assign('cfg', cmsCore::m('registration')->config)->
             assign('user', $user)->
-            display('com_registration_remind.tpl');
+            display();
 
 }
 
@@ -120,6 +136,10 @@ if ($do=='remind'){
 if ($do=='register'){
 
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+    
+    if (cmsCore::c('user')->id && !cmsCore::c('user')->is_admin) {
+        if ($inCore->menuId() == 1) { return; } else {  cmsCore::error404(); }
+    }
 
     // регистрация закрыта
     if (!cmsCore::m('registration')->config['is_on']){
@@ -149,7 +169,7 @@ if ($do=='register'){
     if(mb_strlen($item['login'])<2 ||
             mb_strlen($item['login'])>15 ||
             is_numeric($item['login']) ||
-            !preg_match("/^([a-zA-Z0-9])+$/ui", $item['login'])) {
+            !preg_match("/^([a-z0-9])+$/ui", $item['login'])) {
 
         cmsCore::addSessionMessage($_LANG['ERR_LOGIN'], 'error'); $errors = true;
 
@@ -197,7 +217,7 @@ if ($do=='register'){
     }
 
     // Проверяем каптчу
-    if(!cmsCore::checkCaptchaCode(cmsCore::request('code', 'str'))) { cmsCore::addSessionMessage($_LANG['ERR_CAPTCHA'], 'error'); $errors = true; }
+    if(!cmsCore::checkCaptchaCode()) { cmsCore::addSessionMessage($_LANG['ERR_CAPTCHA'], 'error'); $errors = true; }
 
     // проверяем есть ли такой пользователь
     $user_exist = cmsCore::c('db')->get_fields('cms_users', "(login LIKE '{$item['login']}' OR email LIKE '{$item['email']}') AND is_deleted = 0", 'id, login, email');
@@ -329,7 +349,7 @@ if ($do=='view'){
             assign('pagetitle', $pagetitle)->
             assign('correct_invite', $correct_invite)->
             assign('private_forms', $private_forms)->
-            display('com_registration.tpl');
+            display();
 
 }
 
@@ -400,7 +420,7 @@ if ($do=='auth'){
                 assign('cfg', cmsCore::m('registration')->config)->
                 assign('anti_brute_force', $anti_brute_force)->
                 assign('is_sess_back', cmsUser::sessionGet('auth_back_url'))->
-                display('com_registration_login.tpl');
+                display();
 
             if (!mb_strstr(cmsCore::getBackURL(), 'login')) {
                 cmsUser::sessionPut('auth_back_url', cmsCore::getBackURL());
@@ -413,7 +433,7 @@ if ($do=='auth'){
     	if(!mb_strstr(@$_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST'])) { cmsCore::error404(); }
 
         // Проверяем каптчу
-        if($anti_brute_force && !cmsCore::checkCaptchaCode(cmsCore::request('code', 'str'))) {
+        if($anti_brute_force && !cmsCore::checkCaptchaCode()) {
             cmsCore::addSessionMessage($_LANG['ERR_CAPTCHA'], 'error');
             cmsCore::redirect('/login');
         }
@@ -441,4 +461,3 @@ if ($do=='autherror'){
 //============================================================================//
 
 }
-?>

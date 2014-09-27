@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.4                                //
+//                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -75,13 +75,13 @@ class rudi_graphics{
         return array('width' => imagesx($image), 'heigth' => imagesy($image));
     }
 
-    public function resize($image_file, $upload_file=false){
+    public function resize($image_file, $upload_file = false) {
         $this->checkSizeOpt();
         $m_dir = mb_strstr($this->medium_dir, PATH) ? $this->medium_dir : $this->big_dir . $this->medium_dir;
         $s_dir = mb_strstr($this->small_dir, PATH) ? $this->small_dir : $this->big_dir . $this->small_dir;
         
-        if ($upload_file === true){
-            if (!empty($_FILES[$image_file]['name'])){
+        if ($upload_file === true) {
+            if (!empty($_FILES[$image_file]['name'])) {
                 global $_LANG;
 
                 $max_size = ini_get('upload_max_filesize');
@@ -98,43 +98,42 @@ class rudi_graphics{
                     UPLOAD_ERR_EXTENSION => $_LANG['UPLOAD_ERR_EXTENSION']
                 );
                 
-                if ($_FILES[$image_file]['error'] !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])){
+                if ($_FILES[$image_file]['error'] !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])) {
                     $_SESSION['file_upload_error'] = $uploadErrors[$errorCode];
                     return false;
                 }
                 
                 $image_file = $_FILES[$image_file]['tmp_name'];
-            }else{
+            } else {
                 return false;
             }
-        }else{
+        } else {
             if (
                 (mb_substr($image_file, 0, 7) == 'http://') ||
                 (mb_substr($image_file, 0, 8) == 'https://')
-            ){
+            ) {
                 $image_file2 = PATH .'/cache/'. md5($image_file .' '. microtime(true)) .'.tmp';
 
-                if (!cmsCore::c('curl')->saveFile($image_file, $image_file2)){
+                if (!cmsCore::c('curl')->saveFile($image_file, $image_file2)) {
                     return false;
                 }
-                cmsCore::cd('curl');
 
                 $image_file = $image_file2;
             }
         }
         
-        if (!$size = self::getImgInfo($image_file)){
+        if (!$size = self::getImgInfo($image_file)) {
             return false;
         }
         
         $this->ext = $size['type'];
-        if ($this->ext != 'jpg' and $this->ext != 'png' and $this->ext != 'gif'){
+        if ($this->ext != 'jpg' && $this->ext != 'png' && $this->ext != 'gif') {
             return false;
         }
         
-        $this->filename = ($this->filename ? $this->filename : md5(time() ." ". $image_file) .'.'. $this->ext);
+        $this->filename = ($this->filename ? $this->filename : md5(microtime() .' '. $image_file) .'.'. $this->ext);
         
-        if ($this->ext == 'gif'){
+        if ($this->ext == 'gif') {
             cmsCore::loadClass('gif_resize');
             $gif_resize = new gifresizer();
         }
@@ -145,89 +144,89 @@ class rudi_graphics{
         $this->h_ratio = $this->h / $this->w;
         
         $this->loadImage($image_file);
-        if (!is_resource($this->old_img)){
+        if (!is_resource($this->old_img)) {
             return false;
         }
         
-        if ($this->watermark or $this->mwatermark){
+        if ($this->watermark || $this->mwatermark) {
             $inConf = cmsConfig::getInstance();
         }
         
-        if ((int)$this->new_bw){
+        if ((int)$this->new_bw) {
             if (
-                ($this->w < $this->new_bw and $this->h < $this->new_bh) or 
-                ($this->resize_type == 'portrait' and $this->h < $this->new_bh) or 
-                ($this->resize_type == 'landscape' and $this->w < $this->new_bw)
-            ){
+                ($this->w < $this->new_bw && $this->h < $this->new_bh) || 
+                ($this->resize_type == 'portrait' && $this->h < $this->new_bh) || 
+                ($this->resize_type == 'landscape' && $this->w < $this->new_bw)
+            ) {
                 copy($image_file, $this->big_dir . $this->filename);
-            }else{
+            } else {
                 $new_size = $this->getNewImageSize($this->new_bw, $this->new_bh, $this->resize_type);
                 $this->new_img = imagecreatetruecolor($new_size['w'], $new_size['h']);
                 imagecopyresampled($this->new_img, $this->old_img, 0, 0, 0, 0, $new_size['w'], $new_size['h'], $this->w, $this->h);
-                if ($this->resize_type == 'crop'){
+                if ($this->resize_type == 'crop') {
                     $this->crop($new_size['w'], $new_size['h'], $this->new_bw, $this->new_bh);
                 }
-                if ($this->ext != 'gif'){
+                if ($this->ext != 'gif') {
                     $this->saveImage($this->big_dir . $this->filename, $this->ext);
-                }else{
+                } else {
                     $gif_resize->resize($image_file, $this->big_dir . $this->filename, $this->new_bw, $this->new_bh);
                 }
             }
             
-            if (!empty($this->watermark)){
+            if (!empty($this->watermark)) {
                 self::addWatermark($this->big_dir . $this->filename, PATH .'/images/'. $inConf->wmark, $this->watermark);
             }
-        }else if ($this->new_bw == 'copy'){
+        } else if ($this->new_bw == 'copy') {
             copy($image_file, $this->big_dir . $this->filename);
         }
         
-        if ($this->new_mw){
-            if ($this->w < $this->new_mw and $this->h < $this->new_mh){
+        if ($this->new_mw) {
+            if ($this->w < $this->new_mw && $this->h < $this->new_mh) {
                 copy($image_file, $m_dir . $this->filename);
-            }else{
+            } else {
                 $rt = $this->mresize_type ? $this->mresize_type : $this->resize_type;
-                if (($rt == 'portrait' and $this->h < $this->new_mh) or 
-                ($rt == 'landscape' and $this->w < $this->new_mw)){
+                if (($rt == 'portrait' && $this->h < $this->new_mh) || 
+                ($rt == 'landscape' && $this->w < $this->new_mw)) {
                     copy($image_file, $m_dir . $this->filename);
-                }else{
+                } else {
                     $new_size = $this->getNewImageSize($this->new_mw, $this->new_mh, $rt);
                     $this->new_img = imagecreatetruecolor($new_size['w'], $new_size['h']);
                     imagecopyresampled($this->new_img, $this->old_img, 0, 0, 0, 0, $new_size['w'], $new_size['h'], $this->w, $this->h);
-                    if ($rt == 'crop'){
+                    if ($rt == 'crop') {
                         $this->crop($new_size['w'], $new_size['h'], $this->new_mw, $this->new_mh);
                     }
                 }
             }
-            if ($this->ext != 'gif'){
+            if ($this->ext != 'gif') {
                 $this->saveImage($m_dir . $this->filename, $this->ext);
-            }else{
+            } else {
                 $gif_resize->resize($image_file, $m_dir . $this->filename, $this->new_mw, $this->new_mh);
             }
-            if (!empty($this->mwatermark)){
+            if (!empty($this->mwatermark)) {
                 self::addWatermark($m_dir . $this->filename, PATH .'/images/'. $inConf->wmark, $this->mwatermark);
             }
         }
         
-        if ($this->new_sw){
-            if ($this->w < $this->new_sw and $this->h < $this->new_sh){
+        if ($this->new_sw) {
+            if ($this->w < $this->new_sw and $this->h < $this->new_sh) {
                 copy($image_file, $s_dir . $this->filename);
-            }else{
+            } else {
                 $rt = $this->sresize_type ? $this->sresize_type : $this->resize_type;
-                if (($rt == 'portrait' and $this->h < $this->new_sh) or 
-                ($rt == 'landscape' and $this->w < $this->new_sw)){
+                if (($rt == 'portrait' && $this->h < $this->new_sh) || 
+                ($rt == 'landscape' && $this->w < $this->new_sw)) {
                     copy($image_file, $s_dir . $this->filename);
-                }else{
+                } else {
                     $new_size = $this->getNewImageSize($this->new_sw, $this->new_sh, $rt);
                     $this->new_img = imagecreatetruecolor($new_size['w'], $new_size['h']);
                     imagecopyresampled($this->new_img, $this->old_img, 0, 0, 0, 0, $new_size['w'], $new_size['h'], $this->w, $this->h);
-                    if ($rt == 'crop'){
+                    if ($rt == 'crop') {
                         $this->crop($new_size['w'], $new_size['h'], $this->new_sw, $this->new_sh);
                     }
                 }
             }
-            if ($this->ext != 'gif'){
+            if ($this->ext != 'gif') {
                 $this->saveImage($s_dir . $this->filename, $this->ext);
-            }else{
+            } else {
                 $gif_resize->resize($image_file, $s_dir . $this->filename, $this->new_sw, $this->new_sh);
             }
         }
@@ -235,7 +234,7 @@ class rudi_graphics{
         $filename = $this->filename;
         unset($this->filename);
         
-        if (mb_strstr($image_file, PATH .'/cache/')){
+        if (mb_strstr($image_file, PATH .'/cache/')) {
             unlink($image_file);
         }
         

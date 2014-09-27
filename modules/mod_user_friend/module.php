@@ -64,7 +64,7 @@ function mod_user_friend($module_id, $cfg){
             assign('friends', $friends)->
             assign('total', $total)->
             assign('cfg', $cfg)->
-            display('mod_user_friend.tpl');
+            display();
 
     return true;
 

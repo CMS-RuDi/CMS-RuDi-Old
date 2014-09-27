@@ -92,23 +92,22 @@ class cms_model_registration {
         }
         $letter= str_replace('{sitename}', cmsConfig::getConfig('sitename'), $letter);
 
-        return cmsCore::getInstance()->mailText($user['email'], $_LANG['THANKS_FOR_REGISTERING'].' - '.cmsConfig::getConfig('sitename'), $letter);
+        return cmsCore::mailText($user['email'], $_LANG['THANKS_FOR_REGISTERING'].' - '.cmsConfig::getConfig('sitename'), $letter);
 
     }
 
     public function sendActivationNotice($send_pass, $user_id){
-
         global $_LANG;
 
         $user = cmsUser::getShortUserData($user_id);
         if(!$user_id){ return false; }
         $user['password'] = $send_pass;
 
-        $code = md5($user['email'] . mb_substr(md5(mt_rand(0,9999)), 0, mt_rand(0,32)));
+        $code = md5($user['email'] . mb_substr(md5(mt_rand(0,9999)), 0, mt_rand(0,32)) . microtime());
         $codelink = HOST .'/activate/'. $code .'?user_id='. $user_id;
         
         $sql = "INSERT cms_users_activate (pubdate, user_id, code)
-                VALUES (NOW(), '{$user['id']}', '$code')";
+                VALUES (NOW(), '". $user['id'] ."', '". $code ."')";
         $this->inDB->query($sql);
 
         $letter = cmsCore::getLanguageTextFile('activation');
@@ -119,7 +118,7 @@ class cms_model_registration {
         $letter= str_replace('{sitename}', cmsConfig::getConfig('sitename'), $letter);
         $letter= str_replace('{codelink}', $codelink, $letter);
 
-        return cmsCore::getInstance()->mailText($user['email'], $_LANG['ACTIVATION_ACCOUNT'].' - '.cmsConfig::getConfig('sitename'), $letter);
+        return cmsCore::mailText($user['email'], $_LANG['ACTIVATION_ACCOUNT'].' - '.cmsConfig::getConfig('sitename'), $letter);
 
     }
 

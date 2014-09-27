@@ -160,7 +160,7 @@
                     var html = '<div class="ajax_file" id="ajax_file'+ response.id +'">';
 
                     <?php if ($options['type'] == 'images') { ?>
-                    html += '<div class="ajax_img_tmb"><img src="'+ response.small_src +'" /><?php if ($options['insertEditor']){ ?><div class="ajax_insertEditor"><a href="#" title="small" onclick="ajaxInsertImg(\''+ response.small_src +'\'); return false;">S</a><a href="#" title="medium" onclick="ajaxInsertImg(\''+ response.medium_src +'\'); return false;">M</a><a href="#" title="big" onclick="ajaxInsertImg(\''+ response.big_src +'\'); return false;">B</a></div><?php } ?></div><div class="ajax_file_id">#'+ response.id +'</div></div>';
+                    html += '<div class="ajax_img_tmb"><img src="'+ response.small_src +'" /><?php if ($options['insertEditor']){ ?><div class="ajax_insertEditor"><a href="#" title="small" onclick="ajaxInsertImg(\''+ response.small_src +'\'); return false;">S</a><a href="#" title="medium" onclick="ajaxInsertImg(\''+ response.medium_src +'\'); return false;">M</a><a href="#" title="big" onclick="ajaxInsertImg(\''+ response.big_src +'\'); return false;">B</a></div><?php } ?></div><div class="ajax_file_id">#'+ response.id +'</div>';
                     <?php } else { ?>
 
                     if (response.data) {

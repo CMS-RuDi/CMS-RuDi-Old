@@ -34,7 +34,7 @@ function mod_actions($module_id, $cfg){
         assign('actions', $actions)->
         assign('cfg', $cfg)->
         assign('user_id', cmsUser::getInstance()->id)->
-        display('mod_actions.tpl');
+        display();
 
     return true;
 

@@ -12,7 +12,7 @@ if ($do_photo == 'addphoto'){
 		cmsPage::initTemplate('components', 'com_photos_add1')->
                 assign('no_tags', true)->
                 assign('is_admin', ($is_admin || $is_moder))->
-                display('com_photos_add1.tpl');
+                display();
 
 	}
 
@@ -51,7 +51,7 @@ if ($do_photo == 'submit_photo'){
             assign('max_files', 0)->
             assign('uload_type', $mod['is_multi'] ? 'multi' : 'single')->
             assign('stop_photo', false)->
-            display('com_photos_add2.tpl');
+            display();
 
 }
 

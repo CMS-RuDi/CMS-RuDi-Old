@@ -133,7 +133,7 @@ if ($do=='view'){
             assign('is_quests', $is_quests)->
             assign('is_user', $inUser->id)->
             assign('pagebar', cmsPage::getPagebar($records, $page, $perpage, '/faq/%id%-%page%', array('id'=>$id)))->
-            display('com_faq_view.tpl');
+            display();
 
 }
 
@@ -171,7 +171,7 @@ if ($do=='read'){
                     assign('cfg', $cfg)->
                     assign('labels', array('comments' => $_LANG['ANSWERS'], 'add' => $_LANG['REPLY'], 'rss' => $_LANG['RSS_FEED'], 'not_comments' => $_LANG['NOT_ANSWERS']))->
                     assign('is_admin', $inUser->is_admin)->
-                    display('com_faq_read.tpl');
+                    display();
 
 		} else { cmsCore::error404(); }
 }
@@ -192,7 +192,7 @@ if ($do=='sendquest'){
     $published      = ($inUser->is_admin || $cfg['publish']) ? 1 : 0;
     $is_submit      = $inCore->inRequest('message');
 
-    if ($is_submit && !$inUser->id && !$inCore->checkCaptchaCode($inCore->request('code', 'str'))) { $error = $_LANG['ERR_CAPTCHA']; }
+    if ($is_submit && !$inUser->id && !cmsCore::checkCaptchaCode()) { $error = $_LANG['ERR_CAPTCHA']; }
 
 	if (!$is_submit || $error){
 
@@ -203,7 +203,7 @@ if ($do=='sendquest'){
                 assign('user_id', $inUser->id)->
                 assign('message', htmlspecialchars($inCore->request('message', 'html', '')))->
                 assign('error', $error)->
-                display('com_faq_add.tpl');
+                display();
 
 	} else {
 
@@ -270,7 +270,7 @@ if ($do=='delquest'){
 			$confirm['yes_button']['name']  	= 'confirm';
             cmsPage::initTemplate('components', 'action_confirm')->
                     assign('confirm', $confirm)->
-                    display('action_confirm.tpl');
+                    display();
         } else {
             $inCore->redirectBack();
         }

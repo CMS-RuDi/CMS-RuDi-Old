@@ -21,7 +21,7 @@ function mod_auth($module_id, $cfg){
 
     cmsPage::initTemplate('modules', 'mod_auth')->
             assign('cfg', $cfg)->
-            display('mod_auth.tpl');
+            display();
 
     return true;
 

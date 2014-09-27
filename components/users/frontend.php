@@ -13,7 +13,9 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function users(){
-    header('X-Frame-Options: DENY');
+    if (!cmsCore::c('config')->iframe_enable) {
+        header('X-Frame-Options: DENY');
+    }
     
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
@@ -24,25 +26,25 @@ function users(){
 
     $model = new cms_model_users();
 
-	// id пользователя
-	$id = cmsCore::request('id', 'int', 0);
-	// логин пользователя
-	$login = cmsCore::strClear(urldecode(cmsCore::request('login', 'html', '')));
+    // id пользователя
+    $id = cmsCore::request('id', 'int', 0);
+    // логин пользователя
+    $login = cmsCore::strClear(urldecode(cmsCore::request('login', 'html', '')));
 
-	$do   = $inCore->do;
-	$page = cmsCore::request('page', 'int', 1);
+    $do   = $inCore->do;
+    $page = cmsCore::request('page', 'int', 1);
 
-	$pagetitle = $inCore->getComponentTitle();
+    $pagetitle = $inCore->getComponentTitle();
 
-	$inPage->addPathway($pagetitle, '/users');
-	$inPage->setTitle($pagetitle);
-	$inPage->setDescription($pagetitle);
+    $inPage->addPathway($pagetitle, '/users');
+    $inPage->setTitle($pagetitle);
+    $inPage->setDescription($pagetitle);
 
-	// js только авторизованным
-	if($inUser->id){
-		$inPage->addHeadJS('components/users/js/profile.js');
+    // js только авторизованным
+    if ($inUser->id) {
+        $inPage->addHeadJS('components/users/js/profile.js');
         $inPage->addHeadJsLang(array('CONFIRM_CLEAN_CAT','CHOOSE_RECIPIENT','SEND_TO_USER','FRIENDSHIP_OFFER','STOP_FRIENDLY','REALY_STOP_FRIENDLY','ENTER_STATUS','HAVE_JUST'));
-	}
+    }
 
 //============================================================================//
 //========================= Список пользователей  ============================//
@@ -178,7 +180,7 @@ if ($do == 'view'){
             assign('cfg', $model->config)->
             assign('link', $link)->
             assign('pagebar', cmsPage::getPagebar($total, $page, $model->config['users_perpage'], $pagebar_link))->
-            display('com_users_view.tpl');
+            display();
 
 }
 
@@ -222,7 +224,7 @@ if ($do=='editprofile'){
                 assign('private_forms', $private_forms)->
                 assign('cfg_forum', $inCore->loadComponentConfig('forum'))->
                 assign('cfg', $model->config)->
-                display('com_users_edit_profile.tpl');
+                display();
 		return;
 
 	}
@@ -358,16 +360,16 @@ if ($do=='profile'){
         cmsPage::initTemplate('components', 'com_users_not_allow')->
                 assign('is_auth', $inUser->id)->
                 assign('usr', $usr)->
-                display('com_users_not_allow.tpl');
+                display();
         return;
     }
 	// Профиль удален
     if ($usr['is_deleted']){
-        cmsPage::initTemplate('components', 'com_users_deleted.tpl')->
+        cmsPage::initTemplate('components', 'com_users_deleted')->
                 assign('usr', $usr)->
                 assign('is_admin', $inUser->is_admin)->
                 assign('others_active', $inDB->rows_count('cms_users', "login='{$usr['login']}' AND is_deleted=0", 1))->
-                display('com_users_deleted.tpl');
+                display();
         return;
     }
 
@@ -420,31 +422,36 @@ if ($do=='profile'){
 								$inDB->get_fields('cms_blogs', "user_id = '{$usr['id']}' AND owner = 'user'", 'title, seolink') : false;
 
     $usr['form_fields'] = array();
-	if (is_array($model->config['privforms'])){
-		foreach($model->config['privforms'] as $form_id){
-			$usr['form_fields'] = array_merge($usr['form_fields'], cmsForm::getFieldsValues($form_id, $usr['formsdata']));
-		}
-	}
+    if (is_array($model->config['privforms'])) {
+            foreach ($model->config['privforms'] as $form_id) {
+                    $usr['form_fields'] = array_merge($usr['form_fields'], cmsForm::getFieldsValues($form_id, $usr['formsdata']));
+            }
+    }
+        
+    if ($usr['city']) {
+        $city_parents = cmsCore::m('geo')->getCityParents($usr['city']);
+        if ($city_parents) {
+            $usr['country'] = $city_parents['country_name'];
+        }
+    } 
 
     $plugins = cmsCore::callTabEventPlugins('USER_PROFILE', $usr);
 
-    cmsPage::initTemplate('components', 'com_users_profile.tpl')->
-            assign('usr', $usr)->
-            assign('plugins', $plugins)->
-            assign('cfg', $model->config)->
-            assign('myprofile', $myprofile)->
-            assign('cfg_forum', $inCore->loadComponentConfig('forum'))->
-            assign('is_admin', $inUser->is_admin)->
-            assign('is_auth', $inUser->id)->
-            display('com_users_profile.tpl');
-
+    cmsPage::initTemplate('components', 'com_users_profile')->
+        assign('usr', $usr)->
+        assign('plugins', $plugins)->
+        assign('cfg', $model->config)->
+        assign('myprofile', $myprofile)->
+        assign('cfg_forum', $inCore->loadComponentConfig('forum'))->
+        assign('is_admin', $inUser->is_admin)->
+        assign('is_auth', $inUser->id)->
+        display();
 }
 
 //============================================================================//
 //============================= Список сообщений  ============================//
 //============================================================================//
 if ($do=='messages'){
-
     if (!$model->config['sw_msg']) { cmsCore::error404(); }
 
     if (!$inUser->id || ($inUser->id != $id && !$inUser->is_admin)){ cmsUser::goToLogin(); }
@@ -457,7 +464,6 @@ if ($do=='messages'){
     $inPage->addPathway($_LANG['MY_MESS'], '/users/'.$id.'/messages.html');
 
     include 'components/users/messages.php';
-
 }
 
 //============================================================================//
@@ -495,7 +501,7 @@ if ($do=='sendmessage'){
                 assign('groups', $inUser->is_admin ? cmsUser::getGroups(true) : array())->
                 assign('friends', cmsUser::getFriends($inUser->id))->
                 assign('id_admin', $inUser->is_admin)->
-                display('com_users_messages_add.tpl');
+                display();
 
 		cmsCore::jsonOutput(array('error' => false,
 								  'html'  => ob_get_clean()
@@ -707,7 +713,7 @@ if ($do=='avatar'){
 
 		cmsPage::initTemplate('components', 'com_users_avatar_upload')->
                 assign('id', $id)->
-                display('com_users_avatar_upload.tpl');
+                display();
 
 	}
 }
@@ -750,7 +756,7 @@ if ($do=='select_avatar'){
                 assign('page', $page)->
                 assign('perpage', $perpage)->
                 assign('pagebar', cmsPage::getPagebar($total, $page, $perpage, '/users/%user_id%/select-avatar-%page%.html', array('user_id'=>$id)))->
-                display('com_users_avatars.tpl');
+                display();
 
 	} else {
 
@@ -840,7 +846,7 @@ if ($do=='friendlist'){
             assign('myprofile', ($id == $inUser->id))->
             assign('total', $total)->
             assign('pagebar', cmsPage::getPagebar($total, $page, $perpage, 'javascript:centerLink(\'/users/'.$id.'/friendlist%page%.html\')'))->
-            display('com_users_friends.tpl');
+            display();
 
 }
 
@@ -952,7 +958,7 @@ if ($do=='karma'){
 	cmsPage::initTemplate('components', 'com_users_karma')->
             assign('karma', $model->getUserKarma($usr['id']))->
             assign('usr', $usr)->
-            display('com_users_karma.tpl');
+            display();
 
 }
 //============================================================================//
@@ -994,7 +1000,7 @@ if ($do=='giveaward'){
 		cmsPage::initTemplate('components', 'com_users_awards_give')->
                 assign('usr', $usr)->
                 assign('awardslist', cmsUser::getAwardsImages())->
-                display('com_users_awards_give.tpl');
+                display();
 
 	} else {
 
@@ -1067,7 +1073,7 @@ if ($do=='awardslist'){
 
 	cmsPage::initTemplate('components', 'com_users_awards_site')->
             assign('aws', $aws)->
-            display('com_users_awards_site.tpl');
+            display();
 
 }
 //============================================================================//
@@ -1118,9 +1124,9 @@ if ($do == 'delprofile'){
 		$confirm['action'] = '/users/'.$id.'/delprofile.html';
 		$confirm['yes_button'] = array();
 		$confirm['yes_button']['type'] = 'submit';
-		cmsPage::initTemplate('components', 'action_confirm.tpl')->
+		cmsPage::initTemplate('components', 'action_confirm')->
                 assign('confirm', $confirm)->
-                display('action_confirm.tpl');
+                display();
 
 	}
 
@@ -1171,7 +1177,7 @@ if ($do=='invites'){
 
         cmsPage::initTemplate('components', 'com_users_invites')->
                 assign('invites_count', $invites_count)->
-                display('com_users_invites.tpl');
+                display();
 
         return;
 

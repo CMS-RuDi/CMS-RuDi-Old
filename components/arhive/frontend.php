@@ -39,7 +39,7 @@ function arhive(){
             assign('pagetitle', $pagetitle)->
             assign('items', $items)->
             assign('do', $inCore->do)->
-            display('com_arhive_dates.tpl');
+            display();
 
     }
 
@@ -70,7 +70,7 @@ function arhive(){
         cmsPage::initTemplate('components', 'com_arhive_list')->
             assign('pagetitle', $pagetitle)->
             assign('items', $items)->
-            display('com_arhive_list.tpl');
+            display();
 
     }
 

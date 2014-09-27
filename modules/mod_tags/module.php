@@ -67,7 +67,7 @@ function mod_tags($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_tags')->
             assign('tags', $tags)->
             assign('cfg', $cfg)->
-            display('mod_tags.tpl');
+            display();
 
     return true;
 

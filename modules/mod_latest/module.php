@@ -57,7 +57,7 @@ function mod_latest($module_id, $cfg){
         assign('pagebar_module', $pagebar)->
         assign('module_id', $module_id)->
         assign('cfg', $cfg)->
-        display('mod_latest.tpl');
+        display();
 
     return true;
 }

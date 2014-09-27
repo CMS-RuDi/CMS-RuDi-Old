@@ -49,7 +49,7 @@ function mod_cart($module_id, $cfg){
             assign('items_count', $items_count)->
             assign('total_summ', number_format($total_summ, 2, '.', ' '))->
             assign('items', $items)->
-            display('mod_cart.tpl');
+            display();
 
     return true;
 

@@ -88,7 +88,7 @@
                 <?php } else { ?>
                     <td valign="top"><strong><?php echo $field['title']; ?>:</strong></td>
                     <td>
-                        {wysiwyg name="fdata[$id]" value=$field.value height=300 width='98%' toolbar='Basic'}
+                        <?php cmsCore::insertEditor('fdata['. $id .']', $field['value'], 300, '98%'); ?>
                     </td>
                 <?php } ?>
             </tr>

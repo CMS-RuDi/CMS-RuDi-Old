@@ -44,7 +44,7 @@
                 </td>
             </tr>
         </table>
-        <?php cmsCore::insertEditor($params['description'], $club['description'], 350, '100%'); ?>
+        <?php cmsCore::insertEditor('description', $club['description'], 350, '100%'); ?>
     </div>
     
     <div id="moders">

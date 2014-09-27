@@ -13,7 +13,7 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function applet_filters(){
+function applet_filters() {
     global $_LANG;
     
     global $adminAccess;
@@ -27,26 +27,24 @@ function applet_filters(){
     $do = cmsCore::request('do', 'str', 'list');
     $id = cmsCore::request('id', 'int', -1);
 
-    if ($do == 'hide'){
+    if ($do == 'hide') {
         cmsCore::c('db')->setFlag('cms_filters', $id, 'published', '0');
         cmsCore::halt('1');
     }
 
-    if ($do == 'show'){
+    if ($do == 'show') {
         cmsCore::c('db')->setFlag('cms_filters', $id, 'published', '1');
         cmsCore::halt('1');
     }
 
-    if ($do == 'list'){
-        $fields[] = array('title'=>'id', 'field'=>'id', 'width'=>'30');
-        $fields[] = array('title'=>$_LANG['TITLE'], 'field'=>'title', 'width'=>'250');
-        $fields[] = array('title'=>$_LANG['DESCRIPTION'], 'field'=>'description', 'width'=>'');
-        $fields[] = array('title'=>$_LANG['AD_ENABLE'], 'field'=>'published', 'width'=>'100');
+    if ($do == 'list') {
+        $fields = array(
+            array( 'title' =>  'id', 'field' => 'id', 'width' => '40' ),
+            array( 'title' => $_LANG['TITLE'], 'field' => 'title', 'width' => '250' ),
+            array( 'title' => $_LANG['DESCRIPTION'], 'field' => 'description', 'width' => '' ),
+            array( 'title' => $_LANG['AD_ENABLE'], 'field' => 'published', 'width' => '100' )
+        );
 
-        $actions = array();
-
-        cpListTable('cms_filters', $fields, $actions);
+        cpListTable('cms_filters', $fields, array());
     }
 }
-
-?>

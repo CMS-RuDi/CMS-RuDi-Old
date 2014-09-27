@@ -27,7 +27,10 @@ cmsCore::c('page')->addHeadJS('includes/jqueryui/init-ui.js');
 cmsCore::c('page')->addHeadJS('includes/jqueryui/i18n/jquery.ui.datepicker-'. cmsConfig::getConfig('lang') .'.min.js');
 cmsCore::c('page')->addHeadJS('includes/jquery/jquery.form.js');
 cmsCore::c('page')->addHeadJS('admin/js/hltable.js');
-cmsCore::c('page')->addHeadJS('admin/js/jquery.jclock.js');
+
+cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap.min.css');
+cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap-theme.min.css');
+cmsCore::c('page')->addHeadJS('includes/bootstrap/js/bootstrap.min.js');
 
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -43,68 +46,122 @@ cmsCore::c('page')->addHeadJS('admin/js/jquery.jclock.js');
     </head>
 
     <body>
-        <table cellpadding="0" cellspacing="0" border="0" width="100%" height="100%">
-            <tr>
-                <td valign="top">
-                    <div id="container">
-                        <div id="header" style="height:69px">
-                            <table width="100%" height="69" border="0" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td width="230" align="left" valign="middle" style="padding-left:20px; padding-top:5px;">
-                                        <a href="/admin/">
-                                            <img src="images/toplogo.png" alt="<?php echo $_LANG['AD_ADMIN_PANEL']; ?>" border="0" />
+        <div class="main_body">
+            <div id="container">
+                <div id="header" style="height:50px">
+                    <nav class="navbar navbar-inverse navbar-collapse" role="navigation" style="margin-bottom:0;">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a href="/admin/">
+                                    <i class="fa fa-home"></i>
+                                    CMS RuDi v<?php echo CMS_RUDI_V .': '. $_LANG['AD_ADMIN_PANEL']; ?>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-question-circle"></i>
+                                    <?php echo $_LANG['AD_HELP']; ?>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a class="fa fa-question" href="http://cmsrudi.ru/docs" target="_blank">
+                                            <?php echo $_LANG['AD_DOCS']; ?>
                                         </a>
-                                    </td>
-                                    <td width="120">
-                                        <div class="jdate"><?php echo date('d') .' '. $_LANG['MONTH_'.date('m')]; ?></div>
-                                        <div class="jclock">00:00:00</div>
-                                    </td>
-                                    <td>
+                                    </li>
+                                    <li>
+                                        <a class="fa fa-ticket" href="/admin/index.php?view=tickets" >
+                                            <?php echo $_LANG['AD_TICKETS']; ?>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a class="fa fa-external-link" href="/" target="_blank">
+                                    <?php echo $_LANG['AD_OPEN_SITE']; ?>
+                                </a>
+                            </li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-user"></i>
+                                    <?php echo cmsCore::c('db')->get_field('cms_users', 'id='.cmsCore::c('user')->id, 'nickname'); ?>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="#" onclick="return false;">
+                                            <i class="fa fa-info-circle"></i>
+                                            IP: <?php echo cmsCore::c('user')->ip; ?>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="<?php echo cmsUser::getProfileURL(cmsCore::c('user')->login); ?>" target="_blank" title="<?php echo $_LANG['AD_GO_PROFILE']; ?>">
+                                            <i class="fa fa-user"></i>
+                                            <?php echo $_LANG['TEMPLATE_MY_PROFILE']; ?>
+                                        </a>
                                         <?php
                                             $new_messages = cmsCore::c('user')->getNewMsg();
-                                            if ($new_messages['total']){
-                                                $msg_link = '<a href="/users/'.cmsCore::c('user')->id.'/messages.html" style="color:yellow">'.$_LANG['AD_NEW_MSG'].' ('.$new_messages['total'].')</a>';
-                                            } else {
-                                                $msg_link = '<span>'.$_LANG['NO'].' '.$_LANG['NEW_MESSAGES'].'</span>';
+                                            if ($new_messages['total']) {
+                                                echo '<a href="/users/'. cmsCore::c('user')->id .'/messages.html" class="fa fa-envelope-o">'. $_LANG['AD_NEW_MSG'] .' ('. $new_messages['total'] .')</a>';
                                             }
                                         ?>
-                                        <div class="juser"><?php echo $_LANG['AD_YOU']; ?> &mdash; <a href="<?php echo cmsUser::getProfileURL(cmsCore::c('user')->login); ?>" target="_blank" title="<?php echo $_LANG['AD_GO_PROFILE']; ?>"><?php echo cmsCore::c('db')->get_field('cms_users', 'id='.cmsCore::c('user')->id, 'nickname'); ?></a>, ip: <?php echo cmsCore::c('user')->ip ?></div>
-                                        <div class="jmessages"><?php echo $msg_link; ?></div>
-                                    </td>
-                                    <td width="120">
-                                        <div class="jsite"><a href="/" target="_blank"><?php echo $_LANG['AD_OPEN_SITE']; ?></a></div>
-                                        <div class="jlogout"><a href="/logout" target="" ><?php echo $_LANG['AD_EXIT']; ?></a></div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div id="mainmenu" style="height:24px; background:url(js/hmenu/hmenubg.jpg) repeat-x">
-                            <div style="padding-left:15px;height:24px"><?php cpMenu(); ?></div>
-                        </div>
-                        <div id="pathway" style="margin-top:4px;">
-                            <?php cpPathway('&rarr;'); ?>
-                        </div>
-                        <?php $messages = cmsCore::getSessionMessages();
-                        if ($messages) { ?>
-                        <div class="sess_messages" style="margin:5px 5px 0 5px">
-                            <?php foreach($messages as $message){
-                                     echo $message;
-                                  }?>
-                        </div>
-                        <?php } ?>
-                        <div id="body" style="padding:5px 10px 10px 10px;">
-                            <?php cpBody(); ?>
-                        </div>
+                                    </li>
+                                    <li>
+                                        <a class="fa fa-power-off" href="/logout">
+                                            <?php echo $_LANG['AD_EXIT']; ?>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                
+                <?php
+                    cpMenu();
+                    cpPathway();
+                ?>
+                
+                <?php $messages = cmsCore::getSessionMessages(true);
+                if ($messages) { ?>
+                    <?php
+                        foreach($messages as $msg){
+                            $type = $msg['type'] == 'error' ? 'danger' : $msg['type'];
+                            ?>
+                            <div class="alert alert-<?php echo $type; ?> alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only"><?php echo $_LANG['CLOSE']; ?></span></button>
+                                <?php echo $msg['msg']; ?>
+                            </div>
+                        <?php
+                        }
+                    ?>
+                <?php } ?>
+                
+                <div id="body" style="padding:0px 10px 10px 10px;">
+                    <?php cpBody(); ?>
+                </div>
+            </div>
+            
+            <div class="well" style="text-align:center;">
+                &copy; <a href="http://cmsrudi.ru/"><strong>CMS RuDi</strong></a><strong> v<?php echo CMS_RUDI_V; ?>, 2014</strong>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="modalMsgBox" tabindex="-1" role="dialog" aria-labelledby="modalMsgBoxLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="modalMsgBoxLabel">Modal title</h4>
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td height="50">
-                    <div id="footer" style="text-align:center;background:#ECECEC;height:50px;line-height:50px;">
-                        &copy; <a href="http://www.instantcms.ru/"><strong>InstantCMS</strong></a><strong> v<?php echo CORE_VERSION?>, 2007-<?php echo date('Y'); ?></strong><br />
+                    <div class="modal-body" id="modalMsgBoxBody"></div>
+                    <div class="modal-footer">
+                        <button type="button" id="modalMsgBoxCancel" class="btn btn-default" data-dismiss="modal"><?php echo $_LANG['CLOSE']; ?></button>
+                        <button type="button" id="modalMsgBoxOk" class="btn btn-primary"><?php echo $_LANG['CONTINUE']; ?></button>
                     </div>
-                </td>
-            </tr>
-        </table>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

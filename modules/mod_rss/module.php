@@ -28,7 +28,7 @@ function mod_rss($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_rss')->
             assign('rs', $rs)->
             assign('cfg', $cfg)->
-            display('mod_rss.tpl');
+            display();
 
     return true;
 

@@ -16,5 +16,3 @@ if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 $_LANG['P_SIMILAR_ARTICLES'] = 'Похожие статьи';
 $_LANG['P_LIMIT']            = 'Количество похожих статей';
 $_LANG['P_UNSORT']           = 'Перемешивать результат';
-
-?>

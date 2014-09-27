@@ -19,85 +19,48 @@ header('Content-Type: text/html; charset=utf-8');
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title><?php echo $_LANG['AD_ADMIN_PANEL']; ?></title>
-        <style>
-            html, body{
-            margin:0; padding:0;
-            font-family: 'Trebuchet MS', sans-serif;
-            font-size: 100%;
-            height:100%;
-            background: #F5F5F5;
-        }
-        #body {
-            background: #385C89;
-            bottom: 0;
-            height: 270px;
-            left: 0;
-            margin: auto;
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 300px;
-            padding:0 25px
-        }
-        h2 {
-            font-size: 24px;
-            color: #FFF;
-            font-weight: normal;
-            margin: 20px 0;
-        }
-        form {
-            overflow: hidden;
-        }
-        input {
-            line-height: normal;
-            font-family: inherit;
-            font-size: 100%;
-            margin: 0;
-            text-align: left;
-            border: 0;
-            outline: none;
-            display: block;
-            width: 100%;
-            padding: 8px 0 8px 30px;
-            margin-bottom: 15px;
-        }
-        input[type="submit"] {
-            background: #4A79A9;
-            color: #FFF;
-            cursor: pointer;
-            float: right;
-            text-align: left;
-            width: 110px;
-        }
-        input[type="submit"]:hover{
-            background: #1F3147;
-        }
-        #login {
-            background: url("images/auth/login.png") no-repeat scroll -6px -2px #FFF;
-        }
-        #pass {
-            background: url("images/auth/pass.png") no-repeat scroll -6px -2px #FFF;
-        }
-        #copy, #copy a {
-            color: #CCC;
-            text-decoration: none;
-        }
-        #copy a:hover {
-            text-decoration: underline;
-        }
-    </style>
+        <link href="/includes/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="/includes/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="/includes/bootstrap/js/bootstrap.min.js"></script>
     </head>
 
     <body>
-        <div id="body">
-            <form action="/login" method="post">
-                <input type="hidden" name="is_admin" value="1" />
-                <h2><?php echo $_LANG['AD_AUTH']; ?></h2>
-                <input required="true" tabindex="1" name="login" type="text" id="login" placeholder="<?php echo $_LANG['AD_AUTH_LOGIN']; ?>" />
-                <input required="true" tabindex="2" name="pass" type="password" id="pass" placeholder="<?php echo $_LANG['AD_AUTH_PASS']; ?>" />
-                <input tabindex="3" type="submit" value="&rarr; <?php echo $_LANG['AD_DO_AUTH']; ?>" />
-            </form>
-            <div id="copy">&copy; <a href="http://www.instantcms.ru/">InstantCMS</a>, 2007—<?php echo date('Y'); ?></div>
+        <div class="container" style="width:400px;bottom:0;height:270px;left:0;margin:auto;position:absolute;right:0;top:0;">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><?php echo $_LANG['AD_AUTH']; ?></h3>
+                </div>
+                <div class="panel-body">
+                    <form action="/login" method="post" role="form">
+                        <input type="hidden" name="is_admin" value="1" />
+                        
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="width:36px;"><span class="fa fa-user"></span></span>
+                                <input type="text" class="form-control" style="width:300px;" placeholder="<?php echo $_LANG['AD_AUTH_LOGIN']; ?>" required="true" autofocus name="login" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="width:36px;"><span class="fa fa-lock"></span></span>
+                                <input type="password" class="form-control" style="width:300px;" placeholder="<?php echo $_LANG['AD_AUTH_PASS']; ?>" required="true" name="pass" />
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="text-align:right;">
+                            <button type="submit" class="btn btn-labeled btn-success">
+                                <span class="btn-label"><i class="fa fa-check"></i></span><?php echo $_LANG['AD_DO_AUTH']; ?>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-footer">
+                    <div style="text-align:center;">
+                        &copy; <a href="http://cmsrudi.ru/">CMS RuDi</a>, <?php echo date('Y'); ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

@@ -439,7 +439,7 @@ function shopFinishOrder($cfg){
 		$customer['company'] = $inCore->request('customer_company', 'str');
 		$customer['email']   = $inCore->request('customer_email', 'str');
 		$customer['comment'] = $inCore->request('customer_comment', 'str');
-		if(!$inCore->checkCaptchaCode($_REQUEST['code'])) { $error .= $_LANG['ERR_CAPTCHA'].'<br/>'; }
+		if(!cmsCore::checkCaptchaCode()) { $error .= $_LANG['ERR_CAPTCHA'].'<br/>'; }
 
 		//BUILD MESSAGE
 		if($error==''){

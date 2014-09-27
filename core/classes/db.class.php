@@ -36,7 +36,7 @@ class cmsDatabase {
 
     private function __construct(){
         $this->db_link = self::initConnection();
-        $this->db_prefix = cmsConfig::getConfig('db_prefix') .'_';
+        $this->db_prefix = cmsCore::c('config')->db_prefix .'_';
     }
     public function __destruct(){
         mysqli_close($this->db_link);
@@ -75,9 +75,7 @@ class cmsDatabase {
      * @return resource $db_link
      */
     private static function initConnection(){
-        $inConf = cmsConfig::getInstance();
-
-        $db_link = mysqli_connect($inConf->db_host, $inConf->db_user, $inConf->db_pass, $inConf->db_base);
+        $db_link = mysqli_connect(cmsCore::c('config')->db_host, cmsCore::c('config')->db_user, cmsCore::c('config')->db_pass, cmsCore::c('config')->db_base);
 
         if (mysqli_connect_errno()) {
            die('Cannot connect to MySQL server: ' . mysqli_connect_error());
@@ -105,23 +103,28 @@ class cmsDatabase {
     }
 
     public function addJoin($join){
-        $this->join .= $join . "\n"; return $this;
+        $this->join .= $join . "\n";
+        return $this;
     }
 
     public function addSelect($condition){
-        $this->select .= ', '.$condition; return $this;
+        $this->select .= ', '. $condition;
+        return $this;
     }
 
     public function where($condition){
-        $this->where .= ' AND ('.$condition.')' . "\n"; return $this;
+        $this->where .= ' AND ('. $condition .')'. "\n";
+        return $this;
     }
 
     public function groupBy($field){
-        $this->group_by = 'GROUP BY '.$field; return $this;
+        $this->group_by = 'GROUP BY '. $field;
+        return $this;
     }
 
     public function orderBy($field, $direction='ASC'){
-        $this->order_by = 'ORDER BY '.$field.' '.$direction; return $this;
+        $this->order_by = 'ORDER BY '. $field .' '. $direction;
+        return $this;
     }
 
     public function limit($howmany) {
@@ -163,15 +166,15 @@ class cmsDatabase {
 
         $result = mysqli_query($this->db_link, $sql);
 
-        if (cmsConfig::getConfig('debug')) {
+        if (cmsCore::c('config')->debug) {
             $this->q_count += 1;
             $this->q_dump .= '<pre>'. number_format(microtime(true)-$time,6) ."\n". $sql .'</pre><hr/>';
         }
 
-        if (cmsConfig::getConfig('debug') && !$ignore_errors) {
+        if (cmsCore::c('config')->debug && !$ignore_errors) {
             $error = $this->error();
             if ($error) {
-                die('<div style="border:solid 1px gray;padding:12px">DATABASE ERROR: <pre>'.$sql.'</pre>'.$error.'</div>');
+                die('<div style="border:solid 1px gray;padding:12px">DATABASE ERROR: <pre>'. $sql .'</pre>'. $error .'</div>');
             }
         }
 
@@ -237,8 +240,10 @@ class cmsDatabase {
 // ============================================================================ //
 
     public function rows_count($table, $where, $limit=0){
-        $sql = "SELECT 1 FROM $table WHERE $where";
-        if ($limit) { $sql .= " LIMIT ".(int)$limit; }
+        $sql = "SELECT 1 FROM ". $table ." WHERE ". (empty($where) ? '1=1' : $where);
+        
+        if ($limit) { $sql .= " LIMIT ". (int)$limit; }
+        
         $result = $this->query($sql);
 
         return $this->num_rows($result);
@@ -284,12 +289,12 @@ class cmsDatabase {
         if ($where) { $sql .= ' WHERE '.$where; }
         $result = $this->query($sql);
 
-        if ($this->num_rows($result)){
-            while($data = $this->fetch_assoc($result)){
+        if ($this->num_rows($result)) {
+            while($data = $this->fetch_assoc($result)) {
                 $list[] = $data;
             }
             return $list;
-        }else{
+        } else {
             return false;
         }
     }
@@ -354,28 +359,26 @@ class cmsDatabase {
 // ============================================================================ //
 // ============================================================================ //
 
-    public static function optimizeTables($tlist=''){
-        $inDB = self::getInstance();
-
-        if(is_array($tlist)) {
+    public static function optimizeTables($tlist='') {
+        if (is_array($tlist)) {
             foreach($tlist as $tname) {
-                $inDB->query("OPTIMIZE TABLE $tname", true);
-                $inDB->query("ANALYZE TABLE $tname", true);
+                cmsCore::c('db')->query('OPTIMIZE TABLE '. $tname, true);
+                cmsCore::c('db')->query('ANALYZE TABLE '. $tname, true);
             }
-        }else if($inDB->isTableExists('information_schema.tables')){
-            $base = cmsConfig::getConfig('db_base');
+        } else if (cmsCore::c('db')->isTableExists('information_schema.tables')) {
+            $base = cmsCore::c('config')->db_base;
 
-            $tlist  = $inDB->get_table('information_schema.tables', "table_schema = '{$base}'", 'table_name');
+            $tlist  = cmsCore::c('db')->get_table('information_schema.tables', "table_schema = '". $base ."'", 'table_name');
 
             if (!is_array($tlist)) { return false; }
 
-            foreach($tlist as $tname) {
-                $inDB->query("OPTIMIZE TABLE {$tname['table_name']}", true);
-                $inDB->query("ANALYZE TABLE {$tname['table_name']}", true);
+            foreach ($tlist as $tname) {
+                cmsCore::c('db')->query("OPTIMIZE TABLE ". $tname['table_name'], true);
+                cmsCore::c('db')->query("ANALYZE TABLE ". $tname['table_name'], true);
             }
         }
 
-        if ($inDB->errno()){ return false; }
+        if (cmsCore::c('db')->errno()) { return false; }
 
         return true;
     }
@@ -647,10 +650,10 @@ class cmsDatabase {
 
             $line = mb_substr($line, 0, -1);
 
-            $result = $this->query(str_replace("#_", cmsConfig::getConfig('db_prefix'), $line), false, false);
+            $result = $this->query(str_replace("#_", cmsCore::c('config')->db_prefix, $line), false, false);
 
             if (!$result) {
-                die('DATABASE ERROR: <pre>'.$line.'</pre><br>'.$this->error());
+                die('DATABASE ERROR: <pre>'. $line .'</pre><br>'. $this->error());
             }
 
         }

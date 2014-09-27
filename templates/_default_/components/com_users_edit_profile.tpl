@@ -1,11 +1,11 @@
 {add_js file='includes/jquery/tabs/jquery.ui.min.js'}
 {add_css file='includes/jquery/tabs/tabs.css'}
 
-{literal}
-	<script type="text/javascript">
-		$(function(){$(".uitabs").tabs();});
-	</script>
-{/literal}
+<script type="text/javascript">
+    $(function() {
+        $(".uitabs").tabs();
+    });
+</script>
 
 <div class="con_heading">{$LANG.CONFIG_PROFILE}</div>
 
@@ -218,17 +218,15 @@
     </div>
 </div>
 
-{literal}
-	<script type="text/javascript">
-        $(function(){
-            $( '#tabs li' ).click( function(){
-                rel = $( this ).attr( "rel" );
-                if(!rel){
-                    $('#submitform').show();
-                } else {
-                    $('#submitform').hide();
-                }
-            });
+<script type="text/javascript">
+    $(function() {
+        $('#tabs li').click( function() {
+            rel = $( this ).attr( "rel" );
+            if (!rel) {
+                $('#submitform').show();
+            } else {
+                $('#submitform').hide();
+            }
         });
-	</script>
-{/literal}
+    });
+</script>

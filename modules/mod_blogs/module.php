@@ -61,7 +61,7 @@ function mod_blogs($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_blogs')->
         assign('posts', $posts)->
         assign('cfg', $cfg)->
-        display('mod_blogs.tpl');
+        display();
 
     return true;
 }

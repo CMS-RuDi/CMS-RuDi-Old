@@ -18,11 +18,11 @@
                 <ul>
                     <?php foreach ($images as $image) { ?>
                         <?php if ($slide_opt == 3) { ?>
-                    <li><a href="<?php echo $image['big_src']; ?>" class="photobox" title="<?php echo cmsCore::escape_string(cmsCore::getArrVal($image, 'title', ''), 'html'); ?>"><img src="<?php echo $image['medium_src']; ?>" alt="<?php echo cmsCore::escape_strin(cmsCore::getArrVal($image, 'title', $title .' '. $image['id']), 'html'); ?>"></a></li>
+                    <li><a href="<?php echo $image['big_src']; ?>" class="photobox" title="<?php echo $this->escape(cmsCore::getArrVal($image, 'title', '')); ?>"><img src="<?php echo $image['medium_src']; ?>" alt="<?php echo $this->escape(cmsCore::getArrVal($image, 'title', $title .' '. $image['id'])); ?>"></a></li>
                         <?php } ?>
                         
                         <?php if ($slide_opt == 1) { ?>
-                            <li><img src="<?php echo $image['big_src']; ?>" width="600" height="400" alt="<?php echo cmsCore::escape_strin(cmsCore::getArrVal($image, 'title', $title .' '. $image['id']), 'html'); ?>"></li>
+                            <li><img src="<?php echo $image['big_src']; ?>" width="600" height="400" alt="<?php echo $this->escape(cmsCore::getArrVal($image, 'title', $title .' '. $image['id']), 'html'); ?>"></li>
                         <?php } ?>
                     <?php } ?>
                 </ul>
@@ -45,7 +45,7 @@
                 <div class="carousel carousel-stage">
                     <ul>
                         <?php foreach ($images as $image) { ?>
-                            <li><img src="<?php echo $image['big_src']; ?>" width="600" height="400" alt="<?php echo cmsCore::escape_strin(cmsCore::getArrVal($image, 'title', $title .' '. $image['id']), 'html'); ?>"></li>
+                            <li><img src="<?php echo $image['big_src']; ?>" width="600" height="400" alt="<?php echo $this->escape(cmsCore::getArrVal($image, 'title', $title .' '. $image['id']), 'html'); ?>"></li>
                         <?php } ?>
                     </ul>
                 </div>

@@ -22,3 +22,6 @@ $_LANG['USERMENU_CHANNEL']     = 'Channel';
 $_LANG['USERMENU_ADMININTER']  = 'Admin';
 $_LANG['USERMENU_ADD_ARTICLE'] = 'Add article';
 $_LANG['USERMENU_EXIT']        = 'Exit';
+
+$_LANG['INVITE_FRIENDS']      = 'Пригласить Друзей';
+$_LANG['INVITE_FRIENDS_TO_APP'] = 'Invite friends';

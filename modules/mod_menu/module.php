@@ -21,7 +21,7 @@ function mod_menu($module_id, $cfg) {
             'menu' => 'mainmenu',
             'show_home' => 1,
             'is_sub_menu' => 0,
-            'tpl' => 'mod_menu.tpl'
+            'tpl' => 'mod_menu'
         ),
         is_array($cfg) ? $cfg : array()
     );
@@ -86,7 +86,7 @@ function mod_menu($module_id, $cfg) {
         assign('user_id', cmsCore::c('user')->id)->
         assign('is_admin', cmsCore::c('user')->is_admin)->
         assign('cfg', $cfg)->
-        display($cfg['tpl']);
+        display();
 
     return true;
 }

@@ -112,7 +112,7 @@ if ($do=='view'){
             assign('total', $total)->
             assign('orderby', $orderby)->
             assign('orderto', $orderto)->
-            display('com_photos_view.tpl');
+            display();
 
 	// если есть фотограйии в альбоме и включены комментарии в альбоме, то показываем их
 	if($album['is_comments'] && $photos && $inCore->isComponentInstalled('comments')){
@@ -174,7 +174,7 @@ if($do=='viewphoto'){
             assign('is_author', $is_author)->
             assign('is_admin', $inUser->is_admin)->
             assign('tagbar', ($photo['a_tags'] ? cmsTagBar('photo', $photo['id']) : ''))->
-            display('com_photos_view_photo.tpl');
+            display();
 	//выводим комментарии, если они разрешены и фото опубликовано
 	if($photo['comments'] && $inCore->isComponentInstalled('comments')){
 		cmsCore::includeComments();
@@ -267,7 +267,7 @@ if ($do=='editphoto'){
                 assign('form_action', '/photos/editphoto'.$photo['id'].'.html')->
                 assign('no_tags', false)->
                 assign('is_admin', $inUser->is_admin)->
-                display('com_photos_edit.tpl');
+                display();
 
 		cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
 
@@ -293,7 +293,7 @@ if ($do=='movephoto'){
 		cmsPage::initTemplate('components', 'com_photos_move')->
                 assign('form_action', '/photos/movephoto'.$photo['id'].'.html')->
                 assign('html', $inPhoto->getAlbumsOption('', $photo['album_id']))->
-                display('com_photos_move.tpl');
+                display();
 
 		cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
 
@@ -408,7 +408,7 @@ if (in_array($do, array('latest', 'best'))){
             assign('maxcols', $model->config['best_latest_maxcols'])->
             assign('pagetitle', $pagetitle)->
             assign('photos', $photos)->
-            display('com_photos_bl.tpl');
+            display();
 
 }
 /////////////////////////////// /////////////////////////////// /////////////////////////////// /////////////////////////////// //////

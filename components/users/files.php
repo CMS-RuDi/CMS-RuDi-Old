@@ -58,7 +58,7 @@ if ($fdo=='view'){
             assign('myprofile', $myprofile)->
             assign('is_admin', $inUser->is_admin)->
             assign('files', $files)->
-            display('com_users_file_view.tpl');
+            display();
 
 }
 
@@ -209,7 +209,7 @@ if ($fdo=='addfile'){
                 assign('post_max_mb', (round($post_max_b/1024)/1024) . ' '.$_LANG['MBITE'])->
                 assign('cfg', $model->config)->
                 assign('types', $model->config['filestype'])->
-                display('com_users_file_add.tpl');
+                display();
 
 	}
 

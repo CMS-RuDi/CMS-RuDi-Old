@@ -36,32 +36,31 @@
                  </table>
                  <div class="forum_poll_submit"><input id="forum_poll_submit" type="button" value="{$LANG.VOTING}" onclick="threadPollSubmit();"></div>
              </form>
-             <script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
+
+            <script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
             <script type="text/javascript">
                 var LANG_ATTENTION = '{$LANG.ATTENTION}';
-            {literal}
-            function threadPollSubmit(){
-                $('#forum_poll_submit').prop('disabled', true);
-                var options = {
-                    success: loadForumPoll
-                };
-                $('#forum_poll_submit_form').ajaxSubmit(options);
-            }
-            function loadForumPoll(result, statusText, xhr, $form){
-                if(statusText == 'success'){
-                    if(result.error == false){
-                        thread_id = $('#thread_id').val();
-                        $.post('/forum/viewpoll'+thread_id, { }, function(data){
-                            $('#thread_poll').html(data);
-                        });
-                    } else {
-                        core.alert(result.text, LANG_ATTENTION);
-                        $('#forum_poll_submit').prop('disabled', false);
+
+                function threadPollSubmit() {
+                    $('#forum_poll_submit').prop('disabled', true);
+                    var options = {
+                        success: loadForumPoll
+                    };
+                    $('#forum_poll_submit_form').ajaxSubmit(options);
+                }
+                function loadForumPoll(result, statusText, xhr, $form) {
+                    if (statusText == 'success') {
+                        if (result.error == false) {
+                            thread_id = $('#thread_id').val();
+                            $.post('/forum/viewpoll'+thread_id, { }, function(data) {
+                                $('#thread_poll').html(data);
+                            });
+                        } else {
+                            core.alert(result.text, LANG_ATTENTION);
+                            $('#forum_poll_submit').prop('disabled', false);
+                        }
                     }
                 }
-
-            }
-            {/literal}
             </script>
         {else}
             {foreach key=answer item=num from=$thread_poll.answers}

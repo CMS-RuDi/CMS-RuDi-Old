@@ -91,10 +91,9 @@
         <input name="cancel" type="button" onclick="window.history.go(-1)" value="{$LANG.CANCEL}" />
     </p>
 </form>
-{literal}
+
 <script type="text/javascript">
-    $(document).ready(function(){
+    $(function() {
         $('#title').focus();
     });
 </script>
-{/literal}

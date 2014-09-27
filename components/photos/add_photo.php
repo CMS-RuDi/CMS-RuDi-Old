@@ -16,7 +16,7 @@ if ($do_photo == 'addphoto'){
                 assign('no_tags', false)->
                 assign('is_admin', $inUser->is_admin)->
                 assign('autocomplete_js', $autocomplete_js)->
-                display('com_photos_add1.tpl');
+                display();
 
 	}
 
@@ -70,7 +70,7 @@ if ($do_photo == 'submit_photo'){
             assign('max_files', $max_files)->
             assign('uload_type', $mod['is_multi'] ? 'multi' : 'single')->
             assign('stop_photo', $stop_photo)->
-            display('com_photos_add2.tpl');
+            display();
 
 }
 

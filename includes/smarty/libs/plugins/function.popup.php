@@ -19,7 +19,7 @@
  * @param Smarty
  * @return string
  */
-function smarty_function_popup($params, &$smarty)
+function smarty_function_popup($params, $template)
 {
     $append = '';
     foreach ($params as $_key=>$_value) {
@@ -94,12 +94,12 @@ function smarty_function_popup($params, &$smarty)
                 break;
 
             default:
-                $smarty->trigger_error("[popup] unknown parameter $_key", E_USER_WARNING);
+                $template->trigger_error("[popup] unknown parameter $_key", E_USER_WARNING);
         }
     }
 
     if (empty($text) && !isset($inarray) && empty($function)) {
-        $smarty->trigger_error("overlib: attribute 'text' or 'inarray' or 'function' required");
+        $template->trigger_error("overlib: attribute 'text' or 'inarray' or 'function' required");
         return false;
     }
 
@@ -107,13 +107,12 @@ function smarty_function_popup($params, &$smarty)
 
     $retval = $trigger . '="return overlib(\''.preg_replace(array("!'!","![\r\n]!"),array("\'",'\r'),$text).'\'';
     $retval .= $append . ');"';
-    if ($trigger == 'onmouseover')
-       $retval .= ' onmouseout="nd();"';
+    if ($trigger == 'onmouseover') {
+        $retval .= ' onmouseout="nd();"';
+    }
 
 
     return $retval;
 }
 
 /* vim: set expandtab: */
-
-?>

@@ -34,7 +34,7 @@ function mod_clubs($module_id, $cfg){
 
 	cmsPage::initTemplate('modules', 'mod_clubs')->
             assign('clubs', $clubs)->
-            display('mod_clubs.tpl');
+            display();
 
 	return true;
 

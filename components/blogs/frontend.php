@@ -88,7 +88,7 @@ function blogs(){
             assign('posts', $posts)->
             assign('pagination', cmsPage::getPagebar($total, $page, cmsCore::m('blogs')->config['perpage'], '/blogs/latest-%page%.html'))->
             assign('cfg', cmsCore::m('blogs')->config)->
-            display('com_blog_view_posts.tpl');
+            display();
     }
 
     ////////// СОЗДАНИЕ БЛОГА //////////////////////////////////////////////////
@@ -109,7 +109,7 @@ function blogs(){
             cmsPage::initTemplate('components', 'com_blog_create')->
                 assign('is_restrictions', (!cmsCore::c('user')->is_admin && cmsCore::m('blogs')->config['min_karma']))->
                 assign('cfg', cmsCore::m('blogs')->config)->
-                display('com_blog_create.tpl');
+                display();
         }
 
         //Сам процесс создания блога
@@ -185,7 +185,7 @@ function blogs(){
                 assign('users_list', cmsUser::getUsersList(false, $authors))->
                 assign('is_restrictions', (!cmsCore::c('user')->is_admin && cmsCore::m('blogs')->config['min_karma']))->
                 assign('cfg', cmsCore::m('blogs')->config)->
-                display('com_blog_config.tpl');
+                display();
 
             cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
         }
@@ -289,7 +289,7 @@ function blogs(){
             assign('ownertype', $ownertype)->
             assign('blogs', $blogs)->
             assign('pagination', cmsPage::getPagebar($total, $page, cmsCore::m('blogs')->config['perpage_blog'], $link))->
-            display('com_blog_view_all.tpl');
+            display();
     }
     
     ////////// ПРОСМОТР БЛОГА //////////////////////////////////////////////////
@@ -401,7 +401,7 @@ function blogs(){
             assign('all_total', (isset($all_total) ? $all_total : 0))->
             assign('blog', $blog)->assign('posts', $posts)->
             assign('pagination', $pagination)->
-            display('com_blog_view.tpl');
+            display();
     }
 
     ////////// НОВЫЙ ПОСТ / РЕДАКТИРОВАНИЕ ПОСТА ///////////////////////////////
@@ -489,7 +489,7 @@ function blogs(){
                 assign('myblog', $myblog)->
                 assign('user_can_iscomments', cmsUser::isUserCan('comments/iscomments'))->
                 assign('autocomplete_js', $autocomplete_js)->
-                display('com_blog_edit_post.tpl');
+                display();
         }
 
         //Если есть запрос на сохранение
@@ -633,7 +633,7 @@ function blogs(){
             cmsPage::initTemplate('components', 'com_blog_edit_cat')->
                 assign('mod', $cat)->
                 assign('form_action', ($inCore->do=='newcat' ? '/blogs/'.$blog['id'].'/newcat.html' : '/blogs/editcat'.$cat['id'].'.html'))->
-                display('com_blog_edit_cat.tpl');
+                display();
 
             cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
         }
@@ -744,7 +744,7 @@ function blogs(){
             assign('is_admin', cmsCore::c('user')->is_admin)->
             assign('karma_form', cmsKarmaForm('blogpost', $post['id'], $post['rating'], $is_author))->
             assign('navigation', cmsCore::c('blog')->getPostNavigation($post['id'], $blog['id'], cmsCore::m('blogs'), $blog['seolink']))->
-            display('com_blog_view_post.tpl');
+            display();
 
         if($inCore->isComponentInstalled('comments') && $post['comments']){
             cmsCore::includeComments();
@@ -883,7 +883,7 @@ function blogs(){
             assign('posts', $posts)->
             assign('pagination', cmsPage::getPagebar($total, $page, cmsCore::m('blogs')->config['perpage'], '/blogs/popular-%page%.html'))->
             assign('cfg', cmsCore::m('blogs')->config)->
-            display('com_blog_view_posts.tpl');
+            display();
     }
 
 }

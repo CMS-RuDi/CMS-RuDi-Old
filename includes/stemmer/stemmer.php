@@ -87,5 +87,3 @@ class Lingua_Stem_Ru{
     }
 
 }
-
-?>

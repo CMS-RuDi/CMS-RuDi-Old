@@ -27,41 +27,32 @@ function xlsEditCol(){
 
 function ignoreRow(row){
     var r_id = 'row_'+row;
-    var c_id = 'ignore_'+row;
-    var checked = $('input:checkbox[id='+c_id+']').prop('checked');
-    if(checked){
-        $('tr#'+r_id+' input:text[class!=other]').prop('disabled', true);
-        $('tr#'+r_id+' input:text[class=other]').prop('disabled', false);
+    var checked = $('input:checkbox[id=ignore_'+row+']').prop('checked');
+    if (checked) {
+        $('tr#'+r_id+' input[class=form-control]').prop('disabled', true);
+        $('tr#'+r_id+' input#other_'+ row).prop('disabled', false);
     } else {
-        $('tr#'+r_id+' input:text[class!=other]').prop('disabled', false);
-        $('tr#'+r_id+' input:text[class=other]').prop('disabled', true);
+        $('tr#'+r_id+' input[class=form-control]').prop('disabled', false);
+        $('tr#'+r_id+' input#other_'+ row).prop('disabled', true);
     }
 }
 
 function toggleDiscountLimit(){
     var sign = Number($('select#sign').val());
 
-    if (sign==3){ $('tr.if_limit').show(); }
-    else { $('tr.if_limit').hide(); }
+    if (sign==3){ $('div.if_limit').show(); }
+    else { $('div.if_limit').hide(); }
 }
 
 function checkGroupList(){
 
 	if(document.addform.is_public.checked){
-		$('select#showin').prop('disabled', false);
-        $('input#can_edit').prop('disabled', false);
+            $('select#showin').prop('disabled', false);
+            $('input#can_edit').prop('disabled', false);
 	} else {
-		$('select#showin').prop('disabled', true);
-        $('input#can_edit').prop('disabled', true);
-        $('input#can_edit').prop('checked', false);
+            $('select#showin').prop('disabled', true);
+            $('input#can_edit').prop('disabled', true);
+            $('input#can_edit').prop('checked', false);
 	}
 
-}
-
-function toggleAdvert(){
-    if ($('select#view_type').val() == 'shop') {
-        $('.advert').show();
-    } else {
-        $('.advert').hide();
-    }
 }

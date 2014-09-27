@@ -89,7 +89,7 @@
             assign('bb_toolbar', isset($bb_toolbar) ? $bb_toolbar :'')->
             assign('smilies', isset($smilies) ? $smilies : '')->
             assign('notice', isset($notice) ? $notice : '')->
-            display('com_comments_add.tpl');
+            display();
 
 	cmsCore::halt();
 

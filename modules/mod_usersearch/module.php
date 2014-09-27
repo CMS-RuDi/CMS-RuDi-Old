@@ -17,7 +17,7 @@ function mod_usersearch($module_id, $cfg){
 
     cmsPage::initTemplate('modules', 'mod_usersearch')->
             assign('cfg', $cfg)->
-            display('mod_usersearch.tpl');
+            display();
 
     return true;
 

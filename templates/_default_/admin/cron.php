@@ -1,4 +1,4 @@
-<?php if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); } ?>
+<?php if (!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); } ?>
 
 <form name="selform" action="index.php?view=cron" method="post">
     <table id="listTable" class="tablesorter" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:10px">
@@ -8,14 +8,14 @@
                 <th class="lt_header" width="80"><?php echo $_LANG['TITLE']; ?></th>
                 <th class="lt_header" width=""><?php echo $_LANG['DESCRIPTION']; ?></th>
                 <th class="lt_header" width="30"><?php echo $_LANG['AD_MISSION_INTERVAL']; ?></th>
-                <th class="lt_header" width="100"><?php echo $_LANG['AD_LAST_START']; ?></th>
+                <th class="lt_header" width="150"><?php echo $_LANG['AD_LAST_START']; ?></th>
                 <th class="lt_header" width="50"><?php echo $_LANG['AD_IS_ACTIVE']; ?></th>
-                <th class="lt_header" align="center" width="65"><?php echo $_LANG['AD_ACTIONS']; ?></th>
+                <th class="lt_header" align="center" width="100"><?php echo $_LANG['AD_ACTIONS']; ?></th>
             </tr>
         </thead>
-        <?php if ($items){ ?>
+        <?php if ($items) { ?>
             <tbody>
-                <?php foreach($items as $num=>$item){ ?>
+                <?php foreach ($items as $num => $item) { ?>
                     <tr id="<?php echo $item['id']; ?>" class="item_tr">
                         <td><?php echo $item['id']; ?></td>
                         <td>

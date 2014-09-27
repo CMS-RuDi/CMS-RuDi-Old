@@ -19,7 +19,7 @@ function mod_search(){
 
     cmsPage::initTemplate('modules', 'mod_search')->
             assign('enable_components', $model->getEnableComponentsWithSupportSearch())->
-            display('mod_search.tpl');
+            display();
 
     return true;
 

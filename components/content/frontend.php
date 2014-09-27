@@ -12,14 +12,14 @@
 /******************************************************************************/
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function content(){
+function content() {
     $inCore = cmsCore::getInstance();
 
-    if (!defined('IS_BILLING')){
+    if (!defined('IS_BILLING')) {
         define('IS_BILLING', $inCore->isComponentInstalled('billing'));
     }
     
-    if (IS_BILLING){ cmsCore::loadClass('billing'); }
+    if (IS_BILLING) { cmsCore::loadClass('billing'); }
 
     global $_LANG;
 
@@ -30,11 +30,11 @@ function content(){
     $page    = cmsCore::request('page', 'int', 1);
 
 ///////////////////////////////////// VIEW CATEGORY ////////////////////////////////////////////////////////////////////////////////
-if ($do=='view') {
+if ($do == 'view') {
     $cat = cmsCore::c('db')->getNsCategory('cms_category', $seolink);
 
     // если не найдена категория и мы не на главной, 404
-    if (!$cat && $inCore->menuId() !== 1){ cmsCore::error404(); }
+    if (!$cat && $inCore->menuId() !== 1) { cmsCore::error404(); }
 
     // Плагины
     $cat = cmsCore::callEvent('GET_CONTENT_CAT', $cat);
@@ -43,16 +43,16 @@ if ($do=='view') {
     if (!$cat['published'] && !cmsCore::c('user')->is_admin) { cmsCore::error404(); }
 
     // Проверяем доступ к категории
-    if(!$inCore->checkUserAccess('category', $cat['id']) ){
+    if (!$inCore->checkUserAccess('category', $cat['id'])) {
         cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
         cmsCore::redirect('/content');
     }
 
     // если не корень категорий
-    if($cat['NSLevel'] > 0){
+    if ($cat['NSLevel'] > 0) {
         cmsCore::c('page')->setTitle(empty($cat['pagetitle']) ? $cat['title'] : $cat['pagetitle']);
-        if (!empty($cat['meta_keys'])){ cmsCore::c('page')->setKeywords($cat['meta_keys']); }
-        if (!empty($cat['meta_desc'])){ cmsCore::c('page')->setDescription($cat['meta_desc']); }
+        if (!empty($cat['meta_keys'])) { cmsCore::c('page')->setKeywords($cat['meta_keys']); }
+        if (!empty($cat['meta_desc'])) { cmsCore::c('page')->setDescription($cat['meta_desc']); }
         
         $pagetitle = $cat['title'];
         $showdate  = $cat['showdate'];
@@ -61,12 +61,12 @@ if ($do=='view') {
     }
 
     // Если корневая категория
-    if ($cat['NSLevel'] == 0){
+    if ($cat['NSLevel'] == 0) {
         cmsCore::c('page')->setTitle(empty(cmsCore::m('content')->config['pagetitle']) ? $_LANG['CATALOG_ARTICLES'] : cmsCore::m('content')->config['pagetitle']);
-        if (!empty(cmsCore::m('content')->config['meta_keys'])){
+        if (!empty(cmsCore::m('content')->config['meta_keys'])) {
             cmsCore::c('page')->setKeywords(cmsCore::m('content')->config['meta_keys']);
         }
-        if (!empty(cmsCore::m('content')->config['meta_desc'])){
+        if (!empty(cmsCore::m('content')->config['meta_desc'])) {
             cmsCore::c('page')->setDescription(cmsCore::m('content')->config['meta_keys']);
         }
 
@@ -78,9 +78,9 @@ if ($do=='view') {
     // Получаем дерево категорий
     $path_list = cmsCore::c('db')->getNsCategoryPath('cms_category', $cat['NSLeft'], $cat['NSRight'], 'id, title, NSLevel, seolink, url');
 
-    if ($path_list){
-        foreach($path_list as $pcat){
-            if(!$inCore->checkUserAccess('category', $pcat['id'])){
+    if ($path_list) {
+        foreach ($path_list as $pcat) {
+            if (!$inCore->checkUserAccess('category', $pcat['id'])) {
                 cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
                 cmsCore::redirect('/content');
             }
@@ -112,11 +112,11 @@ if ($do=='view') {
     $content_list = $total ? cmsCore::m('content')->getArticlesList(!$is_editor) : array();
     cmsCore::c('db')->resetConditions();
     
-    if(!$content_list && $page > 1){ cmsCore::error404(); }
+    if (!$content_list && $page > 1) { cmsCore::error404(); }
     
     $pagebar = cmsPage::getPagebar($total, $page, cmsCore::m('content')->config['perpage'], cmsCore::m('content')->getCategoryURL(null, $cat['seolink'], 0, true));
 
-    $template = ($cat['tpl'] ? $cat['tpl'] : 'com_content_view.tpl');
+    $template = ($cat['tpl'] ? $cat['tpl'] : 'com_content_view');
 
     cmsPage::initTemplate('components', $template)->
         assign('cat', $cat)->
@@ -128,13 +128,13 @@ if ($do=='view') {
         assign('cat_photos', $cat_photos)->
         assign('articles', $content_list)->
         assign('pagebar', $pagebar)->
-        display($template);
+        display();
 }
 ///////////////////////////////////// READ ARTICLE ////////////////////////////////////////////////////////////////////////////////
-if ($do=='read'){
+if ($do == 'read') {
     // Получаем статью
     $article = cmsCore::m('content')->getArticle($seolink);
-    if (!$article){ cmsCore::error404(); }
+    if (!$article) { cmsCore::error404(); }
 
     $article = cmsCore::callEvent('GET_ARTICLE', $article);
 
@@ -146,13 +146,13 @@ if ($do=='read'){
     // если статья не опубликована или дата публикации позже, 404
     if ((!$article['published'] || strtotime($article['pubdate']) > time()) && !$is_admin && !$is_editor && !$is_author) { cmsCore::error404(); }
 
-    if(!$inCore->checkUserAccess('material', $article['id'])){
+    if (!$inCore->checkUserAccess('material', $article['id'])) {
         cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
         cmsCore::redirect(cmsCore::m('content')->getCategoryURL(null, $article['catseolink']));
     }
 
     // увеличиваем кол-во просмотров
-    if(@!$is_author){
+    if (@!$is_author) {
         cmsCore::c('db')->setFlag('cms_content', $article['id'], 'hits', $article['hits']+1);
     }
 
@@ -163,16 +163,16 @@ if ($do=='read'){
     // Дата публикации
     $article['pubdate'] = cmsCore::dateFormat($article['pubdate']);
     // Шаблон статьи
-    $article['tpl'] = $article['tpl'] ? $article['tpl'] : 'com_content_read.tpl';
+    $article['tpl'] = $article['tpl'] ? $article['tpl'] : 'com_content_read';
 
     cmsCore::c('page')->setTitle($article['pagetitle']);
 
     // Получаем дерево категорий
     $path_list = $article['showpath'] ? cmsCore::c('db')->getNsCategoryPath('cms_category', $article['leftkey'], $article['rightkey'], 'id, title, NSLevel, seolink, url') : array();
 
-    if ($path_list){
-        foreach($path_list as $pcat){
-            if(!$inCore->checkUserAccess('category', $pcat['id'])){
+    if ($path_list) {
+        foreach ($path_list as $pcat) {
+            if (!$inCore->checkUserAccess('category', $pcat['id'])) {
                 cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
                 cmsCore::redirect('/content');
             }
@@ -183,14 +183,14 @@ if ($do=='read'){
     cmsCore::c('page')->addPathway($article['title']);
 
     // Мета теги KEYWORDS и DESCRIPTION
-    if ($article['meta_keys']){
+    if ($article['meta_keys']) {
         cmsCore::c('page')->setKeywords($article['meta_keys']);
-    }else{
-        if (mb_strlen($article['content'])>30){
+    } else {
+        if (mb_strlen($article['content'])>30) {
             cmsCore::c('page')->setKeywords(cmsCore::getKeywords(cmsCore::strClear($article['content'])));
         }
     }
-    if (!empty($article['meta_desc'])){
+    if (!empty($article['meta_desc'])) {
         cmsCore::c('page')->setDescription($article['meta_desc']);
     }
 
@@ -199,15 +199,15 @@ if ($do=='read'){
 
     // Разбивка статей на страницы
     $pt_pages = array();
-    if(!empty($GLOBALS['pt'])){
-        foreach($GLOBALS['pt'] as $num=>$page_title){
+    if (!empty($GLOBALS['pt'])) {
+        foreach ($GLOBALS['pt'] as $num=>$page_title) {
             $pt_pages[$num]['title'] = $page_title;
             $pt_pages[$num]['url']   = cmsCore::m('content')->getArticleURL(null, $article['seolink'], $num+1);
         }
     }
 
     // Рейтинг статьи
-    if(cmsCore::m('content')->config['rating'] && $article['canrate']){
+    if (cmsCore::m('content')->config['rating'] && $article['canrate']) {
         $karma = cmsKarma('content', $article['id']);
         $karma_points = cmsKarmaFormatSmall($karma['points']);
         $btns = cmsKarmaButtonsText('content', $article['id'], $karma['points'], $is_author);
@@ -227,23 +227,23 @@ if ($do=='read'){
         assign('karma_points', @$karma_points)->
         assign('karma_votes', @$karma['votes'])->
         assign('karma_buttons', @$btns)->
-        display($article['tpl']);
+        display();
 
     // Комментарии статьи
-    if($article['published'] && $article['comments'] && $inCore->isComponentInstalled('comments')){
+    if ($article['published'] && $article['comments'] && $inCore->isComponentInstalled('comments')) {
         cmsCore::includeComments();
         comments('article', $article['id']);
     }
 }
 ///////////////////////////////////// ADD ARTICLE //////////////////////////////////////////////////////////////////////////////////
-if ($do=='addarticle' || $do=='editarticle'){
+if ($do == 'addarticle' || $do == 'editarticle') {
     $is_add      = cmsUser::isUserCan('content/add');     // может добавлять статьи
     $is_auto_add = cmsUser::isUserCan('content/autoadd'); // добавлять статьи без модерации
 
-    if (!$is_add){ cmsCore::error404(); }
+    if (!$is_add) { cmsCore::error404(); }
 
     // Для редактирования получаем статью и проверяем доступ
-    if ($do=='editarticle'){
+    if ($do == 'editarticle') {
         // Получаем статью
         $item = cmsCore::m('content')->getArticle($id);
         if (!$item) { cmsCore::error404(); }
@@ -251,7 +251,7 @@ if ($do=='addarticle' || $do=='editarticle'){
         $pubcats = array();
         // доступ к редактированию админам, авторам и редакторам
         
-        if(!cmsCore::c('user')->is_admin &&
+        if (!cmsCore::c('user')->is_admin &&
             ($item['user_id'] != cmsCore::c('user')->id) &&
             !($item['modgrp_id'] == cmsCore::c('user')->group_id &&
             cmsUser::isUserCan('content/autoadd')))
@@ -261,26 +261,26 @@ if ($do=='addarticle' || $do=='editarticle'){
     }
 
     // Для добавления проверяем не вводили ли мы данные ранее
-    if ($do=='addarticle'){
+    if ($do=='addarticle') {
         $item = cmsUser::sessionGet('article');
-        if ($item){ cmsUser::sessionDel('article'); }
+        if ($item) { cmsUser::sessionDel('article'); }
 
         $item['images'] = cmsCore::getUploadImages(0, '', 'cms_content_images', 'content');
         
         // Категории, в которые разрешено публиковать
         $pubcats = cmsCore::m('content')->getPublicCats();
-        if(!$pubcats){
+        if (!$pubcats) {
             cmsCore::addSessionMessage($_LANG['ADD_ARTICLE_ERR_CAT'], 'error');
             cmsCore::redirectBack();
         }
     }
 
     // не было запроса на сохранение, показываем форму
-    if (!cmsCore::inRequest('add_mod')){
+    if (!cmsCore::inRequest('add_mod')) {
         $dynamic_cost = false;
 
         // Если добавляем статью
-        if ($do=='addarticle'){
+        if ($do=='addarticle') {
             $pagetitle = $_LANG['ADD_ARTICLE'];
             
             cmsCore::c('page')->setTitle($pagetitle);
@@ -290,10 +290,10 @@ if ($do=='addarticle' || $do=='editarticle'){
             cmsCore::c('page')->addPathway($pagetitle);
 
             // поддержка биллинга
-            if (IS_BILLING){
+            if (IS_BILLING) {
                 $action = cmsBilling::getAction('content', 'add_content');
-                foreach($pubcats as $p=>$pubcat){
-                    if ($pubcat['cost']){
+                foreach ($pubcats as $p=>$pubcat) {
+                    if ($pubcat['cost']) {
                         $dynamic_cost = true;
                     } else {
                         $pubcats[$p]['cost'] = $action['point_cost'][cmsCore::c('user')->group_id];
@@ -304,15 +304,15 @@ if ($do=='addarticle' || $do=='editarticle'){
         }
 
         // Если редактируем статью
-        if ($do=='editarticle'){
+        if ($do == 'editarticle') {
             $pagetitle = $_LANG['EDIT_ARTICLE'];
             
             cmsCore::c('page')->setTitle($pagetitle);
             cmsCore::c('page')->addPathway($_LANG['USERS'], '/'.str_replace('/', '', cmsUser::PROFILE_LINK_PREFIX));
-            if($item['user_id'] != cmsCore::c('user')->id){
+            if ($item['user_id'] != cmsCore::c('user')->id) {
                 $user = cmsCore::c('db')->get_fields('cms_users', "id='{$item['user_id']}'", 'login, nickname');
                 cmsCore::c('page')->addPathway($user['nickname'], cmsUser::getProfileURL($user['login']));
-            }else{
+            } else {
                 cmsCore::c('page')->addPathway(cmsCore::c('user')->nickname, cmsUser::getProfileURL(cmsCore::c('user')->login));
             }
             cmsCore::c('page')->addPathway($_LANG['MY_ARTICLES'], '/content/my.html');
@@ -320,7 +320,7 @@ if ($do=='addarticle' || $do=='editarticle'){
 
             $item['tags']  = cmsTagLine('content', $item['id'], false);
 
-            if (!$is_auto_add){
+            if (!$is_auto_add) {
                 cmsCore::addSessionMessage($_LANG['ATTENTION'].': '.$_LANG['EDIT_ARTICLE_PREMODER'], 'info');
             }
         }
@@ -330,7 +330,7 @@ if ($do=='addarticle' || $do=='editarticle'){
 
         $item = cmsCore::callEvent('PRE_EDIT_ARTICLE', (@$item ? $item : array()));
         
-        if (cmsCore::m('content')->config['img_on']){
+        if (cmsCore::m('content')->config['img_on']) {
             $ajaxUploader = cmsCore::c('page')->initAjaxUpload(
                 'plupload',
                 array(
@@ -353,12 +353,12 @@ if ($do=='addarticle' || $do=='editarticle'){
             assign('dynamic_cost', $dynamic_cost)->
             assign('autocomplete_js', $autocomplete_js)->
             assign('ajaxUploader', !empty($ajaxUploader) ? $ajaxUploader : '')->
-            display('com_content_edit.tpl');
+            display();
 
     }
 
     // Пришел запрос на сохранение статьи
-    if (cmsCore::inRequest('add_mod')){
+    if (cmsCore::inRequest('add_mod')) {
         $errors = false;
 
         $article['category_id']  = cmsCore::request('category_id', 'int', 1);
@@ -372,7 +372,7 @@ if ($do=='addarticle' || $do=='editarticle'){
         $article['content']      = cmsCore::badTagClear($article['content']);
 
         $article['published']    = $is_auto_add ? 1 : 0;
-        if ($do=='editarticle'){
+        if ($do=='editarticle') {
            $article['published'] = ($item['published'] == 0) ? $item['published'] : $article['published'];
         }
         $article['pubdate']      = $do=='editarticle' ? $item['pubdate'] : date('Y-m-d H:i');
@@ -389,16 +389,16 @@ if ($do=='addarticle' || $do=='editarticle'){
         $article['comments']     = $do=='editarticle' ? $item['comments'] : 1;
         $article['canrate']      = $do=='editarticle' ? $item['canrate'] : 1;
         $article['pagetitle']    = '';
-        if ($do=='editarticle'){
+        if ($do=='editarticle') {
            $article['tpl']       = $item['tpl'];
         }
 
-        if (mb_strlen($article['title'])<2){ cmsCore::addSessionMessage($_LANG['REQ_TITLE'], 'error'); $errors = true; }
-        if (mb_strlen($article['content'])<10){ cmsCore::addSessionMessage($_LANG['REQ_CONTENT'], 'error'); $errors = true; }
+        if (mb_strlen($article['title']) < 2) { cmsCore::addSessionMessage($_LANG['REQ_TITLE'], 'error'); $errors = true; }
+        if (mb_strlen($article['content']) < 10) { cmsCore::addSessionMessage($_LANG['REQ_CONTENT'], 'error'); $errors = true; }
 
-        if($errors) {
+        if ($errors) {
             // При добавлении статьи при ошибках сохраняем введенные поля
-            if ($do=='addarticle'){
+            if ($do == 'addarticle') {
                 cmsUser::sessionPut('article', $article);
             }
             cmsCore::redirectBack();
@@ -410,7 +410,7 @@ if ($do=='addarticle' || $do=='editarticle'){
         $article = cmsCore::callEvent('AFTER_EDIT_ARTICLE', $article);
 
         // добавление статьи
-        if ($do == 'addarticle'){
+        if ($do == 'addarticle') {
             $article_id = cmsCore::m('content')->addArticle($article);
         }
 
@@ -419,11 +419,11 @@ if ($do=='addarticle' || $do=='editarticle'){
         
         // операции после добавления/редактирования статьи
         // добавление статьи
-        if ($do=='addarticle'){
+        if ($do == 'addarticle') {
             // Получаем добавленную статью
             $article = cmsCore::m('content')->getArticle($article_id);
 
-            if (!$article['published']){
+            if (!$article['published']) {
                 cmsCore::addSessionMessage($_LANG['ARTICLE_PREMODER_TEXT'], 'info');
 
                 // отсылаем уведомление администраторам
@@ -432,7 +432,7 @@ if ($do=='addarticle' || $do=='editarticle'){
                 $message = str_replace('%link%', $link, $message);
 
                 cmsUser::sendMessageToGroup(USER_UPDATER, cmsUser::getAdminGroups(), $message);
-            }else{
+            } else {
                 //регистрируем событие
                 cmsActions::log('add_article', array(
                     'object' => $article['title'],
@@ -444,7 +444,7 @@ if ($do=='addarticle' || $do=='editarticle'){
                     'description' => ''
                 ));
 
-                if (IS_BILLING){
+                if (IS_BILLING) {
                     $category_cost = $article['cost']==='' ? false : (int)$article['cost'];
                     cmsBilling::process('content', 'add_content', $category_cost);
                 }
@@ -457,12 +457,12 @@ if ($do=='addarticle' || $do=='editarticle'){
         }
 
         // Редактирование статьи
-        if ($do=='editarticle'){
+        if ($do == 'editarticle') {
             cmsCore::m('content')->updateArticle($item['id'], $article, true);
             
             cmsActions::updateLog('add_article', array('object' => $article['title']), $item['id']);
             
-            if (!$article['published']){
+            if (!$article['published']) {
                 $link = '<a href="'.cmsCore::m('content')->getArticleURL(null, $item['seolink']).'">'.$article['title'].'</a>';
                 $message = str_replace('%user%', cmsUser::getProfileLink(cmsCore::c('user')->login, cmsCore::c('user')->nickname), $_LANG['MSG_ARTICLE_EDITED']);
                 $message = str_replace('%link%', $link, $message);
@@ -477,8 +477,8 @@ if ($do=='addarticle' || $do=='editarticle'){
     }
 }
 ///////////////////////// PUBLISH ARTICLE /////////////////////////////////////////////////////////////////////////////
-if ($do == 'publisharticle'){
-    if (!cmsCore::c('user')->id){ cmsCore::error404(); }
+if ($do == 'publisharticle') {
+    if (!cmsCore::c('user')->id) { cmsCore::error404(); }
 
     $article = cmsCore::m('content')->getArticle($id);
     if (!$article) { cmsCore::error404(); }
@@ -490,7 +490,7 @@ if ($do == 'publisharticle'){
     
     cmsCore::callEvent('ADD_ARTICLE_DONE', $article);
 
-    if (IS_BILLING){
+    if (IS_BILLING) {
         $author = cmsCore::c('db')->get_fields('cms_users', "id='{$article['user_id']}'", '*');
         $category_cost = $article['cost']==='' ? false : (int)$article['cost'];
         cmsBilling::process('content', 'add_content', $category_cost, $author);
@@ -498,14 +498,14 @@ if ($do == 'publisharticle'){
 
     //регистрируем событие
     cmsActions::log('add_article', array(
-           'object' => $article['title'],
-           'user_id' => $article['user_id'],
-           'object_url' =>  cmsCore::m('content')->getArticleURL(null, $article['seolink']),
-           'object_id' =>  $article['id'],
-           'target' => $article['cat_title'],
-           'target_url' => cmsCore::m('content')->getCategoryURL(null, $article['catseolink']),
-           'target_id' =>  $article['cat_id'],
-           'description' => ''
+       'object' => $article['title'],
+       'user_id' => $article['user_id'],
+       'object_url' =>  cmsCore::m('content')->getArticleURL(null, $article['seolink']),
+       'object_id' =>  $article['id'],
+       'target' => $article['cat_title'],
+       'target_url' => cmsCore::m('content')->getCategoryURL(null, $article['catseolink']),
+       'target_id' =>  $article['cat_id'],
+       'description' => ''
     ));
 
     $link = '<a href="'.cmsCore::m('content')->getArticleURL(null, $article['seolink']).'">'.$article['title'].'</a>';
@@ -517,8 +517,8 @@ if ($do == 'publisharticle'){
     cmsCore::redirectBack();
 }
 ///////////////////////////////////// DELETE ARTICLE ///////////////////////////////////////////////////////////////////////////////////
-if ($do=='deletearticle'){
-    if (!cmsCore::c('user')->id){ cmsCore::error404(); }
+if ($do == 'deletearticle') {
+    if (!cmsCore::c('user')->id) { cmsCore::error404(); }
 
     $article = cmsCore::m('content')->getArticle($id);
     if (!$article) { cmsCore::error404(); }
@@ -529,7 +529,7 @@ if ($do=='deletearticle'){
 
     if (!$is_author && !$is_editor && !cmsCore::c('user')->is_admin) { cmsCore::error404(); }
     
-    if (!cmsCore::inRequest('goadd')){
+    if (!cmsCore::inRequest('goadd')) {
         cmsCore::c('page')->setTitle($_LANG['ARTICLE_REMOVAL']);
         cmsCore::c('page')->addPathway($_LANG['ARTICLE_REMOVAL']);
 
@@ -541,20 +541,20 @@ if ($do=='deletearticle'){
         $confirm['yes_button']['name'] = 'goadd';
         cmsPage::initTemplate('components', 'action_confirm')->
         assign('confirm', $confirm)->
-        display('action_confirm.tpl');
-    }else{
+        display();
+    } else {
         cmsCore::m('content')->deleteArticle($article['id']);
         
         if ($_SERVER['HTTP_REFERER'] == '/my.html' ) {
             cmsCore::addSessionMessage($_LANG['ARTICLE_DELETED'], 'info');
             cmsCore::redirectBack();
-        }else{
+        } else {
             // если удалили как администратор или редактор и мы не авторы статьи, отсылаем сообщение автору
-            if (($is_editor || cmsCore::c('user')->is_admin) && $article['user_id'] != cmsCore::c('user')->id){
+            if (($is_editor || cmsCore::c('user')->is_admin) && $article['user_id'] != cmsCore::c('user')->id) {
                 $link = '<a href="'.cmsCore::m('content')->getArticleURL(null, $article['seolink']).'">'.$article['title'].'</a>';
                 $message = str_replace('%link%', $link, ($article['published'] ? $_LANG['MSG_ARTICLE_DELETED'] : $_LANG['MSG_ARTICLE_REJECTED']));
                 cmsUser::sendMessage(USER_UPDATER, $article['user_id'], $message);
-            }else{
+            } else {
                 cmsCore::addSessionMessage($_LANG['ARTICLE_DELETED'], 'info');
             }
             
@@ -563,8 +563,8 @@ if ($do=='deletearticle'){
     }
 }
 ///////////////////////////////////// MY ARTICLES ///////////////////////////////////////////////////////////////////////////////////
-if ($do=='my'){
-    if (!cmsUser::isUserCan('content/add')){ cmsCore::error404(); }
+if ($do == 'my'){
+    if (!cmsUser::isUserCan('content/add')) { cmsCore::error404(); }
 
     cmsCore::c('page')->setTitle($_LANG['MY_ARTICLES']);
     cmsCore::c('page')->addPathway($_LANG['USERS'], '/'.str_replace('/', '', cmsUser::PROFILE_LINK_PREFIX));
@@ -592,10 +592,10 @@ if ($do=='my'){
         assign('total', $total)->
         assign('user_can_delete', cmsUser::isUserCan('content/delete'))->
         assign('pagebar', cmsPage::getPagebar($total, $page, $perpage, '/content/my%page%.html'))->
-        display('com_content_my.tpl');
+        display();
 }
 ///////////////////////////////////// BEST ARTICLES ///////////////////////////////////////////////////////////////////////////////////
-if ($do=='best'){
+if ($do == 'best') {
     cmsCore::c('page')->setTitle($_LANG['ARTICLES_RATING']);
     cmsCore::c('page')->addPathway($_LANG['ARTICLES_RATING']);
 
@@ -611,8 +611,7 @@ if ($do=='best'){
 
     cmsPage::initTemplate('components', 'com_content_rating')->
         assign('articles', $content_list)->
-        display('com_content_rating.tpl');
+        display();
 }
 
 }
-?>

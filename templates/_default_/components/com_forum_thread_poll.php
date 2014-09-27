@@ -24,7 +24,7 @@
                 <input type="hidden" name="poll_id" value="<?php echo $thread_poll['id']; ?>" />
                 <input type="hidden" name="id" id="thread_id" value="<?php echo $thread['id']; ?>" />
                 <table>
-                <?php foreach($thread_poll['answers'] as $num) { ?>
+                <?php foreach($thread_poll['answers'] as $answer => $num) { ?>
                     <tr>
                       <td class="mod_poll_answer">
                           <label>

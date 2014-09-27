@@ -1,4 +1,3 @@
-{literal}
 <style type="text/css">
 html #popup_container .body {
     width: 333px;
@@ -13,7 +12,7 @@ html #popup_container .body {
     width: 300px;
 }
 </style>
-{/literal}
+
 <div id="geo_window">
     <div class="list">
         {html_options name=countries options=$countries selected=$country_id onchange="geo.changeParent(this, 'regions')"}
@@ -27,3 +26,11 @@ html #popup_container .body {
         {html_options name=cities options=$cities selected=$city_id onchange="geo.changeCity(this)"}
     </div>
 </div>
+        
+{if $country_id && !$city_id}
+    <script type="text/javascript">
+        $(function() {
+            $('#geo_window select[name=countries]').trigger('change');
+        });
+    </script>
+{/if} 

@@ -48,7 +48,7 @@ if ($pdo=='addphoto'){
             assign('max_files', $max_files)->
             assign('uload_type', $uload_type)->
             assign('stop_photo', $stop_photo)->
-            display('com_users_photo_add.tpl');
+            display();
 
 }
 
@@ -144,7 +144,7 @@ if ($pdo=='submitphotos'){
                 assign('photos', $photos)->
                 assign('album_id', $album_id)->
                 assign('is_edit', cmsCore::request('is_edit', 'int', 0))->
-                display('com_users_photo_submit.tpl');
+                display();
 
     }
 
@@ -285,7 +285,7 @@ if ($pdo=='delphoto'){
             $confirm['yes_button']['name'] = 'godelete';
             cmsPage::initTemplate('components', 'action_confirm')->
                     assign('confirm', $confirm)->
-                    display('action_confirm.tpl');
+                    display();
 
 		} else {
 
@@ -436,7 +436,7 @@ if ($pdo=='viewphotos'){
             assign('albums', $albums)->
             assign('my_profile', $my_profile)->
             assign('user', $usr)->
-            display('com_users_albums.tpl');
+            display();
 
 }
 
@@ -494,7 +494,7 @@ if ($pdo=='viewphoto'){
             assign('is_admin', cmsUser::userIsAdmin($inUser->id))->
             assign('is_allow', $is_allow)->
             assign('tagbar', ($is_allow ? cmsTagBar('userphoto', $photo['id']) : ''))->
-            display('com_users_photos_view.tpl');
+            display();
 
 	if($inCore->isComponentInstalled('comments') && $is_allow){
         cmsCore::includeComments();
@@ -567,7 +567,7 @@ if ($pdo=='viewalbum'){
             assign('my_profile', $my_profile)->
             assign('is_admin', $inUser->is_admin)->
             assign('pagebar', $pagination)->
-            display('com_users_photos.tpl');
+            display();
 
 }
 

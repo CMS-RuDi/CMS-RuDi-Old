@@ -77,7 +77,7 @@ if($do == 'add'){
                     assign('component', $component)->
                     assign('bb_toolbar', cmsPage::getBBCodeToolbar('message', true, $component, 'wall'))->
                     assign('smilies', cmsPage::getSmilesPanel('message'))->
-                    display('com_users_addwall.tpl');
+                    display();
 
                     cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
 

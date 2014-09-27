@@ -1,4 +1,4 @@
-<?php Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+<?php
 /******************************************************************************/
 //                                                                            //
 //                           InstantCMS v1.10.4                               //
@@ -11,6 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
+Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 header('Content-Type: text/html; charset=utf-8');
 header('X-Frame-Options: DENY');
 
@@ -22,8 +23,7 @@ define("VALID_CMS_ADMIN", 1);
 define('PATH', $_SERVER['DOCUMENT_ROOT']);
 
 require(PATH .'/core/cms.php'); 
-require(PATH .'/admin/includes/cp.php'); 
-require(PATH .'/includes/tools.inc.php');
+require(PATH .'/admin/includes/cp.php');
 
 $inCore = cmsCore::getInstance(false, true);
 
@@ -34,16 +34,13 @@ cmsCore::loadClass('actions');
 if (!cmsCore::c('user')->update()) { cmsCore::error404(); }
 
 // проверяем доступ по Ip
-if(!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
-
-define('TEMPLATE_DIR', PATH .'/templates/'. cmsCore::c('config')->template .'/');
-define('DEFAULT_TEMPLATE_DIR', PATH .'/templates/_default_/');
+if (!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
 
 cmsCore::loadLanguage('admin/lang');
 global $_LANG;
 
 //-------CHECK AUTHENTICATION--------------------------------------//
-if (!cmsCore::c('user')->is_admin){
+if (!cmsCore::c('user')->is_admin) {
     include PATH .'/admin/login.php';
     cmsCore::halt();
 }

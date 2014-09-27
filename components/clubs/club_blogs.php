@@ -85,7 +85,7 @@ if (in_array($bdo, array('newpost', 'editpost'))){
         $cat_list = cmsCore::getListItems('cms_blog_cats', $post['cat_id'], 'id', 'ASC', "blog_id = '{$blog['id']}'");
 
         //получаем код панелей bbcode и смайлов
-        $bb_toolbar = cmsPage::getBBCodeToolbar('message', true, 'clubs', 'post', $post_id);
+        $bb_toolbar = cmsPage::getBBCodeToolbar('message', true, 'clubs', 'blog_post', $post_id);
         $smilies    = cmsPage::getSmilesPanel('message');
 
         $inCore->initAutoGrowText('#message');
@@ -102,7 +102,7 @@ if (in_array($bdo, array('newpost', 'editpost'))){
                 assign('myblog', ($is_admin || $is_moder))->
                 assign('user_can_iscomments', cmsUser::isUserCan('comments/iscomments'))->
                 assign('autocomplete_js', $autocomplete_js)->
-                display('com_blog_edit_post.tpl');
+                display();
 
     }
 
@@ -279,7 +279,7 @@ if($bdo=='post'){
             assign('is_admin', ($is_admin || $is_moder))->
             assign('karma_form', cmsKarmaForm($inBlog->getTarget('rating'), $post['id'], $post['rating'], $is_author))->
             assign('navigation', $inBlog->getPostNavigation($post['id'], $blog['id'], $model, $club['id']))->
-            display('com_blog_view_post.tpl');
+            display();
 
     if($inCore->isComponentInstalled('comments') && $post['comments']){
         cmsCore::includeComments();
@@ -432,7 +432,7 @@ if ($bdo=='blog'){
             assign('blog', $blog)->
             assign('posts', $posts)->
             assign('pagination', $pagination)->
-            display('com_blog_view.tpl');
+            display();
 
 }
 ////////// НОВАЯ РУБРИКА / РЕДАКТИРОВАНИЕ РУБРИКИ //////////////////////////////////////////////////////
@@ -474,7 +474,7 @@ if (in_array($bdo, array('newcat','editcat'))){
         cmsPage::initTemplate('components', 'com_blog_edit_cat')->
                 assign('mod', $cat)->
                 assign('form_action', ($bdo=='newcat' ? '/clubs/'.$blog['id'].'/newcat.html' : '/clubs/editcat'.$cat['id'].'.html'))->
-                display('com_blog_edit_cat.tpl');
+                display();
 		cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
 
     }

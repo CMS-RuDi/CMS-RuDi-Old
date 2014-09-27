@@ -42,32 +42,32 @@
 
 {if !$is_ajax}
 </div>
-<script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
-{literal}
-<script type="text/javascript">
-function pollSubmit(){
-    $('#mod_poll_submit').prop('disabled', true);
-    var options = {
-        success: loadPoll
-    };
-    $('#mod_poll_submit_form').ajaxSubmit(options);
-}
-function loadPoll(result, statusText, xhr, $form){
-    var module_id = {/literal}{$module_id}{literal};
-	if(statusText == 'success'){
-		if(result.error == false){
-            core.alert(result.text, '{/literal}{$LANG.NOTICE}{literal}!');
-            $.post('/modules/mod_polls/load.php', {module_id: module_id}, function(data){
-                $('#poll_module_'+module_id).html(data);
-            });
-            setTimeout('core.box_close()', 900);
-		} else {
-            core.alert(result.text, '{/literal}{$LANG.ATTENTION}{literal}!');
-            $('#mod_poll_submit').prop('disabled', false);
-        }
-	}
 
-}
+<script type="text/javascript" src="/includes/jquery/jquery.form.js"></script>
+
+<script type="text/javascript">
+    function pollSubmit() {
+        $('#mod_poll_submit').prop('disabled', true);
+        var options = {
+            success: loadPoll
+        };
+        $('#mod_poll_submit_form').ajaxSubmit(options);
+    }
+    function loadPoll(result, statusText, xhr, $form) {
+        var module_id = {$module_id};
+        if (statusText == 'success') {
+            if (result.error == false) {
+                core.alert(result.text, '{$LANG.NOTICE}!');
+                $.post('/modules/mod_polls/load.php', { module_id: module_id }, function(data) {
+                    $('#poll_module_'+module_id).html(data);
+                });
+                setTimeout('core.box_close()', 900);
+            } else {
+                core.alert(result.text, '{$LANG.ATTENTION}!');
+                $('#mod_poll_submit').prop('disabled', false);
+            }
+        }
+
+    }
 </script>
-{/literal}
 {/if}

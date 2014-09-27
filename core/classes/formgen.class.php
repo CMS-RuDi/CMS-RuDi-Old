@@ -132,26 +132,14 @@ class cmsFormGen {
 //============================================================================//
 
     private function getParamHTML($param) {
-        switch ($param['type']){
-
-            case 'number':  return $this->renderNumber($param);
-                            break;
-
-            case 'string':  return $this->renderString($param);
-                            break;
-
-            case 'flag':    return $this->renderFlag($param);
-                            break;
-
-            case 'list':    return $this->renderList($param);
-                            break;
-
-            case 'list_db': return $this->renderListDB($param);
-                            break;
-
-            case 'list_function': return $this->renderListFunction($param);
-                            break;
-
+        switch ($param['type']) {
+            case 'number':  return $this->renderNumber($param); break;
+            case 'string':  return $this->renderString($param); break;
+            case 'flag':    return $this->renderFlag($param); break;
+            case 'list':    return $this->renderList($param); break;
+            case 'list_db': return $this->renderListDB($param); break;
+            case 'html': return $this->renderHtml($param); break;
+            case 'list_function': return $this->renderListFunction($param); break;
         }
 
         return;
@@ -161,22 +149,22 @@ class cmsFormGen {
 //============================================================================//
 
     private function renderNumber($param) {
-        return '<input type="text" id="'.$param['name'].'" name="'.$param['name'].'" value="'.$param['value'].'" class="param-number" /> '. $param['units'];
+        return '<input type="number" id="'. $param['name'] .'" class="form-control" name="'. $param['name'] .'" value="'. $param['value'] .'" /> ';
     }
 
     private function renderString($param) {
-        return '<input type="text" id="'.$param['name'].'" name="'.$param['name'].'" value="'.htmlspecialchars($param['value']).'" class="param-string" /> ';
+        return '<input type="text" id="'.$param['name'].'" name="'.$param['name'].'" value="'.htmlspecialchars($param['value']).'" class="form-control" /> ';
     }
 
     private function renderFlag($param) {
-        $html = '<input type="checkbox" '.($param['value']==1 ? 'checked="checked"' : '').' onclick="$(\'#'.$param['name'].'\').val(1-$(\'#'.$param['name'].'\').val())" />' . "\n" .
-                '<input type="hidden" id="'.$param['name'].'" name="'.$param['name'].'" value="'.$param['value'].'" />';
+        $html = '<input type="checkbox" '.($param['value'] == 1 ? 'checked="checked"' : '').' onclick="$(\'#'. $param['name'] .'\').val(1-$(\'#'. $param['name'] .'\').val())" />' . "\n" .
+                '<input type="hidden" id="'. $param['name'] .'" name="'. $param['name'] .'" value="'. $param['value'] .'" />';
 
         return $html;
     }
 
     private function renderList($param){
-        $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="param-list">' . "\n";
+        $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="form-control">' . "\n";
 
         foreach($param['tag_option'] as $option){
 
@@ -199,7 +187,7 @@ class cmsFormGen {
         $items = call_user_func($param['function'], $fparam);
         if(!$items){ return ''; }
 
-        $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="param-list">' . "\n";
+        $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="form-control">' . "\n";
 
         if (isset($param['tag_option'])){
             foreach($param['tag_option'] as $option){
@@ -248,7 +236,7 @@ class cmsFormGen {
 
         if (!isset($param['multiple'])){
 
-            $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="param-list">' . "\n";
+            $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="form-control">' . "\n";
 
             if (isset($param['tag_option'])){
                 foreach($param['tag_option'] as $option){
@@ -278,22 +266,21 @@ class cmsFormGen {
 
             $values = explode('|', $param['value']);
 
-            $html = '<table cellpadding="0" cellspacing="0">' . "\n";
-
             if (cmsCore::c('db')->num_rows($result)){
                 while($option = cmsCore::c('db')->fetch_assoc($result)){
-                    $html .= '<tr>' . "\n" .
-                                "\t" . '<td><input type="checkbox" id="'.$param['name'].'_'.$option['value'].'" name="'.$param['name'].'['.$option['value'].']" value="'.htmlspecialchars($option['value']).'" '.(in_array($option['value'], $values) ? 'checked="checked"' : '').' />' . "\n" .
-                                "\t" . '<td><label for="'.$param['name'].'_'.$option['value'].'">'.$option['title'].'</label></td>' . "\n" .
-                             '</tr>';
+                    $html .= '<div><label><input type="checkbox" id="'. $param['name'] .'_'. $option['value'] .'" name="'. $param['name'] .'['. $option['value'] .']" value="'. htmlspecialchars($option['value']) .'" '. (in_array($option['value'], $values) ? 'checked="checked"' : '') .' /> '. $option['title'] .'</label></div>';
                 }
             }
-
-            $html .= '</table>' . "\n";
 
         }
 
         return $html;
+    }
+    
+    private function renderHtml($param) {
+        ob_start();
+            cmsCore::insertEditor($param['name'], $param['value'], $param['height'], $param['width'], $param['toolbar']);
+        return ob_get_clean();
     }
 
 

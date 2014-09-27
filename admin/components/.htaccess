@@ -1,0 +1,4 @@
+<FilesMatch ".(htaccess|php|json|xml)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

@@ -619,7 +619,7 @@ class cms_model_board{
                 assign('orderby', $orderby)->
                 assign('orderto', $orderto)->
                 assign('action_url', '/board/'.$category['id'])->
-                display('com_board_order_form.tpl');
+                display();
 		return ob_get_clean();
 
 	}

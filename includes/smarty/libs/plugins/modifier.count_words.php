@@ -18,8 +18,7 @@
  * @param string
  * @return integer
  */
-function smarty_modifier_count_words($string)
-{
+function smarty_modifier_count_words($string) {
     // split text by ' ',\r,\n,\f,\t
     $split_array = preg_split('/\s+/',$string);
     // count matches that contain alphanumerics
@@ -29,5 +28,3 @@ function smarty_modifier_count_words($string)
 }
 
 /* vim: set expandtab: */
-
-?>

@@ -44,7 +44,7 @@
             assign('labels', $model->labels)->
             assign('target', $target)->
             assign('target_id', $target_id)->
-            display('com_comments_list.tpl');
+            display();
 
     cmsCore::halt();
 

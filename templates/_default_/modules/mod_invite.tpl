@@ -16,11 +16,10 @@
 
 </form>
 {if $is_redirect}
-{literal}
+
 <script type="text/javascript">
-    $(document).ready(function(){
-        location.href='{/literal}{$smarty.server.REQUEST_URI}{literal}';
+    $(document).ready(function() {
+        location.href='{$smarty.server.REQUEST_URI}';
     });
 </script>
-{/literal}
 {/if}

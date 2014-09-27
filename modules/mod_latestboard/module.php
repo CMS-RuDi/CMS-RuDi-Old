@@ -47,7 +47,7 @@ function mod_latestboard($module_id, $cfg){
     cmsPage::initTemplate('modules', 'mod_latestboard')->
             assign('items', $items)->
             assign('cfg', $cfg)->
-            display('mod_latestboard.tpl');
+            display();
 
     return true;
 

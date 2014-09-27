@@ -50,7 +50,7 @@ function forms(){
         }
         
         // проверяем каптчу
-        if(!cmsCore::checkCaptchaCode(cmsCore::request('code', 'str'))) {
+        if(!cmsCore::checkCaptchaCode()) {
             $errors[] = $_LANG['ERR_CAPTCHA'];
         }
 

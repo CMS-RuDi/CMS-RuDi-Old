@@ -78,7 +78,7 @@ function mod_photo($module_id, $cfg){
         cmsPage::initTemplate('modules', 'mod_photo')->
             assign('photos', $photos)->
             assign('cfg', $cfg)->
-            display('mod_photo.tpl');
+            display();
     }else{
         if ($cfg['sort'] == 'rating') $cfg['sort'] = 'hits';
         
@@ -120,7 +120,7 @@ function mod_photo($module_id, $cfg){
         cmsPage::initTemplate('modules', 'mod_user_photo')->
             assign('photos', $photos)->
             assign('cfg', $cfg)->
-            display('mod_user_photo.tpl');
+            display();
     }
 
 	return true;

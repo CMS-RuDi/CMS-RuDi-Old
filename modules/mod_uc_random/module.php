@@ -65,7 +65,7 @@ function mod_uc_random($module_id, $cfg){
             assign('items', $items)->
             assign('cfg', $cfg)->
             assign('is_uc', $is_uc)->
-            display('mod_uc_random.tpl');
+            display();
 
     return true;
 

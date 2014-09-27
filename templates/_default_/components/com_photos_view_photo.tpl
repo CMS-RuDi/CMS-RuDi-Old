@@ -15,7 +15,7 @@
 <table cellpadding="0" cellspacing="0" border="0" class="photo_layout">
     <tr>
         <td valign="top" style="padding-right:15px">
-            <img src="/images/photos/medium/{$photo.file}" border="0" alt="{$photo.title|escape:'html'}" />
+            <img src="/images/photos/medium/{$photo.file}" border="0" alt="{$photo.title|escape:'html'}" style="max-width: 650px;" />
 
             {if $photo.album_nav}
                 <div align="center" style="margin:5px 0 0 0">

@@ -527,13 +527,13 @@ function applet_menu() {
                             </select>
                         </div>
                             
-                        <div id="t_link" class="form-group" style="display:<?php if ($link_type == 'link' || $link_type == 'ext') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_link" class="form-group menu_target" style="display:<?php if ($link_type == 'link' || $link_type == 'ext') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_LINK']; ?></label>
                             <input type="text" id="link" class="form-control" style="width:100%" name="link" size="50" value="<?php if ($link_type == 'link' || $link_type == 'ext') { echo cmsCore::getArrVal($mod, 'link', ''); } ?>" />
                             <div class="help-block"><?php echo $_LANG['AD_LINK_HINT']; ?> <b>http://</b></div>
                         </div>
                             
-                        <div id="t_content" class="form-group" style="display:<?php if ($link_type == 'content') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_content" class="form-group menu_target" style="display:<?php if ($link_type == 'content') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_CHECK_ARTICLE'] ; ?></label>
                             <select id="content" class="form-control" style="width:100%" name="content">
                                 <?php
@@ -543,7 +543,7 @@ function applet_menu() {
                         </div>
                             
                         <?php if($inCore->isComponentInstalled('video')){ ?> 
-                        <div id="t_video_cat" class="form-group" style="display:<?php if ($link_type == 'video_cat') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_video_cat" class="form-group menu_target" style="display:<?php if ($link_type == 'video_cat') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_CHECK_PARTITION']; ?></label>
                             <select id="video_cat" class="form-control" style="width:100%" name="video_cat"> 
                                 <?php
@@ -553,7 +553,7 @@ function applet_menu() {
                         </div>
                         <?php } ?>
                             
-                        <div id="t_category" class="form-group" style="display:<?php if ($link_type == 'category') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_category" class="form-group menu_target" style="display:<?php if ($link_type == 'category') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_CHECK_PARTITION']; ?></label>
                             <select id="category" class="form-control" style="width:100%" name="category"> 
                                 <?php
@@ -562,7 +562,7 @@ function applet_menu() {
                             </select>
                         </div>
                             
-                        <div id="t_component" class="form-group" style="display:<?php if ($link_type == 'component') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_component" class="form-group menu_target" style="display:<?php if ($link_type == 'component') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_CHECK_COMPONENT']; ?></label>
                             <select id="component" class="form-control" style="width:100%" name="component"> 
                                 <?php
@@ -571,7 +571,7 @@ function applet_menu() {
                             </select>
                         </div>
                             
-                        <div id="t_blog" class="form-group" style="display:<?php if ($link_type == 'blog') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_blog" class="form-group menu_target" style="display:<?php if ($link_type == 'blog') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_CHECK_BLOG']; ?></label>
                             <select id="blog" class="form-control" style="width:100%" name="blog"> 
                                 <?php
@@ -580,7 +580,7 @@ function applet_menu() {
                             </select>
                         </div>
                             
-                        <div id="t_uccat" class="form-group" style="display:<?php if ($link_type == 'uccat') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_uccat" class="form-group menu_target" style="display:<?php if ($link_type == 'uccat') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_CHECK_CATEGORY']; ?></label>
                             <select id="blog" class="form-control" style="width:100%" name="blog"> 
                                 <?php
@@ -589,7 +589,7 @@ function applet_menu() {
                             </select>
                         </div>
                             
-                        <div id="t_photoalbum" class="form-group" style="display:<?php if ($link_type == 'photoalbum') { echo 'block'; } else { echo 'none'; } ?>">
+                        <div id="t_photoalbum" class="form-group menu_target" style="display:<?php if ($link_type == 'photoalbum') { echo 'block'; } else { echo 'none'; } ?>">
                             <label><?php echo $_LANG['AD_CHECK_ALBUM']; ?></label>
                             <select id="blog" class="form-control" style="width:100%" name="blog"> 
                                 <?php

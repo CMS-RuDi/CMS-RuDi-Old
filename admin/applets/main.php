@@ -236,10 +236,10 @@ function applet_main() {
                             <div class="panel-heading"><?php echo $_LANG['AD_ICMS_RAVE']; ?></div>
                             <ul class="list-group">
                                 <li class="list-group-item fa fa-external-link">
-                                    <a href="http://www.instantcms.ru/"><?php echo $_LANG['AD_ICMS_OFFICIAL']; ?></a>
+                                    <a href="http://cmsrudi.ru/"><?php echo $_LANG['AD_CMSRD_OFFICIAL']; ?></a>
                                 </li>
                                 <li class="list-group-item fa fa-external-link">
-                                    <a href="http://www.instantcms.ru/wiki"><?php echo $_LANG['AD_ICMS_DOCUMENTATION']; ?></a>
+                                    <a href="http://cmsrudi.ru/docs"><?php echo $_LANG['AD_CMSRD_DOCUMENTATION']; ?></a>
                                 </li>
                                 <li class="list-group-item fa fa-external-link">
                                     <a href="http://www.instantcms.ru/forum"><?php echo $_LANG['AD_ICMS_FORUM']; ?></a>

@@ -39,7 +39,8 @@ function applet_plugins() {
 
     if ($do == 'list') {
         $toolmenu = array(
-            array( 'icon' => 'install.gif', 'title' => $_LANG['AD_INSTALL_PLUGINS'], 'link' => '?view=install&do=plugin' )
+            array( 'icon' => 'install.gif', 'title' => $_LANG['AD_INSTALL_PLUGINS'], 'link' => '?view=install&do=plugin' ),
+            array( 'icon' => 'help.gif', 'title' => $_LANG['AD_HELP'], 'link' => '?view=help&topic=plugins' )
         );
 
         cpToolMenu($toolmenu);

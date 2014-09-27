@@ -333,7 +333,7 @@ if ($opt == 'add_album' || $opt == 'edit_album') {
             <label><?php echo $_LANG['AD_ALBUM_PARENT']; ?>:</label>
             <?php $rootid = cmsCore::c('db')->get_field('cms_photo_albums', "parent_id=0 AND NSDiffer=''", 'id'); ?>
             <select id="parent_id" class="form-control" name="parent_id" size="8">
-                <option value="<?php echo $rootid; ?>" <?php if (cmsCore::getArrVal($mod, 'title', $rootid) == $rootid) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_ALBUM_ROOT']; ?></option>
+                <option value="<?php echo $rootid; ?>" <?php if (cmsCore::getArrVal($mod, 'parent_id', $rootid) == $rootid) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_ALBUM_ROOT']; ?></option>
                 <?php
                     echo $inCore->getListItemsNS('cms_photo_albums', cmsCore::getArrVal($mod, 'parent_id', 0));
                 ?>

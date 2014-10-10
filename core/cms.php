@@ -86,7 +86,7 @@ class cmsCore {
         $this->uri = $this->detectURI();
 
         //загрузим все компоненты в память
-        $this->components = $this->getAllComponents();
+        $this->getAllComponents();
 
         //определим компонент
         $this->component = $this->detectComponent();
@@ -335,11 +335,19 @@ class cmsCore {
      */
     public function getAllComponents() {
         // если уже получали, возвращаемся
-        if($this->components && is_array($this->components)) { return $this->components; }
+        if ($this->components && is_array($this->components)) {
+            return $this->components;
+        }
 
         // Получаем список компонентов
-        $this->components = self::c('db')->get_table('cms_components', '1=1 ORDER BY title', 'id, title, link, config, internal, published, version, system');
-        if (!$this->components){ die('kernel panic'); }
+        $results = self::c('db')->query("SELECT * FROM cms_components WHERE 1=1 ORDER BY title ASC");
+        if (!self::c('db')->num_rows($results)) { die('kernel panic'); }
+        
+        $this->components = array();
+        
+        while ($component = self::c('db')->fetch_assoc($results)) {
+            $this->components[$component['link']] = $component;
+        }
 
         return $this->components;
     }
@@ -354,10 +362,8 @@ class cmsCore {
     public function isComponentEnable($component){
         $enable = false;
 
-        foreach ($this->components as $inst_component){
-            if($inst_component['link'] == $component){
-                $enable = (bool)$inst_component['published']; break;
-            }
+        if (isset($this->components[$component])) {
+            $enable = (bool)$this->components[$component]['published'];
         }
 
         return $enable;
@@ -372,7 +378,7 @@ class cmsCore {
      */
     public function getComponent($component_id){
         $c = array();
-
+        
         foreach ($this->components as $inst_component){
             if($inst_component['id'] == $component_id){
                 $c = $inst_component; break;
@@ -904,11 +910,10 @@ class cmsCore {
     public function getComponentTitle() {
         // Заголовок меню
         $menutitle = $this->menuTitle();
+        
         // Название компонента
-        foreach ($this->components as $inst_component){
-            if($inst_component['link'] == $this->component){
-                $component_title = $inst_component['title']; break;
-            }
+        if (isset($this->components[$this->component])) {
+            $component_title = $this->components[$this->component]['title'];
         }
 
         return ($menutitle && $this->isMenuIdStrict()) ? $menutitle : $component_title;
@@ -1306,33 +1311,36 @@ class cmsCore {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Возвращает кофигурацию компонента в виде массива
-     * @param string $plugin
+     * @param string $component
      * @return float
      */
     public function loadComponentConfig($component){
-        if (isset($this->component_configs[$component])) { return $this->component_configs[$component]; }
-
-        $config = array();
-
-        foreach ($this->components as $inst_component){
-            if($inst_component['link'] == $component){
-                $config = self::yamlToArray($inst_component['config']);
-                // проверяем настройки по умолчанию в модели
-                $is_model_loaded = true;
-                if(!class_exists('cms_model_'.$component)){
-                    $is_model_loaded = self::loadModel($component);
-                }
-                if($is_model_loaded && method_exists('cms_model_'.$component, 'getDefaultConfig')){
-                    $default_cfg = call_user_func(array('cms_model_'.$component, 'getDefaultConfig'));
-                    $config = array_merge($default_cfg, $config);
-                }
-                $config['component_enabled'] = $inst_component['published'];
-                break;
-            }
+        if (isset($this->component_configs[$component])) {
+            return $this->component_configs[$component];
         }
 
+        $config = array();
+        
+        if (isset($this->components[$component])) {
+            $config = self::yamlToArray($this->components[$component]['config']);
+            
+            // проверяем настройки по умолчанию в модели
+            $is_model_loaded = true;
+            
+            if (!class_exists('cms_model_'. $component)) {
+                $is_model_loaded = self::loadModel($component);
+            }
+            
+            if ($is_model_loaded && method_exists('cms_model_'. $component, 'getDefaultConfig')) {
+                $default_cfg = call_user_func(array('cms_model_'. $component, 'getDefaultConfig'));
+                $config = array_merge($default_cfg, $config);
+            }
+            
+            $config['component_enabled'] = $this->components[$component]['published'];
+        }
+        
         $this->cacheComponentConfig($component, $config);
-
+        
         return $config;
     }
 
@@ -1841,6 +1849,8 @@ class cmsCore {
 
         foreach($comments as $comment){
             cmsActions::removeObjectLog('add_comment', $comment['id']);
+            self::deleteUploadImages($comment['id'], 'comment');
+            self::deleteRatings('comment', $comment['id']);
         }
 
         self::c('db')->delete('cms_comments', "target='". $target ."' AND target_id='". $target_id ."'");;
@@ -1871,15 +1881,7 @@ class cmsCore {
      * @return bool
      */
     public function isComponentInstalled($component) {
-        $is_installed = false;
-
-        foreach ($this->components as $inst_component) {
-            if ($inst_component['link'] == $component) {
-                $is_installed = true; break;
-            }
-        }
-
-        return $is_installed;
+        return isset($this->components[$component]);
     }
 
     public function isModuleInstalled($module) {

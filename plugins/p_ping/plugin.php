@@ -64,7 +64,7 @@ class p_ping extends cmsPlugin {
             break;
 
             case 'ADD_ARTICLE_DONE':
-                $pageURL = HOST .'/'. $item['seolink'] . '.html';
+                $pageURL = HOST .'/'. $item['seolink'] .'.html';
                 $feedURL = HOST . '/rss/content/all/feed.rss';
                 $this->ping($pageURL, $feedURL);
 
@@ -76,7 +76,7 @@ class p_ping extends cmsPlugin {
             break;
         }
 
-        return;
+        return $item;
     }
 
     private function ping($pageURL, $feedURL) {

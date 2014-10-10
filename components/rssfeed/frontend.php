@@ -11,87 +11,82 @@
 //                                                                            //
 /******************************************************************************/
 
-function rssfeed(){
-
+function rssfeed($component=null, $item_id=null) {
     $inCore = cmsCore::getInstance();
-    $inConf = cmsConfig::getInstance();
-
-	$cfg = $inCore->loadComponentConfig('rssfeed');
-
     global $_LANG;
 
-    $do      = $inCore->do;
-    $target  = cmsCore::request('target', 'str', 'rss');
-    $item_id = cmsCore::request('item_id', 'str', 'all');
+    $component = isset($component) ? $component : cmsCore::request('target', 'str', 'rss');
+    $item_id   = isset($item_id)   ? $item_id   : cmsCore::request('item_id', 'str', 'all');
 
-	if(!$inCore->isComponentInstalled($target)) { cmsCore::error404(); }
+    if (!$inCore->isComponentInstalled($component)) { cmsCore::error404(); }
 
-	if (!preg_match('/^([a-z0-9_\-]+)$/ui', $item_id)) { $item_id = 0; }
+    if (!preg_match('/^([a-z0-9_\-]+)$/ui', $item_id)) { $item_id = 0; }
 
-	if ($item_id == 'all') { $item_id = 0; }
+    if ($item_id == 'all') { $item_id = 0; }
 
-////////////////////// RSS /////////////////////////////////////////////////////////////////////////////////////////////////
-if ($do=='view'){
+if ($inCore->do == 'view') {
+	if (!file_exists(PATH.'/components/'. $component .'/prss.php')) {
+            header('HTTP/1.0 404 Not Found');
+            header('HTTP/1.1 404 Not Found');
+            header('Status: 404 Not Found');
+            cmsCore::halt($_LANG['NOT_RSS_GENERATOR']);
+        }
 
-	if (!file_exists(PATH.'/components/'.$target.'/prss.php')){ cmsCore::halt($_LANG['NOT_RSS_GENERATOR']); }
+	cmsCore::loadLanguage('components/'. $component);
+	cmsCore::includeFile('components/'. $component .'/prss.php');
 
-	cmsCore::loadLanguage('components/'.$target);
-	cmsCore::includeFile('components/'.$target.'/prss.php');
-
-	$rssdata = call_user_func_array('rss_'.$target, array($item_id, $cfg));
-	if(!$rssdata){ cmsCore::halt($_LANG['NOT_RSS_GENERATOR']); }
+	$rssdata = call_user_func_array('rss_'. $component, array($item_id, cmsCore::m('rssfeed')->config));
+	if (!$rssdata){ cmsCore::halt($_LANG['NOT_RSS_GENERATOR']); }
 
 	$channel = $rssdata['channel'];
 	$items   = $rssdata['items'];
 
-	if ($cfg['addsite']) { $channel['title'] .= ' :: ' . $inConf->sitename; }
+	if (cmsCore::m('rssfeed')->config['addsite']) { $channel['title'] .= ' :: ' . cmsCore::c('config')->sitename; }
 	$channel['title'] = trim(htmlspecialchars(strip_tags($channel['title'])));
 
 	header('Content-Type: application/rss+xml; charset=utf-8');
 
 	$rss  = '<?xml version="1.0" encoding="utf-8" ?>' ."\n";
 	$rss .= '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">' ."\n";
-		$rss .= '<channel>' ."\n";
-			// Канал
-			$rss .= '<title>'.$channel['title'].'</title>' ."\n";
-			$rss .= '<link>'.$channel['link'].'</link>' ."\n";
-			$rss .= '<description><![CDATA['.trim(htmlspecialchars(strip_tags($channel['description']))).']]></description>' ."\n";
+        $rss .= '  <channel>' ."\n";
+        // Канал
+        $rss .= '    <title>'. $channel['title'] .'</title>' ."\n";
+        $rss .= '    <link>'. $channel['link'] .'</link>' ."\n";
+        $rss .= '    <description><![CDATA['. trim(htmlspecialchars(strip_tags($channel['description']))) .']]></description>' ."\n";
+        
+        if (cmsCore::m('rssfeed')->config['icon_on']) {
+            $rss .= '    <image>'."\n";
+            $rss .= '      <title>'.$channel['title'].'</title>'."\n";
+            $rss .= '      <url>'.cmsCore::m('rssfeed')->config['icon_url'].'</url>'."\n";
+            $rss .= '      <link>'.$channel['link'].'</link>'."\n";
+            $rss .= '    </image>'."\n";
+        }
 
-			if ($cfg['icon_on']){
-				$rss .= '<image>'."\n";
-					$rss .= '<title>'.$channel['title'].'</title>'."\n";
-					$rss .= '<url>'.$cfg['icon_url'].'</url>'."\n";
-					$rss .= '<link>'.$channel['link'].'</link>'."\n";
-				$rss .= '</image>'."\n";
-			}
-
-			// Содержимое канала
-			if (is_array($items) && $items){
-				foreach ($items as $key=>$item){
-					$rss .= '<item>' ."\n";
-						$rss .= '<title>'.trim(htmlspecialchars(strip_tags($item['title']))).'</title>' ."\n";
-						$rss .= '<pubDate>'.date('r', strtotime($item['pubdate'])+($inConf->timediff*3600)).'</pubDate>' ."\n";
-						$rss .= '<guid>'.$item['link'].'</guid>' ."\n";
-						$rss .= '<link>'.$item['link'].'</link>' ."\n";
-						if (@$item['description']){
-							$rss .= '<description><![CDATA['.$item['description'].']]></description>' ."\n";
-						}
-						$rss .= '<category>'.$item['category'].'</category>' ."\n";
-						$rss .= '<comments>'.$item['comments'].'</comments>' ."\n";
-						if (@$item['image']){
-							  $rss .= '<enclosure url="'.$item['image'].'" length="'.$item['size'].'" type="image/jpeg" />' ."\n";
-						}
-					$rss .= '</item>' ."\n";
-				}
-			}
-		$rss .= '</channel>' ."\n";
-	$rss .= '</rss>';
-
-	cmsCore::halt($rss);
-
+        // Содержимое канала
+        if (!empty($items)) {
+            if (is_array($items)) {
+                foreach ($items as $item){
+                    $rss .= '    <item>' ."\n";
+                    $rss .= '      <title>'.trim(htmlspecialchars(strip_tags($item['title']))).'</title>' ."\n";
+                    $rss .= '      <pubDate>'.date('r', strtotime($item['pubdate'])+(cmsCore::c('config')->timediff*3600)).'</pubDate>' ."\n";
+                    $rss .= '      <guid>'.$item['link'].'</guid>' ."\n";
+                    $rss .= '      <link>'.$item['link'].'</link>' ."\n";
+                    if (!empty($item['description'])) {
+                        $rss .= '      <description><![CDATA['.$item['description'].']]></description>' ."\n";
+                    }
+                    $rss .= '      <category>'.$item['category'].'</category>' ."\n";
+                    $rss .= '      <comments>'.$item['comments'].'</comments>' ."\n";
+                    if (!empty($item['image'])) {
+                        $rss .= '      <enclosure url="'.$item['image'].'" length="'.$item['size'].'" type="image/jpeg" />' ."\n";
+                    }
+                    $rss .= '    </item>' ."\n";
+                }
+            }
+        }
+        
+        $rss .= '  </channel>' ."\n";
+        $rss .= '</rss>';
+        
+        cmsCore::halt($rss);
+    }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-}
-
-?>

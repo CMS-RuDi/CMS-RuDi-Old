@@ -34,10 +34,11 @@ class cmsDatabase {
 // ============================================================================ //
 // ============================================================================ //
 
-    private function __construct(){
+    protected function __construct(){
         $this->db_link = self::initConnection();
         $this->db_prefix = cmsCore::c('config')->db_prefix .'_';
     }
+    
     public function __destruct(){
         mysqli_close($this->db_link);
     }
@@ -74,7 +75,7 @@ class cmsDatabase {
      * Устанавливает соединение с базой
      * @return resource $db_link
      */
-    private static function initConnection(){
+    protected static function initConnection(){
         $db_link = mysqli_connect(cmsCore::c('config')->db_host, cmsCore::c('config')->db_user, cmsCore::c('config')->db_pass, cmsCore::c('config')->db_base);
 
         if (mysqli_connect_errno()) {

@@ -11,16 +11,12 @@
 //                                                                            //
 /******************************************************************************/
 
-    function routes_rssfeed(){
-
-        $routes[] = array(
-                            '_uri'  => '/^rssfeed\/([a-z]+)\/(.+)$/i',
-                            1       => 'target',
-                            2       => 'item_id'
-                         );
-
-        return $routes;
-
-    }
-
-?>
+function routes_rssfeed() {
+    return array(
+        array(
+            '_uri' => '/^rssfeed\/([a-z]+)\/(.+)$/i',
+            1      => 'target',
+            2      => 'item_id'
+        )
+    );
+}

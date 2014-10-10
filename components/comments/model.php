@@ -14,21 +14,18 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 class cms_model_comments{
-
     private $childs;
-
-	public $is_can_delete    = false;
-	public $is_can_moderate  = false;
-	public $is_can_bbcode    = false;
-	public $is_can_add       = false;
+    public $is_can_delete    = false;
+    public $is_can_moderate  = false;
+    public $is_can_bbcode    = false;
+    public $is_can_add       = false;
     public $is_add_published = false;
 
-
-	public function __construct($labels=array()){
+    public function __construct($labels=array()) {
         $this->inDB   = cmsDatabase::getInstance();
-		$this->config = cmsCore::getInstance()->loadComponentConfig('comments');
-		cmsCore::loadLanguage('components/comments');
-		$this->labels = $labels ? $labels : self::getDefaultLabels();
+        $this->config = cmsCore::getInstance()->loadComponentConfig('comments');
+        cmsCore::loadLanguage('components/comments');
+        $this->labels = array_merge(self::getDefaultLabels(), $labels);
     }
 
 /* ==================================================================================================== */

@@ -83,7 +83,7 @@ class cmsPage {
      * Производит инициализацию класса шаблонизатора
      * @return obj $tpl_info['renderer']
      */
-    public static function initTemplate($tpl_folder, $tpl_file) {
+    public static function initTemplate($tpl_folder, $tpl_file, $data=null) {
         $thisObj = self::getInstance();
 
         // чтобы не перезаписать
@@ -112,8 +112,20 @@ class cmsPage {
             global $_LANG;
             cmsCore::halt(sprintf($_LANG['TEMPLATE_CLASS_NOTFOUND'], $tpl_info['renderer']));
         }
-
-        return new $tpl_info['renderer']($tpl_folder, $tpl_file);
+        
+        $render_class =  new $tpl_info['renderer']($tpl_folder, $tpl_file);
+        
+        if (!empty($data)) {
+            if (is_array($data)) {
+                foreach ($data as $k=>$v) {
+                    $render_class->assign($k, $v);
+                }
+            } else {
+                $render_class->assign('data', $data);
+            }
+        }
+        
+        return $render_class;
     }
     
     /**

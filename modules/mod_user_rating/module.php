@@ -11,29 +11,27 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_user_rating($module_id, $cfg){
+function mod_user_rating($module_id, $cfg) {
+    $cfg = array_merge(array(
+        'count' => 20,
+        'view_type' => 'rating'
+    ), $cfg);
+ 
+    if (!in_array($cfg['view_type'], array('karma', 'rating'))) {
+        $cfg['view_type'] = 'rating';
+    }
 
-    $inDB   = cmsDatabase::getInstance();
-    cmsCore::loadModel('users');
-    $model = new cms_model_users();
+    cmsCore::c('db')->orderBy($cfg['view_type'], 'DESC');
+    cmsCore::c('db')->limitPage(1, $cfg['count']);
 
-    if (!isset($cfg['count'])) { $cfg['count'] = 20; }
-    if (!isset($cfg['view_type'])) { $cfg['view_type'] = 'rating'; }
+    $users = cmsCore::m('users')->getUsers();
+    
+    cmsCore::c('db')->resetConditions();
 
-    if(!in_array($cfg['view_type'], array('karma', 'rating'))) { $cfg['view_type'] = 'rating'; }
-
-    $inDB->orderBy($cfg['view_type'], 'DESC');
-
-    $inDB->limitPage(1, $cfg['count']);
-
-    $users = $model->getUsers();
-
-    cmsPage::initTemplate('modules', 'mod_user_rating')->
-            assign('users', $users)->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('users', $users)->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }
-?>

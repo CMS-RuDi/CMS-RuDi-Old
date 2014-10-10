@@ -16,48 +16,65 @@ class cmsPlugin {
     protected $inCore;
     protected $inPage;
 
-    public $info;
-    public $events;
-    public $config;
+    public $info; // Информация о плагине
+    public $events; // События отлавливаемые плагином
+    public $config; // Массив настроек плагина
 
-    public function __construct(){
-
-        cmsCore::loadClass('page');
+    public function __construct() {
         $this->inCore = cmsCore::getInstance();
-        $this->inDB   = cmsDatabase::getInstance();
-        $this->inPage = cmsPage::getInstance();
-
+        $this->inDB   = cmsCore::c('db');
+        $this->inPage = cmsCore::c('page');
     }
 
     public function __clone() {}
-
-    public function install() {
-
-        return $this->inCore->installPlugin($this->info, $this->events, $this->config);
-
+    
+    /**
+     * Массив с элементами формы настроек плагина
+     * @return boolean|array
+     */
+    public function getConfigFields() {
+        return false;
     }
 
+    /**
+     * Процедура установки плагина
+     * @return boolean
+     */
+    public function install() {
+        return $this->inCore->installPlugin($this->info, $this->events, $this->config);
+    }
+
+    /**
+     * Процедура обновления плагина
+     * @return boolean
+     */
     public function upgrade() {
-
         return $this->inCore->upgradePlugin($this->info, $this->events, $this->config);
-
     }
     
+    /**
+     * Процедура удаления плагина
+     * @return boolean
+     */
     public function uninstall() {
-        
         return $this->inCore->removePlugin($this->info);
-        
     }
 
+    /**
+     * Обработка событий
+     * @param string $event идентификатор события
+     * @param array $item входные данные
+     * @return mixed в зависимости от события возвращает измененые данные или html
+     * код
+     */
     public function execute($event='', $item=array()) {
-
         $this->config = $this->inCore->loadPluginConfig( $this->info['plugin'] );
-
     }
 
+    /**
+     * Сохраняет настройки плагина
+     */
     public function saveConfig() {
-
         $this->inCore->savePluginConfig( $this->info['plugin'], $this->config );
-
     }
 }

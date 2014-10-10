@@ -1702,35 +1702,32 @@ class cmsCore {
      * @param int $rootid корневой элемент
      * @return html
      */
-    public function getListItemsNS($table, $selected=0, $differ='', $need_field='', $rootid=0, $no_padding=false){
+    public function getListItemsNS($table, $selected=array(), $differ='', $need_field='', $rootid=0, $no_padding=false){
         $html = '';
         $nested_sets = $this->nestedSetsInit($table);
 
         $lookup = "parent_id=0 AND NSDiffer='{$differ}'";
 
-        if(!$rootid) { $rootid = self::c('db')->get_field($table, $lookup, 'id'); }
+        if (!$rootid) { $rootid = self::c('db')->get_field($table, $lookup, 'id'); }
 
-        if(!$rootid) { return; }
+        if (!$rootid) { return; }
 
         $rs_rows = $nested_sets->SelectSubNodes($rootid);
 
-        if ($rs_rows){
-            while($node = self::c('db')->fetch_assoc($rs_rows)){
-                if (!$need_field || $node[$need_field]){
-                    if (@$selected==$node['id']){
-                        $s = 'selected="selected"';
-                    } else {
-                        $s = '';
-                    }
-                    if (!$no_padding){
-                        $padding = str_repeat('--', $node['NSLevel']) . ' ';
-                    } else {
-                        $padding = '';
-                    }
-                    $html .= '<option value="'.htmlspecialchars($node['id']).'" '.$s.'>'.$padding.$node['title'].'</option>';
+        if ($rs_rows) {
+            $selected = is_array($selected) ? $selected : array($selected);
+            
+            while($node = self::c('db')->fetch_assoc($rs_rows)) {
+                if (!$need_field || $node[$need_field]) {
+                    $s = in_array($node['id'], $selected) ? 'selected="selected"' : '';
+                    
+                    $padding = $no_padding ? '' : str_repeat('--', $node['NSLevel']) . ' ';
+
+                    $html .= '<option value="'.htmlspecialchars($node['id']).'" '.$s.'>'.$padding.$node['title'].'</option>' ."\n";
                 }
             }
         }
+        
         return $html;
     }
 
@@ -1873,11 +1870,11 @@ class cmsCore {
      * @param string $component
      * @return bool
      */
-    public function isComponentInstalled($component){
+    public function isComponentInstalled($component) {
         $is_installed = false;
 
-        foreach ($this->components as $inst_component){
-            if($inst_component['link'] == $component){
+        foreach ($this->components as $inst_component) {
+            if ($inst_component['link'] == $component) {
                 $is_installed = true; break;
             }
         }
@@ -2009,7 +2006,6 @@ class cmsCore {
      * @return bool
      */
     public static function setAccess($id, $showfor_list, $content_type){
-
         if (!sizeof($showfor_list)){ return true; }
 
         self::clearAccess($id, $content_type);
@@ -2634,7 +2630,7 @@ class cmsCore {
      * @param bool $is_cyr
      * @return str
      */
-    public static function generateCatSeoLink($category, $table, $is_cyr = false, $differ=''){
+public static function generateCatSeoLink($category, $table, $is_cyr = false, $differ=''){
         $seolink = '';
 
         $cat = self::c('db')->getNsCategory($table, $category['id']);

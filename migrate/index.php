@@ -138,12 +138,12 @@
                 'name' => 'content',
                 'unset_keys' => array( 'img_table' ),
                 'merge_cfgs' => array(
-                    'imgs_big_w'    => 300,
-                    'imgs_big_h'    => 300,
-                    'imgs_medium_w' => 200,
-                    'imgs_medium_h' => 200,
-                    'imgs_small_w'  => 100,
-                    'imgs_small_h'  => 100,
+                    'imgs_big_w'    => 1024,
+                    'imgs_big_h'    => 1024,
+                    'imgs_medium_w' => 600,
+                    'imgs_medium_h' => 600,
+                    'imgs_small_w'  => 200,
+                    'imgs_small_h'  => 200,
                     'resize_type'   => 'auto',
                     'mresize_type'  => 'auto',
                     'sresize_type'  => 'auto',
@@ -233,6 +233,8 @@
         $migrateDB->query();
         // Изменяем настройки компонентов если требуется
         $migrateDB->setComCfgs();
+        // Изменяем настройки модулей если требуется
+        $migrateDB->setModCfgs();
         
         if ($migrateDB->checkCreateField('is_lax')) {
             $result = cmsCore::c('db')->query("SELECT id, menu FROM cms_menu");
@@ -250,6 +252,69 @@
             cmsCore::c('db')->query("UPDATE `cms_plugins` SET `version` = '1.10.4' WHERE `plugin` = 'p_loginza'"); 
             echo '<p>Плагин "Авторизация Loginza" обновлен.</p>'; 
         }
+        
+        // --------- Обновляем настройки плагинов для CMS RuDi v0.0.8 ----------
+        // ---------- p_auto_forum ----------
+        $plg_config = cmsCore::c('db')->get_field('cms_plugins', "plugin='p_auto_forum'", 'config');
+        $plg_config = cmsCore::yamlToArray($plg_config);
+        if (!isset($plg_config['no_create_thread_cats'])) {
+            $plg_nconfig = array(
+                'delete_thread' => $plg_config['AF_DELETE_THREAD'],
+                'link_thread'   => $plg_config['AF_LINK_THREAD'],
+                'forum_id'      => $plg_config['AF_ADDTREADFORUM_ID'],
+                'no_create_thread_cats' => array_map('trim', explode(',', $plg_config['AF_NOCREATETREAD']))
+
+            );
+            $plg_nconfig = cmsCore::arrayToYaml($plg_nconfig);
+            cmsCore::c('db')->query("UPDATE cms_plugins SET config='". cmsCore::c('db')->escape_string($plg_nconfig) ."' WHERE plugin='p_auto_forum' LIMIT 1");
+        }
+        // ========== /p_auto_forum =========
+        // ---------- p_ckeditor ----------
+        $plg_config = cmsCore::c('db')->get_field('cms_plugins', "plugin='p_ckeditor'", 'config');
+        $plg_config = cmsCore::yamlToArray($plg_config);
+        if (!isset($plg_config['admin_skin'])) {
+            $plg_nconfig = array(
+                'inline'     => $plg_config['PCK_INLINE'],
+                'admin_skin' => $plg_config['PCK_ADMIN_SKIN'],
+                'user_skin'  => $plg_config['PCK_USER_SKIN']
+            );
+            $plg_nconfig = cmsCore::arrayToYaml($plg_nconfig);
+            cmsCore::c('db')->query("UPDATE cms_plugins SET config='". cmsCore::c('db')->escape_string($plg_nconfig) ."' WHERE plugin='p_ckeditor' LIMIT 1");
+        }
+        // ========== /p_ckeditor =========
+        // ---------- p_content_imgs ----------
+        $plg_config = cmsCore::c('db')->get_field('cms_plugins', "plugin='p_content_imgs'", 'config');
+        $plg_config = cmsCore::yamlToArray($plg_config);
+        if (!isset($plg_config['slider'])) {
+            $plg_nconfig = array(
+                'slider' => $plg_config['PCI_SLIDER'] .'__'. $plg_config['PCI_SLIDER_OPT']
+            );
+            $plg_nconfig = cmsCore::arrayToYaml($plg_nconfig);
+            cmsCore::c('db')->query("UPDATE cms_plugins SET config='". cmsCore::c('db')->escape_string($plg_nconfig) ."' WHERE plugin='p_content_imgs' LIMIT 1");
+        }
+        // ========== /p_content_imgs =========
+        //======================================================================
+        
+        // --------------- Добавляем всем модулям настройку tpl ----------------
+        $results = cmsCore::c('db')->query('SELECT id, content, config FROM cms_modules WHERE is_external = 1');
+        while ($mod = cmsCore::c('db')->fetch_assoc($results)) {
+            $mod['config'] = cmsCore::yamlToArray($mod['config']);
+            
+            if (empty($mod['config']['tpl'])) {
+                $mod['config']['tpl'] = $mod['content'];
+            }
+            
+            $mod['config'] = cmsCore::arrayToYaml($mod['config']);
+            
+            cmsCore::c('db')->update(
+                'cms_modules',
+                array(
+                    'config' => cmsCore::c('db')->escape_string($mod['config'])
+                ),
+                $mod['id']
+            );
+        }
+        //======================================================================
         
         // Оптимизируем таблицы в БД
         cmsDatabase::optimizeTables();

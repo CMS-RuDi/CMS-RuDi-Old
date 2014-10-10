@@ -144,7 +144,7 @@ function applet_content() {
             $article['description'] = cmsCore::request('description', 'html', '');
             $article['description'] = cmsCore::c('db')->escape_string($article['description']);
             $article['content']     = cmsCore::request('content', 'html', '');
-            $article['content']    	= cmsCore::c('db')->escape_string($article['content']);
+            $article['content']     = cmsCore::c('db')->escape_string($article['content']);
             $article['published']   = cmsCore::request('published', 'int', 0);
 
             $article['showdate']    = cmsCore::request('showdate', 'int', 0);
@@ -168,8 +168,10 @@ function applet_content() {
 
             $article['tpl']         = cmsCore::request('tpl', 'str', 'com_content_read');
 
-            $date = explode('.', $pubdate);
-            $article['pubdate'] = $date[2] .'-'. $date[1] .'-'. $date[0] .' '.  date('H:i');
+            if ($olddate != $pubdate) {
+                $date = explode('.', $pubdate);
+                $article['pubdate'] = $date[2] .'-'. $date[1] .'-'. $date[0] .' '.  date('H:i');
+            }
 
             $autokeys               = cmsCore::request('autokeys', 'int');
 
@@ -190,7 +192,7 @@ function applet_content() {
             cmsCore::m('content')->updateArticle($id, $article);
 
             if (!cmsCore::request('is_public', 'int', 0)) {
-                $showfor = $_REQUEST['showfor'];
+                $showfor = cmsCore::request('showfor', 'array_int', array());
                 cmsCore::setAccess($id, $showfor, 'material');
             } else {
                 cmsCore::clearAccess($id, 'material');
@@ -235,13 +237,13 @@ function applet_content() {
 
         $article['tags']        = cmsCore::request('tags', 'str');
 
-        $article['pubdate']     = $_REQUEST['pubdate'];
+        $article['pubdate']     = cmsCore::request('pubdate', 'str');
         $date                   = explode('.', $article['pubdate']);
         $article['pubdate']     = $date[2] .'-'. $date[1] .'-'. $date[0] .' '. date('H:i');
 
         $article['user_id']     = cmsCore::request('user_id', 'int', cmsCore::c('user')->id);
 
-        $article['tpl'] 	    = cmsCore::request('tpl', 'str', 'com_content_read');
+        $article['tpl']         = cmsCore::request('tpl', 'str', 'com_content_read');
 
         $autokeys               = cmsCore::request('autokeys', 'int');
 
@@ -262,10 +264,8 @@ function applet_content() {
         $article['id'] = cmsCore::m('content')->addArticle($article);
 
         if (!cmsCore::request('is_public', 'int', 0)) {
-            $showfor = $_REQUEST['showfor'];
-            if (count($showfor) > 0  && !cmsCore::request('is_public', 'int', 0)) {
-                cmsCore::setAccess($article['id'], $showfor, 'material');
-            }
+            $showfor = cmsCore::request('showfor', 'array_int', array());
+            cmsCore::setAccess($article['id'], $showfor, 'material');
         }
 
         $inmenu = cmsCore::request('createmenu', 'str', '');

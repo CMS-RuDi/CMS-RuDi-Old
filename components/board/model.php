@@ -23,19 +23,19 @@ class cms_model_board{
 /* ==================================================================================================== */
 /* ==================================================================================================== */
 
-	public function __construct(){
+    public function __construct(){
         $this->inDB        = cmsDatabase::getInstance();
-		$this->inCore      = cmsCore::getInstance();
-		$this->config      = $this->inCore->loadComponentConfig('board');
-		$this->root_cat    = $this->inDB->get_fields('cms_board_cats', 'parent_id=0', '*');
-		$this->category_id = cmsCore::request('category_id', 'int', $this->root_cat['id']);
-		$this->item_id     = cmsCore::request('id', 'int', 0);
-		$this->page        = cmsCore::request('page', 'int', 1);
-		$this->city        = cmsCore::getSearchVar('city');
-		$this->obtype      = cmsCore::getSearchVar('obtype');
-		$this->is_can_add_by_group   = cmsUser::isUserCan('board/add');
-		$this->is_moderator_by_group = cmsUser::isUserCan('board/moderate');
-		cmsCore::loadClass('form');
+        $this->inCore      = cmsCore::getInstance();
+        $this->config      = $this->inCore->loadComponentConfig('board');
+        $this->root_cat    = $this->inDB->get_fields('cms_board_cats', 'parent_id=0', '*');
+        $this->category_id = cmsCore::request('category_id', 'int', $this->root_cat['id']);
+        $this->item_id     = cmsCore::request('id', 'int', 0);
+        $this->page        = cmsCore::request('page', 'int', 1);
+        $this->city        = cmsCore::getSearchVar('city');
+        $this->obtype      = cmsCore::getSearchVar('obtype');
+        $this->is_can_add_by_group   = cmsUser::isUserCan('board/add');
+        $this->is_moderator_by_group = cmsUser::isUserCan('board/moderate');
+        cmsCore::loadClass('form');
     }
 
 /* ==================================================================================================== */

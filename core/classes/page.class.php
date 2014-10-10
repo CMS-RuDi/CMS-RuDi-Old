@@ -926,6 +926,8 @@ class cmsPage {
      * @return html
      */
     public static function getPagebar($total, $page, $perpage, $link, $params=array()) {
+        if (empty($total)) { return; }
+
         $pagebar = cmsCore::callEvent('GET_PAGEBAR', array($total, $page, $perpage, $link, $params));
 
         if (!is_array($pagebar) && $pagebar) { return $pagebar; }
@@ -941,7 +943,7 @@ class cmsPage {
 
         //used in the loop
         $max_links = $max + 1;
-        $current =1;
+        $current = 1;
 
         //if page is above max link
         if ($page > $max_links) {

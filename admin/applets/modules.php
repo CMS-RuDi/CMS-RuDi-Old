@@ -13,10 +13,8 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function cpModuleHasConfig($item) { 
-    if (file_exists('modules/'. $item['content'] .'/backend.php')) { return true; } 
-    if (file_exists('modules/'. $item['content'] .'/backend.xml')) { return true; } 
-    return false;
+function cpModuleHasConfig($item) {
+    return $item['is_external'] ? true : false;
 }
 
 function applet_modules() {
@@ -43,23 +41,19 @@ function applet_modules() {
 
         $xml_file = PATH .'/admin/modules/'. $module_name .'/backend.xml';
         $php_file = 'modules/'. $module_name .'/backend.php';
-
-        if (!file_exists($xml_file)) {
-            if (file_exists($php_file)) { include $php_file; return; }
-            cmsCore::halt();
+        
+        if (file_exists($php_file)) {
+            include $php_file;
+            return;
         }
-
+        
         $cfg = $inCore->loadModuleConfig($id);
-
-        cmsCore::loadClass('formgen');
-
-        $formGen = new cmsFormGen($xml_file, $cfg);
-
+        
         cpAddPathway($module_title, '?view=modules&do=edit&id='. $id);
-    	cpAddPathway($_LANG['AD_SETTINGS']);
+        cpAddPathway($_LANG['AD_SETTINGS']);
 
         echo '<h3>'. $module_title .'</h3>';
-
+        
         $toolmenu = array(
             array( 'icon' => 'save.gif', 'title' => $_LANG['SAVE'], 'link' => 'javascript:submitModuleConfig();' ),
             array( 'icon' => 'cancel.gif', 'title' => $_LANG['CANCEL'], 'link' => 'index.php?view=modules' ),
@@ -67,10 +61,38 @@ function applet_modules() {
         );
 
         cpToolMenu($toolmenu);
-
-        echo '<form action="index.php?view=modules&do=save_auto_config&id='. $id .'" method="post" name="optform" target="_self" id="optform">';
-        echo $formGen->getHTML();
-        echo '</form>';
+?>
+        <form action="index.php?view=modules&do=save_auto_config&id=<?php echo $id; ?>" method="post" name="optform" target="_self" id="optform">
+            <div class="panel panel-default" style="width:650px;">
+                <div class="panel-body">
+<?php
+        if (file_exists($xml_file)) {
+            cmsCore::loadClass('formgen');
+            $formGen = new cmsFormGen($xml_file, $cfg);
+            echo $formGen->getHTML();
+        } else {
+?>
+                    <div class="form-group">
+                        <label class="col-sm-5 control-label"><?php echo $_LANG['AD_MODULE_TEMPLATE']; ?></label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control" value="<?php echo $cfg['tpl']; ?>" />
+                        </div>
+                    </div>
+<?php
+        }
+?>
+                </div>
+                <div class="panel-footer">
+                    <input type="submit" name="save" class="btn btn-primary" value="<?php echo $_LANG['SAVE']; ?>" />
+                </div>
+            </div>
+        <script type="text/javascript">
+            function submitModuleConfig(){
+                $('#optform').submit();
+            }
+        </script>
+        </form>
+<?php
 
         return;
     }
@@ -93,29 +115,31 @@ function applet_modules() {
         if (cmsCore::inRequest('title_only')) { cmsCore::redirectBack(); }
 
         $xml_file = PATH .'/admin/modules/'. $module_name .'/backend.xml';
-        if (!file_exists($xml_file)) { cmsCore::halt(); }
+        if (file_exists($xml_file)) {
+            $cfg = array();
 
-        $cfg = array();
+            $backend = simplexml_load_file($xml_file);
 
-        $backend = simplexml_load_file($xml_file);
+            foreach ($backend->params->param as $param) {
+                $name    = (string)$param['name'];
+                $type    = (string)$param['type'];
+                $default = (string)$param['default'];
 
-        foreach ($backend->params->param as $param) {
-            $name    = (string)$param['name'];
-            $type    = (string)$param['type'];
-            $default = (string)$param['default'];
+                switch($param['type']) {
+                    case 'number': $value = cmsCore::request($name, 'int', $default); break;
+                    case 'string': $value = cmsCore::request($name, 'str', $default); break;
+                    case 'html': $value = cmsCore::request($name, 'html', $default); break;
+                    case 'flag': $value = cmsCore::request($name, 'int', 0); break;
+                    case 'list': $value = cmsCore::request($name, 'str', $default); break;
+                    case 'list_function': $value = cmsCore::request($name, 'str', $default); break;
+                    case 'list_db': $value = (is_array($_POST[$name]) ? cmsCore::request($name, 'array_str', $default) : cmsCore::request($name, 'str', $default)); break;
+                }
 
-            switch($param['type']) {
-                case 'number': $value = cmsCore::request($name, 'int', $default); break;
-                case 'string': $value = cmsCore::request($name, 'str', $default); break;
-                case 'html': $value = cmsCore::request($name, 'html', $default); break;
-                case 'flag': $value = cmsCore::request($name, 'int', 0); break;
-                case 'list': $value = cmsCore::request($name, 'str', $default); break;
-                case 'list_function': $value = cmsCore::request($name, 'str', $default); break;
-                case 'list_db': $value = (is_array($_POST[$name]) ? cmsCore::request($name, 'array_str', $default) : cmsCore::request($name, 'str', $default)); break;
+                $cfg[$name] = $value;
             }
-
-            $cfg[$name] = $value;
         }
+        
+        $cfg['tpl'] = cmsCore::request('tpl', 'str', $module_name);
 
         $inCore->saveModuleConfig($id, $cfg);
 
@@ -567,7 +591,7 @@ function applet_modules() {
                         <?php } ?>
                         
                         <?php if (!isset($mod['user']) || $mod['user'] == 1 || $do == 'add') { ?>
-                        <div class="form-group">
+                        <div id="user_div" class="form-group">
                             <label><?php echo $_LANG['AD_MODULE_CONTENT']; ?></label>
                             <div><?php insertPanel(); ?></div>
                             <div><?php $inCore->insertEditor('content', $mod['content'], '250', '100%'); ?></div>

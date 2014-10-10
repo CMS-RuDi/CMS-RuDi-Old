@@ -3,7 +3,7 @@
 //                                                                            //
 //                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
-//              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
@@ -11,31 +11,21 @@
 class p_captcha extends cmsPlugin {
     public function __construct() {
         parent::__construct();
-
-        $this->info['plugin']      = 'p_captcha';
-        $this->info['title']       = 'Captcha.ru';
-        $this->info['description'] = 'PHP Captcha с сайта Captcha.ru';
-        $this->info['author']      = 'Kruglov Sergei';
-        $this->info['version']     = '2.0';
-        $this->info['type']        = 'captcha';
-
-        $this->events[]            = 'INSERT_CAPTCHA';
-        $this->events[]            = 'CHECK_CAPTCHA';
+        
+        $this->info = array(
+            'plugin'      => 'p_captcha',
+            'title'       => 'Captcha.ru',
+            'description' => 'PHP Captcha с сайта Captcha.ru',
+            'author'      => 'Kruglov Sergei',
+            'version'     => '2.0',
+            'type'        => 'captcha'
+        );
+        
+        $this->events = array(
+            'INSERT_CAPTCHA',
+            'CHECK_CAPTCHA'
+        );
     }
-
-// ==================================================================== //
-
-    public function install() {
-        return parent::install();
-    }
-
-// ==================================================================== //
-
-    public function upgrade() {
-        return parent::upgrade();
-    }
-
-// ==================================================================== //
 
     public function execute($event='', $item=array()) {
         parent::execute();

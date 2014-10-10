@@ -144,8 +144,8 @@ class cms_model_blogs{
 /* ==================================================================================================== */
 
     public static function getBlogURL($bloglink, $page=1, $cat_id=0){
-        $cat_section  = ($cat_id >0 ? '/cat-'. $cat_id   : '');
-        $page_section = ($page   >1 ? '/page-'. $page    : '');
+        $cat_section  = ($cat_id > 0 ? '/cat-'. $cat_id   : '');
+        $page_section = ($page   > 1 ? '/page-'. $page    : '');
 
         return '/blogs/'. $bloglink . $cat_section . $page_section;
     }

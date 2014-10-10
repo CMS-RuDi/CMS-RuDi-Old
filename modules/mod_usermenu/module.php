@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_usermenu($module_id, $cfg){
+function mod_usermenu($module_id, $cfg) {
     $inCore = cmsCore::getInstance();
 
     $is_billing = $inCore->isComponentInstalled('billing');
@@ -19,7 +19,7 @@ function mod_usermenu($module_id, $cfg){
     $is_video   = $inCore->isComponentInstalled('video');
     $is_music   = $inCore->isComponentInstalled('music');
 
-    cmsPage::initTemplate('modules', 'mod_usermenu')->
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
         assign('avatar', cmsCore::c('user')->imageurl)->
         assign('nickname', cmsCore::c('user')->nickname)->
         assign('login', cmsCore::c('user')->login)->

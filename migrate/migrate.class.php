@@ -1,6 +1,6 @@
 <?php
 
-class migrateDB{
+class migrateDB {
     public $calls = array(
         'create_fields' => array(), 'change_fields' => array()
     );
@@ -10,11 +10,19 @@ class migrateDB{
         $this->cfg = $cfg;
     }
     
+    /**
+     * Проверяет было ли создано поле ранее
+     * @param string $field
+     * @return boolean
+     */
     public function checkCreateField($field) {
         if (empty($field)) { return false; }
         return in_array($field, $this->calls['create_fields']);
     }
 
+    /**
+     * Создает новое поле в таблице БД
+     */
     public function createFields() {
         if (!empty($this->cfg['create_fields'])) {
             foreach ($this->cfg['create_fields'] as $create_field) {
@@ -31,6 +39,9 @@ class migrateDB{
         }
     }
     
+    /**
+     * Изменяет тип поля таблицы БД
+     */
     public function changeFields() {
         if (!empty($this->cfg['change_fields'])) {
             foreach ($this->cfg['change_fields'] as $change_field) {
@@ -47,6 +58,9 @@ class migrateDB{
         }
     }
     
+    /**
+     * Удаляет индексы таблицы БД
+     */
     public function dropIndexes() {
         if (!empty($this->cfg['drop_indexes'])) {
             foreach ($this->cfg['drop_indexes'] as $drop_index) {
@@ -63,6 +77,9 @@ class migrateDB{
         }
     }
     
+    /**
+     * Создает индексы в таблице БД
+     */
     public function createIndexes() {
         if (!empty($this->cfg['create_indexes'])) {
             foreach ($this->cfg['create_indexes'] as $create_index) {
@@ -76,6 +93,9 @@ class migrateDB{
         }
     }
     
+    /**
+     * Вставляет новые строки в БД
+     */
     public function inserts() {
         if (!empty($this->cfg['inserts'])) {
             foreach ($this->cfg['inserts'] as $insert) {
@@ -104,6 +124,9 @@ class migrateDB{
         }
     }
 
+    /**
+     * Выполняет произвольные запросы в БД
+     */
     public function query() {
         if (!empty($this->cfg['queries'])) {
             foreach ($this->cfg['queries'] as $query) {
@@ -115,6 +138,9 @@ class migrateDB{
         }
     }
     
+    /**
+     * Обновляет конфигурацию компонентов
+     */
     public function setComCfgs() {
         if (!empty($this->cfg['com_cfgs'])) {
             $inCore = cmsCore::getInstance();
@@ -122,13 +148,53 @@ class migrateDB{
                 $com_cfg = $inCore->loadComponentConfig($com['name']);
                 if (!empty($com['unset_keys'])) {
                     foreach ($com['unset_keys'] as $key) {
-                        if (isset($com_cfg[$key])){ unset($com_cfg[$key]); }
+                        unset($com_cfg[$key]);
                     }
                 }
                 if (!empty($com['merge_cfgs'])) {
-                    $com_cfg = array_merge($com_cfg, $com['merge_cfgs']);
+                    $com_cfg = array_merge($com['merge_cfgs'], $com_cfg);
                 }
                 $inCore->saveComponentConfig($com['name'], $com_cfg);
+            }
+        }
+    }
+    
+    /**
+     * Обновляет конфигурацию модулей
+     */
+    public function setModCfgs() {
+        if (!empty($this->cfg['mod_cfgs'])) {
+            foreach ($this->cfg['mod_cfgs'] as $mod) {
+                $results = cmsCore::c('db')->query("SELECT id,config FROM cms_modules WHERE content='". $mod['name'] ."'");
+                
+                if (!cmsCore::c('db')->num_rows($results)) { continue; }
+                
+                while ($module = cmsCore::c('db')->fetch_assoc($results)) {
+                    if (!empty($module['config'])) {
+                        $module['config'] = cmsCore::yamlToArray($module['config']);
+                        
+                        if (!empty($mod['unset_keys'])) {
+                            foreach ($mod['unset_keys'] as $key) {
+                                unset($module['config'][$key]);
+                            }
+                        }
+                    } else {
+                        $module['config'] = array();
+                    }
+                    
+                    if (!empty($mod['merge_cfgs'])) {
+                        $module['config'] = array_merge($mod['merge_cfgs'], $module['config']);
+                    }
+                    
+                    $module['config'] = cmsCore::arrayToYaml($module['config']);
+                    cmsCore::c('db')->update(
+                        'cms_modules',
+                        array(
+                            'config' => cmsCore::c('db')->escape_string($module['config'])
+                        ),
+                        $module['id']
+                    );
+                }
             }
         }
     }

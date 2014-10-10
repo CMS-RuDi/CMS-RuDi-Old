@@ -3,16 +3,12 @@
 //                                                                            //
 //                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
-//              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
 
-
-
-$_LANG['PCI_SLIDER']     = 'Название карусели (слайдера) в котором будут отображаться загруженные изображения. Возможные значения: Elastislide';
-$_LANG['PCI_SLIDER_OPT'] = 'Режим карусели (слайдера). Подробная информация о режимах и список слайдеров можно прочитать на странице http://cmsrudi.ru/wiki/plugins/p_content_imgs';
-
-$_LANG['PCI_jCarousel_1']= 'jCarousel Слайдер с нумерацией';
-$_LANG['PCI_jCarousel_2']= 'jCarousel Слайдер с превьюшками';
-$_LANG['PCI_jCarousel_3']= 'jCarousel Карусель с увеличением в Colorbox';
+$_LANG['PCI_SLIDER']      = 'Слайдер';
+$_LANG['PCI_JCAROUSEL_1'] = 'jCarousel: С нумерацией';
+$_LANG['PCI_JCAROUSEL_2'] = 'jCarousel: С превьюшками';
+$_LANG['PCI_JCAROUSEL_3'] = 'jCarousel: С увеличением в Colorbox';

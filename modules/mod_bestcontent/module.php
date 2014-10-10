@@ -11,8 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_bestcontent($module_id, $cfg){
-    
+function mod_bestcontent($module_id, $cfg) {
     $cfg = array_merge(
         array(
             'shownum' => 5,
@@ -24,14 +23,14 @@ function mod_bestcontent($module_id, $cfg){
     
     cmsCore::c('db')->where("con.canrate = 1");
 
-    if($cfg['cat_id']){
-        if (!$cfg['subs']){
+    if ($cfg['cat_id']) {
+        if (!$cfg['subs']) {
             //выбираем из категории
             cmsCore::m('content')->whereCatIs($cfg['cat_id']);
         } else {
             //выбираем из категории и подкатегорий
             $rootcat = cmsCore::c('db')->getNsCategory('cms_category', $cfg['cat_id']);
-            if(!$rootcat) { return false; }
+            if (!$rootcat) { return false; }
             cmsCore::m('content')->whereThisAndNestedCats($rootcat['NSLeft'], $rootcat['NSRight']);
         }
     }
@@ -41,11 +40,10 @@ function mod_bestcontent($module_id, $cfg){
 
     $content_list = cmsCore::m('content')->getArticlesList();
 
-    cmsPage::initTemplate('modules', 'mod_bestcontent')->
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
         assign('articles', $content_list)->
         assign('cfg', $cfg)->
         display();
 
     return true;
 }
-?>

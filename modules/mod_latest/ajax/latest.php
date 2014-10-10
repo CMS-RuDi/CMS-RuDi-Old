@@ -11,21 +11,19 @@
 //                                                                            //
 /******************************************************************************/
 
-    define('PATH', $_SERVER['DOCUMENT_ROOT']);
-    include(PATH.'/core/ajax/ajax_core.php');
+define('PATH', $_SERVER['DOCUMENT_ROOT']);
+include(PATH .'/core/ajax/ajax_core.php');
 
-    cmsCore::loadLanguage('modules/mod_latest');
+cmsCore::loadLanguage('modules/mod_latest');
 
-    $module_id = cmsCore::request('module_id', 'int', '');
+$module_id = cmsCore::request('module_id', 'int', '');
 
-    if(!$module_id) { cmsCore::halt(); }
+if (!$module_id) { cmsCore::halt(); }
 
-    $cfg = $inCore->loadModuleConfig($module_id);
-    // номер страницы передаем через конфиг
-    $cfg['page'] = cmsCore::request('page', 'int', 1);
+$cfg = $inCore->loadModuleConfig($module_id);
+// номер страницы передаем через конфиг
+$cfg['page'] = cmsCore::request('page', 'int', 1);
 
-    cmsCore::includeFile('modules/mod_latest/module.php');
+cmsCore::includeFile('modules/mod_latest/module.php');
 
-    mod_latest($module_id, $cfg);
-
-?>
+mod_latest($module_id, $cfg);

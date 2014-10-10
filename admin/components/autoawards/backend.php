@@ -204,10 +204,10 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
                 <div class="form-group">
                     <label><?php echo $_LANG['AD_ENABLE_AWARD_CONFIRM']; ?></label>
                     <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                        <label class="btn btn-default active">
+                        <label class="btn btn-default <?php if (cmsCore::getArrVal($mod, 'published', false)) { echo 'active'; } ?>">
                             <input type="radio" name="published" <?php if (cmsCore::getArrVal($mod, 'published', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                         </label>
-                        <label class="btn btn-default ">
+                        <label class="btn btn-default <?php if (!cmsCore::getArrVal($mod, 'published', false)) { echo 'active'; } ?>">
                             <input type="radio" name="published" <?php if (!cmsCore::getArrVal($mod, 'published', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                         </label>
                     </div>

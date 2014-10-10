@@ -11,14 +11,11 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_template(){
-
-    cmsPage::initTemplate('modules', 'mod_template')->
-            assign('current_template', (isset($_SESSION['template']) ? $_SESSION['template'] : ''))->
-            assign('templates', cmsCore::getDirsList('/templates'))->
-            display();
+function mod_template($module_id, $cfg){
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('current_template', (isset($_SESSION['template']) ? $_SESSION['template'] : ''))->
+        assign('templates', cmsCore::getDirsList('/templates'))->
+        display();
 
     return true;
-
 }
-?>

@@ -11,33 +11,29 @@
 //                                                                            //
 /******************************************************************************/
 
-function fetchFiles($sql){
-
-    $inDB   = cmsDatabase::getInstance();
+function fetchFiles($sql) {
     $files  = array();
 
-    $result = $inDB->query($sql);
+    $result = cmsCore::c('db')->query($sql);
 
-    if ($inDB->num_rows($result)){
-        while($file = $inDB->fetch_assoc($result)){
-            $file['size']   = round(($file['filesize'] / 1024) / 1024, 2);
-            $files[]        = $file;
+    if (cmsCore::c('db')->num_rows($result)) {
+        while($file = cmsCore::c('db')->fetch_assoc($result)) {
+            $file['size'] = round(($file['filesize'] / 1024) / 1024, 2);
+            $files[]      = $file;
         }
     }
 
     return $files;
-
 }
 
-function mod_userfiles($module_id, $cfg){
-
-    $inDB = cmsDatabase::getInstance();
-
-    if (!isset($cfg['sw_stats']))       { $cfg['sw_stats']      = 1;  }
-    if (!isset($cfg['sw_latest']))      { $cfg['sw_latest']     = 1;  }
-    if (!isset($cfg['sw_popular']))     { $cfg['sw_popular']    = 1;  }
-    if (!isset($cfg['num_latest']))     { $cfg['num_latest']    = 5;  }
-    if (!isset($cfg['num_popular']))    { $cfg['num_popular']   = 5;  }
+function mod_userfiles($module_id, $cfg) {
+    $cfg = array_merge(array(
+        'sw_stats'    => 1,
+        'sw_latest'   => 1,
+        'sw_popular'  => 1,
+        'num_latest'  => 5,
+        'num_popular' => 5
+    ), $cfg);
 
     $latest     = array();
     $popular    = array();
@@ -45,69 +41,60 @@ function mod_userfiles($module_id, $cfg){
 
     //-------------------------- Новые файлы --------------------------------------
 
-    if ($cfg['sw_latest'] && $cfg['num_latest']){
-
+    if ($cfg['sw_latest'] && $cfg['num_latest']) {
         $sql = "SELECT f.*,
                        u.nickname as user_nickname, u.login as user_login
                 FROM cms_user_files f, cms_users u
                 WHERE f.user_id = u.id AND f.allow_who = 'all'
                 ORDER BY f.pubdate desc
-                LIMIT {$cfg['num_latest']}";
+                LIMIT ". $cfg['num_latest'];
 
         $latest = fetchFiles($sql);
-
     }
 
     //-------------------------- Популярные файлы ---------------------------------
 
-    if ($cfg['sw_popular'] && $cfg['num_popular']){
-
+    if ($cfg['sw_popular'] && $cfg['num_popular']) {
         $sql = "SELECT f.*,
                        u.nickname as user_nickname, u.login as user_login
                 FROM cms_user_files f, cms_users u
                 WHERE f.user_id = u.id AND f.allow_who = 'all'
                 ORDER BY f.hits desc
-                LIMIT {$cfg['num_popular']}";
+                LIMIT ". $cfg['num_popular'];
 
         $popular = fetchFiles($sql);
-
     }
 
     //----------------------------- Статистика ------------------------------------
 
-    if ($cfg['sw_stats']){
-
-        $stats['total_files']   = $inDB->rows_count('cms_user_files', "allow_who='all'");
-
-        $stats['total_size']    = 0;
+    if ($cfg['sw_stats']) {
+        $stats['total_files'] = cmsCore::c('db')->rows_count('cms_user_files', "allow_who='all'");
+        $stats['total_size']  = 0;
 
         $sql = "SELECT SUM(f.filesize) as bytes
                 FROM cms_user_files f
                 WHERE f.allow_who = 'all'";
 
-        $result = $inDB->query($sql);
+        $result = cmsCore::c('db')->query($sql);
 
-        if ($inDB->num_rows($result)){
-            $size                   = $inDB->fetch_assoc($result);
-            $stats['total_size']    = round(($size['bytes'] / 1024) / 1024, 2);
+        if (cmsCore::c('db')->num_rows($result)) {
+            $size                = cmsCore::c('db')->fetch_assoc($result);
+            $stats['total_size'] = round(($size['bytes'] / 1024) / 1024, 2);
         }
-
     }
 
     //-----------------------------------------------------------------------------
 
-    if (!$popular && !$latest){
+    if (!$popular && !$latest) {
         return false;
     }
 
-    cmsPage::initTemplate('modules', 'mod_userfiles')->
-            assign('latest', $latest)->
-            assign('popular', $popular)->
-            assign('stats', $stats)->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('latest', $latest)->
+        assign('popular', $popular)->
+        assign('stats', $stats)->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }
-?>

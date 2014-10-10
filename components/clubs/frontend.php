@@ -746,6 +746,8 @@ if ($do=='view_album'){
 
 	// Неопубликованные альбомы показываем только админам
 	if (!$album['published'] && !$inUser->is_admin) { return false; }
+        
+        if ($album['NSDiffer'] != 'club'. $album['user_id']) { return false; }
 
 	// получаем клуб
 	$club = $model->getClub($album['user_id']);

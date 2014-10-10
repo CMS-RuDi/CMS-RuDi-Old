@@ -12,61 +12,24 @@
 /******************************************************************************/
 
 class p_hidetext extends cmsPlugin {
-
-// ==================================================================== //
-
-    public function __construct(){
-
+    public function __construct() {
         parent::__construct();
+        
+        $this->info = array(
+            'plugin'      => 'p_hidetext',
+            'title'       => 'Скрытый текст',
+            'description' => 'Скрывает содержимое тега [hide] от незарегистрированных',
+            'author'      => 'InstantCMS Team',
+            'version'     => '1.12'
+        );
 
-        // Информация о плагине
-
-        $this->info['plugin']           = 'p_hidetext';
-        $this->info['title']            = 'Скрытый текст';
-        $this->info['description']      = 'Скрывает содержимое тега [hide] от незарегистрированных';
-        $this->info['author']           = 'InstantCMS Team';
-        $this->info['version']          = '1.12';
-
-        // События, которые будут отлавливаться плагином
-
-        $this->events[]                 = 'GET_POSTS';
-        $this->events[]                 = 'GET_POSTS_MODULE';
-        $this->events[]                 = 'GET_POST';
-        $this->events[]                 = 'GET_COMMENTS';
-        $this->events[]                 = 'GET_COMMENTS_MODULE';
-        $this->events[]                 = 'GET_COMMENT';
-        $this->events[]                 = 'GET_FORUM_POST';
-        $this->events[]                 = 'GET_FORUM_POSTS';
-        $this->events[]                 = 'GET_FORUM_POSTS_MODULE';
-        $this->events[]                 = 'GET_WALL_POSTS';
-
+        $this->events = array(
+            'GET_POSTS', 'GET_POSTS_MODULE', 'GET_POST',
+            'GET_COMMENTS', 'GET_COMMENTS_MODULE', 'GET_COMMENT',
+            'GET_FORUM_POST', 'GET_FORUM_POSTS', 'GET_FORUM_POSTS_MODULE',
+            'GET_WALL_POSTS'
+        );
     }
-
-// ==================================================================== //
-
-    /**
-     * Процедура установки плагина
-     * @return bool
-     */
-    public function install(){
-
-        return parent::install();
-
-    }
-
-// ==================================================================== //
-
-    /**
-     * Процедура обновления плагина
-     * @return bool
-     */
-    public function upgrade(){
-
-        return parent::upgrade();
-
-    }
-
-// ==================================================================== //
 
     /**
      * Обработка событий
@@ -74,11 +37,10 @@ class p_hidetext extends cmsPlugin {
      * @param mixed $item
      * @return mixed
      */
-    public function execute($event='', $item=array()){
-
+    public function execute($event='', $item=array()) {
         parent::execute();
 
-        switch ($event){
+        switch ($event) {
             case 'GET_POST': $item = $this->eventGetPost($item); break;
             case 'GET_POSTS': $item = $this->eventGetPosts($item); break;
             case 'GET_POSTS_MODULE': $item = $this->eventGetPosts($item, true); break;
@@ -92,86 +54,67 @@ class p_hidetext extends cmsPlugin {
         }
 
         return $item;
-
     }
 
-// ==================================================================== //
-
-    private function parseHide($text, $hidden = false){
-
-        $inUser = cmsUser::getInstance();
+    private function parseHide($text, $hidden = false) {
         global $_LANG;
 
         $pattern = '/\[hide(?:=?)([0-9]*)\](.*?)\[\/hide\]/sui';
 
         preg_match($pattern, $text, $matches);
 
-        if(!$matches){ return $text; }
+        if (!$matches) { return $text; }
 
-        if($hidden){
+        if ($hidden) {
             $replacement = '';
-        } else if (!$inUser->id){
-            $replacement = '<div class="bb_tag_hide">'.$_LANG['P_HIDE_TEXT'].'</div>';
+        } else if (!cmsCore::c('user')->id) {
+            $replacement = '<div class="bb_tag_hide">'. $_LANG['P_HIDE_TEXT'] .'</div>';
         } else {
-
-            if(!$matches[1]){
+            if (!$matches[1]) {
                 $replacement = '<div class="bb_tag_hide">${2}</div>';
-            } elseif($inUser->rating > $matches[1] || $inUser->is_admin) {
+            } else if (cmsCore::c('user')->rating > $matches[1] || cmsCore::c('user')->is_admin) {
                 $replacement = '<div class="bb_tag_hide">${2}</div>';
         } else {
                 $replacement = '<div class="bb_tag_hide">'.sprintf($_LANG['P_HIDE_TEXT_RATING'], cmsCore::spellCount($matches[1], $_LANG['P_ITEM1'], $_LANG['P_ITEM2'], $_LANG['P_ITEM10'])).'</div>';
             }
-
         }
-
+        
         return preg_replace($pattern, $replacement, $text);
-
     }
 
     private function eventGetPost($item) {
-
-        if (!is_array($item)){ return $item; }
+        if (!is_array($item)) { return $item; }
 
         $item['content_html'] = $this->parseHide($item['content_html']);
 
         return $item;
-
     }
 
     private function eventGetPosts($items, $hidden = false){
+        if (!is_array($items)) { return $items; }
 
-        if (!is_array($items)){ return $items; }
-
-        foreach($items as $i=>$item){
+        foreach($items as $i=>$item) {
             $items[$i]['content_html'] = $this->parseHide($item['content_html'], $hidden);
         }
 
         return $items;
     }
 
-    private function eventGetComments($items, $hidden = false){
+    private function eventGetComments($items, $hidden = false) {
+        if (!is_array($items)) { return $items; }
 
-        if (!is_array($items)){ return $items; }
-
-        foreach($items as $i=>$item){
+        foreach($items as $i=>$item) {
             $items[$i]['content'] = $this->parseHide($item['content'], $hidden);
         }
 
         return $items;
     }
 
-    private function eventGetComment($item){
-
-        if (!is_array($item)){ return $item; }
+    private function eventGetComment($item) {
+        if (!is_array($item)) { return $item; }
 
         $item['content'] = $this->parseHide($item['content']);
 
         return $item;
-
     }
-
-// ==================================================================== //
-
 }
-
-?>

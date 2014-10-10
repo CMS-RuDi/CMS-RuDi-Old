@@ -157,10 +157,10 @@ if ($opt == 'config') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_ENABLE_PHOTO_LOAD']; ?></label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if (cmsCore::getArrVal($cfg, 'img_on', false)) { echo 'active'; } ?>">
                         <input type="radio" name="img_on" <?php if (cmsCore::getArrVal($cfg, 'img_on', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'img_on', false)) { echo 'active'; } ?>">
                         <input type="radio" name="img_on" <?php if (!cmsCore::getArrVal($cfg, 'img_on', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -169,10 +169,10 @@ if ($opt == 'config') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_ENABLE_WATERMARK']; ?></label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if (cmsCore::getArrVal($cfg, 'watermark', false)) { echo 'active'; } ?>">
                         <input type="radio" name="watermark" <?php if (cmsCore::getArrVal($cfg, 'watermark', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'watermark', false)) { echo 'active'; } ?>">
                         <input type="radio" name="watermark" <?php if (!cmsCore::getArrVal($cfg, 'watermark', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -186,10 +186,10 @@ if ($opt == 'config') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_UPDATE_CALENDAR_DATA']; ?></label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if (cmsCore::getArrVal($cfg, 'update_date', false)) { echo 'active'; } ?>">
                         <input type="radio" name="update_date" <?php if (cmsCore::getArrVal($cfg, 'update_date', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'update_date', false)) { echo 'active'; } ?>">
                         <input type="radio" name="update_date" <?php if (!cmsCore::getArrVal($cfg, 'update_date', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -199,10 +199,10 @@ if ($opt == 'config') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_UPDATE_BLOG_LINK']; ?></label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if (cmsCore::getArrVal($cfg, 'update_seo_link_blog', false)) { echo 'active'; } ?>">
                         <input type="radio" name="update_seo_link_blog" <?php if (cmsCore::getArrVal($cfg, 'update_seo_link_blog', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'update_seo_link_blog', false)) { echo 'active'; } ?>">
                         <input type="radio" name="update_seo_link_blog" <?php if (!cmsCore::getArrVal($cfg, 'update_seo_link_blog', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -212,10 +212,10 @@ if ($opt == 'config') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_UPDATE_TITLE_LINK']; ?></label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if (cmsCore::getArrVal($cfg, 'update_seo_link', false)) { echo 'active'; } ?>">
                         <input type="radio" name="update_seo_link" <?php if (cmsCore::getArrVal($cfg, 'update_seo_link', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'update_seo_link', false)) { echo 'active'; } ?>">
                         <input type="radio" name="update_seo_link" <?php if (!cmsCore::getArrVal($cfg, 'update_seo_link', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -229,10 +229,10 @@ if ($opt == 'config') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_USE_LIMIT']; ?></label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if (cmsCore::getArrVal($cfg, 'min_karma', false)) { echo 'active'; } ?>">
                         <input type="radio" name="min_karma" <?php if (cmsCore::getArrVal($cfg, 'min_karma', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'min_karma', false)) { echo 'active'; } ?>">
                         <input type="radio" name="min_karma" <?php if (!cmsCore::getArrVal($cfg, 'min_karma', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>

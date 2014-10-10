@@ -11,58 +11,49 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_blogs($module_id, $cfg){
-    $inDB = cmsDatabase::getInstance();
-    $default_cfg = array (
-        'sort' => 'pubdate',
-        'owner' => 'user',
-        'shownum' => 5,
-        'minrate' => 0,
-        'blog_id' => 0,
-        'showrss' => 1
+function mod_blogs($module_id, $cfg) {
+    $cfg = array_merge(
+        array(
+            'sort'    => 'pubdate',
+            'owner'   => 'user',
+            'shownum' => 5,
+            'minrate' => 0,
+            'blog_id' => 0,
+            'showrss' => 1
+        ),
+        $cfg
     );
-    
-    $cfg = array_merge($default_cfg, $cfg);
-    
-    cmsCore::loadClass('blog');
-    $inBlog = cmsBlogs::getInstance();
-    $inBlog->owner = $cfg['owner'];
 
-    if($cfg['owner'] == 'club'){
-        cmsCore::loadModel('clubs');
-        $model = new cms_model_clubs();
-        $inDB->addSelect('b.user_id as bloglink');
-    }else{
-        cmsCore::loadModel('blogs');
-        $model = new cms_model_blogs();
+    cmsCore::c('blog')->owner = $cfg['owner'];
+
+    if ($cfg['owner'] == 'club') {
+        cmsCore::c('db')->addSelect('b.user_id as bloglink');
     }
 
     // получаем аватары владельцев
-    $inDB->addSelect('up.imageurl');
-    $inDB->addJoin('LEFT JOIN cms_user_profiles up ON up.user_id = u.id');
+    cmsCore::c('db')->addSelect('up.imageurl');
+    cmsCore::c('db')->addJoin('LEFT JOIN cms_user_profiles up ON up.user_id = u.id');
 
-    $inBlog->whereOnlyPublic();
+    cmsCore::c('blog')->whereOnlyPublic();
 
-    if($cfg['minrate']){
-        $inBlog->ratingGreaterThan($cfg['minrate']);
+    if ($cfg['minrate']) {
+        cmsCore::c('blog')->ratingGreaterThan($cfg['minrate']);
     }
 
-    if($cfg['blog_id']){
-        $inBlog->whereBlogIs($cfg['blog_id']);
+    if ($cfg['blog_id']) {
+        cmsCore::c('blog')->whereBlogIs($cfg['blog_id']);
     }
 
-    $inDB->orderBy('p.'.$cfg['sort'], 'DESC');
+    cmsCore::c('db')->orderBy('p.'.$cfg['sort'], 'DESC');
+    cmsCore::c('db')->limit($cfg['shownum']);
 
-    $inDB->limit($cfg['shownum']);
+    $posts = cmsCore::c('blog')->getPosts(false, cmsCore::m( $cfg['owner'] == 'club' ? 'clubs' : 'blogs' ));
+    if (!$posts) { return false; }
 
-    $posts = $inBlog->getPosts(false, $model);
-    if(!$posts){ return false; }
-
-    cmsPage::initTemplate('modules', 'mod_blogs')->
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
         assign('posts', $posts)->
         assign('cfg', $cfg)->
         display();
 
     return true;
 }
-?>

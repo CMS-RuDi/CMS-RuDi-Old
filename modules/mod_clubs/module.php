@@ -11,32 +11,28 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_clubs($module_id, $cfg){
+function mod_clubs($module_id, $cfg) {
+    $cfg = array_merge(array(
+        'count'      => 5,
+        'type'       => 'id',
+        'vip_on_top' => 1
+    ), $cfg);
 
-	$inDB = cmsDatabase::getInstance();
+    if ($cfg['vip_on_top']) {
+        cmsCore::c('db')->orderBy('is_vip', 'DESC, c.'. $cfg['type'] .' DESC');
+    } else {
+        cmsCore::c('db')->orderBy('c.'. $cfg['type'], 'DESC');
+    }
+    
+    cmsCore::c('db')->limit($cfg['count']);
 
-	if (!isset($cfg['count'])) { $cfg['count'] = 5; }
-	if (!isset($cfg['type'])) { $cfg['type'] = 'id'; }
-	if (!isset($cfg['vip_on_top'])) { $cfg['vip_on_top'] = 1; }
+    $clubs = cmsCore::m('clubs')->getClubs();
+    
+    if (!$clubs) { return false; }
 
-    cmsCore::loadModel('clubs');
-    $model = new cms_model_clubs();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('clubs', $clubs)->
+        display();
 
-	if($cfg['vip_on_top']){
-		$inDB->orderBy('is_vip', 'DESC, c.'.$cfg['type'].' DESC');
-	} else {
-		$inDB->orderBy('c.'.$cfg['type'], 'DESC');
-	}
-	$inDB->limit($cfg['count']);
-
-    $clubs = $model->getClubs();
-	if(!$clubs){ return false; }
-
-	cmsPage::initTemplate('modules', 'mod_clubs')->
-            assign('clubs', $clubs)->
-            display();
-
-	return true;
-
+    return true;
 }
-?>

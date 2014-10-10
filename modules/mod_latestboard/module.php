@@ -11,45 +11,46 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_latestboard($module_id, $cfg){
+function mod_latestboard($module_id, $cfg) {
+    $cfg = array_merge(array(
+        'shownum' => 5,
+        'onlyvip' => 0,
+        'butvip'  => 0,
+        'cat_id'  => 0,
+        'subs'    => 0
+    ), $cfg);
 
     $inDB = cmsDatabase::getInstance();
 
-    cmsCore::loadModel('board');
-    $model = new cms_model_board();
-
-    if (!isset($cfg['shownum'])){ $cfg['shownum'] = 5; }
-    if (!isset($cfg['onlyvip'])){ $cfg['onlyvip'] = 0; }
-    if (!isset($cfg['butvip'])){ $cfg['butvip'] = 0; }
-
-    if (@$cfg['cat_id']) {
-        if (!@$cfg['subs']){
-            $model->whereCatIs($cfg['cat_id']);
+    if ($cfg['cat_id']) {
+        if (!$cfg['subs']) {
+            cmsCore::m('board')->whereCatIs($cfg['cat_id']);
         } else {
-            $cat = $inDB->get_fields('cms_board_cats', "id='{$cfg['cat_id']}'", 'NSLeft, NSRight');
-            if(!$cat) { return false; }
-            $model->whereThisAndNestedCats($cat['NSLeft'], $cat['NSRight']);
+            $cat = cmsCore::c('db')->get_fields('cms_board_cats', "id='". $cfg['cat_id'] ."'", 'NSLeft, NSRight');
+            if (!$cat) { return false; }
+            cmsCore::m('board')->whereThisAndNestedCats($cat['NSLeft'], $cat['NSRight']);
         }
     }
+    
     // только ВИП
-    if($cfg['onlyvip'] && !$cfg['butvip']){
-        $model->whereVip(1);
+    if($cfg['onlyvip'] && !$cfg['butvip']) {
+        cmsCore::m('board')->whereVip(1);
     }
+    
     // кроме ВИП
-    if($cfg['butvip'] && !$cfg['onlyvip']){
-        $model->whereVip(0);
+    if($cfg['butvip'] && !$cfg['onlyvip']) {
+        cmsCore::m('board')->whereVip(0);
     }
-    $inDB->orderBy('i.is_vip', 'DESC, i.pubdate DESC');
-    $inDB->limitPage(1, $cfg['shownum']);
+    
+    cmsCore::c('db')->orderBy('i.is_vip', 'DESC, i.pubdate DESC');
+    cmsCore::c('db')->limitPage(1, $cfg['shownum']);
 
-    $items = $model->getAdverts(false, true, false, true);
+    $items = cmsCore::m('board')->getAdverts(false, true, false, true);
 
-    cmsPage::initTemplate('modules', 'mod_latestboard')->
-            assign('items', $items)->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('items', $items)->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }
-?>

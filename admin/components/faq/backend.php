@@ -489,7 +489,7 @@ if ($opt == 'add_cat' || $opt == 'edit_cat') {
         <div class="form-group">
             <label><?php echo $_LANG['AD_PARENT_CATEGORY']; ?>:</label>
             <select class="form-control" name="parent_id">
-                <option value="0" <?php if (!isset($mod['parent_id'])||@$mod['parent_id']==0){ echo 'selected'; } ?>>--</option>
+                <option value="0" <?php if (cmsCore::getArrVal($mod, 'parent_id', 0) == 0) { echo 'selected="selected"'; } ?>>--</option>
                 <?php echo $inCore->getListItems('cms_faq_cats', cmsCore::getArrVal($mod, 'parent_id', 0)); ?>
             </select>
         </div>

@@ -41,17 +41,20 @@ class cmsFormGen {
         // подключим LANG файл для модуля
         cmsCore::loadLanguage('admin/modules/'.(string)$this->xml->module->id);
 
-        foreach($this->xml->params->param as $p){
-
+        foreach($this->xml->params->param as $p){       
             $param = array();
             // заполняем атрибутами массив и приводим к строке значения
             foreach($p->attributes() as $key => $value) {
                 $param[$key] = (string)$value;
             }
+            
+            if ($param['name'] == 'tpl') {
+                continue;
+            }
+            
             // Если есть элементы списка
-            if (isset($p->option)){
-
-                foreach($p->option as $o){
+            if (isset($p->option)) {
+                foreach($p->option as $o) {
                     $opt = array();
                     foreach($o->attributes() as $k => $v) {
                         $opt[$k] = (string)$v;
@@ -89,6 +92,16 @@ class cmsFormGen {
 
             $this->params[] = $param;
         }
+        
+        $param = array(
+            'type'  => 'string',
+            'title' => $_LANG['AD_MODULE_TEMPLATE'],
+            'name'  => 'tpl',
+            'value' => $this->getParamValue('tpl', ''),
+        );
+        $param['html']  = $this->getParamHTML($param);
+        
+        $this->params[] = $param;
 
         return;
     }
@@ -238,11 +251,9 @@ class cmsFormGen {
 
             $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="form-control">' . "\n";
 
-            if (isset($param['tag_option'])){
-                foreach($param['tag_option'] as $option){
-
-                    $html .= "\t" . '<option value="'.htmlspecialchars($option['value']).'" '.($param['value'] == $option['value'] ? 'selected="selected"' : '').'>'.$option['title'].'</option>' . "\n";
-
+            if (isset($param['tag_option'])) {
+                foreach($param['tag_option'] as $option) {
+                    $html .= "\t" . '<option value="'.htmlspecialchars($option['value']).'" '.($param['value'] == $option['value'] ? 'selected="selected"' : '').'>'. $option['title'] .'</option>' . "\n";
                 }
             }
 

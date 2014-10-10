@@ -1056,7 +1056,7 @@ $this->logout();
             case 'all':        	$access = true; break;
             case 'registered': 	$access = $inUser->id ? true : false; break;
             case 'nobody':      $access = $inUser->id == $user_id ? true : false; break;
-            case 'friends':		$access = $inUser->isFriend($user_id); break;
+            case 'friends':	$access = $inUser->isFriend($user_id); break;
             default: $access = false;
         }
 

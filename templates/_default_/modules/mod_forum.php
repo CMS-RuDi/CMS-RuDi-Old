@@ -5,7 +5,7 @@
             <td width="13">
                 <img src="/templates/<?php echo cmsCore::c('config')->template; ?>/images/icons/user_comment.png" border="0" />
             </td>
-            <td style="padding-left:0px"><?php echo $thread['last_msg_array']['user_link']; if ($thread['last_msg_array']['post_count'] == 1) { echo $_LANG['FORUM_START_THREAD']; } else {  } ?><?php echo $_LANG['FORUM_REPLY_THREAD']; ?> &laquo;<?php echo $thread['last_msg_array']['thread_link']; ?>&raquo;
+            <td style="padding-left:0px"><?php echo $thread['last_msg_array']['user_link']; if ($thread['last_msg_array']['post_count'] == 1) { echo $_LANG['FORUM_START_THREAD']; } else { echo $_LANG['FORUM_REPLY_THREAD']; } ?> &laquo;<?php echo $thread['last_msg_array']['thread_link']; ?>&raquo;
             <?php if ($cfg['showforum']) { echo $_LANG['FORUM_ON_FORUM']; ?> &laquo;<a href="/forum/{$thread.forum_id}">{$thread.forum_title}</a>&raquo;<?php } ?>
             </td>
         </tr>

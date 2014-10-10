@@ -16,15 +16,12 @@ function mod_menu($module_id, $cfg) {
     $menuid      = $inCore->menuId();
     $full_menu   = $inCore->getMenuStruct();
 
-    $cfg = array_merge(
-        array(
-            'menu' => 'mainmenu',
-            'show_home' => 1,
-            'is_sub_menu' => 0,
-            'tpl' => 'mod_menu'
-        ),
-        is_array($cfg) ? $cfg : array()
-    );
+    $cfg = array_merge(array(
+        'menu' => 'mainmenu',
+        'show_home' => 1,
+        'is_sub_menu' => 0,
+        'tpl' => 'mod_menu'
+    ), $cfg);
     
     // текущий пункт меню
     $currentmenu = isset($full_menu[$menuid]) ? $full_menu[$menuid] : array();

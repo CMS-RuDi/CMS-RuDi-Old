@@ -11,45 +11,43 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_comments($module_id, $cfg){
+function mod_comments($module_id, $cfg) {
+    $cfg = array_merge(array(
+        'showrss' => 1,
+        'minrate' => 0,
+        'showguest' => 0
+    ), $cfg);
 
-	$inDB   = cmsDatabase::getInstance();
-	$inUser = cmsUser::getInstance();
+    if (empty($cfg['targets'])) { return true; }
 
-	if (!isset($cfg['showrss'])) { $cfg['showrss'] = 1;}
-	if (!isset($cfg['minrate'])) { $cfg['minrate'] = 0;}
-	if (!isset($cfg['showguest'])) { $cfg['showguest'] = 0;}
-	if (!sizeof($cfg['targets'])){ return true; }
+    cmsCore::m('comments')->initAccess();
 
-	cmsCore::loadModel('comments');
-	$model = new cms_model_comments();
-	$model->initAccess();
+    // Комментарии только нужного назначения
+    cmsCore::m('comments')->whereTargetIn($cfg['targets']);
+    
+    // Если не показывать гостей, добавляем условие
+    if (!$cfg['showguest']) { cmsCore::m('comments')->whereOnlyUsers(); }
+    
+    // Администраторам и админам показываем все комментарии
+    if (!(cmsCore::c('user')->is_admin || cmsCore::m('comments')->is_can_moderate)) {
+        cmsCore::m('comments')->whereIsShow();
+    }
+    
+    // Комментарии в зависимости от рейтинга
+    if ($cfg['minrate'] <> 0) {
+        cmsCore::m('comments')->whereRatingOver($cfg['minrate']);
+    }
 
-	// Комментарии только нужного назначения
-	$model->whereTargetIn($cfg['targets']);
-	// Если не показывать гостей, добавляем условие
-	if(!$cfg['showguest']){ $model->whereOnlyUsers(); }
-	// Администраторам и админам показываем все комментарии
-	if(!($inUser->is_admin || $model->is_can_moderate)){
-		$model->whereIsShow();
-	}
-	// Комментарии в зависимости от рейтинга
-	if($cfg['minrate'] <> 0){
-		$model->whereRatingOver($cfg['minrate']);
-	}
+    cmsCore::c('db')->orderBy('c.pubdate', 'DESC');
+    cmsCore::c('db')->limitPage(1, $cfg['shownum']);
 
-	$inDB->orderBy('c.pubdate', 'DESC');
-	$inDB->limitPage(1, $cfg['shownum']);
+    $comments = cmsCore::m('comments')->getComments(true, false, true);
+    if (!$comments) { return false; }
 
-	$comments = $model->getComments(true, false, true);
-	if(!$comments) { return false; }
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('comments', $comments)->
+        assign('cfg', $cfg)->
+        display();
 
-	cmsPage::initTemplate('modules', 'mod_comments')->
-            assign('comments', $comments)->
-            assign('cfg', $cfg)->
-            display();
-
-	return true;
-
+    return true;
 }
-?>

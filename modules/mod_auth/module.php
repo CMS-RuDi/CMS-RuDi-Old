@@ -11,19 +11,14 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_auth($module_id, $cfg){
-
-    $inUser = cmsUser::getInstance();
-
-    if ($inUser->id){ return false; }
+function mod_auth($module_id, $cfg) {
+    if (cmsCore::c('user')->id) { return false; }
 
     cmsUser::sessionPut('auth_back_url', cmsCore::getBackURL());
 
-    cmsPage::initTemplate('modules', 'mod_auth')->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }
-?>

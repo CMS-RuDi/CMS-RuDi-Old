@@ -12,50 +12,73 @@
 /******************************************************************************/
 
 class p_loginza extends cmsPlugin {
-    public function __construct(){
+    public function __construct() {
         parent::__construct();
 
         // Информация о плагине
-        $this->info['plugin']      = 'p_loginza';
-        $this->info['title']       = 'Авторизация Loginza';
-        $this->info['description'] = 'Позволяет посетителям авторизоваться на сайте, используя аккаунты популярных социальных сетей';
-        $this->info['author']      = 'InstantCMS Team';
-        $this->info['version']     = '1.10.4';
+        $this->info = array(
+            'plugin'      => 'p_loginza',
+            'title'       => 'Авторизация Loginza',
+            'description' => 'Позволяет посетителям авторизоваться на сайте, используя аккаунты популярных социальных сетей',
+            'author'      => 'InstantCMS Team',
+            'version'     => '1.10.4'
+        );
 
         // Настройки по-умолчанию
-        $this->config['PL_PROVIDERS'] = 'vkontakte,facebook,mailruapi,google,yandex,openid,twitter,webmoney,rambler,flickr,mailru,loginza,myopenid,lastfm,verisign,aol,steam';
-        $this->config['PL_LANG']      = 'ru';
+        $this->config = array(
+            'PL_PROVIDERS' => 'vkontakte,facebook,mailruapi,google,yandex,openid,twitter,webmoney,rambler,flickr,mailru,loginza,myopenid,lastfm,verisign,aol,steam',
+            'PL_LANG'      => 'ru'
+        );
 
         // События, которые будут отлавливаться плагином
-        $this->events[] = 'LOGINZA_BUTTON';
-        $this->events[] = 'LOGINZA_AUTH';
+        $this->events = array(
+            'LOGINZA_BUTTON',
+            'LOGINZA_AUTH'
+        );
     }
-
-// ==================================================================== //
+    
+    public function getConfigFields() {
+        global $_LANG;
+        return array(
+            array(
+                'type' => 'textarea',
+                'title' => $_LANG['PL_PROVIDERS'],
+                'name' => 'PL_PROVIDERS'
+            ),
+            array(
+                'type' => 'select',
+                'title' => $_LANG['PL_LANG'],
+                'name' => 'PL_LANG',
+                'options' => array(
+                    'title' => 'RU', 'value' => 'ru',
+                    'title' => 'UK', 'value' => 'uk',
+                    'title' => 'BE', 'value' => 'be',
+                    'title' => 'FR', 'value' => 'fr',
+                    'title' => 'EN', 'value' => 'en'
+                )
+            )
+        );
+    }
 
     /**
      * Процедура установки плагина
      * @return bool
      */
-    public function install(){
-        if (!cmsCore::c('db')->isFieldExists('cms_users', 'openid')){
+    public function install() {
+        if (!cmsCore::c('db')->isFieldExists('cms_users', 'openid')) {
             cmsCore::c('db')->query("ALTER TABLE `cms_users` ADD `openid` VARCHAR( 250 ) NULL, ADD INDEX ( `openid` )");
         }
         return parent::install();
     }
 
-// ==================================================================== //
-
     /**
      * Процедура обновления плагина
      * @return bool
      */
-    public function upgrade(){
+    public function upgrade() {
         cmsCore::c('db')->query("UPDATE `cms_users` SET `openid` = MD5(openid) WHERE `openid` IS NOT NULL");
         return parent::upgrade();
     }
-
-// ==================================================================== //
 
     /**
      * Обработка событий
@@ -63,22 +86,20 @@ class p_loginza extends cmsPlugin {
      * @param mixed $item
      * @return mixed
      */
-    public function execute($event='', $item=array()){
+    public function execute($event='', $item=array()) {
         parent::execute();
         
-        if (cmsCore::m('registration')->config['reg_type'] == 'invite'){
+        if (cmsCore::m('registration')->config['reg_type'] == 'invite') {
             return true;
         }
 
-        switch ($event){
+        switch ($event) {
             case 'LOGINZA_BUTTON':  $item = $this->showLoginzaButton(); break;
             case 'LOGINZA_AUTH':    $item = $this->loginzaAuth(); break;
         }
 
         return true;
     }
-
-// ==================================================================== //
 
     private function showLoginzaButton() {
         global $_LANG;
@@ -93,14 +114,11 @@ class p_loginza extends cmsPlugin {
         echo $html;
 
         return;
-
     }
 
-// ==================================================================== //
-
-    private function loginzaAuth(){
+    private function loginzaAuth() {
         $token = cmsCore::request('token', 'str', '');
-        if (!$token){ cmsCore::error404(); }
+        if (!$token) { cmsCore::error404(); }
 
         // получение профиля
         $profile = $this->request('http://loginza.ru/api/authinfo?token=?token='. $token);
@@ -114,12 +132,12 @@ class p_loginza extends cmsPlugin {
         $user_id = $this->getUserByIdentity($profile->identity);
 
         // если пользователя нет, создаем
-        if (!$user_id){
+        if (!$user_id) {
             $user_id = $this->createUser($profile);
         }
 
         // если пользователь уже был или успешно создан, авторизуем
-        if ($user_id){
+        if ($user_id) {
             $user = cmsCore::c('db')->get_fields('cms_users', "id = '". $user_id ."'", 'login, password');
             if (!$user) { cmsCore::error404(); }
 
@@ -131,8 +149,6 @@ class p_loginza extends cmsPlugin {
         // если авторизация не удалась, редиректим на сообщение об ошибке
         cmsCore::redirect('/auth/error.html');
     }
-
-// ==================================================================== //
 
     private function createUser($profile) {
         $inCore = cmsCore::getInstance();
@@ -173,7 +189,6 @@ class p_loginza extends cmsPlugin {
             // не указано вообще ничего
             $max = cmsCore::c('db')->get_fields('cms_users', 'id>0', 'id', 'id DESC');
             $nickname = $login = 'user' . ($max['id'] + 1);
-
         }
 
         // генерируем пароль 
@@ -216,13 +231,13 @@ class p_loginza extends cmsPlugin {
         $user_array['id'] = $user_id = cmsCore::c('db')->insert('cms_users', $user_array);
 
         // создаем профиль пользователя
-        if ($user_id){
+        if ($user_id) {
             $filename = 'nopic.jpg';
 
             // если есть аватар, пробуем скачать
-            if (!empty($profile->photo) || !empty($advanced['photo'])){
+            if (!empty($profile->photo) || !empty($advanced['photo'])) {
                 $photo_path = $this->downloadAvatar((!empty($advanced['photo']) ? $advanced['photo'] : $profile->photo));
-                if ($photo_path){
+                if ($photo_path) {
                     cmsCore::includeGraphics();
 
                     $uploaddir 		= PATH .'/images/users/avatars/';
@@ -269,9 +284,7 @@ class p_loginza extends cmsPlugin {
         return false;
     }
 
-// ==================================================================== //
-
-    private function downloadAvatar($url){
+    private function downloadAvatar($url) {
         $tempfile = PATH.'/images/users/avatars/'.md5(session_id()).'.jpg';
 
         if (function_exists('curl_init')) {
@@ -300,13 +313,9 @@ class p_loginza extends cmsPlugin {
         }
     }
 
-// ==================================================================== //
-
-    private function getUserByIdentity($identity){
+    private function getUserByIdentity($identity) {
         return cmsCore::c('db')->get_field('cms_users', "openid='". md5($identity) ."'", 'id');
     }
-
-// ==================================================================== //
 
     private function request($url) {
         if (function_exists('curl_init')) {
@@ -336,7 +345,4 @@ class p_loginza extends cmsPlugin {
         )));
         return $r ? current($r->response) : false;
     }
-
-// ==================================================================== //
-
 }

@@ -44,7 +44,7 @@ function applet_components() {
     $id   = cmsCore::request('id', 'int', 0);
     $link = cmsCore::request('link', 'str', '');
     
-    if ($link) { $_REQUEST['id'] = $id = $inCore->getComponentId($link); }
+    if (!empty($link)) { $_REQUEST['id'] = $id = $inCore->getComponentId($link); }
 
     if ($do != 'list') {
         $com = $inCore->getComponent($id);

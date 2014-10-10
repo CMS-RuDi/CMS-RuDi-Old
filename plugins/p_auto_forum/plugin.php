@@ -12,72 +12,64 @@
 /******************************************************************************/
 
 class p_auto_forum extends cmsPlugin {
-
-// ==================================================================== //
-
     public function __construct() {
-
         parent::__construct();
-
-        // Информация о плагине
-        $this->info['plugin']      = 'p_auto_forum';
-        $this->info['title']       = 'Автофорум';
-        $this->info['description'] = 'Создает тему на форуме для обсуждения статьи';
-        $this->info['author']      = 'InstantCMS Team';
-        $this->info['version']     = '1.1';
-
-        // Настройки по-умолчанию
-        // Ключи массива должны быть латиницей в верхнем регистре
-        // если вы хотите, чтобы название опций было на нужном вам языке
-        // создайте соответствующий lang файл, например /languages/ru/plugins/p_auto_forum.php
-        // ключи языковых переменных должны совпадать с ключами массива конфигурации
-        $this->config['AF_DELETE_THREAD']    = 1;
-        $this->config['AF_LINK_TREAD']       = 1;
-        $this->config['AF_ADDTREADFORUM_ID'] = 0;
-        $this->config['AF_NOCREATETREAD']    = 0;
-
-        // События, которые будут отлавливаться плагином
-        $this->events[] = 'DELETE_ARTICLE';
-        $this->events[] = 'GET_ARTICLE';
-        $this->events[] = 'ADD_ARTICLE_DONE';
-        $this->events[] = 'UPDATE_ARTICLE';
-
+        
+        $this->info = array(
+            'plugin'      => 'p_auto_forum',
+            'title'       => 'Автофорум',
+            'description' => 'Создает тему на форуме для обсуждения статьи',
+            'author'      => 'InstantCMS Team',
+            'version'     => '1.1'
+        );
+        
+        $this->config = array(
+            'delete_thread'         => 1,
+            'link_thread'           => 1,
+            'forum_id'              => 0,
+            'no_create_thread_cats' => 0
+        );
+        
+        $this->events = array(
+            'DELETE_ARTICLE',
+            'GET_ARTICLE',
+            'ADD_ARTICLE_DONE',
+            'UPDATE_ARTICLE'
+        );
+    }
+    
+    public function getConfigFields() {
+        global $_LANG;
+        
+        return array(
+            array(
+                'type' => 'btn_yes_no', 
+                'title' => $_LANG['AF_DELETE_THREAD'],
+                'name' => 'delete_thread'
+            ),
+            array(
+                'type' => 'btn_yes_no', 
+                'title' => $_LANG['AF_LINK_THREAD'],
+                'name' => 'link_thread'
+            ),
+            array(
+                'type' => 'ns_list',
+                'title' => $_LANG['AF_ADDTREADFORUM_ID'],
+                'name' => 'forum_id',
+                'table' => 'cms_forums'
+            ),
+            array(
+                'type' => 'ns_list',
+                'title' => $_LANG['AF_NOCREATETREAD'],
+                'name' => 'no_create_thread_cats[]',
+                'table' => 'cms_category',
+                'no_padding' => true,
+                'multiple' => true
+            )
+        );
     }
 
-// ==================================================================== //
-
-    /**
-     * Процедура установки плагина
-     * @return bool
-     */
-    public function install() {
-
-        return parent::install();
-
-    }
-
-// ==================================================================== //
-
-    /**
-     * Процедура обновления плагина
-     * @return bool
-     */
-    public function upgrade() {
-
-        return parent::upgrade();
-
-    }
-
-// ==================================================================== //
-
-    /**
-     * Обработка событий
-     * @param string $event
-     * @param array $article
-     * @return html
-     */
     public function execute($event='', $article=array()) {
-
         parent::execute();
 
         switch ($event) {
@@ -88,10 +80,7 @@ class p_auto_forum extends cmsPlugin {
         }
 
         return $article;
-
     }
-
-// ==================================================================== //
 
     private function updateLastForumPost($article) {
         // получаем полную статью
@@ -103,8 +92,8 @@ class p_auto_forum extends cmsPlugin {
         if ($post) {
             cmsCore::m('forum')->updatePost(
                 array(
-                    'content'=>$this->getBbtexPost($article),
-                    'content_html'=>$this->getHtmlPost($article)
+                    'content' => $this->getBbtexPost($article),
+                    'content_html' => $this->getHtmlPost($article)
                 ),
                 $post['id']
             );
@@ -113,10 +102,8 @@ class p_auto_forum extends cmsPlugin {
         return true;
     }
 
-// ==================================================================== //
-
-    private function deleteForum($article_id){
-        if (!$this->config['AF_DELETE_THREAD']) { return; }
+    private function deleteForum($article_id) {
+        if (!$this->config['delete_thread']) { return; }
 
         $thread = cmsCore::c('db')->get_fields('cms_forum_threads t
                                            INNER JOIN cms_forums f ON f.id = t.forum_id',
@@ -131,26 +118,22 @@ class p_auto_forum extends cmsPlugin {
         return true;
     }
 
-// ==================================================================== //
-
-    private function getForumLink($article){
+    private function getForumLink($article) {
         global $_LANG;
 
-        if (!$this->config['AF_LINK_TREAD']) { return $article; }
+        if (!$this->config['link_thread']) { return $article; }
 
         $forum_thread_id = cmsCore::c('db')->get_field('cms_forum_threads', "rel_to='content' AND rel_id='". $article['id'] ."'", 'id');
 
-        if($forum_thread_id){
+        if ($forum_thread_id) {
             $article['content'] .= '<div class="con_forum_link"><a href="/forum/thread'. $forum_thread_id .'.html">'. $_LANG['DISCUSS_ON_FORUM'] .'</a></div>';
         }
 
         return $article;
     }
 
-// ==================================================================== //
-
-    private function createForum($article){
-        $forum_id = (int)$this->config['AF_ADDTREADFORUM_ID'];
+    private function createForum($article) {
+        $forum_id = (int)$this->config['forum_id'];
 
         if (!$forum_id) { return false; }
 
@@ -212,19 +195,13 @@ class p_auto_forum extends cmsPlugin {
         return true;
     }
 
-// ==================================================================== //
-
-    private function checkCatForAdd($cat_id){
+    private function checkCatForAdd($cat_id) {
         if (!$cat_id) { return false; }
-        if (!$this->config['AF_NOCREATETREAD']) { return true; }
 
-        $ids = explode(',', $this->config['AF_NOCREATETREAD']);
-        $ids = array_map("trim", $ids);
+        if (empty($this->config['no_create_thread_cats'])) { return true; }
 
-        return !(in_array($cat_id, $ids));
+        return !(in_array($cat_id, $this->config['no_create_thread_cats']));
     }
-
-// ==================================================================== //
 
     private function getHtmlPost($article) {
         global $_LANG;
@@ -235,7 +212,4 @@ class p_auto_forum extends cmsPlugin {
         global $_LANG;
         return cmsCore::c('db')->escape_string(sprintf($_LANG['AF_LANG_TEXT_HTML'], '[url='. HOST .'/'. $article['seolink'] .'.html]'. $article['title'] .'[/url]'));
     }
-
-// ==================================================================== //
-
 }

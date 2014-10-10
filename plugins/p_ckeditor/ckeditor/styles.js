@@ -57,16 +57,16 @@ CKEDITOR.stylesSet.add( 'default', [
 	{ name: 'Superscript',		element: 'sup' },
 	*/
 
-	{ name: 'Marker',		element: 'span', attributes: { 'class': 'marker' } },
+	{ name: 'Marker',			element: 'span', attributes: { 'class': 'marker' } },
 
-	{ name: 'Big',			element: 'big' },
-	{ name: 'Small',		element: 'small' },
+	{ name: 'Big',				element: 'big' },
+	{ name: 'Small',			element: 'small' },
 	{ name: 'Typewriter',		element: 'tt' },
 
 	{ name: 'Computer Code',	element: 'code' },
 	{ name: 'Keyboard Phrase',	element: 'kbd' },
 	{ name: 'Sample Text',		element: 'samp' },
-	{ name: 'Variable',		element: 'var' },
+	{ name: 'Variable',			element: 'var' },
 
 	{ name: 'Deleted Text',		element: 'del' },
 	{ name: 'Inserted Text',	element: 'ins' },

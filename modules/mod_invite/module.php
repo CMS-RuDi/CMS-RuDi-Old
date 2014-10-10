@@ -11,34 +11,32 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_invite($module_id, $cfg){
-
-    $inUser = cmsUser::getInstance();
-
+function mod_invite($module_id, $cfg) {
     global $_LANG;
 
     $errors      = false;
     $is_redirect = false; // в модуле нельзя использовать cmsCore::redirectBack(), используем костыли ;)
 
-    if (cmsCore::inRequest('send_invite_email')){
-
+    if (cmsCore::inRequest('send_invite_email')) {
         $is_redirect = true;
 
         $username = cmsCore::request('username', 'str', '');
         $email    = cmsCore::request('friend_email', 'email', '');
 
-        if (!$username && !$inUser->id){
+        if (!$username && !cmsCore::c('user')->id) {
             cmsCore::addSessionMessage($_LANG['ERR_NEED_NAME'], 'error'); $errors = true;
         }
-        if ($inUser->id) { $username = $inUser->nickname; }
+        
+        if (cmsCore::c('user')->id) {
+            $username = cmsCore::c('user')->nickname;
+        }
 
-        if (!$email){
+        if (!$email) {
             cmsCore::addSessionMessage($_LANG['ERR_NEED_MAIL'], 'error'); $errors = true;
         }
 
-        if(!$errors){
-
-            if(!cmsUser::checkCsrfToken()){
+        if (!$errors) {
+            if (!cmsUser::checkCsrfToken()) {
                 cmsCore::error404();
             }
 
@@ -48,20 +46,14 @@ function mod_invite($module_id, $cfg){
             $letter = str_replace('{username}', $username, $letter);
 
             cmsCore::mailText($email, sprintf($_LANG['INVITE_SUBJECT'], $username), $letter);
-
             cmsCore::addSessionMessage($_LANG['INVITE_SENDED'], 'success');
-
         }
-
     }
 
-    cmsPage::initTemplate('modules', 'mod_invite')->
-            assign('user_id', $inUser->id)->
-            assign('is_redirect', $is_redirect)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('user_id', cmsCore::c('user')->id)->
+        assign('is_redirect', $is_redirect)->
+        display();
 
     return true;
-
 }
-
-?>

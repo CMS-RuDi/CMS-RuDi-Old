@@ -11,43 +11,41 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_latest_faq($module_id, $cfg){
-
-    $inDB = cmsDatabase::getInstance();
-
-    if (!isset($cfg['newscount'])) { $cfg['newscount'] = 2;}
-    if (!isset($cfg['cat_id'])) { $cfg['cat_id'] = 0;}
-    if (!isset($cfg['maxlen'])) { $cfg['maxlen'] = 120;}
+function mod_latest_faq($module_id, $cfg) {
+    $cfg = array_merge(array(
+        'newscount' => 2,
+        'cat_id'    => 0,
+        'maxlen'    => 120
+    ), $cfg);
 
     if ($cfg['cat_id']) {
-        $catsql = 'AND category_id = '.$cfg['cat_id'];
-    } else { $catsql = ''; }
+        $catsql = 'AND category_id = '. $cfg['cat_id'];
+    } else {
+        $catsql = '';
+    }
 
     $sql = "SELECT *
             FROM cms_faq_quests
-            WHERE published = 1 ".$catsql."
+            WHERE published = 1 ". $catsql ."
             ORDER BY pubdate DESC
-            LIMIT ".$cfg['newscount'];
+            LIMIT ". $cfg['newscount'];
 
-    $result = $inDB->query($sql) ;
+    $result = cmsCore::c('db')->query($sql) ;
 
     $faq = array();
 
-    if ($inDB->num_rows($result)){
-
-        while($con = $inDB->fetch_assoc($result)){
+    if (cmsCore::c('db')->num_rows($result)) {
+        while($con = cmsCore::c('db')->fetch_assoc($result)) {
             $con['date'] = cmsCore::dateFormat($con['pubdate']);
             $con['href'] = '/faq/quest'.$con['id'].'.html';
             $faq[] = $con;
         }
-
     }
 
-    cmsPage::initTemplate('modules', 'mod_latest_faq')->
-            assign('faq', $faq)->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('faq', $faq)->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }

@@ -125,10 +125,10 @@ if ($opt == 'saveconfig') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_REGISTRATION_ON']; ?>:</label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if ($cfg['is_on']) { echo 'active'; } ?>">
                         <input type="radio" name="is_on" <?php if ($cfg['is_on']) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!$cfg['is_on']) { echo 'active'; } ?>">
                         <input type="radio" name="is_on" <?php if (!$cfg['is_on']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -142,10 +142,10 @@ if ($opt == 'saveconfig') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_ACTIVATION_MAIL']; ?>:</label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if ($cfg['act']) { echo 'active'; } ?>">
                         <input type="radio" name="act" <?php if ($cfg['act']) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!$cfg['act']) { echo 'active'; } ?>">
                         <input type="radio" name="act" <?php if (!$cfg['act']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -205,10 +205,10 @@ if ($opt == 'saveconfig') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_REQUIRE_ICQ']; ?>:</label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if ($cfg['ask_icq']) { echo 'active'; } ?>">
                         <input type="radio" name="ask_icq" <?php if ($cfg['ask_icq']) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!$cfg['ask_icq']) { echo 'active'; } ?>">
                         <input type="radio" name="ask_icq" <?php if (!$cfg['ask_icq']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -217,10 +217,10 @@ if ($opt == 'saveconfig') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_REQUIRE_BIRD']; ?>:</label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if ($cfg['ask_birthdate']) { echo 'active'; } ?>">
                         <input type="radio" name="ask_birthdate" <?php if ($cfg['ask_birthdate']) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!$cfg['ask_birthdate']) { echo 'active'; } ?>">
                         <input type="radio" name="ask_birthdate" <?php if (!$cfg['ask_birthdate']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -229,10 +229,10 @@ if ($opt == 'saveconfig') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_REQUIRE_CITY']; ?>:</label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if ($cfg['ask_city']) { echo 'active'; } ?>">
                         <input type="radio" name="ask_city" <?php if ($cfg['ask_city']) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!$cfg['ask_city']) { echo 'active'; } ?>">
                         <input type="radio" name="ask_city" <?php if (!$cfg['ask_city']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>
@@ -243,10 +243,10 @@ if ($opt == 'saveconfig') {
             <div class="form-group">
                 <label><?php echo $_LANG['AD_SEND_MASSAGE']; ?>:</label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if ($cfg['send_greetmsg']) { echo 'active'; } ?>">
                         <input type="radio" name="send_greetmsg" <?php if ($cfg['send_greetmsg']) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!$cfg['send_greetmsg']) { echo 'active'; } ?>">
                         <input type="radio" name="send_greetmsg" <?php if (!$cfg['send_greetmsg']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>

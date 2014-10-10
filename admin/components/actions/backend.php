@@ -102,10 +102,10 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
             <div class="form-group">
                 <label><?php echo $_LANG['AD_SHOW_TARGET']; ?>:</label>
                 <div class="btn-group" data-toggle="buttons" style="vertical-align:top;float:right;">
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <?php if (cmsCore::m('actions')->config['show_target']) { echo 'active'; } ?>">
                         <input type="radio" name="show_target" <?php if (cmsCore::m('actions')->config['show_target']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
                     </label>
-                    <label class="btn btn-default ">
+                    <label class="btn btn-default <?php if (!cmsCore::m('actions')->config['show_target']) { echo 'active'; } ?>">
                         <input type="radio" name="show_target" <?php if (!cmsCore::m('actions')->config['show_target']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                 </div>

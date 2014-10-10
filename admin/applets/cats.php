@@ -61,6 +61,7 @@ function applet_cats() {
 
     if ($do == 'update') {
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+        
         if (cmsCore::inRequest('id')) {
             $category['id']          = cmsCore::request('id', 'int', 0);
             $category['title']       = cmsCore::request('title', 'str', $_LANG['AD_SECTION_UNTITLED']);
@@ -302,7 +303,7 @@ function applet_cats() {
                     <select id="parent_id" class="form-control" name="parent_id" size="12" onchange="if($(this).val()=='<?php echo cmsCore::getArrVal($mod, 'id', ''); ?>'){ $('.parent_notice').show();$('#add_mod').prop('disabled', true); } else { $('.parent_notice').hide();$('#add_mod').prop('disabled', false); }">
                         <?php $rootid = cmsCore::c('db')->getNsRootCatId('cms_category'); ?>
                         <option value="<?php echo $rootid; ?>" <?php if (!isset($mod['parent_id']) || cmsCore::getArrVal($mod, 'parent_id', '') == $rootid) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_SECTION'];?></option>
-                        <?php echo $inCore->getListItemsNS('cms_category', cmsCore::getArrVal($mod, 'parent_id', 0)); ?>
+                        <?php echo $inCore->getListItemsNS('cms_category', cmsCore::getArrVal($mod, 'parent_id', $rootid)); ?>
                     </select>
                 </div>
                     
@@ -337,7 +338,7 @@ function applet_cats() {
                             <div class="help-block"><?php echo $_LANG['AD_FROM_TITLE'];?></div>
                         </div>
                             
-                        <?php if ($do=='edit'){  ?>
+                        <?php if ($do == 'edit') {  ?>
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" name="update_seolink" value="1" onclick="$('.url_cat').slideToggle('fast');" />

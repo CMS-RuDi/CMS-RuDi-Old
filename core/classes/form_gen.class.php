@@ -3,7 +3,7 @@
 //                                                                            //
 //                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
-//              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
@@ -19,15 +19,19 @@
  */
 class rudi_form_generate {
     private $fields = array(
-        'tabs'     => array( 'class' => 'rudi_form_tab',      'count' => 0 ),
-        'fieldset' => array( 'class' => 'rudi_form_fieldset', 'count' => 0 ),
-        'text'     => array( 'class' => 'rudi_form_text',     'count' => 0 ),
-        'number'   => array( 'class' => 'rudi_form_number',   'count' => 0 ),
-        'textarea' => array( 'class' => 'rudi_form_textarea', 'count' => 0 ),
-        'select'   => array( 'class' => 'rudi_form_select',   'count' => 0 ),
-        'checkbox' => array( 'class' => 'rudi_form_checkbox', 'count' => 0 ),
-        'radio'    => array( 'class' => 'rudi_form_radio',    'count' => 0 ),
-        'hr' => 1, 'btn_yes_no' => 1, 'img_size' => 1
+        'tabs'       => array( 'class' => 'rudi_form_tab',      'count' => 0 ),
+        'fieldset'   => array( 'class' => 'rudi_form_fieldset', 'count' => 0 ),
+        'text'       => array( 'class' => 'rudi_form_text',     'count' => 0 ),
+        'number'     => array( 'class' => 'rudi_form_number',   'count' => 0 ),
+        'textarea'   => array( 'class' => 'rudi_form_textarea', 'count' => 0 ),
+        'select'     => array( 'class' => 'rudi_form_select',   'count' => 0 ),
+        'checkbox'   => array( 'class' => 'rudi_form_checkbox', 'count' => 0 ),
+        'radio'      => array( 'class' => 'rudi_form_radio',    'count' => 0 ),
+        'hr'         => 1,
+        'btn_yes_no' => 1,
+        'img_size'   => 1,
+        'ns_list'    => 1,
+        'dir_list'   => 1
     );
     private $values = array();
     
@@ -114,6 +118,11 @@ class rudi_form_generate {
         return $data;
     }
     
+    /**
+     * Генерирует html код табов
+     * @param array $field
+     * @return boolean|array 
+     */
     private function tabs($field) {
         if (empty($field['tabs'])) { return false; }
         
@@ -153,6 +162,11 @@ class rudi_form_generate {
         return $data;
     }
 
+    /**
+     * Генерирует html код <fieldset>
+     * @param array $field
+     * @return boolean|array
+     */
     private function fieldset($field) {
         if (empty($field['fields'])) { return false; }
         
@@ -182,6 +196,11 @@ class rudi_form_generate {
         return $data;
     }
     
+    /**
+     * Генерирует html код поля <input type="text"/>
+     * @param array $field
+     * @return boolean|array
+     */
     private function text($field) {
         if (empty($field['name'])) { return false; }
         
@@ -193,6 +212,11 @@ class rudi_form_generate {
         );
     }
     
+    /**
+     * Генерирует html код поля <input type="number"/>
+     * @param array $field
+     * @return boolean|array
+     */
     private function number($field) {
         if (empty($field['name'])) { return false; }
         
@@ -204,6 +228,11 @@ class rudi_form_generate {
         );
     }
     
+    /**
+     * Генерирует html код поля <textarea>
+     * @param array $field
+     * @return boolean|array
+     */
     private function textarea($field) {
         if (empty($field['name'])) { return false; }
         
@@ -214,6 +243,11 @@ class rudi_form_generate {
             'html' => '<textarea id="'. $this->fields['textarea']['class'] .'_'. $this->fields['textarea']['count'] .'" class="form-control '. $this->fields['textarea']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'">'. $this->getValue($field) .'</textarea>');
     }
     
+    /**
+     * Генерирует html код поля <select>
+     * @param array $field
+     * @return boolean|array
+     */
     private function select($field) {
         if (empty($field['name']) || empty($field['options'])) { return false; }
         
@@ -246,6 +280,11 @@ class rudi_form_generate {
         );
     }
     
+    /**
+     * Генерирует html код поля checkbox
+     * @param array $field
+     * @return boolean|array
+     */
     private function checkbox($field) {
         if (empty($field['name'])) { return false; }
         
@@ -257,6 +296,11 @@ class rudi_form_generate {
         );
     }
     
+    /**
+     * Генерирует html код поля радио группы опций или одной радио кнопки
+     * @param array $field
+     * @return boolean|array
+     */
     private function radio($field) {
         if (empty($field['name']) || empty($field['options'])) { return false; }
         
@@ -288,6 +332,11 @@ class rudi_form_generate {
         return $data;
     }
     
+    /**
+     * Генерирует html код поля с кнопками ДА/НЕТ
+     * @param array $field
+     * @return boolean|array
+     */
     private function btn_yes_no($field) {
         if (empty($field['name'])) { return false; }
         
@@ -303,6 +352,11 @@ class rudi_form_generate {
         );
     }
     
+    /**
+     * Генерирует html код поля для выбора ширины и высоты изображения
+     * @param array $field
+     * @return boolean|array
+     */
     private function img_size($field) {
         if (empty($field['nameX']) || empty($field['nameY'])) { return false; }
         
@@ -312,13 +366,109 @@ class rudi_form_generate {
             'html' => '<table width="100%"><tr><td><input type="number" class="form-control" name="'. $field['nameX'] .'" value="'. (float)$this->getValue($field, false, 'nameX', 'valueX') .'" /></td><td><span style="padding:5px;">x</span></td><td><input type="number" class="form-control" name="'. $field['nameY'] .'" value="'. (float)$this->getValue($field, false, 'nameY', 'valueY') .'" /></td></tr></table>'
         );
     }
+    
+    /**
+     * Генерирует html код поля <select> из таблицы в базе данных с вложенными 
+     * множествами
+     * @param array $field Массив параметров, вдобавок к стандартным (name, title...)
+     * можно указать еще и параметры для метода ядра getListItemsNS (table,differ,
+     * need_field,rootid,no_padding - указание параметра table обязательно остальные нет)
+     * @return boolean|array
+     */
+    private function ns_list($field) {
+        if (empty($field['name']) || empty($field['table'])) {
+            return false;
+        }
+        
+        $this->fields['select']['count']++;
+        
+        $selected = $this->getValue($field);
+        
+        $attr_field = $field;
+        unset($attr_field['table'], $attr_field['differ'], $attr_field['need_field'], $attr_field['rootid'], $attr_field['no_padding']);
+        
+        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'">' ."\n";
+        
+        $html .= cmsCore::getInstance()->getListItemsNS(
+            $field['table'],
+            $selected,
+            cmsCore::getArrVal($field, 'differ', ''),
+            cmsCore::getArrVal($field, 'need_field', ''),
+            cmsCore::getArrVal($field, 'rootid', 0),
+            cmsCore::getArrVal($field, 'no_padding')
+        );
+        
+        $html .= '</select>';
+        
+        return array(
+            'type' => $field['type'],
+            'title' => $field['title'],
+            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'html' => $html
+        );
+    }
+    
+    /**
+     * Генерирует html код поля <select> из списка названий директорий в указанной папке
+     * @param array $field Массив параметров, вдобавок к стандартным (name, title...)
+     * обязательно должен быть указан параметр path содержащую ссылку на папку 
+     * относительно корня сайта
+     * @return boolean|array
+     */
+    private function dir_list($field) {
+        if (empty($field['name']) || empty($field['path'])) {
+            return false;
+        }
+        
+        $field['path'] = rtrim($field['path'], '/');
+        
+        if (!file_exists(PATH . $field['path']) || !is_dir(PATH . $field['path'])) {
+            return false;
+        }
+        
+        $this->fields['select']['count']++;
+        
+        $selected = $this->getValue($field);
+        if (!is_array($selected)) { $selected = array($selected); }
+        
+        $attr_field = $field;
+        unset($attr_field['path']);
+        
+        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'">' ."\n";
+        
+        $dirs = cmsCore::getDirsList($field['path'] .'/');
+        if (!empty($dirs)) {
+            foreach ($dirs as $dir) {
+                $html .= '    <option value="'. htmlspecialchars($dir) .'"'. (in_array($dir, $selected) ? ' selected="selected"' : '') .'>'. $dir .'</option>'. "\n";
+            }
+        }
+        
+        $html .= '</select>';
+        
+        return array(
+            'type' => $field['type'],
+            'title' => $field['title'],
+            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'html' => $html
+        );
+    }
 
+    /**
+     * Вставляет горизонтальную линию
+     * @param array $field
+     * @return array
+     */
     private function hr($field) {
         return array( 'html' => '<hr/>' );
     }
     
     //==========================================================================
     
+    /**
+     * Возвращает значение атрибута style при наличии
+     * @param mixed $style
+     * @return string
+     */
     private function getStyle($style=false) {
         if (empty($style)) { return ''; }
         
@@ -335,11 +485,17 @@ class rudi_form_generate {
         return ' style="'. (string)$style .'"';
     }
     
+    /**
+     * Возвращает строку из атрибутов элемента
+     * @param array $field
+     * @return string
+     */
     private function getOtherAttributes($field) {
         $tmp = array();
             
         foreach ($field as $k=>$v) {
             if (!in_array($k, array('title', 'fields', 'type', 'class', 'style', 'name', 'value', 'selected', 'checked')) && !is_array($v)) {
+                $v = is_bool($v) ? (int)$v : $v;
                 $tmp[] = $k .'="'. (mb_substr($v, 0, 2) == 'on' ? $v : htmlspecialchars($v)) .'"';
             }
         }
@@ -347,6 +503,15 @@ class rudi_form_generate {
         return (empty($tmp) ? '' : ' '. implode(' ', $tmp));
     }
     
+    /**
+     * Возвращает текущее значение параметра или дефолтовое, или же проверяет 
+     * присвоено ли значение
+     * @param array $field
+     * @param boolean $return_isset Флаг указывающий возвращать значение или наличие в 
+     * @param string $name
+     * @param string $value
+     * @return mixed
+     */
     private function getValue($field, $return_isset=false, $name='name', $value='value') {
         $matches = array();
         
@@ -378,5 +543,4 @@ class rudi_form_generate {
         
         return $return_isset ? false : cmsCore::getArrVal($field, $value, '');
     }
-    
 }

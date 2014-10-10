@@ -3,7 +3,7 @@
 //                                                                            //
 //                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
-//              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
@@ -26,79 +26,6 @@ class p_phpcaptcha extends cmsPlugin {
         );
         
         $this->events = array( 'INSERT_CAPTCHA', 'CHECK_CAPTCHA');
-    }
-    
-    public function getConfigFields() {
-        global $_LANG;
-        
-        return array(
-            array(
-                'type' => 'fieldset',
-                'title' => $_LANG['PRC_KEYS'],
-                'fields' => array(
-                    array(
-                        'type' => 'text',
-                        'title' => $_LANG['PRC_DOMENS'],
-                        'description' => $_LANG['PRC_DOMENS_HINT'],
-                        'name' => 'rpc_domens'
-                    ),
-                    array(
-                        'type' => 'text',
-                        'title' => $_LANG['PRC_PUBLIC_KEY'],
-                        'name' => 'rpc_public_key'
-                    ),
-                    array(
-                        'type' => 'text',
-                        'title' => $_LANG['PRC_PRIVATE_KEY'],
-                        'name' => 'rpc_private_key'
-                    ),
-                )
-            ),
-            array(
-                'type' => 'fieldset',
-                'title' => $_LANG['PRC_APPEARANCE'],
-                'fields' => array(
-                    array(
-                        'type' => 'select',
-                        'title' => $_LANG['PRC_THEME'],
-                        'name' => 'rpc_theme',
-                        'options' => array(
-                            array( 'title' => 'Red', 'value' => 'red' ),
-                            array( 'title' => 'White', 'value' => 'white' ),
-                            array( 'title' => 'Blackglass', 'value' => 'blackglass' ),
-                            array( 'title' => 'Clean', 'value' => 'clean' ),
-                        )
-                    ),
-                    array(
-                        'type' => 'select',
-                        'title' => $_LANG['PRC_LANG'],
-                        'name' => 'rpc_lang',
-                        'options' => array(
-                            array( 'title' => $_LANG['PRC_LANG_RU'], 'value' => 'ru' ),
-                            array( 'title' => $_LANG['PRC_LANG_EN'], 'value' => 'en' ),
-                            array( 'title' => $_LANG['PRC_LANG_NL'], 'value' => 'nl' ),
-                            array( 'title' => $_LANG['PRC_LANG_FR'], 'value' => 'fr' ),
-                            array( 'title' => $_LANG['PRC_LANG_DE'], 'value' => 'de' ),
-                            array( 'title' => $_LANG['PRC_LANG_PT'], 'value' => 'pt' ),
-                            array( 'title' => $_LANG['PRC_LANG_ES'], 'value' => 'es' ),
-                            array( 'title' => $_LANG['PRC_LANG_TR'], 'value' => 'tr' )
-                        )
-                    )
-                )
-            )
-        );
-    }
-
-    public function install() {
-        return parent::install();
-    }
-
-    public function upgrade() {
-        return parent::upgrade();
-    }
-    
-    public function uninstall() {
-        return parent::uninstall();
     }
 
     public function execute($event='', $item=array()) {

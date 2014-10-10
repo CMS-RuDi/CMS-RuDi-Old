@@ -43,7 +43,7 @@ if ($do == 'view') {
     if (!$cat['published'] && !cmsCore::c('user')->is_admin) { cmsCore::error404(); }
 
     // Проверяем доступ к категории
-    if (!$inCore->checkUserAccess('category', $cat['id'])) {
+    if (!cmsCore::checkUserAccess('category', $cat['id'])) {
         cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
         cmsCore::redirect('/content');
     }
@@ -80,7 +80,7 @@ if ($do == 'view') {
 
     if ($path_list) {
         foreach ($path_list as $pcat) {
-            if (!$inCore->checkUserAccess('category', $pcat['id'])) {
+            if (!cmsCore::checkUserAccess('category', $pcat['id'])) {
                 cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
                 cmsCore::redirect('/content');
             }
@@ -146,7 +146,7 @@ if ($do == 'read') {
     // если статья не опубликована или дата публикации позже, 404
     if ((!$article['published'] || strtotime($article['pubdate']) > time()) && !$is_admin && !$is_editor && !$is_author) { cmsCore::error404(); }
 
-    if (!$inCore->checkUserAccess('material', $article['id'])) {
+    if (!cmsCore::checkUserAccess('material', $article['id'])) {
         cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
         cmsCore::redirect(cmsCore::m('content')->getCategoryURL(null, $article['catseolink']));
     }
@@ -172,7 +172,7 @@ if ($do == 'read') {
 
     if ($path_list) {
         foreach ($path_list as $pcat) {
-            if (!$inCore->checkUserAccess('category', $pcat['id'])) {
+            if (!cmsCore::checkUserAccess('category', $pcat['id'])) {
                 cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
                 cmsCore::redirect('/content');
             }

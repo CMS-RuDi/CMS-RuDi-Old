@@ -538,7 +538,7 @@ class cms_model_search {
 /* ==================================================================================================== */
     /**
      * Формирует массив компонентов, у которых есть поддержка поиска фултекст
-	 * формирует $this->components
+     * формирует $this->components
      * @return bool
      */
     private function getComponentsWithSupportSearch() {

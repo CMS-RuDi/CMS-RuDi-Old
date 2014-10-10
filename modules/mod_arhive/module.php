@@ -11,26 +11,20 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_arhive($module_id, $cfg){
+function mod_arhive($module_id, $cfg) {
+    cmsCore::m('arhive')->whereThisAndNestedCats(cmsCore::getArrVal($cfg, 'cat_id', 0));
 
-    cmsCore::loadModel('arhive');
-    $model = new cms_model_arhive();
-
-    $model->whereThisAndNestedCats(@$cfg['cat_id']);
-
-    if($model->year != 'all'){
-        $model->whereYearIs();
+    if (cmsCore::m('arhive')->year != 'all') {
+        cmsCore::m('arhive')->whereYearIs();
     }
 
-    $items = $model->getArhiveContent();
-    if(!$items){ return false; }
+    $items = cmsCore::m('arhive')->getArhiveContent();
+    if (!$items) { return false; }
 
-    cmsPage::initTemplate('modules', 'mod_arhive')->
-            assign('arhives', $items)->
-            assign('date', array('year'=>$model->year,'month'=>$model->month,'day'=>$model->day))->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('arhives', $items)->
+        assign('date', array('year'=>cmsCore::m('arhive')->year,'month'=>cmsCore::m('arhive')->month,'day'=>cmsCore::m('arhive')->day))->
+        display();
 
     return true;
-
 }
-?>

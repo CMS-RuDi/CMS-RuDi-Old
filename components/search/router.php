@@ -10,24 +10,20 @@
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
+if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-    function routes_search(){
-
-        $routes[] = array(
-                            '_uri'  => '/^search\/tag\/(.+)\/page([0-9]+).html$/i',
-                            'do'    => 'tag',
-                            1       => 'query',
-                            2       => 'page'
-                         );
-
-        $routes[] = array(
-                            '_uri'  => '/^search\/tag\/(.+)$/i',
-                            'do'    => 'tag',
-                            1       => 'query'
-                         );
-
-        return $routes;
-
-    }
-
-?>
+function routes_search() {
+    return array(
+        array(
+            '_uri'  => '/^search\/tag\/(.+)\/page([0-9]+).html$/i',
+            'do'    => 'tag',
+            1       => 'query',
+            2       => 'page'
+        ),
+        array(
+            '_uri'  => '/^search\/tag\/(.+)$/i',
+            'do'    => 'tag',
+            1       => 'query'
+        )
+    );
+}

@@ -39,7 +39,7 @@ if ($do=='view'){
 
 	//Получаем текущую категорию
 	$category = $model->getCategory($model->category_id);
-	if (!$category) { cmsCore::error404(); }
+	if (!$category || (!$category['published'] && !cmsCore::c('user')->is_admin)) { cmsCore::error404(); }
 
     if ($category['id'] != $model->root_cat['id']) {
 

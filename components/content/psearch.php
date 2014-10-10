@@ -30,7 +30,7 @@ function search_content($query, $look) {
             $result_array = array(
                 'link' => '/'. $item['seolink'] .'.html',
                 'place' => $_LANG['CATALOG_ARTICLES'],
-                'placelink' => $item['cat_parent_id']>0 ? '/'. $item['cat_seolink'] : '/'. $item['attrs']['seolink'] .'.html',
+                'placelink' => '/'. ($item['cat_parent_id']>0 ?  $item['cat_seolink'] : $item['seolink'] .'.html'),
                 'description' => cmsCore::m('search')->getProposalWithSearchWord($item['content']),
                 'title' => $item['title'],
                 'imageurl' => (file_exists(PATH .'/images/content/medium/'. ceil($item['id']/100) .'/article'. $item['id' ] .'.jpg') ? '/images/content/medium/'. ceil($item['id']/100) .'/article'. $item['id' ] .'.jpg' : ''),

@@ -11,10 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_user_image($module_id, $cfg){
-
-    $inDB = cmsDatabase::getInstance();
-
+function mod_user_image($module_id, $cfg) {
     $sql = "SELECT u.id uid, u.nickname author, u.login as login, p.imageurl, p.title, p.id, pr.gender gender
             FROM cms_user_photos p
             LEFT JOIN cms_users u ON u.id = p.user_id
@@ -25,24 +22,19 @@ function mod_user_image($module_id, $cfg){
             ORDER BY RAND()
             LIMIT 1";
 
-    $result = $inDB->query($sql) ;
+    $result = cmsCore::c('db')->query($sql) ;
 
-    if (!$inDB->num_rows($result)){ return false; }
+    if (!cmsCore::c('db')->num_rows($result)) { return false; }
 
-    while ($usr = $inDB->fetch_assoc($result)){
-
+    while ($usr = cmsCore::c('db')->fetch_assoc($result)) {
         $usr['genderlink'] = cmsUser::getGenderLink($usr['uid'], $usr['author'], $usr['gender'], $usr['login']);
-
         $users[] = $usr;
-
     }
 
-    cmsPage::initTemplate('modules', 'mod_user_image')->
-            assign('users', $users)->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('users', $users)->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }
-?>

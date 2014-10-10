@@ -11,17 +11,14 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_search(){
-
+function mod_search($module_id, $cfg) {
     cmsCore::loadModel('search');
     cmsCore::loadLanguage('components/search');
     $model = cms_model_search::initModel();
 
-    cmsPage::initTemplate('modules', 'mod_search')->
-            assign('enable_components', $model->getEnableComponentsWithSupportSearch())->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('enable_components', $model->getEnableComponentsWithSupportSearch())->
+        display();
 
     return true;
-
 }
-?>

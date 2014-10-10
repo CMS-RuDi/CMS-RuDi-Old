@@ -11,31 +11,21 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_polls($module_id, $cfg){
-
-    cmsCore::loadModel('polls');
-    $model = new cms_model_polls();
-
-    if ($cfg['poll_id']>0){
-
-        $poll = $model->getPoll($cfg['poll_id']);
-
+function mod_polls($module_id, $cfg) {
+    if ($cfg['poll_id'] > 0) {
+        $poll = cmsCore::m('polls')->getPoll($cfg['poll_id']);
     } else {
-
-        $poll = $model->getPoll(0, 'RAND()');
-
+        $poll = cmsCore::m('polls')->getPoll(0, 'RAND()');
     }
 
     if (!$poll) { return false; }
 
-	cmsPage::initTemplate('modules', 'mod_polls')->
-            assign('poll', $poll)->
-            assign('is_voted', $model->isUserVoted($poll['id']))->
-            assign('module_id', $module_id)->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('poll', $poll)->
+        assign('is_voted', cmsCore::m('polls')->isUserVoted($poll['id']))->
+        assign('module_id', $module_id)->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }
-?>

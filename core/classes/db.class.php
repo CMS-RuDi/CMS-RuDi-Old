@@ -506,7 +506,7 @@ class cmsDatabase {
 // ============================================================================ //
 
     public function getNsRootCatId($table, $differ = '') {
-        if(isset($this->cache[$table][$differ])) { return $this->cache[$table][$differ]; }
+        if (isset($this->cache[$table][$differ])) { return $this->cache[$table][$differ]; }
 
         $root_cat = $this->getNsCategory($table, 0, $differ);
 

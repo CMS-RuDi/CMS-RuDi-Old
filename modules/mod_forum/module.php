@@ -12,7 +12,7 @@
 /******************************************************************************/
 
 function mod_forum($module_id, $cfg) {
-    $default_cfg = array (
+    $cfg = array_merge(array(
         'shownum' => 4,
         'cat_id' => 0,
         'forum_id' => 0,
@@ -22,9 +22,7 @@ function mod_forum($module_id, $cfg) {
         'showtext' => 1,
         'showforum' => 0,
         'order' => 'pubdate'
-    );
-    
-    $cfg = array_merge($default_cfg, $cfg);
+    ), $cfg);
     
     cmsCore::c('db')->addJoin('INNER JOIN cms_forums f ON f.id = t.forum_id');
     cmsCore::c('db')->addSelect('f.title as forum_title');
@@ -54,12 +52,13 @@ function mod_forum($module_id, $cfg) {
 
     cmsCore::c('db')->orderBy('t.'.$cfg['order'], 'DESC');
     cmsCore::c('db')->limit($cfg['shownum']);
+    
     $threads = cmsCore::m('forum')->getThreads();
 
-    cmsPage::initTemplate('modules', 'mod_forum')->
-            assign('threads', $threads)->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('threads', $threads)->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
 }

@@ -1149,7 +1149,7 @@ INSERT INTO `#__plugins` (`id`, `plugin`, `title`, `description`, `author`, `ver
 (17, 'p_auto_forum', 'Автофорум', 'Создает тему на форуме для обсуждения статьи', 'InstantCMS Team', '1.10.3', '', 1, '---\nAF_DELETE_THREAD: 1\nAF_LINK_TREAD: 1\nAF_ADDTREADFORUM_ID: 1\nAF_NOCREATETREAD: 0\n'),
 (18, 'p_content_imgs', 'Прикрепленные к статьям фотографии', 'Плагин добавляет в конце статьи карусель (слайдер) с прикрепленными фотографиями.', 'DS Soft', '0.0.3', 'plugin', 1, '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n'),
 (19, 'p_captcha', 'Captcha.ru', 'PHP Captcha с сайта Captcha.ru', 'Kruglov Sergei', '2.0', 'captcha', 1, '---\n'),
-(20, 'p_recaptcha', 'reCaptcha', 'reCaptcha капча от гугла https://www.google.com/recaptcha/', 'DS Soft', '0.0.2', 'captcha', 0, '---\nPRC_DOMENS:\nPRC_PUBLIC_KEY:\nPRC_PRIVATE_KEY:\nPRC_THEME: blackglass\nPRC_LANG: ru\n');
+(20, 'p_recaptcha', 'reCaptcha', 'reCaptcha капча от гугла https://www.google.com/recaptcha/', 'DS Soft', '0.0.2', 'captcha', 0, '---\nrpc_domens:\nrpc_public_key:\nrpc_private_key:\nrpc_theme: blackglass\nrpc_lang: ru\n');
 
 DROP TABLE IF EXISTS `#__polls`;
 CREATE TABLE `#__polls` (

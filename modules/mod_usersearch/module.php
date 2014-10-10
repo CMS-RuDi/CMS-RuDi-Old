@@ -11,15 +11,12 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_usersearch($module_id, $cfg){
-
+function mod_usersearch($module_id, $cfg) {
     cmsCore::loadLanguage('components/users');
 
-    cmsPage::initTemplate('modules', 'mod_usersearch')->
-            assign('cfg', $cfg)->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('cfg', $cfg)->
+        display();
 
     return true;
-
 }
-?>

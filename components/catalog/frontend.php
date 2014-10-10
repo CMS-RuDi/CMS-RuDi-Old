@@ -199,15 +199,10 @@ function subCatsList($parent_id=0, $left_key=0, $right_key=0){
     $cats = $model->getSubCats($parent_id, $left_key, $right_key);
 
     if ($cats){
-
-        ob_start();
-
-        cmsPage::initTemplate('components', 'com_catalog_cats')->
-                assign('cfg', $inCore->loadComponentConfig('catalog'))->
-                assign('cats', $cats)->
-                display();
-
-        $html = ob_get_clean();
+        $html = cmsPage::initTemplate('components', 'com_catalog_cats')->
+            assign('cfg', $inCore->loadComponentConfig('catalog'))->
+            assign('cats', $cats)->
+            fetch();
     }
 
     return $html;

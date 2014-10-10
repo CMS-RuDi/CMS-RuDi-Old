@@ -77,7 +77,7 @@ class cms_model_arhive{
         }
     }
     public function whereThisAndNestedCats($cat_id) {
-        if(!@$cat_id){ return false; }
+        if(empty($cat_id)){ return false; }
         $rootcat = cmsCore::c('db')->get_fields('cms_category', "id='{$cat_id}'", 'NSLeft, NSRight');
         if(!$rootcat) { return false; }
         cmsCore::c('db')->where("cat.NSLeft >= '{$rootcat['NSLeft']}' AND cat.NSRight <= '{$rootcat['NSRight']}' AND cat.parent_id > 0");

@@ -11,31 +11,24 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_lastreg($module_id, $cfg){
+function mod_lastreg($module_id, $cfg) {
+    cmsCore::c('db')->orderBy('regdate', 'DESC');
+    cmsCore::c('db')->limitPage(1, $cfg['newscount']);
 
-    $inDB = cmsDatabase::getInstance();
+    $users = cmsCore::m('users')->getUsers();
 
-    cmsCore::loadModel('users');
-    $model = new cms_model_users();
-
-    $inDB->orderBy('regdate', 'DESC');
-
-    $inDB->limitPage(1, $cfg['newscount']);
-
-    $users = $model->getUsers();
-
-    if ($cfg['view_type']=='list'){
+    if ($cfg['view_type'] == 'list') {
         $total_all = cmsUser::getCountAllUsers();
-    } else { $total_all = 0; }
+    } else {
+        $total_all = 0;
+    }
 
-    cmsPage::initTemplate('modules', 'mod_lastreg')->
-            assign('usrs', $users)->
-            assign('cfg', $cfg)->
-            assign('total_all', $total_all)->
-            assign('total', sizeof($users))->
-            display();
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('usrs', $users)->
+        assign('cfg', $cfg)->
+        assign('total_all', $total_all)->
+        assign('total', sizeof($users))->
+        display();
 
     return true;
-
 }
-?>

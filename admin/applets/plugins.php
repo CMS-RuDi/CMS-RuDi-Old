@@ -85,7 +85,9 @@ function applet_plugins() {
         $plugin_name = cmsCore::request('plugin', 'str', 0);
         $plugin = $inCore->loadPlugin($plugin_name);
         
-        if (!method_exists($plugin, 'getConfigFields')) {
+        $plugin_cfg_fields = $plugin->getConfigFields();
+        
+        if (empty($plugin_cfg_fields)) {
             $config = cmsCore::request('config', 'array_str');
         } else {
             $config = cmsCore::c('form_gen')->requestForm($plugin->getConfigFields());
@@ -107,39 +109,40 @@ function applet_plugins() {
 
         $plugin = $inCore->loadPlugin($plugin_name);
         $config = $inCore->loadPluginConfig($plugin_name);
+        
+        $plugin_cfg_fields = $plugin->getConfigFields();
 
         cmsCore::c('page')->setAdminTitle($plugin->info['title']);
         cpAddPathway($plugin->info['title'], 'index.php?view=plugins&do=config&id='. $id);
 
-        echo '<h3>'. $plugin->info['title'] .'</h3>';
+        echo '<fieldset style="width:610px;"><legend>'. $plugin->info['title'] .'</legend>';
 
         if (!$config) {
             echo '<p>'. $_LANG['AD_PLUGIN_DISABLE'] .'.</p>';
             echo '<p><a href="javascript:window.history.go(-1);">'. $_LANG['BACK'] .'</a></p>';
-            return;
+        } else {
+            echo '<form action="index.php?view=plugins&do=save_config&plugin='. $plugin_name .'" method="POST">';
+                if (empty($plugin_cfg_fields)) {
+                    echo '<input type="hidden" name="csrf_token" value="'. cmsUser::getCsrfToken() .'" />';
+                    echo '<table class="proptable" width="605" cellpadding="8" cellspacing="0" border="0">';
+                        foreach ($config as $field => $value) {
+                            echo '<tr>';
+                                echo '<td width="150"><strong>'. cmsCore::getArrVal($_LANG, mb_strtoupper($field), $field) .':</strong></td>';
+                                echo '<td><input type="text" style="width:90%" name="config['. $field .']" value="'. htmlspecialchars($value) .'" /></td>';
+                            echo '</tr>';
+                        }
+                    echo '</table>';
+                } else {
+                    echo '<div style="width:610px;">'. cmsCore::c('form_gen')->generateForm($plugin->getConfigFields(), $config) .'</div>';
+                }
 
+                echo '<div style="margin-top:6px;">';
+                    echo '<input type="submit" class="btn btn-primary" name="save" value="'. $_LANG['SAVE'] .'" /> ';
+                    echo '<input type="button" class="btn btn-default" name="back" value="'. $_LANG['CANCEL'] .'" onclick="window.history.go(-1)" />';
+                echo '</div>';
+
+            echo '</form>';
         }
-
-        echo '<form action="index.php?view=plugins&do=save_config&plugin='. $plugin_name .'" method="POST">';
-            if (!method_exists($plugin, 'getConfigFields')) {
-                echo '<input type="hidden" name="csrf_token" value="'. cmsUser::getCsrfToken() .'" />';
-                echo '<table class="proptable" width="605" cellpadding="8" cellspacing="0" border="0">';
-                    foreach ($config as $field => $value) {
-                        echo '<tr>';
-                            echo '<td width="150"><strong>'. cmsCore::getArrVal($_LANG, mb_strtoupper($field), $field) .':</strong></td>';
-                            echo '<td><input type="text" style="width:90%" name="config['. $field .']" value="'. htmlspecialchars($value) .'" /></td>';
-                        echo '</tr>';
-                    }
-                echo '</table>';
-            } else {
-                echo '<div style="width:650px;">'. cmsCore::c('form_gen')->generateForm($plugin->getConfigFields(), $config) .'</div>';
-            }
-
-            echo '<div style="margin-top:6px;">';
-                echo '<input type="submit" class="btn btn-primary" name="save" value="'. $_LANG['SAVE'] .'" /> ';
-                echo '<input type="button" class="btn btn-default" name="back" value="'. $_LANG['CANCEL'] .'" onclick="window.history.go(-1)" />';
-            echo '</div>';
-
-        echo '</form>';
+        echo '</fieldset>';
     }
 }

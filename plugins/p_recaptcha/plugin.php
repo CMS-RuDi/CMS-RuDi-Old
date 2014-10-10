@@ -3,7 +3,7 @@
 //                                                                            //
 //                             CMS RuDi v0.0.7                                //
 //                            http://cmsrudi.ru/                              //
-//              Copyright (c) 2013 DS Soft (http://ds-soft.ru/)               //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
@@ -91,18 +91,6 @@ class p_recaptcha extends cmsPlugin {
                 )
             )
         );
-    }
-
-    public function install() {
-        return parent::install();
-    }
-
-    public function upgrade() {
-        return parent::upgrade();
-    }
-    
-    public function uninstall() {
-        return parent::uninstall();
     }
 
     public function execute($event='', $item=array()) {

@@ -11,32 +11,35 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_actions($module_id, $cfg){
-
-    $inDB      = cmsDatabase::getInstance();
-    $inActions = cmsActions::getInstance();
-
+function mod_actions($module_id, $cfg) {
     global $_LANG;
+    
+    if (!isset($cfg['action_types'])) {
+        echo $_LANG['MODULE_NOT_CONFIGURED'];
+        return true;
+    }
+    
+    $cfg = array_merge(
+        array(
+            'show_target' => 1,
+            'limit' => 15,
+            'show_link' => 1
+        ),
+        $cfg
+    );
+    
+    if (!$cfg['show_target']) {
+        cmsCore::c('actions')->showTargets(false);
+    }
 
-    if (!isset($cfg['show_target'])) { $cfg['show_target'] = 1; }
-    if (!isset($cfg['limit'])) { $cfg['limit'] = 15; }
-    if (!isset($cfg['show_link'])) { $cfg['show_link'] = 1; }
-    if (!isset($cfg['action_types'])) { echo $_LANG['MODULE_NOT_CONFIGURED']; return true; }
+    cmsCore::c('actions')->onlySelectedTypes($cfg['action_types']);
+    cmsCore::c('db')->limitIs($cfg['limit']);
 
-    if (!$cfg['show_target']){ $inActions->showTargets(false); }
-
-    $inActions->onlySelectedTypes($cfg['action_types']);
-    $inDB->limitIs($cfg['limit']);
-
-    $actions = $inActions->getActionsLog();
-
-    cmsPage::initTemplate('modules', 'mod_actions')->
-        assign('actions', $actions)->
+    cmsPage::initTemplate('modules', $cfg['tpl'])->
+        assign('actions', cmsCore::c('actions')->getActionsLog())->
         assign('cfg', $cfg)->
-        assign('user_id', cmsUser::getInstance()->id)->
+        assign('user_id', cmsCore::c('user')->id)->
         display();
 
     return true;
-
 }
-?>

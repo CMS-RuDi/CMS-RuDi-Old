@@ -1023,13 +1023,13 @@ CREATE TABLE `#__plugins` (
 
 INSERT INTO `#__plugins` (`id`, `plugin`, `title`, `description`, `author`, `version`, `type`, `published`, `config`) VALUES
 (6, 'p_usertab', 'Demo Profile Plugin', 'Example plugin - Adds a tab "Articles" in the user profiles', 'InstantCMS Team', '1.10.4', 'plugin', 0, '---\nPU_LIMIT: 10\n'),
-(3, 'p_ckeditor', 'CKEditor 4.4', 'WYSIWYG editor', 'Plugin - DS SOFT. CKEditor - Frederico Knabben', '0.0.2', 'wysiwyg', 1, '---\nPCK_INLINE: 0'),
+(3, 'p_ckeditor', 'CKEditor 4.4.5', 'WYSIWYG editor', 'Plugin - DS SOFT. CKEditor - Frederico Knabben', '0.0.3', 'wysiwyg', 1, '---\ninline:\nadmin_skin: moono\nuser_skin: moono\n'),
 (5, 'p_demo', 'Demo Plugin', 'Example plugin - Adds text to the end of each article on the website', 'InstantCMS Team', '1.0', 'plugin', 0, '---\ntext: Added By Plugin From Parameter\ncolor: blue\ncounter: 1\n'),
 (8, 'p_ping', 'Web search engine ping', 'Pings Yandex and Google when adding articles, announcements and blog posts', 'InstantCMS Team', '1.10', 'plugin', 1, '---\nYandex HOST: ping.blogs.yandex.ru\nYandex PATH: /RPC2\nGoogle HOST: blogsearch.google.com\nGoogle PATH: /ping/RPC2\n'),
 (15, 'p_morecontent', 'Related articles', 'Appends each article a list of related articles.', 'Maximov & InstantCMS Team', '1.10.4', 'plugin', 0, '---\nP_LIMIT: 5\nP_UNSORT: 1\n'),
-(14, 'p_hidetext', 'Hidden text', 'Hides the contents of the tag [hide] from unregistered', 'InstantCMS Team', '1.10.4', 'plugin', 1, '---\n'),
+(14, 'p_hidetext', 'Hidden text', 'Hides the contents of the tag [hide] from unregistered', 'InstantCMS Team', '1.12', 'plugin', 1, '---\n'),
 (16, 'p_loginza', 'Loginza authorization', 'Allows visitors to login using the account of popular social networks', 'InstantCMS Team', '1.10.4', 'plugin', 1, '---\nPL_PROVIDERS: >\n  vkontakte,facebook,mailruapi,google,yandex,openid,twitter,webmoney,rambler,flickr,mailru,loginza,myopenid,lastfm,verisign,aol,steam\nPL_LANG: ru\n'),
-(17, 'p_auto_forum', 'Autoforum', 'Creates a thread in the forum for the discussion of article', 'InstantCMS Team', '1.10.4', '', 1, '---\nAF_DELETE_THREAD: 1\nAF_LINK_TREAD: 1\nAF_ADDTREADFORUM_ID: 1\nAF_NOCREATETREAD: 0\n'),
+(17, 'p_auto_forum', 'Autoforum', 'Creates a thread in the forum for the discussion of article', 'InstantCMS Team', '1.10.4', '', 1, '---\ndelete_thread: 1\nlink_thread: 1\nforum_id: 1\nno_create_thread_cats: 0\n'),
 (18, 'p_content_imgs', 'Attached to Articles Photo', 'Plug-in adds to the article carousel (slider) with attached pictures.', 'DS Soft', '0.0.3', 'plugin', 1, '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n'),
 (19, 'p_captcha', 'Captcha.ru', 'PHP Captcha site Captcha.ru', 'Kruglov Sergei', '2.0', 'captcha', 1, '---\n'),
 (20, 'p_recaptcha', 'reCaptcha', 'reCaptcha https://www.google.com/recaptcha/', 'DS Soft', '0.0.2', 'captcha', 0, '---\nrpc_domens:\nrpc_public_key:\nrpc_private_key:\nrpc_theme: blackglass\nrpc_lang: ru\n');

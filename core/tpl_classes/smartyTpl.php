@@ -161,5 +161,5 @@ function cmsSmartyCurrentTemplate($params, $smarty){
 function cmsSmartyCallEvent($params, $smarty){
     if (empty($params['event'])) { return false; }
     
-    return cmsCore::callEvent($params['event'], cmsCore::getArrVal($params, 'item', array()));
+    return cmsCore::callEvent($params['event'], cmsCore::getArrVal($params, 'item', ''));
 }

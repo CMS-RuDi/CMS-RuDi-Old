@@ -62,6 +62,8 @@ function mod_photo($module_id, $cfg) {
         $photos = cmsCore::c('photo')->getPhotos(false, $cfg['is_full']);
         
         if (empty($photos)) { return false; }
+        
+        $tpl = $cfg['tpl'];
     } else {
         if ($cfg['sort'] == 'rating') { $cfg['sort'] = 'hits'; }
         
@@ -96,9 +98,11 @@ function mod_photo($module_id, $cfg) {
         }
         
         cmsCore::callEvent('GET_PHOTOS', $photos);
+        
+        $tpl = 'mod_user_photo';
     }
     
-    cmsPage::initTemplate('modules', $cfg['tpl'])->
+    cmsPage::initTemplate('modules', $tpl)->
         assign('photos', $photos)->
         assign('cfg', $cfg)->
         display();

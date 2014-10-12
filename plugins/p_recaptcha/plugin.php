@@ -115,7 +115,12 @@ class p_recaptcha extends cmsPlugin {
             $public_key = $this->config['rpc_public_key'];
         }
         
-        cmsCore::c('page')->addHeadJS('http://www.google.com/recaptcha/api/js/recaptcha_ajax.js');
+        if (!cmsCore::isAjax()) {
+            cmsCore::c('page')->addHeadJS('http://www.google.com/recaptcha/api/js/recaptcha_ajax.js');
+        } else {
+            cmsCore::c('page')->addHead('<script type="text/javascript">if (!document.getElementById("rescript")) { var rescript = document.createElement("script"); rescript.src = "http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"; rescript.id = "rescript"; document.documentElement.children[0].appendChild(rescript); }</script>');
+        }
+        
         cmsCore::c('page')->addHead('<script type="text/javascript">function createGoogleRecaptcha(){Recaptcha.create("'. $public_key .'", "google_recaptcha", { theme: "'. $this->config['rpc_theme'] .'", lang:"'. $this->config['rpc_lang'] .'", callback: Recaptcha.focus_response_field });} function setTimeoutRecaptcha() { setTimeout(function () { try { createGoogleRecaptcha(); } catch(e) { setTimeoutRecaptcha(); } }, 300); } setTimeoutRecaptcha();</script>');
          
         return '<div id="google_recaptcha"></div>';

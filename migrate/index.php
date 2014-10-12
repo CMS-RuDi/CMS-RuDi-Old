@@ -118,19 +118,21 @@
         ),
         
         'inserts' => array(
-            array( 'table' => 'cms_plugins', 'where' => "plugin='p_content_imgs'", 'insert_array' => array('plugin' => 'p_content_imgs', 'title' => 'Прикрепленные к статьям фотографии', 'description' => 'Плагин добавляет в конце статьи карусель (слайдер) с прикрепленными фотографиями.', 'author' => 'DS Soft', 'version' => '0.0.1', 'type' => 'plugin', 'published' => 1, 'config' => '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n'), 'msg' => 'Установлен и включен плагин p_content_imgs', 'after' => "INSERT INTO `cms_event_hooks` SET `event`='GET_ARTICLE', `plugin_id`='%id%'" ),
+            array( 'table' => 'cms_plugins', 'where' => "plugin='p_content_imgs'", 'insert_array' => array('plugin' => 'p_content_imgs', 'title' => 'Прикрепленные к статьям фотографии', 'description' => 'Плагин добавляет в конце статьи карусель (слайдер) с прикрепленными фотографиями.', 'author' => 'DS Soft', 'version' => '0.0.1', 'type' => 'plugin', 'published' => 1, 'config' => '---\nslider: jCarousel__1\n'), 'msg' => 'Установлен и включен плагин p_content_imgs', 'after' => "INSERT INTO `cms_event_hooks` SET `event`='GET_ARTICLE', `plugin_id`='%id%'" ),
             array( 'table' => 'cms_plugins', 'where' => "plugin='p_captcha'", 'insert_array' => array('plugin' => 'p_captcha', 'title' => 'Captcha.ru', 'description' => 'PHP Captcha с сайта Captcha.ru', 'author' => 'Kruglov Sergei', 'version' => '2.0', 'type' => 'captcha', 'published' => 1, 'config' => '---\n'), 'msg' => 'Установлен и включен плагин p_captcha', 'after' => array("INSERT INTO `cms_event_hooks` SET `event`='INSERT_CAPTCHA', `plugin_id`='%id%'", "INSERT INTO `cms_event_hooks` SET `event`='CHECK_CAPTCHA', `plugin_id`='%id%';") ),
             array( 'table' => 'cms_plugins', 'where' => "plugin='p_recaptcha'", 'insert_array' => array('plugin' => 'p_recaptcha', 'title' => 'reCaptcha', 'description' => 'reCaptcha капча от гугла https://www.google.com/recaptcha/', 'author' => 'DS Soft', 'version' => '0.0.1', 'type' => 'captcha', 'published' => 0, 'config' => '---\nPRC_DOMENS:\nPRC_PUBLIC_KEY:\nPRC_PRIVATE_KEY:\nPRC_THEME: blackglass\nPRC_LANG: ru\n'), 'msg' => 'Установлен плагин p_recaptcha', 'after' => array("INSERT INTO `cms_event_hooks` SET `event`='INSERT_CAPTCHA', `plugin_id`='%id%'", "INSERT INTO `cms_event_hooks` SET `event`='CHECK_CAPTCHA', `plugin_id`='%id%';") )
         ),
         
         'queries' => array(
-            array( 'sql' => "UPDATE `cms_plugins` SET `plugin`='p_ckeditor', `title`='CKEditor 4.4', `description`='Визуальный редактор', `author`='Plugin - DS SOFT. CKEditor - Frederico Knabben', `version`='0.0.2', `type`='wysiwyg', `config`='---\nPCK_INLINE: 0'  WHERE `plugin` = 'p_fckeditor'", 'msg' => 'Плагин p_fckeditor удален вместо него установлен плагин p_ckeditor.' ),
+            array( 'sql' => "UPDATE `cms_plugins` SET `plugin`='p_ckeditor', `title`='CKEditor 4.4.5', `description`='Визуальный редактор', `author`='Plugin - DS SOFT. CKEditor - Frederico Knabben', `version`='0.0.3', `type`='wysiwyg', `config`='---\ninline:\nadmin_skin: moono\nuser_skin: moono\n'  WHERE `plugin` = 'p_fckeditor'", 'msg' => 'Плагин p_fckeditor удален вместо него установлен плагин p_ckeditor.' ),
             array( 'sql' => "UPDATE `cms_modules_bind` SET `tpl` = '". cmsCore::c('config')->template ."' WHERE `tpl` = ''" ),
             array( 'sql' => "UPDATE cms_user_groups_access SET hide_for_guest=1 WHERE id=4 or id=5 or id=6 or id=9 or id=12 or id=14 or id=15" ),
             array( 'sql' => "UPDATE cms_components SET internal = '0' WHERE link = 'comments'" ),
             array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_ticket` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cat_id` int(11) NOT NULL DEFAULT '0', `title` varchar(256) NOT NULL, `msg` text NOT NULL, `msg_count` int(11) NOT NULL, `last_msg_date` datetime NOT NULL, `status` tinyint(4) NOT NULL DEFAULT '0', `priority` tinyint(4) NOT NULL DEFAULT '0', `secret_key` varchar(256) NOT NULL, `pubdate` datetime NOT NULL, `user_id` int(11) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1" ),
             array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_ticket_cat` ( `id` int(11) NOT NULL AUTO_INCREMENT, `title` varchar(256) NOT NULL, `module` varchar(32) NOT NULL, `server` varchar(128) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1" ),
-            array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_ticket_msg` ( `id` int(11) NOT NULL AUTO_INCREMENT, `ticket_id` int(11) NOT NULL, `msg` text NOT NULL, `pubdate` datetime NOT NULL, `support` varchar(128) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1" )
+            array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_ticket_msg` ( `id` int(11) NOT NULL AUTO_INCREMENT, `ticket_id` int(11) NOT NULL, `msg` text NOT NULL, `pubdate` datetime NOT NULL, `support` varchar(128) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1" ),
+            array( 'sql' => "UPDATE `cms_plugins` SET  `version`='0.0.3' WHERE `plugin` = 'p_ckeditor'" ),
+            array( 'sql' => "UPDATE `cms_plugins` SET  `version`='1.12' WHERE `plugin` = 'p_hidetext'" )
         ),
         
         'com_cfgs' => array(
@@ -155,7 +157,7 @@
     ));
     
     $version_prev = 'CMS RuDi 0.0.x или Instant CMS v1.10.3+';
-    $version_next = 'CMS RuDi 0.0.7';
+    $version_next = 'CMS RuDi 0.0.8';
 
 // ========================================================================== //
 // ========================================================================== //

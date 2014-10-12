@@ -113,7 +113,7 @@ class cmsPage {
             cmsCore::halt(sprintf($_LANG['TEMPLATE_CLASS_NOTFOUND'], $tpl_info['renderer']));
         }
         
-        $render_class =  new $tpl_info['renderer']($tpl_folder, $tpl_file);
+        $render_class = new $tpl_info['renderer']($tpl_folder, $tpl_file);
         
         if (!empty($data)) {
             if (is_array($data)) {
@@ -522,7 +522,7 @@ class cmsPage {
      * Какой именно шаблон выводить определяют константы TEMPLATE и TEMPLATE_DIR
      * Эти константы задаются в файле /core/cms.php
      */
-    public function showTemplate(){
+    public function showTemplate() {
         // Инициализируем нужные объекты
         $inCore = cmsCore::getInstance();
         $inUser = cmsCore::c('user');
@@ -587,28 +587,35 @@ class cmsPage {
      * @return bool
      */
     private function loadModulesForMenuItem() {
-        if(isset($this->modules)){ return true; }
+        if (isset($this->modules)) { return true; }
 
         $modules = array();
 
         $inCore = cmsCore::getInstance();
 
         $is_strict = $inCore->isMenuIdStrict();
-        if (!$is_strict){ $strict_sql = "AND (m.is_strict_bind = 0)"; } else { $strict_sql = ''; }
+        if (!$is_strict){
+            $strict_sql = "AND (m.is_strict_bind = 0)";
+        } else {
+            $strict_sql = '';
+        }
 
         $menuid = $inCore->menuId();
 
         $sql = "SELECT m.*, mb.position as mb_position
                 FROM cms_modules m
-                INNER JOIN cms_modules_bind mb ON mb.module_id = m.id AND mb.menu_id IN ($menuid, 0) AND mb.tpl = '". $this->site_cfg->template ."'
-                WHERE m.published = 1 $strict_sql
+                INNER JOIN cms_modules_bind mb ON mb.module_id = m.id AND mb.menu_id IN (". $menuid .", 0) AND mb.tpl = '". $this->site_cfg->template ."'
+                WHERE m.published = 1 ". $strict_sql ."
                 ORDER BY m.ordering ASC";
 
         $result = cmsCore::c('db')->query($sql);
 
-        if (!cmsCore::c('db')->num_rows($result)){ $this->modules = $modules; return true; }
+        if (!cmsCore::c('db')->num_rows($result)) {
+            $this->modules = $modules;
+            return true;
+        }
 
-        while ($mod = cmsCore::c('db')->fetch_assoc($result)){
+        while ($mod = cmsCore::c('db')->fetch_assoc($result)) {
             if (!cmsCore::checkContentAccess($mod['access_list'])) { continue; }
             
             // не показывать модуль на определенных пунктах меню

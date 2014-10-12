@@ -14,8 +14,8 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
-define('CMS_RUDI_V', '0.0.7');
-define('CMS_RUDI_V_DATE', '15.09.2014');
+define('CMS_RUDI_V', '0.0.8');
+define('CMS_RUDI_V_DATE', '11.10.2014');
 
 class cmsCore {
     private static   $instance;
@@ -2190,7 +2190,7 @@ class cmsCore {
      * @return bool
      */
     public static function checkCaptchaCode($var=false){
-        $result = self::callEvent('CHECK_CAPTCHA', $code);
+        $result = self::callEvent('CHECK_CAPTCHA', $var);
         
         if (!is_bool($result)) { return false; }
         

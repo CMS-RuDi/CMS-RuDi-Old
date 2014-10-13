@@ -8,59 +8,59 @@
             <i class="jstree-icon jstree-themeicon"></i>Главная
         </a>
         <ul class="jstree-children">
-        <?php foreach ($components as $component) { ?>
-            <li class="jstree-node jstree-<?php if (!isset($component['sections'])) { echo 'closed'; } else { echo 'open'; } ?> jstree-last">
-                <a class="jstree-icon jstree-ocl" href="/sitemap/<?php echo $component['link']; ?>.html"></a>
-                <a class="jstree-anchor" href="/<?php echo $component['link']; ?>">
+        {foreach item=component from=$components}
+            <li class="jstree-node jstree-{if $component.sections}closed{else}open{/if} jstree-last">
+                <a class="jstree-icon jstree-ocl" href="/sitemap/{$component.link}.html"></a>
+                <a class="jstree-anchor" href="/{$component.link}">
                     <i class="jstree-icon jstree-themeicon folder jstree-themeicon-custom"></i>
-                    <?php echo $component['title']; ?>
+                    {$component.title}
                 </a>
-                <?php if (isset($component['sections'])) { ?>
-                    <?php if (isset($component['section'])) { ?>
+                {if $component.sections}
+                    {if $component.section}
                         <ul class="jstree-children">
                             <li class="jstree-node jstree-open jstree-last">
-                                <a class="jstree-icon jstree-ocl" href="/sitemap/<?php echo $component['link'] .'_'. $component['section']['target'] .'_'. $component['section']['target_id']; ?>.html"></a>
-                                <a class="jstree-anchor" href="<?php echo $component['section']['link']; ?>">
+                                <a class="jstree-icon jstree-ocl" href="/sitemap/{$component.link}_{$component.section.target}_{$component.section.target_id}.html"></a>
+                                <a class="jstree-anchor" href="{$component.section.link}">
                                     <i class="jstree-icon jstree-themeicon folder jstree-themeicon-custom"></i>
-                                    <?php echo $component['section']['title']; ?>
+                                    {$component.section.title}
                                 </a>
-                    <?php } ?>
+                    {/if}
                                 <ul class="jstree-children">
-                                    <?php foreach ($component['sections'] as $section) { ?>
-                                        <?php if (isset($section['target_id'])) { ?>
+                                    {foreach item=section from=$component.sections}
+                                        {if $section.target_id}
                                             <li class="jstree-node jstree-closed jstree-last">
-                                                <a class="jstree-icon jstree-ocl" href="/sitemap/<?php echo $component['link'] .'_'. $section['target'] .'_'. $section['target_id']; ?>.html"></a>
-                                                <a class="jstree-anchor" href="<?php echo $section['link']; ?>">
+                                                <a class="jstree-icon jstree-ocl" href="/sitemap/{$component.link}_{$section.target}_{$section.target_id}.html"></a>
+                                                <a class="jstree-anchor" href="{$section.link}">
                                                     <i class="jstree-icon jstree-themeicon folder jstree-themeicon-custom"></i>
-                                                    <?php echo $section['title']; ?>
+                                                    {$section.title}
                                                 </a>
                                             </li>
-                                        <?php } else { ?>
+                                        {else}
                                             <li class="jstree-node jstree-leaf jstree-last">
                                                 <a class="jstree-icon jstree-ocl" href="#"></a>
-                                                <a class="jstree-anchor" href="<?php echo $section['link']; ?>">
+                                                <a class="jstree-anchor" href="{$section.link}">
                                                     <i class="jstree-icon jstree-themeicon file jstree-themeicon-custom"></i>
-                                                    <?php echo $section['title']; ?>
+                                                    {$section.title}
                                                 </a>
                                             </li>
-                                        <?php } ?>
-                                    <?php } ?>
+                                        {/if}
+                                    {/foreach}
                                 </ul>
-                    <?php if (isset($component['section'])) { ?>
+                    {if $component.section}
                             </li>
                         </ul>
-                    <?php } ?>
-                <?php } ?>
+                    {/if}
+                {/if}
             </li>
-        <?php } ?>
+        {/foreach}
         </ul>
     </li>
 </ul>
 </div>
 
-<?php if (!empty($pagebar)) { echo $pagebar; } ?>
+{if $pagebar}{$pagebar}{/if}
 
-<?php if ($do == 'view') { ?>
+{if $do == 'view'}
 <script type="text/javascript">
     $(function () {
         $('#jstree_sitemap').jstree({
@@ -76,16 +76,16 @@
         });
     });
 </script>
-<?php } ?>
+{/if}
 
 <style>
     #jstree_sitemap .folder {
-        background: url('/templates/<?php echo cmsCore::c('config')->template ?>/images/icons/folder.png');
+        background: url('/templates/{template}/images/icons/folder.png');
         background-repeat: no-repeat;
         background-position: center;
     }
     #jstree_sitemap .file {
-        background: url('/templates/<?php echo cmsCore::c('config')->template ?>/images/icons/article.png');
+        background: url('/templates/{template}/images/icons/article.png');
         background-repeat: no-repeat;
         background-position: center;
     }

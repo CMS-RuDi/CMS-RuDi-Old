@@ -1036,9 +1036,9 @@ class cmsPage {
      * @return \cmsPage
      */
     public function addHeadJsLang($key){
-        if(is_array($key)){
+        if (is_array($key)) {
             array_map(array($this, __FUNCTION__), $key);
-        }else{
+        } else {
             $this->page_lang[$key] = self::getLangJS($key);
         }
         return $this;

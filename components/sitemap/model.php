@@ -171,8 +171,8 @@ class cms_model_sitemap {
 
         $this->objects[$component] = new $class();
         
-        $cfg = $this->config[$com['link']];
-        $cfg['component'] = $com['link'];
+        $cfg = $this->config[$component];
+        $cfg['component'] = $component;
         $this->objects[$component]->config = $cfg;
         
         return $this->objects[$component];

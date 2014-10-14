@@ -139,7 +139,7 @@ function cmsSmartyWysiwyg($params, $smarty){
             $params['name'],
             cmsCore::getArrVal($params, 'value', ''),
             cmsCore::getArrVal($params, 'height', 350),
-            cmsCore::getArrVal($params, 'height', '100%')
+            cmsCore::getArrVal($params, 'width', '100%')
         );
     return ob_get_clean();
 }

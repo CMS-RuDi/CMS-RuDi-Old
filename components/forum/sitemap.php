@@ -28,7 +28,8 @@ class forum_sitemap extends cms_rudi_sitemap {
                 );
             }
         } else if (empty($target)) {
-            $results = cmsCore::c('db')->query("SELECT id, title FROM cms_forums WHERE category_id='". $target_id ."' AND NSLevel = 1 ". (cmsCore::c('user')->is_admin ? '' : ' AND published=1'));
+            $root_forum_ns_level = cmsCore::c('db')->get_field('cms_forums', 'category_id=0 AND parent_id=0', 'NSLevel');
+            $results = cmsCore::c('db')->query("SELECT id, title FROM cms_forums WHERE category_id='". $target_id ."' AND NSLevel = ". ($root_forum_ns_level+1) ." ". (cmsCore::c('user')->is_admin ? '' : ' AND published=1'));
         } else {
             $results = cmsCore::c('db')->query("SELECT id, title FROM cms_forums WHERE parent_id='". $target_id ."' ". (cmsCore::c('user')->is_admin ? '' : ' AND published=1'));
         }

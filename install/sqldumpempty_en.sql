@@ -417,7 +417,8 @@ INSERT INTO `#__components` (`id`, `title`, `link`, `config`, `internal`, `autho
 (24, 'Download and redirect', 'files', '', 1, 'InstantCMS team', 1, '1.10.4', 1),
 (25, 'Polls', 'polls', '---\n', 1, 'InstantCMS team', 1, '1.10.4', 1),
 (26, 'Subscription', 'subscribes', '', 1, 'InstantCMS team', 1, '1.10.4', 1),
-(27, 'Geolocation', 'geo', '---\n', 1, 'InstantCMS team', 1, '1.10.4', 1);
+(27, 'Geolocation', 'geo', '---\n', 1, 'InstantCMS team', 1, '1.10.4', 1),
+(28, 'Карта сайта', 'sitemap', '---\nperpage: 1\nhtml_map_enable: 1\nblogs:\n  published: 1\n  mode: all\n  regen_time: 24\nfaq:\n  published: 1\n  mode: all\n  regen_time: 24\nboard:\n  published: 1\n  mode: all\n  regen_time: 24\ncontent:\n  published: 1\n  mode: all\n  regen_time: 24\nclubs:\n  published: 1\n  mode: all\n  regen_time: 24\nusers:\n  published: 1\n  mode: all\n  regen_time: 24\ncatalog:\n  published: 1\n  mode: all\n  regen_time: 24\nforum:\n  published: 1\n  mode: all\n  regen_time: 24\nphotos:\n  published: 1\n  mode: all\n  regen_time: 24\n', 0, 'DS Soft', 1, '2.2', 1);
 
 DROP TABLE IF EXISTS `#__content`;
 CREATE TABLE `#__content` (
@@ -495,7 +496,8 @@ INSERT INTO `#__cron_jobs` (`id`, `job_name`, `job_interval`, `job_run_date`, `c
 (7, 'deleteOldResults', 24, '2014-06-06 12:10:08', 'search', 'deleteOldResults', '', 1, 1, 'Deletes entries in the search cache older than 1 day.', '', ''),
 (8, 'deleteOldNotification', 48, '2014-06-06 23:19:42', 'users', 'deleteOldNotification', '', 1, 1, 'Deletes update service messages and mailing messages older 1 month', '', ''),
 (9, 'moveArticlesToArchive', 24, '2014-06-06 18:25:10', 'content', 'moveArticlesToArchive', '', 1, 0, 'Moves overdue article to the archive', '', ''),
-(10, 'clearOnlineUsers', 0, '2014-06-06 17:30:01', '', '', '', 1, 0, 'Delete expired data about online users', 'user|cmsUser', 'clearOnlineUsers');
+(10, 'clearOnlineUsers', 0, '2014-06-06 17:30:01', '', '', '', 1, 0, 'Delete expired data about online users', 'user|cmsUser', 'clearOnlineUsers'),
+(11, 'generateSitemaps', 12, '2014-10-14 17:30:01', 'sitemap', 'generateSitemaps', '', 1, 0, 'Генерирует карту сайта.', '', '');
 
 DROP TABLE IF EXISTS `#__downloads`;
 CREATE TABLE `#__downloads` (

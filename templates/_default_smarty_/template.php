@@ -21,10 +21,10 @@
     $mod_count['sidebar'] = $this->countModules('sidebar');
 
     // Подключаем стили шаблона
-    $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/reset.min.css');
-    $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/text.min.css');
-    $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/960.min.css');
-    $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/styles.min.css');
+    $this->addHeadCSS('templates/_default_/css/reset.min.css');
+    $this->addHeadCSS('templates/_default_/css/text.min.css');
+    $this->addHeadCSS('templates/_default_/css/960.min.css');
+    $this->addHeadCSS('templates/_default_/css/styles.min.css');
     
     // Подключаем colorbox (просмотр фото)
     $this->addHeadJS('includes/jquery/colorbox/jquery.colorbox.js');
@@ -36,9 +36,9 @@
     
     if (cmsCore::c('user')->is_admin){
         $this->addHeadJS('admin/js/modconfig.js');
-        $this->addHeadJS('templates/'. cmsCore::c('config')->template .'/js/nyromodal.js');
-        $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/modconfig.min.css');
-        $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/nyromodal.min.css');
+        $this->addHeadJS('templates/_default_/js/nyromodal.js');
+        $this->addHeadCSS('templates/_default_/css/modconfig.min.css');
+        $this->addHeadCSS('templates/_default_/css/nyromodal.min.css');
     }
     
     // подключаем jQuery и js ядра в самое начало
@@ -66,11 +66,11 @@
                 <div class="grid_10">
                     <?php if (cmsCore::c('config')->is_change_lang){
                         $langs = cmsCore::getDirsList('/languages'); ?>
-                        <div onclick="$('#langs-select').toggle().toggleClass('active_lang');$(this).toggleClass('active_lang'); return false;" title="<?php echo $_LANG['TEMPLATE_INTERFACE_LANG']; ?>" id="langs" style="background-image:  url(/templates/<?php echo cmsCore::c('config')->template; ?>/images/icons/langs/<?php echo cmsCore::c('config')->lang; ?>.png);">
+                        <div onclick="$('#langs-select').toggle().toggleClass('active_lang');$(this).toggleClass('active_lang'); return false;" title="<?php echo $_LANG['TEMPLATE_INTERFACE_LANG']; ?>" id="langs" style="background-image:  url(/templates/_default_/images/icons/langs/<?php echo cmsCore::c('config')->lang; ?>.png);">
                             <span>&#9660;</span>
                             <ul id="langs-select">
                                 <?php foreach ($langs as $lng) { ?>
-                                <li onclick="setLang('<?php echo $lng; ?>'); return false;" style="background-image:  url(/templates/<?php echo cmsCore::c('config')->template; ?>/images/icons/langs/<?php echo $lng; ?>.png);"><?php echo $lng; ?></li>
+                                <li onclick="setLang('<?php echo $lng; ?>'); return false;" style="background-image:  url(/templates/_default_/images/icons/langs/<?php echo $lng; ?>.png);"><?php echo $lng; ?></li>
                                 <?php } ?>
                             </ul>
                         </div>

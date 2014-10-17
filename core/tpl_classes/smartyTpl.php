@@ -48,13 +48,13 @@ class smartyTpl {
     }
 
     private function loadSmarty() {
-        if (isset(self::$i_smarty)) {
-            return self::$i_smarty;
-        }
+//        if (isset(self::$i_smarty)) {
+//            return self::$i_smarty;
+//        }
         
         $smarty = new cmsRuDiSmarty();
 
-        self::$i_smarty = $smarty;
+//        self::$i_smarty = $smarty;
         
         return $smarty;
     }
@@ -100,7 +100,7 @@ class cmsRuDiSmarty extends Smarty {
     }
     
     public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false) {
-        parent::fetch($this->rudi_tpl_file, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
+        return parent::fetch($this->rudi_tpl_file, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
     }
 }
 

@@ -49,6 +49,16 @@
                     </td>
                 </tr>
                 <tr>
+                    <td valign="top">
+                        <strong>{$LANG.TIMEZONE}:</strong><br />
+                    </td>
+                    <td valign="top">
+                        <select name="timezone" style="width:307px">
+                            {$timezones_opt}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td valign="top"><strong>{$LANG.BIRTH}:</strong> </td>
                     <td valign="top">
                         {dateform seldate=$usr.birthdate}

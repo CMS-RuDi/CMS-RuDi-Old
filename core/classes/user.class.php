@@ -92,7 +92,10 @@ class cmsUser {
             $this->new_msg_count = $this->new_msg['total'];
 
             $this->logdate = self::getUserLogdate();
-
+            
+            if (!empty($info['timezone'])) {
+                $_SESSION['timezone'] = $info['timezone'];
+            }
         }
 
         // проверяем бан

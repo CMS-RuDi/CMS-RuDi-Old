@@ -1520,6 +1520,7 @@ CREATE TABLE `#__users` (
   `openid` varchar(250) DEFAULT NULL,
   `iframe_provider` varchar(8) DEFAULT NULL,
   `iframe_user_id` varchar(32) DEFAULT NULL,
+  `timezone` VARCHAR(32) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `login` (`login`),
   KEY `email` (`email`),

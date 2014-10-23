@@ -49,6 +49,7 @@
             
             array( 'table' => 'cms_user_groups_access', 'name' => 'hide_for_guest', 'type' => 'TINYINT(1) UNSIGNED', 'default' => "'0'" ),
             array( 'table' => 'cms_users', 'name' => 'music_count', 'type' => 'INT(11)', 'default' => "'0'" ),
+            array( 'table' => 'cms_users', 'name' => 'timezone', 'type' => 'VARCHAR(32)', 'default' => "''" ),
             array( 'table' => 'cms_users', 'name' => 'iframe_provider', 'type' => 'VARCHAR(8)', 'default' => "''" ),
             array( 'table' => 'cms_users', 'name' => 'iframe_user_id', 'type' => 'VARCHAR(32)', 'default' => "''" ),
             

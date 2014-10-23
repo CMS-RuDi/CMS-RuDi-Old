@@ -375,3 +375,4 @@ $_LANG['INVITE_SUBJECT']             = '%s invites you';
 $_LANG['ADRESS_EMAIL_IS_BUSY']       = 'The specified e-mail address is not available';
 $_LANG['YOU_CHANGE_EMAIL']           = 'On your e-mail "%s" letter is sent. To change the email, follow the instructions in it.';
 $_LANG['NEW_EMAIL_SAVED']            = 'New email successfully saved';
+$_LANG['TIMEZONE']                   = 'Timezone';

@@ -48,6 +48,16 @@
                     </td>
                 </tr>
                 <tr>
+                    <td valign="top">
+                        <strong><?php echo $_LANG['TIMEZONE']; ?>:</strong><br />
+                    </td>
+                    <td valign="top">
+                        <select name="timezone" style="width:307px">
+                            <?php echo $timezones_opt; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td valign="top"><strong><?php echo $_LANG['BIRTH']; ?>:</strong> </td>
                     <td valign="top">
                         <?php

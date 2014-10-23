@@ -1907,57 +1907,59 @@ class cmsCore {
         if ((int)$date == 0) { return ''; }
         
         global $_LANG;
-
-        // формируем входную $date с учетом смещения
-        $date = date('Y-m-d H:i:s', strtotime($date)+(self::c('config')->timediff*3600));
+        
+        $dt = new DateTime($date);
+        $dt_now = new DateTime();
+        
+        $with_time = $is_now_time;
+        
+        // Изменяем дату в соответствии с временной зоной пользователя
+        if (!empty($_SESSION['timezone']) && $_SESSION['timezone'] != self::c('config')->timezone) {
+            $dt->setTimezone(new DateTimeZone($_SESSION['timezone']));
+            $dt_now->setTimezone(new DateTimeZone($_SESSION['timezone']));
+        }
 
         // сегодняшняя дата
-        $today     = date('Y-m-d', strtotime(date('Y-m-d H:i:s'))+(self::c('config')->timediff*3600));
+        $today = $dt_now->format('Y-m-d');
+        
         // вчерашняя дата
-        $yesterday = date('Y-m-d', strtotime(date('Y-m-d H:i:s'))-(86400)+(self::c('config')->timediff*3600));
+        $yesterday = $dt_now->modify('-1 day')->format('Y-m-d');
+        
+        // завтрашняя дата
+        $tomorrow = $dt_now->modify('+2 day')->format('Y-m-d');
+        
+        $day = $dt->format('Y-m-d');
+        $time = $dt->format('H:i:s');
 
-        // получаем значение даты и времени
-        list($day, $time) = explode(' ', $date);
-        switch( $day ) {
+        switch ($day) {
             // Если дата совпадает с сегодняшней
             case $today:
                 $result = $_LANG['TODAY'];
-                if ($is_now_time && $time) {
-                    list($h, $m, $s)  = explode(':', $time);
-                    $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
-                }
                 break;
-            //Если дата совпадает со вчерашней
+            // Если дата совпадает со вчерашней
             case $yesterday:
                 $result = $_LANG['YESTERDAY'];
-                if ($is_now_time && $time) {
-                    list($h, $m, $s)  = explode(':', $time);
-                    $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
-                }
+                break;
+            // Если дата совпадает с завтрашней
+            case $tomorrow:
+                $result = $_LANG['TOMORROW'];
                 break;
             default: {
-                // Разделяем отображение даты на составляющие
-                list($y, $m, $d)  = explode('-', $day);
-                
                 // Замена числового обозначения месяца на словесное (склоненное в падеже)
-                if ($is_full_m){
-                    $m = $_LANG['MONTH_'.$m];
-                }else{
-                    $m = $_LANG['MONTH_'.$m.'_SHORT'];
+                if ($is_full_m) {
+                    $m = $_LANG['MONTH_'. $dt->format('m')];
+                } else {
+                    $m = $_LANG['MONTH_'. $dt->format('m') .'_SHORT'];
                 }
+
+                $result = $dt->format('j') .' '. $m .' '. $dt->format('Y');
                 
-                // Замена чисел 01 02 на 1 2
-                $d = sprintf("%2d", $d);
-                
-                // Формирование окончательного результата
-                $result = $d.' '.$m.' '.$y;
-                if( $is_time && $time)   {
-                    // Получаем отдельные составляющие времени
-                    // Секунды нас не интересуют
-                    list($h, $m, $s)  = explode(':', $time);
-                    $result .= ' '.$_LANG['IN'].' '.$h.':'.$m;
-                }
+                $with_time = $is_time;
             }
+        }
+        
+        if ($with_time && $time != '00:00:00') {
+            $result .= ' '. $_LANG['IN'] .' '. $dt->format('H') .':'. $dt->format('i');
         }
         
         return $result;
@@ -1968,16 +1970,19 @@ class cmsCore {
      * @param string $date
      * @return string
      */
-    public static function dateToWday($date){
+    public static function dateToWday($date) {
+        global $_LANG;
 
-	    global $_LANG;
+        $dt = new DateTime($date);
+        
+        // Изменяем дату в соответствии с временной зоной пользователя
+        if (!empty($_SESSION['timezone']) &&
+            $_SESSION['timezone'] != self::c('config')->timezone
+        ) {
+            $dt->setTimezone(new DateTimeZone($_SESSION['timezone']));
+        }
 
-        $d = date('w', strtotime($date)+(cmsConfig::getConfig('timediff')*3600));
-
-        $days_week = array($_LANG['SUNDAY'], $_LANG['MONDAY'], $_LANG['TUESDAY'], $_LANG['WEDNESDAY'], $_LANG['THURSDAY'], $_LANG['FRIDAY'], $_LANG['SATURDAY']);
-
-        return $days_week[$d];
-
+        return $_LANG[mb_strtoupper($dt->format('l'))];
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -2885,6 +2890,48 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
     //Сохраняет настройки шаблона в файл
     public static function saveTplCfg($cfg) {
         file_put_contents(PATH .'/cache/tpl_cfg/'. self::c('config')->template .'.cfg', serialize($cfg));
+    }
+    
+    public static function getTimeZones($offsets=false) {
+        $results = DateTimeZone::listIdentifiers();
+        
+        if ($offsets === false) {
+            return $results;
+        }
+        
+        $timezones = array();
+        
+        foreach ($results as $result) {
+            $now = new DateTime(null, new DateTimeZone($result));
+            $offset = $now->getOffset()/3600;
+            
+            if (!isset($timezones[$offset])) {
+                $timezones[$offset] = array();
+            }
+            
+            $timezones[$offset][] = $result;
+        }
+        
+        ksort($timezones);
+        
+        return $timezones;
+    }
+    
+    public static function getTimeZonesOptions($sel='') {
+        self::loadLanguage('other/timezones');
+        global $_LANG;
+        
+        $timezones = self::getTimeZones(true);
+        
+        $options = '';
+        
+        foreach ($timezones as $offset => $tzones) {
+            foreach ($tzones as $timezone) {
+                $options .= '<option value="'. $timezone .'"'. ($timezone == $sel ? ' selected="selected"' : '') .'>'. ($offset <= 0 ? $offset : '+'. $offset) .'    '. (isset($_LANG[$timezone]) ? $_LANG[$timezone] : $timezone) .'</option>'. "\n";
+            }
+        }
+        
+        return $options;
     }
 } //cmsCore
 

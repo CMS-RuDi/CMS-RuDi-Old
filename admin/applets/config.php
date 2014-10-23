@@ -77,7 +77,6 @@ function applet_config() {
         $newCFG['smtpport']           = cmsCore::request('smtpport', 'int', '25');
 
         $newCFG['timezone']           = cmsCore::request('timezone', 'str', '');
-        $newCFG['timediff']           = cmsCore::request('timediff', 'str', '');
         $newCFG['user_stats']         = cmsCore::request('user_stats', 'int', 0);
         
         $newCFG['seo_url_count']      = cmsCore::request('seo_url_count', 'int', 0);
@@ -121,7 +120,6 @@ function applet_config() {
             <li><a href="#basic"><span><?php echo $_LANG['AD_SITE']; ?></span></a></li>
             <li><a href="#home"><span><?php echo $_LANG['AD_MAIN']; ?></span></a></li>
             <li><a href="#design"><span><?php echo $_LANG['AD_DESIGN']; ?></span></a></li>
-            <li><a href="#time"><span><?php echo $_LANG['AD_TIME'] ; ?></span></a></li>
             <li><a href="#database"><span><?php echo $_LANG['AD_DB'] ; ?></span></a></li>
             <li><a href="#mail"><span><?php echo $_LANG['AD_POST']; ?></span></a></li>
             <li><a href="#other"><span><?php echo $_LANG['AD_PATHWAY']; ?></span></a></li>
@@ -131,6 +129,15 @@ function applet_config() {
         
         <div id="basic">
             <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TIME_ARREA']; ?></label>
+                    <div class="col-sm-7">
+                        <select id="timezone" class="form-control" name="timezone">
+                            <?php echo cmsCore::getTimeZonesOptions($config['timezone']); ?>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SITENAME']; ?></label>
                     <div class="col-sm-7">
@@ -433,33 +440,6 @@ function applet_config() {
                         <label class="btn btn-default <?php if (!$config['slight']) { echo 'active'; } ?>">
                             <input type="radio" name="slight" <?php if (!$config['slight']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['HIDE']; ?>
                         </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="time">
-            <div style="width:750px;">
-                <div class="form-group">
-                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TIME_ARREA']; ?></label>
-                    <div class="col-sm-7">
-                        <select id="timezone" class="form-control" name="timezone">
-                            <?php include(PATH .'/admin/includes/timezones.php'); ?>
-                            <?php foreach($timezones as $tz) { ?>
-                                <option value="<?php echo $tz; ?>" <?php if ($tz == $config['timezone']) { ?>selected="selected"<?php } ?>><?php echo $tz; ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TIME_SLIP']; ?></label>
-                    <div class="col-sm-7">
-                        <select id="timediff" class="form-control" name="timediff">
-                            <?php for ($h=-12; $h<=12; $h++) { ?>
-                                <option value="<?php echo $h; ?>" <?php if ($h == $config['timediff']) { ?>selected="selected"<?php } ?>><?php echo ($h > 0 ? '+'.$h : $h); ?></option>
-                            <?php } ?>
-                        </select>
                     </div>
                 </div>
             </div>

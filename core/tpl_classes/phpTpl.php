@@ -31,6 +31,8 @@ class phpTpl{
     public function display($tpl_file=false){
         global $_LANG;
         
+        $is_ajax = cmsCore::isAjax();
+        
         extract($this->tpl_vars);
 
         include($this->tpl_folder .'/'. $this->tpl_file);

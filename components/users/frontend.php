@@ -49,8 +49,7 @@ function users(){
 //============================================================================//
 //========================= Список пользователей  ============================//
 //============================================================================//
-if ($do == 'view'){
-
+if ($do == 'view') {
     // если запрещен просмотр всех пользователей, 404
     if ($model->config['sw_search'] == 2) {
         cmsCore::error404();
@@ -187,47 +186,49 @@ if ($do == 'view'){
 //============================================================================//
 //======================= Редактирование профиля  ============================//
 //============================================================================//
-if ($do=='editprofile'){
-
-	// неавторизованным, не владельцам и не админам тут делать нечего
-	if (!$inUser->id || ($inUser->id != $id && !$inUser->is_admin)){ cmsCore::error404(); }
+if ($do=='editprofile') {
+    // неавторизованным, не владельцам и не админам тут делать нечего
+    if (!$inUser->id || ($inUser->id != $id && !$inUser->is_admin)) {
+        cmsCore::error404();
+    }
 
     $usr = $model->getUser($id);
-    if (!$usr){ cmsCore::error404(); }
+    if (!$usr) {
+        cmsCore::error404();
+    }
 
 	$opt = cmsCore::request('opt', 'str', 'edit');
 
     // главного админа может редактировать только он сам
-    if($id == 1 && $inUser->id != $id){
+    if ($id == 1 && $inUser->id != $id) {
         cmsCore::error404();
     }
 
-	// показываем форму
-	if ($opt == 'edit'){
+    // показываем форму
+    if ($opt == 'edit') {
+        $inPage->setTitle($_LANG['CONFIG_PROFILE'].' - '.$usr['nickname']);
+        $inPage->addPathway($usr['nickname'], cmsUser::getProfileURL($usr['login']));
+        $inPage->addPathway($_LANG['CONFIG_PROFILE']);
 
-		$inPage->setTitle($_LANG['CONFIG_PROFILE'].' - '.$usr['nickname']);
-		$inPage->addPathway($usr['nickname'], cmsUser::getProfileURL($usr['login']));
-		$inPage->addPathway($_LANG['CONFIG_PROFILE']);
+        $private_forms = array();
+        if (isset($model->config['privforms'])) {
+            if (is_array($model->config['privforms'])) {
+                foreach ($model->config['privforms'] as $form_id) {
+                    $private_forms = array_merge($private_forms, cmsForm::getFieldsHtml($form_id, $usr['formsdata']));
+                }
+            }
+        }
 
-		$private_forms = array();
-		if(isset($model->config['privforms'])){
-			if (is_array($model->config['privforms'])){
-				foreach($model->config['privforms'] as $form_id){
-					$private_forms = array_merge($private_forms, cmsForm::getFieldsHtml($form_id, $usr['formsdata']));
-				}
-			}
-		}
-
-		cmsPage::initTemplate('components', 'com_users_edit_profile')->
-                assign('opt', $opt)->
-                assign('usr', $usr)->
-                assign('private_forms', $private_forms)->
-                assign('cfg_forum', $inCore->loadComponentConfig('forum'))->
-                assign('cfg', $model->config)->
-                display();
-		return;
-
-	}
+        cmsPage::initTemplate('components', 'com_users_edit_profile')->
+            assign('opt', $opt)->
+            assign('usr', $usr)->
+            assign('private_forms', $private_forms)->
+            assign('cfg_forum', $inCore->loadComponentConfig('forum'))->
+            assign('cfg', $model->config)->
+            assign('timezones_opt', cmsCore::getTimeZonesOptions(!empty($usr['timezone']) ? $usr['timezone'] : cmsCore::c('config')->timezone))->
+            display();
+        return;
+    }
 
 	// Если сохраняем профиль
 	if ($opt == 'save'){
@@ -235,6 +236,7 @@ if ($do=='editprofile'){
 		$errors = false;
 
 		$users['nickname'] = cmsCore::request('nickname', 'str');
+                $users['timezone']  = cmsCore::request('timezone', cmsCore::getTimeZones(), cmsCore::c('config')->timezone);
 		if (mb_strlen($users['nickname'])<2) { cmsCore::addSessionMessage($_LANG['SHORT_NICKNAME'], 'error'); $errors = true; }
 		cmsCore::loadModel('registration');
 		$modreg = new cms_model_registration();

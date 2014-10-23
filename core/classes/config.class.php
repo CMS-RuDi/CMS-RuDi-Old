@@ -91,7 +91,6 @@ class cmsConfig {
             'smtphost' => 'localhost',
             'smtpport' => 25,
             'timezone' => 'Europe/Moscow',
-            'timediff' => '',
             'user_stats' => 1,
             'seo_url_count' => 0,
             'allow_ip' => '',

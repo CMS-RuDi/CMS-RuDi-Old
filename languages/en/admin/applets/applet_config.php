@@ -52,7 +52,6 @@ $_LANG['AD_TEMPLATE_INFO']             = 'Template author: "%s";<br>templating -
 $_LANG['AD_TEMPLATE_CONFIG']           = 'Template config';
 $_LANG['AD_SEARCH_RESULT']             = 'Highlighting search results';
 $_LANG['AD_TIME_ARREA']                = 'Time zone:';
-$_LANG['AD_TIME_SLIP']                 = 'Shift in hours:';
 $_LANG['AD_MYSQL_CONFIG']              = 'All MySQL details are set in file /includes/config.inc.php';
 $_LANG['AD_DB_SIZE']                   = 'Database size (approximately)';
 $_LANG['AD_DB_SIZE_ERROR']             = 'It is impossible to determine';

@@ -10,7 +10,7 @@
 [ сайт:      ] http://cmsrudi.ru
 
 [ требуется: ] apache + mod_rewrite
-[            ] php 5.x (+GD, iconv, mbstrings)
+[            ] php 5.2+ (+GD, iconv, mbstrings)
 [            ] mysql 5
 [            ] для работы некоторых разделов требуется: curl
 

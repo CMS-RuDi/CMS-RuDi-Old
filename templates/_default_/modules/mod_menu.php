@@ -7,13 +7,15 @@
 
     <?php foreach($items as $item) { ?>
         <?php if ($item['NSLevel'] == $last_level) { ?></li><?php } ?>
+
         <?php $tail = $last_level - $item['NSLevel']; ?>
+
         <?php for ($i=0;$i<$tail;$i++) { echo '</li></ul></li>'; } ?>
         
         <?php if ($item['NSLevel'] > 1 && $item['NSLevel'] > $last_level) { ?><ul><?php } ?>
 
-            <li class="<?php echo $item['css_class']; ?> <?php if ($menuid == $item['id'] || ($currentmenu['NSLeft'] > $item['NSLeft'] && $currentmenu['NSRight'] < $item['NSRight'])) { ?>selected<?php } ?>">
-                <a href="<?php echo $item['link']; ?>" target="<?php echo $item['target']; ?>" <?php if ($menuid == $item['id']) { ?>class="selected"<?php } ?> title="<?php echo $this->escape($item['title']); ?>">
+            <li class="<?php echo $item['css_class']; ?> <?php if (($menuid == $item['id'] || $current_uri == $item['link']) || ($currentmenu['NSLeft'] > $item['NSLeft'] && $currentmenu['NSRight'] < $item['NSRight'])) { ?>selected<?php } ?>">
+                <a href="<?php echo $item['link']; ?>" target="<?php echo $item['target']; ?>" <?php if ($menuid == $item['id'] || $current_uri == $item['link']) { ?>class="selected"<?php } ?> title="<?php echo $this->escape($item['title']); ?>">
                     <span>
                         <?php if ($item['iconurl']) { ?><img src="/images/menuicons/<?php echo $item['iconurl']; ?>" alt="<?php echo $this->escape($item['title']); ?>" /><?php } ?>
                         <?php echo $item['title']; ?>

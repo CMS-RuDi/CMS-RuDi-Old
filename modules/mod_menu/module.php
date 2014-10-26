@@ -15,6 +15,7 @@ function mod_menu($module_id, $cfg) {
     $inCore      = cmsCore::getInstance();
     $menuid      = $inCore->menuId();
     $full_menu   = $inCore->getMenuStruct();
+    $current_uri = '/'. $inCore->getUri();
 
     $cfg = array_merge(array(
         'menu' => 'mainmenu',
@@ -77,6 +78,7 @@ function mod_menu($module_id, $cfg) {
     cmsPage::initTemplate('modules', $cfg['tpl'])->
         assign('menuid', $menuid)->
         assign('currentmenu', $currentmenu)->
+        assign('current_uri', $current_uri)->
         assign('menu', $cfg['menu'])->
         assign('items', $items)->
         assign('last_level', 0)->

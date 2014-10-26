@@ -1,7 +1,7 @@
 [ CMS RuDi - Community Management System RuDi ]
 -------------------------------------------------------------------------------
 
-[ Версия:    ] 0.0.8
+[ Версия:    ] 0.0.9
 [ Дата:      ] 2014-09-27
 [ Лицензия:  ] GNU/GPL v2
 
@@ -10,7 +10,7 @@
 [ сайт:      ] http://cmsrudi.ru
 
 [ требуется: ] apache + mod_rewrite
-[            ] php 5.2+ (+GD, iconv, mbstrings)
+[            ] php 5.3+ (+GD, iconv, mbstrings)
 [            ] mysql 5
 [            ] для работы некоторых разделов требуется: curl
 

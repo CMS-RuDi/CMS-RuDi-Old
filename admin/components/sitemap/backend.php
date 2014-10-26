@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.8                                //
+//                             CMS RuDi v0.0.9                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -70,6 +70,16 @@ if ($opt == 'config') {
                                     <input type="number" class="form-control" name="sitemap_<?php echo $com['link']; ?>[regen_time]" value="<?php echo cmsCore::getArrVal($config, 'regen_time', 24); ?>" min="0" />
                                 </div>
                             </div>
+                            
+                            <div style="margin-left:30px;">
+                            <?php
+                                $com_config_fields = cmsCore::m('sitemap')->getSitemapClass($com['link'])->getConfig();
+
+                                if (!empty($com_config_fields)) {
+                                    echo cmsCore::c('form_gen')->generateForm($com_config_fields, $config, 'rudiFormGen.php', $com['link'], false);
+                                }
+                            ?>
+                            </div>
                         </div>
                     </div>
                 </fieldset>
@@ -135,6 +145,12 @@ if ($opt == 'saveconfig') {
     
     foreach ($components as $com) {
         $cfg[$com['link']] = cmsCore::request('sitemap_'. $com['link'], 'array', array());
+        $com_config_fields = cmsCore::m('sitemap')->getSitemapClass($com['link'])->getConfig();
+                    
+        if (!empty($com_config_fields)) {
+            $com_config = cmsCore::c('form_gen')->requestForm($com_config_fields, $com['link']);
+            $cfg[$com['link']] = array_merge($cfg[$com['link']], $com_config);
+        }
     }
     
     $inCore->saveComponentConfig('sitemap', $cfg);

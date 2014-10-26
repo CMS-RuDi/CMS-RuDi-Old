@@ -14,8 +14,8 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
-define('CMS_RUDI_V', '0.0.8');
-define('CMS_RUDI_V_DATE', '11.10.2014');
+define('CMS_RUDI_V', '0.0.9');
+define('CMS_RUDI_V_DATE', '26.10.2014');
 
 class cmsCore {
     private static   $instance;
@@ -764,6 +764,10 @@ class cmsCore {
             return self::c('config')->com_without_name_in_url;
         }
     }
+    
+    public function getUri() {
+        return $this->uri;
+    } 
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -908,15 +912,7 @@ class cmsCore {
      * @return str
      */
     public function getComponentTitle() {
-        // Заголовок меню
-        $menutitle = $this->menuTitle();
-        
-        // Название компонента
-        if (isset($this->components[$this->component])) {
-            $component_title = $this->components[$this->component]['title'];
-        }
-
-        return ($menutitle && $this->isMenuIdStrict()) ? $menutitle : $component_title;
+        return $this->components[$this->component]['title'];
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -2933,6 +2929,17 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
         
         return $options;
     }
+    
+    /**
+    * Рекурсивная обработка массива
+    */
+    public static function arrayMapRecursive($callback, $value) {
+        if (is_array($value)) {
+            return array_map(function($value) use ($callback) { return cmsCore::arrayMapRecursive($callback, $value); }, $value);
+        }
+        
+        return $callback($value);
+    } 
 } //cmsCore
 
 function icms_ucfirst($str) {

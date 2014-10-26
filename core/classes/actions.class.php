@@ -298,16 +298,14 @@ class cmsActions {
     public function getActionsLog(){
         if (!$this->only_friends){ cmsCore::c('db')->where('log.is_friends_only = 0'); }
         if (!cmsCore::c('user')->id) { cmsCore::c('db')->where('log.is_users_only = 0'); }
+        
+        $pactions = cmsCore::callEvent('GET_BEFORE_ACTIONS', false);
+        if ($pactions !== false) {
+            return $pactions;
+        }
 
-        $sql = "SELECT log.id as id,
-                       log.user_id,
-                       log.object,
-                       log.object_url,
-                       log.target,
-                       log.target_url,
-                       log.pubdate,
+        $sql = "SELECT log.*,
                        log.pubdate as orig_pubdate,
-                       log.description,
                        a.message,
                        a.name,
                        u.nickname as user_nickname,

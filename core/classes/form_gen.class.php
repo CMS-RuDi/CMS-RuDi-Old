@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.8                                //
+//                             CMS RuDi v0.0.9                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -15,7 +15,7 @@
  * другой формы из простого массива данных
  * 
  * @author DS Soft <support@ds-soft.ru>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class rudi_form_generate {
     private $fields = array(
@@ -34,15 +34,18 @@ class rudi_form_generate {
         'dir_list'   => 1
     );
     private $values = array();
-    
-    public function requestForm($fields) {
+    private $name_prefix = '';
+
+
+    public function requestForm($fields, $name_prefix='') {
         $data = array();
+        $this->name_prefix = empty($name_prefix) ? '' : $name_prefix .'_';
         
         foreach ($fields as $field) {
             if ($field['type'] == 'fieldset') {
                 if (!empty($field['fields'])) {
                     foreach ($field['fields'] as $f) {
-                        $data = $this->requestField($f, $data);
+                        $this->requestField($f, $data);
                     }
                 }
             } else if ($field['type'] == 'tabs') {
@@ -51,23 +54,25 @@ class rudi_form_generate {
                         if ($f['type'] == 'fieldset') {
                             if (!empty($f['fields'])) {
                                 foreach ($f['fields'] as $f2) {
-                                    $data = $this->requestField($f2, $data);
+                                    $this->requestField($f2, $data);
                                 }
                             }
                         } else {
-                            $data = $this->requestField($f, $data);
+                            $this->requestField($f, $data);
                         }
                     }
                 }
             } else {
-                $data = $this->requestField($field, $data);
+                $this->requestField($field, $data);
             }
         }
+        
+        $this->name_prefix = '';
         
         return $data;
     }
     
-    private function requestField($field, $data) {
+    private function requestField($field, &$data) {
         if ($field['type'] == 'img_size') {
             $name = array($field['nameX'], $field['nameY']);
         } else {
@@ -82,25 +87,26 @@ class rudi_form_generate {
                     $rtype = 'array_str';
                 }
 
-                $data[$n] = cmsCore::request($n, $rtype, '');
+                $data[$n] = cmsCore::request($this->name_prefix . $n, $rtype, '');
             }
         }
-
-        return $data;
     }
 
-    public function generateForm($fields, $values=array(), $tpl='rudiFormGen.php') {
+    public function generateForm($fields, $values=array(), $tpl='rudiFormGen.php', $name_prefix='', $insert_token=true) {
         ob_start();
             cmsPage::includeTemplateFile(
                 'special/'. $tpl,
                 array(
-                    'data' => $this->getFormFields($fields, $values)
+                    'data' => $this->getFormFields($fields, $values, $name_prefix),
+                    'insert_token' => $insert_token
                 )
             );
         return ob_get_clean();
     }
     
-    public function getFormFields($fields, $values=array()) {
+    public function getFormFields($fields, $values=array(), $name_prefix='') {
+        $this->name_prefix = empty($name_prefix) ? '' : $name_prefix .'_';
+
         $this->values = is_array($values) ? $values : array();
         
         $data = array();
@@ -114,6 +120,8 @@ class rudi_form_generate {
                 if (!empty($item)) { $data[] = $item; }
             }
         }
+        
+        $this->name_prefix = '';
         
         return $data;
     }
@@ -208,7 +216,7 @@ class rudi_form_generate {
             'type' => $field['type'],
             'title' => $field['title'],
             'description' => cmsCore::getArrVal($field, 'description', ''),
-            'html' => '<input type="text" id="'. $this->fields['text']['class'] .'_'. $this->fields['text']['count'] .'" class="form-control '. $this->fields['text']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'" />'
+            'html' => '<input type="text" id="'. $this->fields['text']['class'] .'_'. $this->fields['text']['count'] .'" class="form-control '. $this->fields['text']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'" />'
         );
     }
     
@@ -224,7 +232,7 @@ class rudi_form_generate {
             'type' => $field['type'],
             'title' => $field['title'],
             'description' => cmsCore::getArrVal($field, 'description', ''),
-            'html' => '<input type="number" id="'. $this->fields['number']['class'] .'_'. $this->fields['number']['count'] .'" class="form-control '. $this->fields['number']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'" />'
+            'html' => '<input type="number" id="'. $this->fields['number']['class'] .'_'. $this->fields['number']['count'] .'" class="form-control '. $this->fields['number']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'" />'
         );
     }
     
@@ -240,7 +248,7 @@ class rudi_form_generate {
             'type' => $field['type'],
             'title' => $field['title'],
             'description' => cmsCore::getArrVal($field, 'description', ''),
-            'html' => '<textarea id="'. $this->fields['textarea']['class'] .'_'. $this->fields['textarea']['count'] .'" class="form-control '. $this->fields['textarea']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'">'. $this->getValue($field) .'</textarea>');
+            'html' => '<textarea id="'. $this->fields['textarea']['class'] .'_'. $this->fields['textarea']['count'] .'" class="form-control '. $this->fields['textarea']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'">'. $this->getValue($field) .'</textarea>');
     }
     
     /**
@@ -251,7 +259,7 @@ class rudi_form_generate {
     private function select($field) {
         if (empty($field['name']) || empty($field['options'])) { return false; }
         
-        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'">' ."\n";
+        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'">' ."\n";
         
         $selected = $this->getValue($field);
         if (!is_array($selected)) { $selected = array($selected); }
@@ -292,7 +300,7 @@ class rudi_form_generate {
             'type' => $field['type'],
             'title' => '<label for="'. $this->fields['checkbox']['class'] .'_'. $this->fields['checkbox']['count'] .'">'. $field['title'] .'</label>',
             'description' => cmsCore::getArrVal($field, 'description', ''),
-            'html' => '<input type="checkbox" id="'. $this->fields['checkbox']['class'] .'_'. $this->fields['checkbox']['count'] .'" class="'. $this->fields['checkbox']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'"'. ($this->getValue($field, true) || isset($field['checked']) ? 'checked="checked"' : '') .' />'
+            'html' => '<input type="checkbox" id="'. $this->fields['checkbox']['class'] .'_'. $this->fields['checkbox']['count'] .'" class="'. $this->fields['checkbox']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'"'. ($this->getValue($field, true) || isset($field['checked']) ? 'checked="checked"' : '') .' />'
         );
     }
     
@@ -323,7 +331,7 @@ class rudi_form_generate {
             $data['options'][] = array(
                 'id' => $this->fields['radio']['class'] .'_'. $count,
                 'title' => $option['title'],
-                'html' => '<input type="radio" id="'. $this->fields['radio']['class'] .'_'. $count .'" class="'. $this->fields['radio']['class'] .' '. cmsCore::getArrVal($option, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($option, 'style', false)) .''. $this->getOtherAttributes($option) .' name="'. $field['name'] .'" value="'. htmlspecialchars($this->getValue($option)) .'"'. $checked .' />'
+                'html' => '<input type="radio" id="'. $this->fields['radio']['class'] .'_'. $count .'" class="'. $this->fields['radio']['class'] .' '. cmsCore::getArrVal($option, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($option, 'style', false)) .''. $this->getOtherAttributes($option) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($option)) .'"'. $checked .' />'
             );
             
             $count++;
@@ -348,7 +356,7 @@ class rudi_form_generate {
             'type' => $field['type'],
             'title' => $field['title'],
             'description' => cmsCore::getArrVal($field, 'description', ''),
-            'html' => '<div class="btn-group" data-toggle="buttons" style="vertical-align:top;"><label class="btn btn-default'. ($val ? ' active' : '') .'"><input type="radio" name="'. $field['name'] .'" checked="checked" value="1"'. ($val ? ' checked="checked"' : '') .' /> '. $_LANG['YES'] .'</label> <label class="btn btn-default'. (!$val ? ' active' : '') .'"><input type="radio" name="'. $field['name'] .'" value="0"'. (!$val ? ' checked="checked"' : '') .' /> '. $_LANG['NO'] .' </label></div>'
+            'html' => '<div class="btn-group" data-toggle="buttons" style="vertical-align:top;"><label class="btn btn-default'. ($val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" checked="checked" value="1"'. ($val ? ' checked="checked"' : '') .' /> '. $_LANG['YES'] .'</label> <label class="btn btn-default'. (!$val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" value="0"'. (!$val ? ' checked="checked"' : '') .' /> '. $_LANG['NO'] .' </label></div>'
         );
     }
     
@@ -363,7 +371,7 @@ class rudi_form_generate {
         return array(
             'type' => $field['type'],
             'title' => $field['title'],
-            'html' => '<table width="100%"><tr><td><input type="number" class="form-control" name="'. $field['nameX'] .'" value="'. (float)$this->getValue($field, false, 'nameX', 'valueX') .'" /></td><td><span style="padding:5px;">x</span></td><td><input type="number" class="form-control" name="'. $field['nameY'] .'" value="'. (float)$this->getValue($field, false, 'nameY', 'valueY') .'" /></td></tr></table>'
+            'html' => '<table width="100%"><tr><td><input type="number" class="form-control" name="'. $this->name_prefix . $field['nameX'] .'" value="'. (float)$this->getValue($field, false, 'nameX', 'valueX') .'" /></td><td><span style="padding:5px;">x</span></td><td><input type="number" class="form-control" name="'. $this->name_prefix . $field['nameY'] .'" value="'. (float)$this->getValue($field, false, 'nameY', 'valueY') .'" /></td></tr></table>'
         );
     }
     
@@ -387,7 +395,7 @@ class rudi_form_generate {
         $attr_field = $field;
         unset($attr_field['table'], $attr_field['differ'], $attr_field['need_field'], $attr_field['rootid'], $attr_field['no_padding']);
         
-        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'">' ."\n";
+        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'">' ."\n";
         
         $html .= cmsCore::getInstance()->getListItemsNS(
             $field['table'],
@@ -434,7 +442,7 @@ class rudi_form_generate {
         $attr_field = $field;
         unset($attr_field['path']);
         
-        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $field['name'] .'">' ."\n";
+        $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'">' ."\n";
         
         $dirs = cmsCore::getDirsList($field['path'] .'/');
         if (!empty($dirs)) {

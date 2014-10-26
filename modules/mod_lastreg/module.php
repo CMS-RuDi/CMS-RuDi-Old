@@ -24,7 +24,7 @@ function mod_lastreg($module_id, $cfg) {
     }
 
     cmsPage::initTemplate('modules', $cfg['tpl'])->
-        assign('usrs', $users)->
+        assign('users', $users)->
         assign('cfg', $cfg)->
         assign('total_all', $total_all)->
         assign('total', sizeof($users))->

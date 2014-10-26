@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.8                                //
+//                             CMS RuDi v0.0.9                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -16,6 +16,8 @@ abstract class cms_rudi_sitemap {
     protected $max_num = 49000; // Максимальное количество ссылок в одном файле
     protected $open_file = null; // Ссылка на открытый файл
     protected $page = 1; // Номер текущего файла
+    
+    public function __construct() {}
 
     /**
      * Должен возвращать массив дополнительных настроек компонента
@@ -177,7 +179,7 @@ abstract class cms_rudi_sitemap {
             $this->createNewPage();
         }
             
-        if (empty($item['lastmod']) || !preg_match('#^[0-9]{4}-[0-9]{2}-[0-9]{2}$#is', $item['lastmod'])) {
+        if (empty($item['lastmod']) || !preg_match('#^[0-9]{4}-[0-9]{2}-[0-9]{2}$#is', $item['lastmod']) || $item['lastmod'] == '0000-00-00') {
             $item['lastmod'] = date('Y-m-d');
         }
         
@@ -201,10 +203,22 @@ abstract class cms_rudi_sitemap {
     public function getMapFiles() {
         $files = array();
         
-        for ($i=1;$i<=$this->page;$i++) {
-            $files[] = $this->config['component'] .'_'. $i .'.xml';
+        $num = $this->num - $this->max_num*($this->page-1);
+        
+        if ($num <= 0) {
+            unlink(PATH .'/upload/sitemaps/'. $this->config['component'] .'_'. $this->page .'.xml');
+            
+            if ($this->page == 1) {
+                return $files;
+            }
+            
+            $this->page--;
         }
         
+        for ($i=1; $i <= $this->page; $i++) {
+            $files[] = $this->config['component'] .'_'. $i .'.xml';
+        }
+
         return $files;
     }
     //==========================================================================

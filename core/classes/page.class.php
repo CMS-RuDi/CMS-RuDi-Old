@@ -357,8 +357,12 @@ class cmsPage {
     
     /**
      * Печатает головную область страницы
+     * @param boolean|string $full_print - определяет слудует ли выводить js и css теги. Возможные значение: 'true' - выводятся оба, 'css' - выводятся css теги js нет, 'js' - выводятся js теги css нет)
+     * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
      */
-    public function printHead($indent = '') {
+    public function printHead($full_print=true, $indent=0) {
+        $indent_str = str_repeat(' ', $indent);
+        
         $this->addHeadJsLang(array('SEND','CONTINUE','CLOSE','SAVE','CANCEL','ATTENTION','CONFIRM','LOADING','ERROR', 'ADD','SELECT_CITY','SELECT'));
 
         // Если есть пагинация и страница больше первой, добавляем "страница №"
@@ -375,45 +379,46 @@ class cmsPage {
 
         //Ключевые слова
         if (!$this->page_keys) { $this->page_keys = $this->site_cfg->keywords; }
-        echo $indent,'<meta name="keywords" content="', htmlspecialchars($this->page_keys), '" />',"\n";
+        echo $indent_str,'<meta name="keywords" content="', htmlspecialchars($this->page_keys), '" />',"\n";
 
         //Описание
         if (!$this->page_desc) { $this->page_desc = $this->site_cfg->metadesc; }
-        echo $indent,'<meta name="description" content="',htmlspecialchars($this->page_desc),'" />',"\n";
+        echo $indent_str,'<meta name="description" content="',htmlspecialchars($this->page_desc),'" />',"\n";
 
         //Генератор
-        echo $indent,'<meta name="generator" content="CMS RuDi" />',"\n";
+        echo $indent_str,'<meta name="generator" content="CMS RuDi" />',"\n";
 
         //CSS
-        $this->page_css = cmsCore::callEvent('PRINT_PAGE_CSS', $this->page_css);
-        if (cmsCore::c('config')->collect_css == 1) {
-            $data = '';
-            foreach ($this->page_css as $key => $value) {
-                if (mb_substr($value, 0, 1) != '/' || mb_substr($value, 0, 2) == '//') { continue; }
-                
-                if (file_exists(PATH . $value)) {
-                    $data .= "\n\n". file_get_contents(PATH . $value);
-                    unset($this->page_css[$key]);
-                }
-            }
-            
-            if (!empty($data)) {
-                file_put_contents(PATH .'/upload/system.css', $data);
-                $this->addHeadCSS('upload/system.css', true);
-            }
-            
-            unset($data);
-        }
-        foreach ($this->page_css as $value){
-            echo $indent,'<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n";
+        if ($full_print === true || $full_print === 'css') {
+            $this->printHeadCSS($indent);
         }
 
         //Meta
         $this->page_meta = cmsCore::callEvent('PRINT_PAGE_META', $this->page_meta);
-        foreach ($this->page_meta as $value){ echo $indent,$value,"\n"; }
+        foreach ($this->page_meta as $value){ echo $indent_str,$value,"\n"; }
 
         //JS
+        if ($full_print === true || $full_print === 'js') {
+            $this->printHeadJS($indent);
+        }
+
+        //Оставшиеся теги
+        $this->page_head = cmsCore::callEvent('PRINT_PAGE_HEAD', $this->page_head);
+        foreach($this->page_head as $value) { echo $indent_str,$value,"\n"; }
+
+        // LANG переменные
+        echo $indent_str,'<script type="text/javascript">'; foreach($this->page_lang as $value) { echo $value; } echo '</script>',"\n";
+    }
+    
+    /**
+     * Печатает теги <script>
+     * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
+     */
+    public function printHeadJS($indent='') {
+        $indent_str = str_repeat(' ', $indent);
+        
         $this->page_js = cmsCore::callEvent('PRINT_PAGE_JS', $this->page_js);
+        
         if (cmsCore::c('config')->collect_js == 1) {
             $data = '';
             foreach ($this->page_js as $key => $value) {
@@ -432,14 +437,43 @@ class cmsPage {
             
             unset($data);
         }
-        foreach ($this->page_js as $value) { echo $indent,'<script type="text/javascript" src="'. $value .'"></script>',"\n"; }
-
-        //Оставшиеся теги
-        $this->page_head = cmsCore::callEvent('PRINT_PAGE_HEAD', $this->page_head);
-        foreach($this->page_head as $value) { echo $indent,$value,"\n"; }
-
-        // LANG переменные
-        echo $indent,'<script type="text/javascript">'; foreach($this->page_lang as $value) { echo $value; } echo '</script>',"\n";
+        
+        foreach ($this->page_js as $value) {
+            echo $indent_str,'<script type="text/javascript" src="'. $value .'"></script>',"\n";
+        }
+    }
+    
+    /**
+     * Печатает теги <style>
+     * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
+     */
+    public function printHeadCSS($indent='') {
+        $indent_str = str_repeat(' ', $indent);
+        
+        $this->page_css = cmsCore::callEvent('PRINT_PAGE_CSS', $this->page_css);
+        
+        if (cmsCore::c('config')->collect_css == 1) {
+            $data = '';
+            foreach ($this->page_css as $key => $value) {
+                if (mb_substr($value, 0, 1) != '/' || mb_substr($value, 0, 2) == '//') { continue; }
+                
+                if (file_exists(PATH . $value)) {
+                    $data .= "\n\n". file_get_contents(PATH . $value);
+                    unset($this->page_css[$key]);
+                }
+            }
+            
+            if (!empty($data)) {
+                file_put_contents(PATH .'/upload/system.css', $data);
+                $this->addHeadCSS('upload/system.css', true);
+            }
+            
+            unset($data);
+        }
+        
+        foreach ($this->page_css as $value){
+            echo $indent_str,'<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n";
+        }
     }
     
     /**
@@ -510,7 +544,7 @@ class cmsPage {
         //Если такого звена еще нет, добавляем его
         if(!$already){
             // проверяем нет ли на ссылку пункта меню, если есть, меняем заголовок
-            $title = ($menu_title = cmsCore::getInstance()->getLinkInMenu($link)) ? $menu_title : $title;
+            $title = ($menu_title = cmsCore::getInstance()->getLinkInMenu($link)) ? cmsUser::stringReplaceUserProperties($menu_title, true) : $title;
             $this->pathway[] = array('title'=>$title, 'link'=>$link);
         }
 

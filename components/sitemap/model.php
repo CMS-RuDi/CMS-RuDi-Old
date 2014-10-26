@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.8                                //
+//                             CMS RuDi v0.0.9                                //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
@@ -158,7 +158,7 @@ class cms_model_sitemap {
      * @param string $component Идентификатор компонента
      * @return boolean|object
      */
-    private function getSitemapClass($component) {
+    public function getSitemapClass($component) {
         if (!cmsCore::includeFile('components/'. $component .'/sitemap.php')) {
             return false;
         }
@@ -183,6 +183,9 @@ class cms_model_sitemap {
      * @return boolean
      */
     public function generateSitemaps() {
+        ignore_user_abort(true);
+        set_time_limit(0);
+
         $map_files = array();
         
         $components = $this->getXmlMapComponents();

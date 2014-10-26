@@ -1,16 +1,16 @@
 <?php if (!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); } ?>
 
 <form name="selform" action="index.php?view=cron" method="post">
-    <table id="listTable" class="tablesorter" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top:10px">
+    <table class="table table-striped tablesorter">
         <thead>
             <tr>
-                <th class="lt_header" width="25">id</th>
-                <th class="lt_header" width="80"><?php echo $_LANG['TITLE']; ?></th>
-                <th class="lt_header" width=""><?php echo $_LANG['DESCRIPTION']; ?></th>
-                <th class="lt_header" width="30"><?php echo $_LANG['AD_MISSION_INTERVAL']; ?></th>
-                <th class="lt_header" width="150"><?php echo $_LANG['AD_LAST_START']; ?></th>
-                <th class="lt_header" width="50"><?php echo $_LANG['AD_IS_ACTIVE']; ?></th>
-                <th class="lt_header" align="center" width="100"><?php echo $_LANG['AD_ACTIONS']; ?></th>
+                <th class="lt_header" width="25" style="vertical-align:middle;">id</th>
+                <th class="lt_header" width="80" style="vertical-align:middle;"><?php echo $_LANG['TITLE']; ?></th>
+                <th class="lt_header" width="" style="vertical-align:middle;"><?php echo $_LANG['DESCRIPTION']; ?></th>
+                <th class="lt_header" width="30" style="vertical-align:middle;"><?php echo $_LANG['AD_MISSION_INTERVAL']; ?></th>
+                <th class="lt_header" width="150" style="vertical-align:middle;"><?php echo $_LANG['AD_LAST_START']; ?></th>
+                <th class="lt_header" width="50" style="vertical-align:middle;"><?php echo $_LANG['AD_IS_ACTIVE']; ?></th>
+                <th class="lt_header" width="100" style="vertical-align:middle;text-align:center;"><?php echo $_LANG['AD_ACTIONS']; ?></th>
             </tr>
         </thead>
         <?php if ($items) { ?>
@@ -60,5 +60,12 @@
         <?php } ?>
     </table>
 
-    <script type="text/javascript">highlightTableRows("listTable","hoverRow","clickedRow");</script>
+    <style>
+        tr td::first-children{
+            background:#eeeeee !important;
+        }
+        tr:hover td,tr :hover{
+            background:#cccccc !important;
+        }
+    </style>
 </form>

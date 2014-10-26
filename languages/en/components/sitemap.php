@@ -7,6 +7,6 @@
 //                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-$_LANG['AD_SPHINX_PREFIX'] = 'Site prefix in the Sphinx configuration';
+$_LANG['VIDEO_TAGS']      = 'Embed tags in the site map video?';
+$_LANG['VIDEO_TAGS_DESC'] = 'Enabling this option will increase the number of queries in the database.';

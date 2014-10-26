@@ -15,7 +15,7 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function newContent($table, $where='') {
     if ($where) { $where = ' AND '. $where; }
-    $new = cmsCore::c('db')->get_field($table, "DATE_FORMAT(pubdate, '%d-%m-%Y') = DATE_FORMAT('". date('Y-m-d H:i:s') ."', '%d-%m-%Y')". $where, 'COUNT(id)');
+    $new = cmsCore::c('db')->get_field($table, "DATE_FORMAT(pubdate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y')". $where, 'COUNT(id)');
     return $new;
 }
 
@@ -120,13 +120,13 @@ function applet_main() {
                         <a href="index.php?view=users"><?php echo $_LANG['AD_FROM_USERS']; ?></a> &mdash; <?php echo cmsCore::c('db')->rows_count('cms_users', 'is_deleted=0'); ?>
                     </li>
                     <li class="list-group-item fa fa-users">
-                        <?php echo $_LANG['AD_NEW_USERS_TODAY']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "DATE_FORMAT(regdate, '%d-%m-%Y') = DATE_FORMAT('". date('Y-m-d H:i:s') ."', '%d-%m-%Y') AND is_deleted = 0", 'COUNT(id)'); ?>
+                        <?php echo $_LANG['AD_NEW_USERS_TODAY']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "DATE_FORMAT(regdate, '%d-%m-%Y') = DATE_FORMAT(NOW(), '%d-%m-%Y') AND is_deleted = 0", 'COUNT(id)'); ?>
                     </li>
                     <li class="list-group-item fa fa-users">
-                        <?php echo $_LANG['AD_NEW_USERS_THEES_WEEK']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "regdate >= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 7 DAY)", 'COUNT(id)'); ?>
+                        <?php echo $_LANG['AD_NEW_USERS_THEES_WEEK']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "regdate >= DATE_SUB(NOW(), INTERVAL 7 DAY)", 'COUNT(id)'); ?>
                     </li>
                     <li class="list-group-item fa fa-users">
-                        <?php echo $_LANG['AD_NEW_USERS_THEES_MONTH']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "regdate >= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 MONTH)", 'COUNT(id)'); ?>
+                        <?php echo $_LANG['AD_NEW_USERS_THEES_MONTH']; ?> &mdash; <?php echo (int)cmsCore::c('db')->get_field('cms_users', "regdate >= DATE_SUB(NOW(), INTERVAL 1 MONTH)", 'COUNT(id)'); ?>
                     </li>
                 </ul>
             </div>

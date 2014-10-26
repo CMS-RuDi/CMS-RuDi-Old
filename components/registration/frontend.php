@@ -52,7 +52,7 @@ if ($do == 'sendremind') {
         }
 
         $usercode = md5($usr['id'] . '-' . uniqid() . '-' . microtime() . '-' . PATH);
-        $sql = "INSERT cms_users_activate (pubdate, user_id, code) VALUES ('". date('Y-m-d H:i:s') ."', '". $usr['id'] ."', '". $usercode ."')";
+        $sql = "INSERT cms_users_activate (pubdate, user_id, code) VALUES (NOW(), '". $usr['id'] ."', '". $usercode ."')";
         cmsCore::c('db')->query($sql);
         
         $newpass_link = HOST .'/registration/remind/'. $usercode;
@@ -113,7 +113,7 @@ if ($do == 'remind') {
 
         $md5_pass = md5($pass);
 
-        cmsCore::c('db')->query("UPDATE cms_users SET password = '". $md5_pass ."', logdate = '". date('Y-m-d H:i:s') ."' WHERE id = '". $user['id'] ."'");
+        cmsCore::c('db')->query("UPDATE cms_users SET password = '". $md5_pass ."', logdate = NOW() WHERE id = '". $user['id'] ."'");
         cmsCore::c('db')->query("DELETE FROM cms_users_activate WHERE code = '". $usercode ."'");
 
         cmsCore::addSessionMessage($_LANG['CHANGE_PASS_COMPLETED'], 'info');

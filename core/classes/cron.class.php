@@ -189,8 +189,8 @@ class cmsCron {
      * @param int $job_id ID задачи
      * @return bool
      */
-    public static function jobSuccess($job_id) {
-        $sql = "UPDATE cms_cron_jobs SET job_run_date = '". date('Y-m-d H:i:s') ."', is_new = 0 WHERE id = '". $job_id ."'";
+    public static function jobSuccess($job_id){
+        $sql = "UPDATE cms_cron_jobs SET job_run_date = CURRENT_TIMESTAMP, is_new = 0 WHERE id = '{$job_id}'";
 
         cmsCore::c('db')->query($sql);
 

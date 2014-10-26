@@ -43,7 +43,7 @@ function cmsSubmitKarma($target, $item_id, $points){
 
     //вставляем новый голос
     $sql = "INSERT INTO cms_ratings (item_id, points, ip, target, user_id, pubdate)
-            VALUES ('$item_id', '$points', '$ip', '$target', '". cmsCore::c('user')->id ."', '". date('Y-m-d H:i:s') ."')";
+            VALUES ('$item_id', '$points', '$ip', '$target', '". cmsCore::c('user')->id ."', NOW())";
     cmsCore::c('db')->query($sql);
 
     //проверяем была ли сделана агрегация для этой цели ранее

@@ -393,7 +393,7 @@ class cmsActions {
      * @return bool
      */
     public static function removeOldLog($pubdays = 60){
-        return cmsCore::c('db')->delete('cms_actions_log', "DATEDIFF('". date('Y-m-d H:i:s') ."', pubdate) > '{$pubdays}'");
+        return cmsCore::c('db')->delete('cms_actions_log', "DATEDIFF(NOW(), pubdate) > '{$pubdays}'");
     }
 
 // ============================================================================ //

@@ -69,8 +69,8 @@ class cmsPhoto {
 
         switch ($period){
             case 'today': cmsCore::c('db')->where("DATE_FORMAT(f.pubdate, '%d-%m-%Y')='$today'"); break;
-            case 'week':  cmsCore::c('db')->where("DATEDIFF('". date('Y-m-d H:i:s') ."', f.pubdate) <= 7"); break;
-            case 'month': cmsCore::c('db')->where("DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 MONTH) < f.pubdate"); break;
+            case 'week':  cmsCore::c('db')->where("DATEDIFF(NOW(), f.pubdate) <= 7"); break;
+            case 'month': cmsCore::c('db')->where("DATE_SUB(NOW(), INTERVAL 1 MONTH) < f.pubdate"); break;
             default: return;
         }
 

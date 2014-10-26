@@ -209,7 +209,7 @@ if ($do=='sendquest'){
 
         //SAVE QUESTION
 		$sql = "INSERT INTO cms_faq_quests (category_id, pubdate, published, quest, answer, user_id, answeruser_id, answerdate, hits)
-				VALUES ('$category_id', '". date('Y-m-d H:i:s') ."', '$published', '$message', '', '{$inUser->id}', 0, '". date('Y-m-d H:i:s') ."', 0)";
+				VALUES ('$category_id', NOW(), '$published', '$message', '', '{$inUser->id}', 0, NOW(), 0)";
 		$inDB->query($sql);
 
 		$quest_id = $inDB->get_last_id('cms_faq_quests');

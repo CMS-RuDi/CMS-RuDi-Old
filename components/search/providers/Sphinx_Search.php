@@ -118,9 +118,9 @@ class Sphinx_Search {
 
         switch ($this->from_pubdate){
             case 'd': cmsCore::c('db')->where("DATE_FORMAT(pubdate, '%d-%m-%Y')='". $today ."'"); break;
-            case 'w': cmsCore::c('db')->where("DATEDIFF('". date('Y-m-d H:i:s') ."', pubdate) <= 7"); break;
-            case 'm': cmsCore::c('db')->where("DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 MONTH) < pubdate"); break;
-            case 'y': cmsCore::c('db')->where("DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 YEAR) < pubdate"); break;
+            case 'w': cmsCore::c('db')->where("DATEDIFF(NOW(), pubdate) <= 7"); break;
+            case 'm': cmsCore::c('db')->where("DATE_SUB(NOW(), INTERVAL 1 MONTH) < pubdate"); break;
+            case 'y': cmsCore::c('db')->where("DATE_SUB(NOW(), INTERVAL 1 YEAR) < pubdate"); break;
             default: return;
         }
         
@@ -394,7 +394,7 @@ class Sphinx_Search {
      * @return bool
      */
     public function deleteOldResults() {
-        cmsCore::c('db')->query("DELETE FROM cms_search WHERE DATEDIFF('". date('Y-m-d H:i:s') ."', date) > 1");
+        cmsCore::c('db')->query("DELETE FROM cms_search WHERE DATEDIFF(NOW(), date) > 1");
         return true;
     }
 

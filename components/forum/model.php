@@ -403,7 +403,7 @@ class cms_model_forum{
 ////////////////////////////////////////////////////////////////////////////////
 
     public function whereDayIntervalIs($day) {
-        $this->inDB->where("DATEDIFF('". date('Y-m-d H:i:s') ."', t.pubdate) <= {$day}");
+        $this->inDB->where("DATEDIFF(NOW(), t.pubdate) <= {$day}");
     }
 
     public function whereForumIs($forum_id) {
@@ -1129,7 +1129,7 @@ class cms_model_forum{
 
         // помечаем кто за что проголосовал
         $sql = "INSERT cms_forum_votes (poll_id, answer, user_id, pubdate)
-                VALUES ('{$poll['id']}', '$answer', '{$inUser->id}', '". date('Y-m-d H:i:s') ."')";
+                VALUES ('{$poll['id']}', '$answer', '{$inUser->id}', NOW())";
         $this->inDB->query($sql);
 
         return true;

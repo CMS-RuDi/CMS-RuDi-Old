@@ -115,7 +115,7 @@ class cms_model_photos{
 
     public function loadedByUser24h($user_id, $album_id) {
 
-		return $this->inDB->rows_count('cms_photo_files', "user_id = '$user_id' AND album_id = '$album_id' AND pubdate >= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 DAY)");
+		return $this->inDB->rows_count('cms_photo_files', "user_id = '$user_id' AND album_id = '$album_id' AND pubdate >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
 
     }
 

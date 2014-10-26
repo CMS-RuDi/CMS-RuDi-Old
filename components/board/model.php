@@ -430,8 +430,8 @@ class cms_model_board{
         if ($this->config['aftertime']){
             $time_sql = '';
             switch ($this->config['aftertime']){
-                case 'delete':  $time_sql = "DELETE FROM cms_board_items WHERE DATEDIFF('". date('Y-m-d H:i:s') ."', pubdate) > pubdays AND pubdays > 0"; break;
-                case 'hide':    $time_sql = "UPDATE cms_board_items SET published = 0 WHERE DATEDIFF('". date('Y-m-d H:i:s') ."', pubdate) > pubdays AND pubdays > 0"; break;
+                case 'delete':  $time_sql = "DELETE FROM cms_board_items WHERE DATEDIFF(NOW(), pubdate) > pubdays AND pubdays > 0"; break;
+                case 'hide':    $time_sql = "UPDATE cms_board_items SET published = 0 WHERE DATEDIFF(NOW(), pubdate) > pubdays AND pubdays > 0"; break;
             }
             if ($time_sql){
                 $this->inDB->query($time_sql);
@@ -470,7 +470,7 @@ class cms_model_board{
         // Установить статус VIP и дату окончания считая от текущей,
         // если до этого статуса VIP не было
         $sql = "UPDATE cms_board_items
-                SET is_vip = 1, vipdate = DATE_ADD('". date('Y-m-d H:i:s') ."', INTERVAL {$days} DAY)
+                SET is_vip = 1, vipdate = DATE_ADD(NOW(), INTERVAL {$days} DAY)
                 WHERE id='{$id}' AND is_vip=0
                 LIMIT 1";
 
@@ -639,7 +639,7 @@ class cms_model_board{
 			return false;
 		}
 
-		$u_count = $this->inDB->rows_count('cms_board_items', "category_id = '{$cat['id']}' {$where} AND pubdate >= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 DAY)");
+		$u_count = $this->inDB->rows_count('cms_board_items', "category_id = '{$cat['id']}' {$where} AND pubdate >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
 
 		if($u_count<=$cat['uplimit']) { return true; }
 

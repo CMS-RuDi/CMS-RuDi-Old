@@ -75,7 +75,7 @@ class cmsDatabase {
      * Устанавливает соединение с базой
      * @return resource $db_link
      */
-    protected static function initConnection(){
+    protected static function initConnection() {
         $db_link = mysqli_connect(cmsCore::c('config')->db_host, cmsCore::c('config')->db_user, cmsCore::c('config')->db_pass, cmsCore::c('config')->db_base);
 
         if (mysqli_connect_errno()) {
@@ -83,6 +83,7 @@ class cmsDatabase {
         }
 
         mysqli_set_charset($db_link, 'utf8');
+        mysqli_query($db_link, "SET LOCAL time_zone='". cmsCore::c('config')->timezone ."'");
 
         return $db_link;
     }

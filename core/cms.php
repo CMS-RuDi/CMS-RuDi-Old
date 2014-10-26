@@ -2482,7 +2482,7 @@ class cmsCore {
      * @return bool
      */
     public static function isCached($target, $target_id, $cachetime=1, $cacheint='MINUTES'){
-        $where = "target='$target' AND target_id='$target_id' AND cachedate >= DATE_SUB(NOW(), INTERVAL $cachetime $cacheint)";
+        $where = "target='$target' AND target_id='$target_id' AND cachedate >= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL $cachetime $cacheint)";
         $cachefile = self::c('db')->get_field('cms_cache', $where, 'cachefile');
 
         if ($cachefile){
@@ -2542,7 +2542,7 @@ class cmsCore {
         $filename = md5($target.$target_id).'.html';
 
         $sql = "INSERT DELAYED INTO cms_cache (target, target_id, cachedate, cachefile)
-                VALUES ('$target', $target_id, NOW(), '$filename')";
+                VALUES ('$target', $target_id, '". date('Y-m-d H:i:s') ."', '$filename')";
 
         self::c('db')->query($sql);
 

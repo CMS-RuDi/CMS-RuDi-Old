@@ -214,7 +214,7 @@ class cmsUser {
         $interval = $ban['int_num'] . ' ' .$ban['int_period'];
 
         // проверяем истек ли срок бана
-        if (cmsCore::c('db')->rows_count('cms_banlist', "id = '{$ban['id']}' AND bandate <= DATE_SUB(NOW(), INTERVAL $interval) AND int_num > 0")){
+        if (cmsCore::c('db')->rows_count('cms_banlist', "id = '{$ban['id']}' AND bandate <= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL $interval) AND int_num > 0")){
             // если истек и флаг автоудаления есть, удаляем
             if ($ban['autodelete']){
                     cmsCore::c('db')->query("DELETE FROM cms_banlist WHERE id='{$ban['id']}'");
@@ -543,7 +543,7 @@ $this->logout();
 
         $from_user_id = $from_user_id ? $from_user_id : self::getInstance()->id;
 
-        cmsCore::c('db')->query("INSERT INTO cms_user_karma (user_id, sender_id, points, senddate) VALUES ('$to_user_id', '$from_user_id', '$points', NOW())");
+        cmsCore::c('db')->query("INSERT INTO cms_user_karma (user_id, sender_id, points, senddate) VALUES ('$to_user_id', '$from_user_id', '$points', '". date('Y-m-d H:i:s') ."')");
 
         $user_karma = self::getKarma($to_user_id);
 
@@ -1201,7 +1201,7 @@ $this->logout();
      * Удаляет просроченные данные об online пользователях
      */
     public static function clearOnlineUsers() {
-        $sql = "DELETE FROM cms_online WHERE lastdate <= DATE_SUB(NOW(), INTERVAL ". ONLINE_INTERVAL ." MINUTE)";
+        $sql = "DELETE FROM cms_online WHERE lastdate <= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL ". ONLINE_INTERVAL ." MINUTE)";
         if (cmsConfig::getConfig('user_stats') == 1){ $sql .= ' LIMIT 5'; }
         return cmsCore::c('db')->query($sql);
     }
@@ -1425,7 +1425,7 @@ $this->logout();
         $award = cmsCore::c('db')->escape_string($award);
 
         $sql = "INSERT INTO cms_user_awards (user_id, pubdate, title, description, imageurl, from_id, award_id)
-                        VALUES ('$user_id', NOW(), '{$award['title']}', '{$award['description']}', '{$award['imageurl']}', '{$award['from_id']}', '{$award['id']}')";
+                        VALUES ('$user_id', '". date('Y-m-d H:i:s') ."', '{$award['title']}', '{$award['description']}', '{$award['imageurl']}', '{$award['from_id']}', '{$award['id']}')";
         cmsCore::c('db')->query($sql);
         $award_id = cmsCore::c('db')->get_last_id('cms_user_awards');
 
@@ -1462,7 +1462,7 @@ $this->logout();
         $message = cmsCore::c('db')->escape_string($message);
 
         $sql = "INSERT INTO cms_user_msg (to_id, from_id, senddate, is_new, message)
-                VALUES ('$receiver_id', '$sender_id', NOW(), 1, '$message')";
+                VALUES ('$receiver_id', '$sender_id', '". date('Y-m-d H:i:s') ."', 1, '$message')";
         cmsCore::c('db')->query($sql);
 
         $msg_id = cmsCore::c('db')->get_last_id('cms_user_msg');
@@ -1558,7 +1558,7 @@ $this->logout();
         if ($subscribe){
             if (!cmsCore::c('db')->rows_count('cms_subscribe', "user_id = '$user_id' AND target = '$target' AND target_id = '$target_id'")){
                 $sql = "INSERT INTO cms_subscribe (user_id, target, target_id, pubdate)
-                        VALUES ('{$user_id}', '{$target}', '{$target_id}', NOW())";
+                        VALUES ('{$user_id}', '{$target}', '{$target_id}', '". date('Y-m-d H:i:s') ."')";
                 cmsCore::c('db')->query($sql) ;
             }
         } else {

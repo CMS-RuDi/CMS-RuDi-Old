@@ -216,11 +216,11 @@ class cms_model_users{
     }
 
     public function whereAgeTo($year) {
-        $this->inDB->where('DATEDIFF(NOW(), u.birthdate) <= '.($year*365));
+        $this->inDB->where("DATEDIFF('". date('Y-m-d H:i:s') ."', u.birthdate) <= ".($year*365));
     }
 
     public function whereAgeFrom($year) {
-        $this->inDB->where('DATEDIFF(NOW(), u.birthdate) >= '.($year*365));
+        $this->inDB->where("DATEDIFF('". date('Y-m-d H:i:s') ."', u.birthdate) >= ".($year*365));
     }
 
 /* ==================================================================================================== */
@@ -464,7 +464,7 @@ class cms_model_users{
     public function addInvite($invite) {
 
         $sql = "INSERT INTO cms_user_invites (code, owner_id, createdate, is_used, is_sended)
-                VALUES ('{$invite['code']}', '{$invite['owner_id']}', NOW(), 0, 0)";
+                VALUES ('{$invite['code']}', '{$invite['owner_id']}', '". date('Y-m-d H:i:s') ."', 0, 0)";
 
         $this->inDB->query($sql);
 
@@ -477,7 +477,7 @@ class cms_model_users{
         if (!$inv_period) { $sql_period = 'DAY'; } else { $sql_period = $inv_period; }
 
         $sql = "SELECT  u.id as id,
-                        IFNULL((u.invdate < DATE_SUB(NOW(), INTERVAL 1 {$sql_period})) OR u.invdate is NULL, 0) as is_time,
+                        IFNULL((u.invdate < DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 {$sql_period})) OR u.invdate is NULL, 0) as is_time,
                         IFNULL(SUM(k.points), 0) as karma
                 FROM cms_users u
                 LEFT JOIN cms_user_karma k ON k.user_id = u.id
@@ -505,7 +505,7 @@ class cms_model_users{
                 $given++;
             }
 
-            $this->inDB->query("UPDATE cms_users SET invdate = NOW() WHERE id = '{$user['id']}'");
+            $this->inDB->query("UPDATE cms_users SET invdate = '". date('Y-m-d H:i:s') ."' WHERE id = '{$user['id']}'");
 
         }
 
@@ -634,7 +634,7 @@ class cms_model_users{
         if (!$album['allow_who']) { $album['allow_who'] = 'all'; }
 
         $sql = "INSERT INTO cms_user_albums (user_id, title, pubdate, allow_who, description)
-                VALUES ({$album['user_id']}, '{$album['title']}', NOW(), '{$album['allow_who']}', '{$album['description']}')";
+                VALUES ({$album['user_id']}, '{$album['title']}', '". date('Y-m-d H:i:s') ."', '{$album['allow_who']}', '{$album['description']}')";
 
         $this->inDB->query($sql);
 
@@ -831,7 +831,7 @@ class cms_model_users{
     public function addUploadedPhoto($user_id, $photo) {
 
         $sql = "INSERT INTO cms_user_photos (user_id, album_id, pubdate, title, description, allow_who, hits, imageurl)
-                VALUES('{$user_id}', '0', NOW(), '{$photo['filename']}', '', 'none', 0, '{$photo['imageurl']}')";
+                VALUES('{$user_id}', '0', '". date('Y-m-d H:i:s') ."', '{$photo['filename']}', '', 'none', 0, '{$photo['imageurl']}')";
 
         $this->inDB->query($sql);
 
@@ -933,7 +933,7 @@ class cms_model_users{
 
 		cmsCore::loadClass('actions');
 
-        $users_list = $this->inDB->get_table('cms_users', "DATE_SUB(NOW(), INTERVAL ".$this->config['deltime']." MONTH) > logdate", 'id');
+        $users_list = $this->inDB->get_table('cms_users', "DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL ".$this->config['deltime']." MONTH) > logdate", 'id');
 
 		if(!$users_list) { return false; }
 
@@ -951,7 +951,7 @@ class cms_model_users{
 
     public function deleteOldNotification() {
 
-		$this->inDB->query("DELETE FROM cms_user_msg WHERE from_id IN (-1, -2) AND is_new =0 AND DATE_SUB(NOW(), INTERVAL 1 MONTH) > senddate");
+		$this->inDB->query("DELETE FROM cms_user_msg WHERE from_id IN (-1, -2) AND is_new =0 AND DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 1 MONTH) > senddate");
 
         return true;
 
@@ -1136,7 +1136,7 @@ class cms_model_users{
 
 		if($user_id == $inUser->id) { return false; }
 
-		$sql = "SELECT id FROM cms_user_karma WHERE user_id = '$user_id' AND sender_id = '".$inUser->id."' AND senddate >= DATE_SUB(NOW(), INTERVAL ".$this->config['karmatime']." ".$this->config['karmaint'].")";
+		$sql = "SELECT id FROM cms_user_karma WHERE user_id = '$user_id' AND sender_id = '".$inUser->id."' AND senddate >= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL ".$this->config['karmatime']." ".$this->config['karmaint'].")";
 		$result = $this->inDB->query($sql) ;
 
 		return !$this->inDB->num_rows($result);

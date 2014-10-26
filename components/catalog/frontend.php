@@ -16,7 +16,7 @@ if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 function isNew($item_id, $shownew, $newint){
     $inDB = cmsDatabase::getInstance();
     if ($shownew){
-        $sql = "SELECT id FROM cms_uc_items WHERE id = $item_id AND pubdate >= DATE_SUB(NOW(), INTERVAL $newint)";
+        $sql = "SELECT id FROM cms_uc_items WHERE id = $item_id AND pubdate >= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL $newint)";
         $result = $inDB->query($sql) ;
         return $inDB->num_rows($result);
     } else { return 0; }

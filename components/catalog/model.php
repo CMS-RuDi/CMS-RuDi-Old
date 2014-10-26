@@ -103,7 +103,7 @@ class cms_model_catalog{
 
 	public function renewItem($id){
         cmsCore::callEvent('RENEW_CATALOG_ITEM', $id);
-        $sql = "UPDATE cms_uc_items SET pubdate = NOW() WHERE id = $id";
+        $sql = "UPDATE cms_uc_items SET pubdate = '". date('Y-m-d H:i:s') ."' WHERE id = $id";
 		$this->inDB->query($sql);
     }
 

@@ -26,7 +26,7 @@
     if (mb_strlen($status)>140){ $status = mb_substr($status, 0, 140); }
 
     $sql = "UPDATE cms_users
-            SET status = '{$status}', status_date = NOW()
+            SET status = '{$status}', status_date = '". date('Y-m-d H:i:s') ."'
             WHERE id = '{$user_id}'
             LIMIT 1";
 

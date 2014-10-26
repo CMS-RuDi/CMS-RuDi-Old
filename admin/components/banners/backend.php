@@ -90,7 +90,7 @@ if ($opt == 'submit' || $opt == 'update') {
         if (cmsCore::moveUploadedFile($_FILES['picture']['tmp_name'], $uploadfile, $_FILES['picture']['error'])) {
             if ($opt == 'submit') {
                 $sql = "INSERT INTO cms_banners (position, typeimg, fileurl, hits, clicks, maxhits, maxuser, user_id, pubdate, title, link, published)
-                        VALUES ('$position', '$typeimg', '$filename', 0, 0, '$maxhits', '$maxuser', 1, NOW(), '$title', '$link', '$published')";
+                        VALUES ('$position', '$typeimg', '$filename', 0, 0, '$maxhits', '$maxuser', 1, '". date('Y-m-d H:i:s') ."', '$title', '$link', '$published')";
                 cmsCore::c('db')->query($sql);
 
                 cmsCore::redirect('?view=components&do=config&opt=list&id='.$id);

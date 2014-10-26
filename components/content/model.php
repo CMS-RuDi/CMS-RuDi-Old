@@ -300,7 +300,7 @@ class cms_model_content {
      * @return bool
      */
     public function moveArticlesToArchive() {
-        return cmsCore::c('db')->query("UPDATE cms_content SET is_arhive = 1 WHERE is_end = 1 AND enddate < NOW()");
+        return cmsCore::c('db')->query("UPDATE cms_content SET is_arhive = 1 WHERE is_end = 1 AND enddate < '". date('Y-m-d H:i:s') ."'");
     }
 
 /* ==================================================================================================== */

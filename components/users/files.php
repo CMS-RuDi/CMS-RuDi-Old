@@ -149,7 +149,7 @@ if ($fdo=='addfile'){
 				$loaded_files[] = $name;
 
 				$sql = "INSERT INTO cms_user_files(user_id, filename, pubdate, allow_who, filesize, hits)
-						VALUES ({$usr['id']}, '$name', NOW(), 'all', '$size', 0)";
+						VALUES ({$usr['id']}, '$name', '". date('Y-m-d H:i:s') ."', 'all', '$size', 0)";
 				$inDB->query($sql);
 				$file_id = $inDB->get_last_id('cms_user_files');
 				cmsActions::log('add_file', array(

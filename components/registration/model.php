@@ -107,7 +107,7 @@ class cms_model_registration {
         $codelink = HOST .'/activate/'. $code .'?user_id='. $user_id;
         
         $sql = "INSERT cms_users_activate (pubdate, user_id, code)
-                VALUES (NOW(), '". $user['id'] ."', '". $code ."')";
+                VALUES ('". date('Y-m-d H:i:s') ."', '". $user['id'] ."', '". $code ."')";
         $this->inDB->query($sql);
 
         $letter = cmsCore::getLanguageTextFile('activation');

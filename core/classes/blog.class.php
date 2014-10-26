@@ -435,7 +435,7 @@ class cmsBlogs {
             foreach ($authors as $key=>$author_id){
                 $author_id = (int)$author_id;
                 $sql = "INSERT INTO cms_blog_authors (user_id, blog_id, description, startdate)
-                                VALUES ('$author_id', '$id', '', NOW())";
+                                VALUES ('$author_id', '$id', '', '". date('Y-m-d H:i:s') ."')";
                 cmsCore::c('db')->query($sql);
             }
         }

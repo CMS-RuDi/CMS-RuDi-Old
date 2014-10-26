@@ -28,7 +28,7 @@ function shopAddToCart($item_id, $itemscount=1){
 
     if (!$in_cart){
 		$sql = "INSERT INTO cms_uc_cart (user_id, session_id, item_id, pubdate, itemscount)
-				VALUES ('$user_id', '$sid', '$item_id', NOW(), '$itemscount')";
+				VALUES ('$user_id', '$sid', '$item_id', '". date('Y-m-d H:i:s') ."', '$itemscount')";
     	$inDB->query($sql) ;
     }
 
@@ -91,7 +91,7 @@ function shopCartLink(){
 
 function shopCheckCarts(){
     $inDB = cmsDatabase::getInstance();
-	$sql = "DELETE FROM cms_uc_cart WHERE user_id = 0 AND pubdate <= DATE_SUB(NOW(), INTERVAL 3 HOUR)";
+	$sql = "DELETE FROM cms_uc_cart WHERE user_id = 0 AND pubdate <= DATE_SUB('". date('Y-m-d H:i:s') ."', INTERVAL 3 HOUR)";
 	$inDB->query($sql) ;
 	return true;
 }

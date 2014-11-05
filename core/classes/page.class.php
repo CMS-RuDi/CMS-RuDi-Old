@@ -76,7 +76,7 @@ class cmsPage {
      * @return array
      */
     public function getCurrentTplInfo() {
-        return $this->tpl_info;
+        return $this->tpl_info[cmsCore::c('config')->template];
     }
 
     /**
@@ -360,7 +360,7 @@ class cmsPage {
      * @param boolean|string $full_print - определяет слудует ли выводить js и css теги. Возможные значение: 'true' - выводятся оба, 'css' - выводятся css теги js нет, 'js' - выводятся js теги css нет)
      * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
      */
-    public function printHead($full_print=true, $indent=0) {
+    public function printHead($full_print=true, $indent=4) {
         $indent_str = str_repeat(' ', $indent);
         
         $this->addHeadJsLang(array('SEND','CONTINUE','CLOSE','SAVE','CANCEL','ATTENTION','CONFIRM','LOADING','ERROR', 'ADD','SELECT_CITY','SELECT'));
@@ -628,7 +628,7 @@ class cmsPage {
         $inCore = cmsCore::getInstance();
 
         $is_strict = $inCore->isMenuIdStrict();
-        if (!$is_strict){
+        if (!$is_strict) {
             $strict_sql = "AND (m.is_strict_bind = 0)";
         } else {
             $strict_sql = '';
@@ -710,19 +710,25 @@ class cmsPage {
         }else{ // Отдельный модуль
             if (cmsCore::includeFile('modules/'.$mod['content'].'/module.php')){
                 // Если есть кеш, берем тело модуля из него
-                if ($mod['cache'] && cmsCore::isCached('module', $mod['id'], $mod['cachetime'], $mod['cacheint'])){
+                if ($mod['cache'] && cmsCore::isCached('module', $mod['id'], $mod['cachetime'], $mod['cacheint'])) {
                     $mod['body'] = cmsCore::getCache('module', $mod['id']);
                     $callback = true;
-                }else{
+                } else {
                     $cfg = cmsCore::yamlToArray($mod['config']);
-
+                    
+                    if (empty($cfg['tpl'])) {
+                        $cfg['tpl'] = $mod['content'];
+                    }
+                    
                     $inCore->cacheModuleConfig($mod['id'], $cfg);
 
                     ob_start();
-                    $callback = call_user_func($mod['content'], $mod['id'], $cfg);
+                        $callback = call_user_func($mod['content'], $mod['id'], $cfg);
                     $mod['body'] = ob_get_clean();
 
-                    if ($mod['cache']){ cmsCore::saveCache('module', $mod['id'], $mod['body']); }
+                    if ($mod['cache']) {
+                        cmsCore::saveCache('module', $mod['id'], $mod['body']);
+                    }
                 }
             }
         }
@@ -730,16 +736,13 @@ class cmsPage {
         // выводим модуль в шаблоне если модуль вернул true
         if ($callback) {
             $module_tpl = file_exists(TEMPLATE_DIR .'modules/'. $mod['template']) ? $mod['template'] : 'module';
+            
             $cfglink = (cmsConfig::getConfig('fastcfg') && cmsUser::getInstance()->is_admin) ? true : false;
 
-            ob_start();
-
-            self::initTemplate('modules', $module_tpl)->
+            $html = self::initTemplate('modules', $module_tpl)->
                     assign('cfglink', $cfglink)->
                     assign('mod', $mod)->
-                    display();
-
-            $html = ob_get_clean();
+                    fetch();
         }
 
         return $html;

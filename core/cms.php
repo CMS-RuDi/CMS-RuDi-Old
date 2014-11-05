@@ -1117,13 +1117,13 @@ class cmsCore {
 
         if ($value) {
             if ($value == 'all') {
-                cmsUser::sessionDel($com.'_'.$search);
+                cmsUser::sessionDel($com .'_'. $search);
                 $value = '';
             } else {
-                cmsUser::sessionPut($com.'_'.$search, $value);
+                cmsUser::sessionPut($com .'_'. $search, $value);
             }
-        } else if (cmsUser::sessionGet($com.'_'.$search)) {
-            $value = cmsUser::sessionGet($com.'_'.$search);
+        } else if (cmsUser::sessionGet($com .'_'. $search)) {
+            $value = cmsUser::sessionGet($com .'_'. $search);
         } else {
             $value = $default;
         }

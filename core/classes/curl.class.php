@@ -202,34 +202,44 @@ class miniCurl {
             return false;
         }
         
-        $this->set_option(CURLOPT_HEADER, false);
-        $this->set_option(CURLOPT_URL, $src);
-        $this->set_option(CURLOPT_FILE, $file);
-        
-        if (!empty($header)) { $this->set_option(CURLOPT_HTTPHEADER, $header); }
-        
-        if ($this->cookies) {
-            $cookies = array();
-            foreach ($this->cookies as $k => $v) {
-                $cookies[] = $k .'='. $v;
-            }
-            $this->set_option(CURLOPT_COOKIE, implode('; ', $cookies));
+        $ch = curl_init();
+        if (!$ch) {
+            $this->error = curl_error($ch);
+            return false;
         }
         
-        $this->setProxy();
-        $this->setInterface();
+        $cfg = self::getDefaultConfig();
+        
+        curl_setopt($ch, CURLOPT_USERAGENT, $cfg['user_agent']);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $cfg['follow_location']);
+        curl_setopt($ch, CURLOPT_HEADER, $cfg['header']);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, $cfg['http_version']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, $cfg['return_transfer']);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $cfg['connect_timeout']);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, $cfg['auto_referer']);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_URL, $src);
+        curl_setopt($ch, CURLOPT_FILE, $file);
+        
+        if (!empty($header)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        }
 
-        $result = curl_exec($this->ch);
+        $result = curl_exec($ch);
         
         fclose($file);
         
         if ($result === false) {
             self::echoError('Не удалось получить файл '. $src);
-            $this->error = curl_error($this->ch);
+            
+            $this->error = curl_error($ch);
+            
+            curl_close($ch);
+            
             return false;
         }
         
-        $this->info = curl_getinfo($this->ch);
+        curl_close($ch);
         
         return true;
     }

@@ -247,19 +247,19 @@ class rudi_graphics{
         }
         $size_src = self::getImgInfo($src_img);
         $size_wm = self::getImgInfo($wm_img);
-        $wimage = @imagecreatefrompng($wm_img);
+        $wimage = imagecreatefrompng($wm_img);
         if (!$size_src or !$size_wm or $size_wm['type'] != 'png' or !$wimage){
             return false;
         }
         switch($size_src['type']){
             case 'jpg':
-                $image = @imagecreatefromjpeg($src_img);
+                $image = imagecreatefromjpeg($src_img);
                 break;
             case 'gif':
-                $image = @imagecreatefromgif($src_img);
+                $image = imagecreatefromgif($src_img);
                 break;
             case 'png':
-                $image = @imagecreatefrompng($src_img);
+                $image = imagecreatefrompng($src_img);
                 break;
             default: break;
         }
@@ -312,13 +312,13 @@ class rudi_graphics{
         imagecopyresampled($image, $wimage, $X, $Y, 0, 0, $size_wm['width'], $size_wm['height'], $size_wm['width'], $size_wm['height']);
         switch($size_src['type']){
             case 'jpg':
-                @imagejpeg($image, $src_img, $q);
+                imagejpeg($image, $src_img, $q);
                 break;
             case 'gif':
-                @imagegif($image, $src_img);
+                imagegif($image, $src_img);
                 break;
             case 'png':
-                @imagepng($image, $src_img, (9 - round($q*0.09)));
+                imagepng($image, $src_img, (9 - round($q*0.09)));
                 break;
         }
         imagedestroy($image);
@@ -388,29 +388,29 @@ class rudi_graphics{
     private function saveImage($save_path, $type='jpg'){
         switch($type){
             case 'jpg':
-                @imagejpeg($this->new_img, $save_path, $this->quality);
+                imagejpeg($this->new_img, $save_path, $this->quality);
                 break;
             case 'gif':
-                @imagegif($this->new_img, $save_path);
+                imagegif($this->new_img, $save_path);
                 break;
             case 'png':
-                @imagepng($this->new_img, $save_path, (9 - round($this->quality*0.09)));
+                imagepng($this->new_img, $save_path, (9 - round($this->quality*0.09)));
                 break;
         }
-        @imagedestroy($this->new_img);
+        imagedestroy($this->new_img);
         return true;
     }
 
     private function loadImage($image_file){
         switch($this->ext){
             case 'jpg':
-                $this->old_img = @imagecreatefromjpeg($image_file);
+                $this->old_img = imagecreatefromjpeg($image_file);
                 break;
             case 'gif':
-                $this->old_img = @imagecreatefromgif($image_file);
+                $this->old_img = imagecreatefromgif($image_file);
                 break;
             case 'png':
-                $this->old_img = @imagecreatefrompng($image_file);
+                $this->old_img = imagecreatefrompng($image_file);
                 break;
             default:
                 $this->old_img = false; return false;

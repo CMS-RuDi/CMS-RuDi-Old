@@ -123,18 +123,36 @@ abstract class cms_rudi_sitemap {
     
     /**
      * Удаляет все файлы карты для текущего компонента
+     * @param string $match регулярка для выборки нужных файлов, используется если
+     * в добавок к стандарной карте создается дополнительная карта, например как
+     * карта для google video
      */
-    protected function deleteAllFiles() {
+    protected function deleteAllFiles($match='') {
+        $files = $this->getAllMapFiles();
+        
+        foreach ($files as $file) {
+            unlink(PATH .'/upload/sitemaps/'. $file);
+        }
+    }
+    
+    protected function getAllMapFiles($match='') {
+        $match = empty($match) ? $this->config['component'] .'_[0-9]+' : $match;
+        
         $dir = PATH .'/upload/sitemaps';
         $pdir = opendir($dir);
-        $page = 1;
-
+        
+        $files = array();
+        
         while ($nextfile = readdir($pdir)){
             $match = array();
-            if (($nextfile != '.') && ($nextfile != '..') && !is_dir($dir .'/'. $nextfile) && preg_match('#'. $this->config['component'] .'_[0-9]+#is', $nextfile)){
-                unlink($dir .'/'. $nextfile);
+            if (($nextfile != '.') && ($nextfile != '..') && !is_dir($dir .'/'. $nextfile) && preg_match('#^'. $match .'$#is', $nextfile)) {
+                $files[] = $nextfile;
             }
         }
+        
+        closedir($pdir);
+        
+        return $files;
     }
 
     /**
@@ -201,22 +219,26 @@ abstract class cms_rudi_sitemap {
      * @return array
      */
     public function getMapFiles() {
-        $files = array();
-        
-        $num = $this->num - $this->max_num*($this->page-1);
-        
-        if ($num <= 0) {
-            unlink(PATH .'/upload/sitemaps/'. $this->config['component'] .'_'. $this->page .'.xml');
+        if ($this->num > 0) {
+            $files = array();
             
-            if ($this->page == 1) {
-                return $files;
+            $num = $this->num - $this->max_num*($this->page-1);
+
+            if ($num <= 0) {
+                unlink(PATH .'/upload/sitemaps/'. $this->config['component'] .'_'. $this->page .'.xml');
+
+                if ($this->page == 1) {
+                    return $files;
+                }
+
+                $this->page--;
             }
-            
-            $this->page--;
-        }
-        
-        for ($i=1; $i <= $this->page; $i++) {
-            $files[] = $this->config['component'] .'_'. $i .'.xml';
+
+            for ($i=1; $i <= $this->page; $i++) {
+                $files[] = $this->config['component'] .'_'. $i .'.xml';
+            }
+        } else {
+            $files = $this->getAllMapFiles();
         }
 
         return $files;

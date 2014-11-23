@@ -37,12 +37,6 @@ $inCore = cmsCore::getInstance();
 cmsCore::loadClass('page');
 cmsCore::loadClass('actions');
 
-// Проверяем что директории установки и миграции удалены
-if (is_dir(PATH .'/install') || is_dir(PATH .'/migrate')) {
-    cmsPage::includeTemplateFile('special/installation.php');
-    cmsCore::halt();
-}
-
 cmsCore::callEvent('GET_INDEX', '');
 
 // автоматически авторизуем пользователя, если найден кукис

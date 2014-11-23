@@ -15,10 +15,12 @@
  * об изображении нанесение водяного знака и других операций с изображениями
  * 
  * @author DS Soft <support@ds-soft.ru>
- * @version 0.0.2
+ * @version 0.0.3
  */
-class rudi_graphics{
+class rudi_graphics {
     private static $instance;
+    public $Imagick = false;
+    
     private static $type = array(
         1=>'gif', 2=>'jpg', 3=>'png', 4=>'swf', 5=>'psd', 6=>'bmp', 7=>'tiff_i', 8=>'tiff_m', 9=>'jpc', 10=>'jp2', 11=>'jpx'
     );
@@ -28,84 +30,84 @@ class rudi_graphics{
             $w_ratio,
             $h_ratio,
             $w,
-            $h;
+            $h,
+            $inConf;
     public $small_dir = 'small/',
-            $medium_dir = 'medium/',
-            $big_dir,
-            $filename,
-            $resize_type = 'auto',
-            $mresize_type,
-            $sresize_type,
-            $watermark = false,
-            $mwatermark = false,
-            $quality = 90,
-            $new_sw,
-            $new_sh,
-            $new_mw,
-            $new_mh,
-            $new_bw,
-            $new_bh;
+           $medium_dir = 'medium/',
+           $big_dir,
+           $filename,
+           $resize_type = 'auto',
+           $mresize_type,
+           $sresize_type,
+           $watermark = false,
+           $mwatermark = false,
+           $quality = 90,
+           $new_sw,
+           $new_sh,
+           $new_mw,
+           $new_mh,
+           $new_bw,
+           $new_bh;
+    
+    private function __construct() {
+        if (class_exists('Imagick')) {
+            $this->Imagick = true;
+        }
+    }
+    private function __clone() {}
 
-    private function __construct(){}
-    private function __clone(){}
-
-    public static function getInstance(){
-        if (!isset(self::$instance)){
+    public static function getInstance() {
+        if (!isset(self::$instance)) {
             self::$instance = new self();
         }
         return self::$instance;
     }
-
-    public static function getImgInfo($image_file){
-        $info = @getimagesize($image_file);
-        if ($info){
+    
+    public static function getImgInfo($image_file) {
+        $info = getimagesize($image_file);
+        
+        if ($info) {
             return array(
-                'width' => $info[0],
+                'width'  => $info[0],
                 'height' => $info[1],
-                'type' => self::$type[$info[2]]
+                'type'   => self::$type[$info[2]]
             );
         }
+        
         return false;
     }
-
-    public static function getResSize($image){
-        if (!is_resource($image)){
-            return false;
-        }
-        return array('width' => imagesx($image), 'heigth' => imagesy($image));
-    }
-
-    public function resize($image_file, $upload_file = false) {
-        $this->checkSizeOpt();
-        $m_dir = mb_strstr($this->medium_dir, PATH) ? $this->medium_dir : $this->big_dir . $this->medium_dir;
-        $s_dir = mb_strstr($this->small_dir, PATH) ? $this->small_dir : $this->big_dir . $this->small_dir;
-        
+    
+    private function uploadOrDownloadImageFile($image_file, $upload_file = false) {
         if ($upload_file === true) {
             if (!empty($_FILES[$image_file]['name'])) {
                 global $_LANG;
 
-                $max_size = ini_get('upload_max_filesize');
-                $max_size = str_ireplace(array('M','K'), array('Mb','Kb'), $max_size);
+                $max_size = str_ireplace(
+                    array('M','K'),
+                    array('Mb','Kb'),
+                    ini_get('upload_max_filesize')
+                );
 
                 $uploadErrors = array(
-                    UPLOAD_ERR_OK => $_LANG['UPLOAD_ERR_OK'],
-                    UPLOAD_ERR_INI_SIZE => $_LANG['UPLOAD_ERR_INI_SIZE'].' &mdash; '.$max_size,
-                    UPLOAD_ERR_FORM_SIZE => $_LANG['UPLOAD_ERR_INI_SIZE'],
-                    UPLOAD_ERR_PARTIAL => $_LANG['UPLOAD_ERR_PARTIAL'],
-                    UPLOAD_ERR_NO_FILE => $_LANG['UPLOAD_ERR_NO_FILE'],
+                    UPLOAD_ERR_OK         => $_LANG['UPLOAD_ERR_OK'],
+                    UPLOAD_ERR_INI_SIZE   => $_LANG['UPLOAD_ERR_INI_SIZE'] .' &mdash; '. $max_size,
+                    UPLOAD_ERR_FORM_SIZE  => $_LANG['UPLOAD_ERR_INI_SIZE'],
+                    UPLOAD_ERR_PARTIAL    => $_LANG['UPLOAD_ERR_PARTIAL'],
+                    UPLOAD_ERR_NO_FILE    => $_LANG['UPLOAD_ERR_NO_FILE'],
                     UPLOAD_ERR_NO_TMP_DIR => $_LANG['UPLOAD_ERR_NO_TMP_DIR'],
                     UPLOAD_ERR_CANT_WRITE => $_LANG['UPLOAD_ERR_CANT_WRITE'],
-                    UPLOAD_ERR_EXTENSION => $_LANG['UPLOAD_ERR_EXTENSION']
+                    UPLOAD_ERR_EXTENSION  => $_LANG['UPLOAD_ERR_EXTENSION']
                 );
                 
-                if ($_FILES[$image_file]['error'] !== UPLOAD_ERR_OK && isset($uploadErrors[$_FILES[$image_file]['error']])) {
-                    $_SESSION['file_upload_error'] = $uploadErrors[$errorCode];
-                    return false;
+                if ($_FILES[$image_file]['error'] !== UPLOAD_ERR_OK) {
+                    if (isset($uploadErrors[$_FILES[$image_file]['error']])) {
+                        $_SESSION['file_upload_error'] = $uploadErrors[$_FILES[$image_file]['error']];
+                    } else {
+                        $_SESSION['file_upload_error'] = $_LANG['UNKNOWN_ERROR'];
+                    }
+                } else {
+                    return $_FILES[$image_file]['tmp_name'];
                 }
-                
-                $image_file = $_FILES[$image_file]['tmp_name'];
-            } else {
-                return false;
             }
         } else {
             if (
@@ -115,215 +117,338 @@ class rudi_graphics{
                 $image_file2 = PATH .'/cache/'. md5($image_file .' '. microtime(true)) .'.tmp';
 
                 if (!cmsCore::c('curl')->saveFile($image_file, $image_file2)) {
-                    return false;
+                    if (cmsCore::c('user')->is_admin) {
+                        cmsCore::addSessionMessage($_LANG['UPLOAD_ERR_NO_FILE'], 'error');
+                    }
+                } else {
+                    return $image_file2;
                 }
-
-                $image_file = $image_file2;
+            } else {
+                return $image_file;
             }
         }
         
+        return false;
+    }
+    
+    private function createThumb($src, $dist, $new_w, $new_h, $resize_type, $watermark) {
+        if (file_exists($dist) && !is_writable($dist)) {
+            return false;
+        }
+        
+        if (!in_array($resize_type, array('exact', 'auto', 'crop', 'portrait', 'landscape'))) {
+            $resize_type = 'auto';
+        }
+        
+        if (!in_array($watermark, array('lt', 'lc', 'lb', 'rt', 'rc', 'rb', 'tc', 'c', 'bc')) && $watermark !== false) {
+            $watermark = 'rb';
+        }
+        
+        if ((int)$new_w) {
+            if (
+                ($this->w < $new_w && $this->h < $new_h) || 
+                ($resize_type == 'portrait' && $this->h < $new_h) || 
+                ($resize_type == 'landscape' && $this->w < $new_w)
+            ) {
+                copy($src, $dist);
+            } else {
+                $new_size = $this->getNewImageSize($new_w, $new_h, $resize_type);
+                
+                if ($this->Imagick === true) {
+                    $image = new Imagick($src);
+                    
+                    switch ($resize_type) {
+                        case 'auto':
+                            if ($this->ext == 'gif'){
+                                foreach ($image as $img) {
+                                    $img->resizeImage($new_w, $new_h, Imagick::FILTER_LANCZOS, 1, true);
+                                    $img->setImagePage($img->getImageWidth(), $img->getImageHeight(), 0, 0);
+                                }
+                            } else {
+                                $image->resizeImage($new_w, $new_h, Imagick::FILTER_LANCZOS, 1, true);
+                            }
+                            
+                            break;
+                        case 'portrait':
+                            if ($this->ext == 'gif'){
+                                foreach ($image as $img) {
+                                    $img->resizeImage(0, $new_h, Imagick::FILTER_LANCZOS, 1);
+                                    $img->setImagePage($img->getImageWidth(), $img->getImageHeight(), 0, 0);
+                                }
+                            } else {
+                                $image->resizeImage(0, $new_h, Imagick::FILTER_LANCZOS, 1);
+                            }
+                            break;
+                        case 'landscape':
+                            if ($this->ext == 'gif'){
+                                foreach ($image as $img) {
+                                    $img->resizeImage($new_w, 0, Imagick::FILTER_LANCZOS, 1);
+                                    $img->setImagePage($img->getImageWidth(), $img->getImageHeight(), 0, 0);
+                                }
+                            } else {
+                                $image->resizeImage($new_w, 0, Imagick::FILTER_LANCZOS, 1);
+                            }
+                            break;
+                        case 'exact':
+                            if ($this->ext == 'gif'){
+                                foreach ($image as $img) {
+                                    $img->resizeImage($new_w, $new_h, Imagick::FILTER_LANCZOS, 1);
+                                    $img->setImagePage($img->getImageWidth(), $img->getImageHeight(), 0, 0);
+                                }
+                            } else {
+                                $image->resizeImage($new_w, $new_h, Imagick::FILTER_LANCZOS, 1);
+                            }
+                            break;
+                        case 'crop':
+                            if ($this->ext == 'gif') {
+                                foreach ($image as $img) {
+                                    $img->cropThumbnailImage($new_w, $new_h);
+                                    $img->setImagePage($img->getImageWidth(), $img->getImageHeight(), 0, 0);
+                                }
+                            } else {
+                                $image->cropThumbnailImage($new_w, $new_h);
+                            }
+                            break;
+                    }
+                    
+                    $image->setImageCompressionQuality($this->quality);
+                    
+                    if ($this->ext == 'jpg') {
+                        $image->setImageBackgroundColor('white');
+                        $image->flattenImages();
+                        $image = $image->flattenImages();
+                        $image->setImageCompression(Imagick::COMPRESSION_JPEG);
+                    }
+                    
+                    $image->setImageFormat($this->ext);
+                    
+                    if ($this->ext == 'gif') {
+                        $image->writeimages($dist);
+                    } else {
+                        $image->writeimage($dist);
+                    }
+
+                    $image->destroy();
+                } else {
+                    $this->new_img = imagecreatetruecolor($new_size['w'], $new_size['h']);
+
+                    imagecopyresampled($this->new_img, $this->old_img, 0, 0, 0, 0, $new_size['w'], $new_size['h'], $this->w, $this->h);
+
+                    if ($resize_type == 'crop') {
+                        $this->crop($new_size['w'], $new_size['h'], $new_w, $new_h);
+                    }
+
+                    if ($this->ext != 'gif' || $this->Imagick === true) {
+                        $this->saveImage($dist, $this->ext);
+                    } else {
+                        $gif_resize = new gifresizer();
+                        $gif_resize->resize($src, $dist, $new_w, $new_h);
+                    }
+                }
+            }
+            
+            if (!empty($watermark)) {
+                self::addWatermark($dist, PATH .'/images/'. $this->inConf->wmark, $watermark);
+            }
+        } else if ($new_w == 'copy') {
+            copy($src, $dist);
+        }
+    }
+    
+    public function resize($image_file, $upload_file = false) {
+        $this->checkSizeOpt();
+
+        $image_file = $this->uploadOrDownloadImageFile($image_file, $upload_file);
+        if ($image_file === false) { return false; }
+        
         if (!$size = self::getImgInfo($image_file)) {
+            if (cmsCore::c('user')->is_admin) {
+                cmsCore::addSessionMessage($_LANG['NOT_SUPPORTED_FORMAT'], 'error');
+            }
             return false;
         }
         
         $this->ext = $size['type'];
         if ($this->ext != 'jpg' && $this->ext != 'png' && $this->ext != 'gif') {
+            if (cmsCore::c('user')->is_admin) {
+                cmsCore::addSessionMessage($_LANG['NOT_SUPPORTED_FORMAT'], 'error');
+            }
             return false;
         }
         
         $this->filename = ($this->filename ? $this->filename : md5(microtime() .' '. $image_file) .'.'. $this->ext);
         
-        if ($this->ext == 'gif') {
+        if ($this->ext == 'gif' && $this->Imagick === false) {
             cmsCore::loadClass('gif_resize');
-            $gif_resize = new gifresizer();
         }
         
-        $this->w = $size['width'];
-        $this->h = $size['height'];
+        $this->w       = $size['width'];
+        $this->h       = $size['height'];
         $this->w_ratio = $this->w / $this->h;
         $this->h_ratio = $this->h / $this->w;
         
-        $this->loadImage($image_file);
-        if (!is_resource($this->old_img)) {
-            return false;
+        if ($this->Imagick === false) {
+            $this->loadImage($image_file);
+            if (!is_resource($this->old_img)) {
+                return false;
+            }
         }
-        
+
         if ($this->watermark || $this->mwatermark) {
-            $inConf = cmsConfig::getInstance();
+            $this->inConf = cmsConfig::getInstance();
         }
         
-        if ((int)$this->new_bw) {
-            if (
-                ($this->w < $this->new_bw && $this->h < $this->new_bh) || 
-                ($this->resize_type == 'portrait' && $this->h < $this->new_bh) || 
-                ($this->resize_type == 'landscape' && $this->w < $this->new_bw)
-            ) {
-                copy($image_file, $this->big_dir . $this->filename);
-            } else {
-                $new_size = $this->getNewImageSize($this->new_bw, $this->new_bh, $this->resize_type);
-                $this->new_img = imagecreatetruecolor($new_size['w'], $new_size['h']);
-                imagecopyresampled($this->new_img, $this->old_img, 0, 0, 0, 0, $new_size['w'], $new_size['h'], $this->w, $this->h);
-                if ($this->resize_type == 'crop') {
-                    $this->crop($new_size['w'], $new_size['h'], $this->new_bw, $this->new_bh);
-                }
-                if ($this->ext != 'gif') {
-                    $this->saveImage($this->big_dir . $this->filename, $this->ext);
-                } else {
-                    $gif_resize->resize($image_file, $this->big_dir . $this->filename, $this->new_bw, $this->new_bh);
-                }
-            }
-            
-            if (!empty($this->watermark)) {
-                self::addWatermark($this->big_dir . $this->filename, PATH .'/images/'. $inConf->wmark, $this->watermark);
-            }
-        } else if ($this->new_bw == 'copy') {
-            copy($image_file, $this->big_dir . $this->filename);
-        }
+        $this->createThumb(
+            $image_file,
+            $this->big_dir . $this->filename,
+            $this->new_bw,
+            $this->new_bh,
+            $this->resize_type,
+            $this->watermark
+        );
         
-        if ($this->new_mw) {
-            if ($this->w < $this->new_mw && $this->h < $this->new_mh) {
-                copy($image_file, $m_dir . $this->filename);
-            } else {
-                $rt = $this->mresize_type ? $this->mresize_type : $this->resize_type;
-                if (($rt == 'portrait' && $this->h < $this->new_mh) || 
-                ($rt == 'landscape' && $this->w < $this->new_mw)) {
-                    copy($image_file, $m_dir . $this->filename);
-                } else {
-                    $new_size = $this->getNewImageSize($this->new_mw, $this->new_mh, $rt);
-                    $this->new_img = imagecreatetruecolor($new_size['w'], $new_size['h']);
-                    imagecopyresampled($this->new_img, $this->old_img, 0, 0, 0, 0, $new_size['w'], $new_size['h'], $this->w, $this->h);
-                    if ($rt == 'crop') {
-                        $this->crop($new_size['w'], $new_size['h'], $this->new_mw, $this->new_mh);
-                    }
-                }
-            }
-            if ($this->ext != 'gif') {
-                $this->saveImage($m_dir . $this->filename, $this->ext);
-            } else {
-                $gif_resize->resize($image_file, $m_dir . $this->filename, $this->new_mw, $this->new_mh);
-            }
-            if (!empty($this->mwatermark)) {
-                self::addWatermark($m_dir . $this->filename, PATH .'/images/'. $inConf->wmark, $this->mwatermark);
-            }
-        }
+        $this->createThumb(
+            $image_file,
+            (mb_strstr($this->medium_dir, PATH) ? $this->medium_dir : $this->big_dir . $this->medium_dir) . $this->filename,
+            $this->new_mw,
+            $this->new_mh,
+            $this->mresize_type ? $this->mresize_type : $this->resize_type,
+            $this->mwatermark
+        );
         
-        if ($this->new_sw) {
-            if ($this->w < $this->new_sw and $this->h < $this->new_sh) {
-                copy($image_file, $s_dir . $this->filename);
-            } else {
-                $rt = $this->sresize_type ? $this->sresize_type : $this->resize_type;
-                if (($rt == 'portrait' && $this->h < $this->new_sh) || 
-                ($rt == 'landscape' && $this->w < $this->new_sw)) {
-                    copy($image_file, $s_dir . $this->filename);
-                } else {
-                    $new_size = $this->getNewImageSize($this->new_sw, $this->new_sh, $rt);
-                    $this->new_img = imagecreatetruecolor($new_size['w'], $new_size['h']);
-                    imagecopyresampled($this->new_img, $this->old_img, 0, 0, 0, 0, $new_size['w'], $new_size['h'], $this->w, $this->h);
-                    if ($rt == 'crop') {
-                        $this->crop($new_size['w'], $new_size['h'], $this->new_sw, $this->new_sh);
-                    }
-                }
-            }
-            if ($this->ext != 'gif') {
-                $this->saveImage($s_dir . $this->filename, $this->ext);
-            } else {
-                $gif_resize->resize($image_file, $s_dir . $this->filename, $this->new_sw, $this->new_sh);
-            }
-        }
-        
+        $this->createThumb(
+            $image_file,
+            (mb_strstr($this->small_dir, PATH) ? $this->small_dir : $this->big_dir . $this->small_dir) . $this->filename,
+            $this->new_sw,
+            $this->new_sh,
+            $this->sresize_type ? $this->sresize_type : $this->resize_type,
+            false
+        );
+
         $filename = $this->filename;
+        
         unset($this->filename);
         
-        if (mb_strstr($image_file, PATH .'/cache/')) {
-            unlink($image_file);
-        }
+        if (mb_strstr($image_file, PATH .'/cache/')) { unlink($image_file); }
         
         return $filename;
     }
 
     public static function addWatermark($src_img, $wm_img, $pos='rb', $q=80){
-        if (!$src_img or !$wm_img){
-            return false;
-        }
+        if (!$src_img || !$wm_img) { return false; }
+        
         $size_src = self::getImgInfo($src_img);
-        $size_wm = self::getImgInfo($wm_img);
-        $wimage = imagecreatefrompng($wm_img);
-        if (!$size_src or !$size_wm or $size_wm['type'] != 'png' or !$wimage){
-            return false;
-        }
-        switch($size_src['type']){
-            case 'jpg':
-                $image = imagecreatefromjpeg($src_img);
-                break;
-            case 'gif':
-                $image = imagecreatefromgif($src_img);
-                break;
-            case 'png':
-                $image = imagecreatefrompng($src_img);
-                break;
-            default: break;
-        }
-        if (!$image){
-            return false;
-        }
+        $size_wm  = self::getImgInfo($wm_img);
+        
+        if (!$size_src || !$size_wm) { return false; }
+        
+        if ($this->Imagick === true) {
+            $image = new Imagick($src_img);
+            $wm    = new Imagick($wm_img);
+            
+            $wm->scaleImage($size_src['width']/10, 0);
+            
+            list($X, $Y) = $this->getWatermarkPos($size_src['width'], $size_src['height'], $wm->getImageWidth(), $wm->getImageHeight());
+            if ($X < 0 || $Y < 0) { return false; }
+            
+            $wm->evaluateImage(Imagick::EVALUATE_MULTIPLY, 0.8, Imagick::CHANNEL_ALPHA);
+            
+            if ($size_src == 'gif') {
+                foreach ($image as $img) {
+                    $img->compositeImage($wm, imagick::COMPOSITE_OVER, $X, $Y);
+                }
+                
+                $image->writeimages($src_img);
+            } else {
+                $image->compositeImage($wm, imagick::COMPOSITE_OVER, $X, $Y);
+                $image->writeimage($src_img);
+            }
+            
+            $image->destroy();
+            $wm->destroy();
+        } else {
+            $wimage = imagecreatefrompng($wm_img);
+            if ($size_wm['type'] != 'png' || empty($wimage)) { return false; }
 
+            list($X, $Y) = $this->getWatermarkPos($size_src['width'], $size_src['height'], $size_wm['width'], $size_wm['height']);
+            if ($X < 0 || $Y < 0) { return false; }
+
+            switch($size_src['type']) {
+                case 'jpg':
+                    $image = imagecreatefromjpeg($src_img);
+                    break;
+                case 'gif':
+                    $image = imagecreatefromgif($src_img);
+                    break;
+                case 'png':
+                    $image = imagecreatefrompng($src_img);
+                    break;
+                default: break;
+            }
+
+            if (!$image) { return false; }
+
+            imagecopyresampled($image, $wimage, $X, $Y, 0, 0, $size_wm['width'], $size_wm['height'], $size_wm['width'], $size_wm['height']);
+
+            switch($size_src['type']) {
+                case 'jpg':
+                    imagejpeg($image, $src_img, $q);
+                    break;
+                case 'gif':
+                    imagegif($image, $src_img);
+                    break;
+                case 'png':
+                    imagepng($image, $src_img, (9 - round($q*0.09)));
+                    break;
+            }
+
+            imagedestroy($image);
+            imagedestroy($wimage);
+        }
+        
+        return true;
+    }
+    
+    private function getWatermarkPos($img_w, $img_h, $wm_w, $wm_h) {
         switch ($pos) {
             case 'lt':
                 $X = 0; $Y = 0;
                 break;
             case 'lb':
-                $X = 0; $Y = $size_src['height'] - $size_wm['height'];
+                $X = 0; $Y = $img_h - $wm_h;
                 break;
             case 'rt':
-                $X = $size_src['width'] - $size_wm['width']; $Y = 0;
+                $X = $img_w - $wm_w; $Y = 0;
                 break;
             case 'rb':
-                $X = $size_src['width'] - $size_wm['width'];
-                $Y = $size_src['height'] - $size_wm['height'];
+                $X = $img_w - $wm_w;
+                $Y = $img_h - $wm_h;
                 break;
             case 'c':
-                $X = ($size_src['width'] - $size_wm['width'])/2;
-                $Y = ($size_src['height'] - $size_wm['height'])/2;
+                $X = ($img_w - $wm_w)/2;
+                $Y = ($img_h - $wm_h)/2;
                 break;
             case 'lc':
-                $X = 0; $Y = ($size_src['height'] - $size_wm['height'])/2;
+                $X = 0; $Y = ($img_h - $wm_h)/2;
                 break;
             case 'rc':
-                $X = $size_src['width'] - $size_wm['width'];
-                $Y = ($size_src['height'] - $size_wm['height'])/2;
+                $X = $img_w - $wm_w;
+                $Y = ($img_h - $wm_h)/2;
                 break;
             case 'tc':
-                $X = ($size_src['width'] - $size_wm['width'])/2; $Y = 0;
+                $X = ($img_w - $wm_w)/2; $Y = 0;
                 break;
             case 'bc':
-                $X = ($size_src['width'] - $size_wm['width'])/2;
-                $Y = $size_src['height'] - $size_wm['height'];
+                $X = ($img_w - $wm_w)/2;
+                $Y = $img_h - $wm_h;
                 break;
             default:
-                $X = $size_src['width'] - $size_wm['width'];
-                $Y = $size_src['height'] - $size_wm['height'];
+                $X = $img_w - $wm_w;
+                $Y = $img_h - $wm_h;
                 break;
         }
         
-        if ($X<0 or $Y<0){
-            return false;
-        }
-        
-        imagecopyresampled($image, $wimage, $X, $Y, 0, 0, $size_wm['width'], $size_wm['height'], $size_wm['width'], $size_wm['height']);
-        switch($size_src['type']){
-            case 'jpg':
-                imagejpeg($image, $src_img, $q);
-                break;
-            case 'gif':
-                imagegif($image, $src_img);
-                break;
-            case 'png':
-                imagepng($image, $src_img, (9 - round($q*0.09)));
-                break;
-        }
-        imagedestroy($image);
-        imagedestroy($wimage);
-        return true;
+        return array($X, $Y);
     }
 
     private function crop($w, $h, $nw, $nh){
@@ -419,27 +544,28 @@ class rudi_graphics{
         return true;
     }
 
-    private function checkSizeOpt(){
-        if (!$this->new_bw xor !$this->new_bh){
-            if ($this->new_bh){
+    private function checkSizeOpt() {
+        if (!$this->new_bw xor !$this->new_bh) {
+            if ($this->new_bh) {
                 $this->new_bw = $this->new_bh;
-            }else{
+            } else {
                 $this->new_bh = $this->new_bw;
             }
         }
-        if (!$this->new_mw xor !$this->new_mh){
-            if ($this->new_mh){
+        if (!$this->new_mw xor !$this->new_mh) {
+            if ($this->new_mh) {
                 $this->new_mw = $this->new_mh;
-            }else{
+            } else {
                 $this->new_mh = $this->new_mw;
             }
         }
-        if (!$this->new_sw xor !$this->new_sh){
-            if ($this->new_sh){
+        if (!$this->new_sw xor !$this->new_sh) {
+            if ($this->new_sh) {
                 $this->new_sw = $this->new_sh;
-            }else{
+            } else {
                 $this->new_sh = $this->new_sw;
             }
         }
     }
+    
 }

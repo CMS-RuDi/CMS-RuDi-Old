@@ -546,7 +546,8 @@ INSERT INTO `#__event_hooks` (`id`, `event`, `plugin_id`) VALUES
 (44, 'INSERT_CAPTCHA', '19'),
 (45, 'CHECK_CAPTCHA', '19'),
 (46, 'INSERT_CAPTCHA', '20'),
-(47, 'CHECK_CAPTCHA', '20');
+(47, 'CHECK_CAPTCHA', '20'),
+(48, 'PRINT_PAGE_HEAD', '21');
 
 DROP TABLE IF EXISTS `#__faq_cats`;
 CREATE TABLE `#__faq_cats` (
@@ -775,8 +776,19 @@ CREATE TABLE `#__menu` (
   KEY `NSLeft` (`NSLeft`,`NSRight`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `#__menu` (`id`, `menu`, `title`, `link`, `linktype`, `linkid`, `target`, `component`, `ordering`, `published`, `template`, `access_list`, `iconurl`, `NSLeft`, `NSRight`, `NSLevel`, `NSDiffer`, `NSIgnore`, `parent_id`) VALUES
-(1, '---\n- root\n', '-- Корневая страница --', '-1', 'link', '-1', '_self', '', 1, 0, '0', '', '', 1, 2, 0, '', 0, 0);
+INSERT INTO `#__menu` (`id`, `menu`, `title`, `css_class`, `link`, `linktype`, `linkid`, `target`, `component`, `ordering`, `published`, `template`, `access_list`, `iconurl`, `NSLeft`, `NSRight`, `NSLevel`, `NSDiffer`, `NSIgnore`, `parent_id`, `is_lax`) VALUES
+(1, '---\n- root\n', '-- Корневая страница --', '', '-1', 'link', '-1', '_self', '', 1, 0, '0', '', '', 1, 24, 0, '', 0, 0, 0),
+(2, '---\n- authmenu\n', 'Войти', 'login', '/login', 'link', '/login', '_self', '', 1, 1, '', '', '', 2, 3, 1, '', 0, 1, 0),
+(3, '---\n- authmenu\n', 'Регистрация', 'register', '/registration', 'link', '/registration', '_self', '', 2, 1, '', '', '', 4, 5, 1, '', 0, 1, 0),
+(4, '---\n- usermenu\n', '{user.nickname}', 'my_profile', '/users/{user.login}', 'link', '/users/{user.login}', '_self', '', 3, 1, '', '', '', 6, 7, 1, '', 0, 1, 0),
+(5, '---\n- usermenu\n', 'Сообщения {user.new_msg_count}', 'my_messages', '/users/{user.id}/messages.html', 'link', '/users/{user.id}/messages', '_self', '', 4, 1, '', '', '', 8, 9, 1, '', 0, 1, 0),
+(6, '---\n- usermenu\n', 'Мой блог', 'my_blog', '/blogs/my_blog.html', 'link', '/blogs/my_blog.html', '_self', '', 5, 1, '', '', '', 10, 11, 1, '', 0, 1, 0),
+(7, '---\n- usermenu\n', 'Фото', 'my_photos', '/users/{user.id}/photoalbum.html', 'link', '/users/{user.id}/photoalb', '_self', '', 6, 1, '', '', '', 12, 15, 1, '', 0, 1, 0),
+(8, '---\n- usermenu\n', 'Добавить фото', 'add_photos', '/users/addphoto.html', 'link', '/users/addphoto.html', '_self', '', 1, 1, '', '', '', 13, 14, 2, '', 0, 7, 0),
+(9, '---\n- usermenu\n', 'Статьи', 'my_content', '/content/my.html', 'link', '/content/my.html', '_self', '', 7, 1, '', '', '', 16, 19, 1, '', 0, 1, 0),
+(10, '---\n- usermenu\n', 'Написать', 'add_content', '/content/add.html', 'link', '/content/add.html', '_self', '', 1, 1, '', '', '', 17, 18, 2, '', 0, 9, 0),
+(11, '---\n- usermenu\n', 'Админка', 'admin', '/admin/', 'link', '/admin/', '_self', '', 8, 1, '', '---\n- 2\n', '', 20, 21, 1, '', 0, 1, 0),
+(12, '---\n- usermenu\n', 'Выход', 'logout', '/logout', 'link', '/logout', '_self', '', 9, 1, '', '', '', 22, 23, 1, '', 0, 1, 0);
 
 DROP TABLE IF EXISTS `#__modules`;
 CREATE TABLE `#__modules` (
@@ -832,7 +844,7 @@ INSERT INTO `#__modules` (`id`, `position`, `name`, `title`, `is_external`, `con
 (61, 'sidebar', 'Последние комментарии', 'Последние комментарии', 1, 'mod_comments', 4, 1, 1, 0, '---\nshownum: 10\nminrate: 0\nshowdesc: 1\nshowrss: 1\nshowtarg: 0\ntargets: \n  faq: faq\n  catalog: catalog\n  boarditem: boarditem\n  blog: blog\n  article: article\n  palbum: palbum\n  photo: photo\n  userphoto: userphoto\n', 1, '', '', 0, 1, 'MINUTE', 'module', 0, '1.0'),
 (62, 'maintop', 'Фотографии', 'Фотографии', 1, 'mod_photo', 32, 1, 1, 0, '---\nshownum: 6\nmaxcols: 2\nalbum_id: 100\nshowtype: short\nshowmore: 0\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
 (64, 'maintop', 'Записи в блогах', 'Записи в блогах', 1, 'mod_blogs', 2, 1, 1, 0, '---\nnamemode: blog\nshownum: 10\nminrate: 0\nshowrss: 1\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
-(66, 'header', 'Меню пользователя', 'Меню пользователя', 1, 'mod_usermenu', 1, 0, 1, 0, '---\navatar: 1\nshowtype: text\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
+(66, 'header', 'Меню', 'Меню пользователя', 1, 'mod_menu', 34, 0, 1, 0, '---\nmenu: usermenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n', 1, 'user_menu_', '---\n- 1\n- 7\n- 9\n- 2\n', 0, 1, 'HOUR', 'module.tpl', 0, '1.0'),
 (67, 'mainbottom', 'Последние вопросы FAQ', 'Последние вопросы FAQ', 1, 'mod_latest_faq', 33, 1, 0, 0, '---\nnewscount: 5\nmaxlen: 140\ncat_id: \n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
 (69, 'maintop', 'Популярные статьи', 'Популярные статьи', 1, 'mod_bestcontent', 3, 1, 0, 0, '---\nshownum: 4\nmenuid: 21\nshowlink: 1\nshowdesc: 1\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
 (70, 'sidebar', 'Поиск пользователей', 'Поиск пользователей', 1, 'mod_usersearch', 4, 1, 0, 0, '---\ncat_id: \nsource: \nmenuid: 15\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
@@ -845,7 +857,8 @@ INSERT INTO `#__modules` (`id`, `position`, `name`, `title`, `is_external`, `con
 (82, 'sidebar', 'Приветствие', 'Универсальный каталог', 0, '<p>С помощью компонента &laquo;Универсальный каталог&raquo;, в котором Вы сейчас находитесь, можно организовать хранение любых данных. От карандашей до автомобилей.</p>\r\n<p>Каждая рубрика каталога имеет собственный набор характеристик, который можно изменить в панели управления. Пользователи могут фильтровать записи каталога по характеристикам одним щелчком мыши.&nbsp;</p>\r\n<p>Любой пользователь может добавлять собственные записи в те рубрики каталога, для которых это разрешено в настройках.</p>', 14, 1, 1, 1, '', 1, '', '', 0, 24, 'HOUR', 'module', 1, '1.0'),
 (83, 'sidebar', 'Статистика пользователей', 'Статистика пользователей', 1, 'mod_user_stats', 1, 1, 1, 0, '---\nshow_total: 1\nshow_online: 1\nshow_gender: 1\nshow_city: 1\nshow_bday: 1\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
 (84, 'sidebar', 'Друзья онлайн', 'Друзья онлайн', 1, 'mod_user_friend', 5, 1, 0, 0, '---\r\nlimit: 5\r\nview_type: table', 1, '', '', 0, 1, 'HOUR', 'module_simple', 0, '1.0'),
-(85, 'sidebar', 'Пригласить друга', 'Пригласить друга', 1, 'mod_invite', 1, 1, 0, 0, '', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0');
+(85, 'sidebar', 'Пригласить друга', 'Пригласить друга', 1, 'mod_invite', 1, 1, 0, 0, '', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
+(88, 'header', 'Меню', 'Меню авторизации', 1, 'mod_menu', 35, 0, 1, 0, '---\nmenu: authmenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n', 1, 'user_menu_', '---\n- 8\n', 0, 1, 'HOUR', 'module.tpl', 0, '1.0');
 
 DROP TABLE IF EXISTS `#__modules_bind`;
 CREATE TABLE `#__modules_bind` (
@@ -925,7 +938,8 @@ INSERT INTO `#__modules_bind` (`id`, `module_id`, `menu_id`, `position`, `tpl`) 
 (608, 49, 1, 'sidebar', '_default_'),
 (607, 83, 15, 'sidebar', '_default_'),
 (616, 75, 1, 'sidebar', '_default_'),
-(615, 87, 1, 'maintop', '_default_');
+(615, 87, 1, 'maintop', '_default_'),
+(620, 88, 0, 'header');
 
 DROP TABLE IF EXISTS `#__ns_transactions`;
 CREATE TABLE `#__ns_transactions` (
@@ -1043,7 +1057,8 @@ INSERT INTO `#__plugins` (`id`, `plugin`, `title`, `description`, `author`, `ver
 (17, 'p_auto_forum', 'Автофорум', 'Создает тему на форуме для обсуждения статьи', 'InstantCMS Team', '1.10.3', '', 1, '---\ndelete_thread: 1\nlink_thread: 1\nforum_id: 1\nno_create_thread_cats: 0\n'),
 (18, 'p_content_imgs', 'Прикрепленные к статьям фотографии', 'Плагин добавляет в конце статьи карусель (слайдер) с прикрепленными фотографиями.', 'DS Soft', '0.0.3', 'plugin', 1, '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n'),
 (19, 'p_captcha', 'Captcha.ru', 'PHP Captcha с сайта Captcha.ru', 'Kruglov Sergei', '2.0', 'captcha', 1, '---\n'),
-(20, 'p_recaptcha', 'reCaptcha', 'reCaptcha капча от гугла https://www.google.com/recaptcha/', 'DS Soft', '0.0.2', 'captcha', 0, '---\nrpc_domens:\nrpc_public_key:\nrpc_private_key:\nrpc_theme: blackglass\nrpc_lang: ru\n');
+(20, 'p_recaptcha', 'reCaptcha', 'reCaptcha капча от гугла https://www.google.com/recaptcha/', 'DS Soft', '0.0.2', 'captcha', 0, '---\nrpc_domens:\nrpc_public_key:\nrpc_private_key:\nrpc_theme: blackglass\nrpc_lang: ru\n'),
+(21, 'p_new_msg', 'Анимация при новом сообщении', 'Анимация при новом сообщении', 'InstantCMS Team', '1.0', '', 1, '---\n');
 
 DROP TABLE IF EXISTS `#__polls`;
 CREATE TABLE `#__polls` (

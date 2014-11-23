@@ -1452,23 +1452,24 @@ $this->logout();
 // ============================================================================ //
     /**
      * Отправляет личное сообщение пользователю
-     * @param int $sender_id
-     * @param int $receiver_id
+     * @param integer $sender_id
+     * @param integer $receiver_id
      * @param string $message
-     * @return bool
+     * @return integer|boolean
      */
-    public static function sendMessage($sender_id, $receiver_id, $message){
-
-        $message = cmsCore::c('db')->escape_string($message);
-
-        $sql = "INSERT INTO cms_user_msg (to_id, from_id, senddate, is_new, message)
-                VALUES ('$receiver_id', '$sender_id', NOW(), 1, '$message')";
-        cmsCore::c('db')->query($sql);
-
-        $msg_id = cmsCore::c('db')->get_last_id('cms_user_msg');
+    public static function sendMessage($sender_id, $receiver_id, $message) {
+        $msg_id = cmsCore::c('db')->insert(
+            'cms_user_msg',
+            array(
+                'to_id' => $receiver_id,
+                'from_id' => $sender_id,
+                'senddate' => date('Y-m-d H:i:s'),
+                'is_new' => 1,
+                'message' => cmsCore::c('db')->escape_string($message)
+            )
+        );
 
         return $msg_id ? $msg_id : false;
-
     }
 
 // ============================================================================ //
@@ -1481,17 +1482,17 @@ $this->logout();
      * @return int
      */
     public static function sendMessages($sender_id, $receiver_ids, $message){
+        if (empty($message) || empty($receiver_ids) || !is_array($receiver_ids)) {
+            return false;
+        }
+        
+        $count = 0;
 
-        if (!is_array($receiver_ids) || !$receiver_ids) { return false; }
-
-        $msg = array();
-
-        foreach ($receiver_ids as $receiver_id){
-            $msg[] = self::sendMessage($sender_id, $receiver_id, $message);
+        foreach ($receiver_ids as $receiver_id) {
+            $count += self::sendMessage($sender_id, $receiver_id, $message);
         }
 
-        return count($msg); // возвращаем количество отправленных сообщений
-
+        return $count; // возвращаем количество отправленных сообщений
     }
 
     /**
@@ -1502,30 +1503,27 @@ $this->logout();
      * @return int
      */
     public static function sendMessageToGroup($sender_id, $group, $message){
-
         // если отсылаем нескольким группам
-        if(is_array($group)){
-
+        if (is_array($group)) {
             $count = 0;
 
             foreach ($group as $group_id){
                 $count += self::sendMessageToGroup($sender_id, $group_id, $message);
             }
-
         } else { // отсылаем одной группе
 
             // получаем участников групппы
             $user_list = self::getGroupMembers($group);
-            if(!$user_list) { return false; }
+            
+            if (!$user_list) { return false; }
+            
             // получаем id пользователей
             $user_ids  = array_keys($user_list);
 
             return self::sendMessages($sender_id, $user_ids, $message);
-
         }
 
         return $count;
-
     }
 
 // ============================================================================ //

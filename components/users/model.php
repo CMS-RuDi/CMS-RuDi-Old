@@ -987,9 +987,8 @@ class cms_model_users{
 
     }
 
-	public function getMessages($show_notice = false){
-
-        if($show_notice){ return $this->getNotices(); }
+    public function getMessages($show_notice = false) {
+        if ($show_notice) { return $this->getNotices(); }
 
         $sql = "SELECT m.*, u.id as user_id, u.nickname as author,
 				u.login as author_login, u.logdate,
@@ -1005,30 +1004,27 @@ class cms_model_users{
 
                 {$this->inDB->order_by}\n";
 
-        if ($this->inDB->limit){
-            $sql .= "LIMIT {$this->inDB->limit}";
+        if ($this->inDB->limit) {
+            $sql .= 'LIMIT '. $this->inDB->limit;
         }
 
-		$result = $this->inDB->query($sql);
+        $result = $this->inDB->query($sql);
 
-		$this->inDB->resetConditions();
+        $this->inDB->resetConditions();
 
-		if(!$this->inDB->num_rows($result)){ return false; }
+        if (!$this->inDB->num_rows($result)) { return false; }
 
-		while ($msg = $this->inDB->fetch_assoc($result)){
+        while ($msg = $this->inDB->fetch_assoc($result)) {
+            $msg['authorlink'] = cmsUser::getProfileLink($msg['author_login'], $msg['author']);
+            $msg['fpubdate'] = cmsCore::dateFormat($msg['senddate'], true, true, true);
+            $msg['user_img']  = cmsUser::getUserAvatarUrl($msg['sender_id'], 'small', $msg['imageurl'], $msg['is_deleted']);
+            $msg['online_status'] = cmsUser::getOnlineStatus($msg['user_id'], $msg['logdate']);
 
-			$msg['authorlink'] = cmsUser::getProfileLink($msg['author_login'], $msg['author']);
-			$msg['fpubdate'] = cmsCore::dateFormat($msg['senddate'], true, true, true);
-			$msg['user_img']  = cmsUser::getUserAvatarUrl($msg['sender_id'], 'small', $msg['imageurl'], $msg['is_deleted']);
-			$msg['online_status'] = cmsUser::getOnlineStatus($msg['user_id'], $msg['logdate']);
+            $msgs[] = $msg;
+        }
 
-			$msgs[] = $msg;
-
-		}
-
-		return $msgs;
-
-	}
+        return $msgs;
+    }
 
 	private function getNotices(){
 

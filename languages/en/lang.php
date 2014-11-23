@@ -199,6 +199,8 @@ $_LANG['UPLOAD_ERR_INI_SIZE']   = 'File size is too large';
 $_LANG['UPLOAD_ERR_NO_TMP_DIR'] = 'Unable to find folder for temporary files on the server';
 $_LANG['UPLOAD_ERR_CANT_WRITE'] = 'Failed to write file to disk';
 $_LANG['UPLOAD_ERR_EXTENSION']  = 'File uploading was interrupted by PHP extension';
+$_LANG['UNKNOWN_ERROR']         = 'Unknown error';
+$_LANG['NOT_SUPPORTED_FORMAT']  = 'File fomat is not supported';
 
 $_LANG['UPLOAD_IMG_IS_DISABLE'] = 'Upload of images is forbidden!';
 $_LANG['UPLOAD_IMG_LIMIT']      = 'You have reached images limit!';

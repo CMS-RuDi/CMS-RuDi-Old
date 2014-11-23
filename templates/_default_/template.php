@@ -146,7 +146,7 @@
     <script type="text/javascript">
         $(function(){
             $('#sess_messages').hide().fadeIn();
-            $('#topmenu .menu li').hover(
+            $('#topmenu .menu li, #usermenu li'').hover(
                 function() {
                     $(this).find('ul:first').fadeIn('fast');
                     $(this).find('a:first').addClass("hover");

@@ -174,6 +174,7 @@ function applet_tickets() {
     }
     
     if ($do == 'add') {
+        cpAddPathway($_LANG['AD_TICKET_CREATE'], 'index.php?view=tickets&do=add');
         $cats = cpGetTicketCats();
 ?>
 <form action="index.php?view=tickets&do=submit" method="post">
@@ -266,7 +267,8 @@ function applet_tickets() {
                 'priority' => $item['priority'],
                 'title' => $item['title'],
                 'msg' => $item['msg'],
-                'host' => cmsCore::c('config')->host
+                'host' => cmsCore::c('config')->host,
+                'module' => $cat['module']
             );
             
             if ($ticket['cat_id'] > 0 && !empty($cat['module'])) {
@@ -277,6 +279,7 @@ function applet_tickets() {
             $result = cmsCore::c('curl')->ajaxJsonPost( $server .'?do=add_ticket', true, $ticket );
             
             if (!empty($result['error'])) {
+                cmsCore::clearSessionMessages();
                 cmsCore::addSessionMessage($result['error'], 'error');
                 cmsCore::c('db')->delete('cms_ticket', 'id='. $item['id']);
             } else if (isset($result['secret_key'])) {
@@ -370,18 +373,18 @@ function applet_tickets() {
                 <div style="margin-top:5px">
                     <input type="hidden" name="id" value="<?php echo $item['id']; ?>" />
                     <input type="submit" class="btn btn-primary" name="save" value="<?php echo $_LANG['SEND']; ?>" />
-                    <input type="button" class="btn btn-warning" value="<?php echo $_LANG['AD_TICKET_CLOSE']; ?>" onclick="location.href='index.php?view=tickets&do=close_ticket&id=<?php echo $item['id']; ?>';return false;" />
+                    <input type="button" class="btn btn-warning" value="<?php echo $_LANG['AD_TICKET_CLOSE']; ?>" onclick="window.location.href='index.php?view=tickets&do=close_ticket&id=<?php echo $item['id']; ?>';return false;" />
                     <input type="button" class="btn btn-danger" value="<?php echo $_LANG['DELETE']; ?>" onclick="jsmsg('<?php echo $_LANG['AD_TICKET_DELETE']; ?>', '?view=tickets&do=delete&id=<?php echo $item['id']; ?>');" />
-                    <input type="button" class="btn btn-default" value="<?php echo $_LANG['BACK']; ?>" onclick="location.href='index.php?view=tickets';return false;" />
+                    <input type="button" class="btn btn-default" value="<?php echo $_LANG['BACK']; ?>" onclick="window.location.href='index.php?view=tickets';return false;" />
                 </div>
             </form>
         <?php } else { ?>
             <div>
                 <?php if ($item['status'] != 3) { ?>
-                    <input type="button" class="btn btn-warning" value="<?php echo $_LANG['AD_TICKET_CLOSE']; ?>" onclick="location.href='index.php?view=tickets&do=close_ticket&id=<?php echo $item['id']; ?>';return false;" />
+                    <input type="button" class="btn btn-warning" value="<?php echo $_LANG['AD_TICKET_CLOSE']; ?>" onclick="window.location.href='index.php?view=tickets&do=close_ticket&id=<?php echo $item['id']; ?>';return false;" />
                 <?php } ?>
                 <input type="button" class="btn btn-danger" value="<?php echo $_LANG['DELETE']; ?>" onclick="jsmsg('<?php echo $_LANG['AD_TICKET_DELETE']; ?>', '?view=tickets&do=delete&id=<?php echo $item['id']; ?>');" />
-                <input type="button" class="btn btn-default" value="<?php echo $_LANG['BACK']; ?>" onclick="location.href='index.php?view=tickets';return false;" />
+                <input type="button" class="btn btn-default" value="<?php echo $_LANG['BACK']; ?>" onclick="window.location.href='index.php?view=tickets';return false;" />
             </div>
         <?php } ?>
     </div>

@@ -541,7 +541,8 @@ INSERT INTO `#__event_hooks` (`id`, `event`, `plugin_id`) VALUES
 (44, 'INSERT_CAPTCHA', '19'),
 (45, 'CHECK_CAPTCHA', '19'),
 (46, 'INSERT_CAPTCHA', '20'),
-(47, 'CHECK_CAPTCHA', '20');
+(47, 'CHECK_CAPTCHA', '20'),
+(48, 'PRINT_PAGE_HEAD', '21');
 
 DROP TABLE IF EXISTS `#__faq_cats`;
 CREATE TABLE `#__faq_cats` (
@@ -770,8 +771,19 @@ CREATE TABLE `#__menu` (
   KEY `NSLeft` (`NSLeft`,`NSRight`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `#__menu` (`id`, `menu`, `title`, `link`, `linktype`, `linkid`, `target`, `component`, `ordering`, `published`, `template`, `access_list`, `iconurl`, `NSLeft`, `NSRight`, `NSLevel`, `NSDiffer`, `NSIgnore`, `parent_id`) VALUES
-(1, '---\n- root\n', '-- root --', '-1', 'link', '-1', '_self', '', 1, 0, '0', '', '', 1, 2, 0, '', 0, 0);
+INSERT INTO `#__menu` (`id`, `menu`, `title`, `css_class`, `link`, `linktype`, `linkid`, `target`, `component`, `ordering`, `published`, `template`, `access_list`, `iconurl`, `NSLeft`, `NSRight`, `NSLevel`, `NSDiffer`, `NSIgnore`, `parent_id`, `is_lax`) VALUES
+(1, '---\n- root\n', '-- root --', '', '-1', 'link', '-1', '_self', '', 1, 0, '0', '', '', 1, 24, 0, '', 0, 0, 0),
+(2, '---\n- authmenu\n', 'Login', 'login', '/login', 'link', '/login', '_self', '', 1, 1, '', '', '', 2, 3, 1, '', 0, 1, 0),
+(3, '---\n- authmenu\n', 'Register', 'register', '/registration', 'link', '/registration', '_self', '', 2, 1, '', '', '', 4, 5, 1, '', 0, 1, 0),
+(4, '---\n- usermenu\n', '{user.nickname}', 'my_profile', '/users/{user.login}', 'link', '/users/{user.login}', '_self', '', 3, 1, '', '', '', 6, 7, 1, '', 0, 1, 0),
+(5, '---\n- usermenu\n', 'Messages {user.new_msg_count}', 'my_messages', '/users/{user.id}/messages.html', 'link', '/users/{user.id}/messages', '_self', '', 4, 1, '', '', '', 8, 9, 1, '', 0, 1, 0),
+(6, '---\n- usermenu\n', 'My blog', 'my_blog', '/blogs/my_blog.html', 'link', '/blogs/my_blog.html', '_self', '', 5, 1, '', '', '', 10, 11, 1, '', 0, 1, 0),
+(7, '---\n- usermenu\n', 'Photos', 'my_photos', '/users/{user.id}/photoalbum.html', 'link', '/users/{user.id}/photoalb', '_self', '', 6, 1, '', '', '', 12, 15, 1, '', 0, 1, 0),
+(8, '---\n- usermenu\n', 'Add photos', 'add_photos', '/users/addphoto.html', 'link', '/users/addphoto.html', '_self', '', 1, 1, '', '', '', 13, 14, 2, '', 0, 7, 0),
+(9, '---\n- usermenu\n', 'Articles', 'my_content', '/content/my.html', 'link', '/content/my.html', '_self', '', 7, 1, '', '', '', 16, 19, 1, '', 0, 1, 0),
+(10, '---\n- usermenu\n', 'Write', 'add_content', '/content/add.html', 'link', '/content/add.html', '_self', '', 1, 1, '', '', '', 17, 18, 2, '', 0, 9, 0),
+(11, '---\n- usermenu\n', 'Admin panel', 'admin', '/admin/', 'link', '/admin/', '_self', '', 8, 1, '', '---\n- 2\n', '', 20, 21, 1, '', 0, 1, 0),
+(12, '---\n- usermenu\n', 'Logout', 'logout', '/logout', 'link', '/logout', '_self', '', 9, 1, '', '', '', 22, 23, 1, '', 0, 1, 0);
 
 DROP TABLE IF EXISTS `#__modules`;
 CREATE TABLE `#__modules` (
@@ -827,7 +839,7 @@ INSERT INTO `#__modules` (`id`, `position`, `name`, `title`, `is_external`, `con
 (61, 'sidebar', 'Latest comments', 'Latest comments', 1, 'mod_comments', 4, 1, 1, 0, '---\nshownum: 10\nminrate: 0\nshowdesc: 1\nshowrss: 1\nshowtarg: 0\ntargets: \n  faq: faq\n  catalog: catalog\n  boarditem: boarditem\n  blog: blog\n  article: article\n  palbum: palbum\n  photo: photo\n  userphoto: userphoto\n', 1, '', '', 0, 1, 'MINUTE', 'module', 0, '1.0'),
 (62, 'maintop', 'Photos', 'Photos', 1, 'mod_photo', 32, 1, 1, 0, '---\nshownum: 6\nmaxcols: 2\nalbum_id: 100\nshowtype: short\nshowmore: 0\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
 (64, 'maintop', 'Blog posts', 'Blog posts', 1, 'mod_blogs', 2, 1, 1, 0, '---\nnamemode: blog\nshownum: 10\nminrate: 0\nshowrss: 1\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
-(66, 'header', 'User menu', 'User menu', 1, 'mod_usermenu', 1, 0, 1, 0, '---\navatar: 1\nshowtype: text\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
+(66, 'header', 'Menu', 'User menu', 1, 'mod_menu', 34, 0, 1, 0, '---\nmenu: usermenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n', 1, 'user_menu_', '---\n- 1\n- 7\n- 9\n- 2\n', 0, 1, 'HOUR', 'module.tpl', 0, '1.0'),
 (67, 'mainbottom', 'Latest questions', 'Latest questions', 1, 'mod_latest_faq', 33, 1, 0, 0, '---\nnewscount: 5\nmaxlen: 140\ncat_id: \n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
 (69, 'maintop', 'Popular articles', 'Popular articles', 1, 'mod_bestcontent', 3, 1, 0, 0, '---\nshownum: 4\nmenuid: 21\nshowlink: 1\nshowdesc: 1\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
 (70, 'sidebar', 'Users search', 'Users search', 1, 'mod_usersearch', 4, 1, 0, 0, '---\ncat_id: \nsource: \nmenuid: 15\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
@@ -836,10 +848,11 @@ INSERT INTO `#__modules` (`id`, `position`, `name`, `title`, `is_external`, `con
 (73, 'maintop', 'Clubs', 'Clubs', 1, 'mod_clubs', 3, 1, 0, 0, '---\ncount: 2\nmenuid: 38\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
 (75, 'sidebar', 'Honors board', 'Honors board', 1, 'mod_respect', 1, 1, 1, 0, '---\nview: all\nshow_awards: 1\norder: desc\nlimit: 5\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
 (76, 'sidebar', 'Users files', 'Users files', 1, 'mod_userfiles', 1, 1, 0, 0, '---\nmenuid: 0\nsw_stats: 1\nsw_latest: 1\nsw_popular: 1\nnum_latest: 5\nnum_popular: 5\n', 1, '', '', 0, 1, 'HOUR', 'module', 0, '1.0'),
-(87, 'maintop', 'Activity feed', 'Activity feed', 1, 'mod_actions', 1, 1, 1, 0, '---\nlimit: 15\nshow_target: 0\naction_types: \n  16: 16\n  15: 15\n  20: 20\n  13: 13\n  29: 29\n  24: 24\n  23: 23\n  2: 2\n  27: 27\n  12: 12\n  10: 10\n  25: 25\n  17: 17\n  8: 8\n  18: 18\n  7: 7\n  26: 26\n  19: 19\n  22: 22\n  11: 11\n  21: 21\n  28: 28\n  9: 9\n  14: 14\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.7'),
 (83, 'sidebar', 'Users statistics', 'Users statistics', 1, 'mod_user_stats', 1, 1, 1, 0, '---\nshow_total: 1\nshow_online: 1\nshow_gender: 1\nshow_city: 1\nshow_bday: 1\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
 (84, 'sidebar', 'Online friends', 'Online friends', 1, 'mod_user_friend', 5, 1, 0, 0, '---\r\nlimit: 5\r\nview_type: table', 1, '', '', 0, 1, 'HOUR', 'module_simple', 0, '1.0'),
-(85, 'sidebar', 'Invite a friend', 'Invite a friend', 1, 'mod_invite', 1, 1, 0, 0, '', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'); 
+(85, 'sidebar', 'Invite a friend', 'Invite a friend', 1, 'mod_invite', 1, 1, 0, 0, '', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.0'),
+(87, 'maintop', 'Activity feed', 'Activity feed', 1, 'mod_actions', 1, 1, 1, 0, '---\nlimit: 15\nshow_target: 0\naction_types: \n  16: 16\n  15: 15\n  20: 20\n  13: 13\n  29: 29\n  24: 24\n  23: 23\n  2: 2\n  27: 27\n  12: 12\n  10: 10\n  25: 25\n  17: 17\n  8: 8\n  18: 18\n  7: 7\n  26: 26\n  19: 19\n  22: 22\n  11: 11\n  21: 21\n  28: 28\n  9: 9\n  14: 14\n', 1, '', '', 0, 1, 'HOUR', 'module', 1, '1.7'),
+(88, 'header', 'Menu', 'Auth menu', 1, 'mod_menu', 35, 0, 1, 0, '---\nmenu: authmenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n', 1, 'user_menu_', '---\n- 8\n', 0, 1, 'HOUR', 'module.tpl', 0, '1.0'); 
 
 DROP TABLE IF EXISTS `#__modules_bind`;
 CREATE TABLE `#__modules_bind` (
@@ -916,7 +929,8 @@ INSERT INTO `#__modules_bind` (`id`, `module_id`, `menu_id`, `position`) VALUES
 (608, 49, 1, 'sidebar'),
 (607, 83, 15, 'sidebar'),
 (616, 75, 1, 'sidebar'),
-(615, 87, 1, 'maintop');
+(615, 87, 1, 'maintop'),
+(620, 88, 0, 'header');
 
 DROP TABLE IF EXISTS `#__ns_transactions`;
 CREATE TABLE `#__ns_transactions` (
@@ -1024,17 +1038,18 @@ CREATE TABLE `#__plugins` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 INSERT INTO `#__plugins` (`id`, `plugin`, `title`, `description`, `author`, `version`, `type`, `published`, `config`) VALUES
-(6, 'p_usertab', 'Demo Profile Plugin', 'Example plugin - Adds a tab "Articles" in the user profiles', 'InstantCMS Team', '1.10.4', 'plugin', 0, '---\nPU_LIMIT: 10\n'),
 (3, 'p_ckeditor', 'CKEditor 4.4.5', 'WYSIWYG editor', 'Plugin - DS SOFT. CKEditor - Frederico Knabben', '0.0.3', 'wysiwyg', 1, '---\ninline:\nadmin_skin: moono\nuser_skin: moono\n'),
 (5, 'p_demo', 'Demo Plugin', 'Example plugin - Adds text to the end of each article on the website', 'InstantCMS Team', '1.0', 'plugin', 0, '---\ntext: Added By Plugin From Parameter\ncolor: blue\ncounter: 1\n'),
+(6, 'p_usertab', 'Demo Profile Plugin', 'Example plugin - Adds a tab "Articles" in the user profiles', 'InstantCMS Team', '1.10.4', 'plugin', 0, '---\nPU_LIMIT: 10\n'),
 (8, 'p_ping', 'Web search engine ping', 'Pings Yandex and Google when adding articles, announcements and blog posts', 'InstantCMS Team', '1.10', 'plugin', 1, '---\nYandex HOST: ping.blogs.yandex.ru\nYandex PATH: /RPC2\nGoogle HOST: blogsearch.google.com\nGoogle PATH: /ping/RPC2\n'),
-(15, 'p_morecontent', 'Related articles', 'Appends each article a list of related articles.', 'Maximov & InstantCMS Team', '1.10.4', 'plugin', 0, '---\nP_LIMIT: 5\nP_UNSORT: 1\n'),
 (14, 'p_hidetext', 'Hidden text', 'Hides the contents of the tag [hide] from unregistered', 'InstantCMS Team', '1.12', 'plugin', 1, '---\n'),
+(15, 'p_morecontent', 'Related articles', 'Appends each article a list of related articles.', 'Maximov & InstantCMS Team', '1.10.4', 'plugin', 0, '---\nP_LIMIT: 5\nP_UNSORT: 1\n'),
 (16, 'p_loginza', 'Loginza authorization', 'Allows visitors to login using the account of popular social networks', 'InstantCMS Team', '1.10.4', 'plugin', 1, '---\nPL_PROVIDERS: >\n  vkontakte,facebook,mailruapi,google,yandex,openid,twitter,webmoney,rambler,flickr,mailru,loginza,myopenid,lastfm,verisign,aol,steam\nPL_LANG: ru\n'),
 (17, 'p_auto_forum', 'Autoforum', 'Creates a thread in the forum for the discussion of article', 'InstantCMS Team', '1.10.4', '', 1, '---\ndelete_thread: 1\nlink_thread: 1\nforum_id: 1\nno_create_thread_cats: 0\n'),
 (18, 'p_content_imgs', 'Attached to Articles Photo', 'Plug-in adds to the article carousel (slider) with attached pictures.', 'DS Soft', '0.0.3', 'plugin', 1, '---\nPCI_SLIDER: jCarousel\nPCI_SLIDER_OPT: 2\nPCI_INSERT_IMAGES: 1\nPCI_DELETE_ERRORS: 1\n'),
 (19, 'p_captcha', 'Captcha.ru', 'PHP Captcha site Captcha.ru', 'Kruglov Sergei', '2.0', 'captcha', 1, '---\n'),
-(20, 'p_recaptcha', 'reCaptcha', 'reCaptcha https://www.google.com/recaptcha/', 'DS Soft', '0.0.2', 'captcha', 0, '---\nrpc_domens:\nrpc_public_key:\nrpc_private_key:\nrpc_theme: blackglass\nrpc_lang: ru\n');
+(20, 'p_recaptcha', 'reCaptcha', 'reCaptcha https://www.google.com/recaptcha/', 'DS Soft', '0.0.2', 'captcha', 0, '---\nrpc_domens:\nrpc_public_key:\nrpc_private_key:\nrpc_theme: blackglass\nrpc_lang: ru\n'),
+(21, 'p_new_msg', 'Анимация при новом сообщении', 'Анимация при новом сообщении', 'InstantCMS Team', '1.0', '', 1, '---\n');
 
 DROP TABLE IF EXISTS `#__polls`;
 CREATE TABLE `#__polls` (

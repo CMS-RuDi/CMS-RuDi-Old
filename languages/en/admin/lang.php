@@ -81,6 +81,7 @@ $_LANG['AD_DELETE_SELECTED']      = 'Delete selected';
 $_LANG['AD_NO_SELECT_OBJECTS']    = 'No selected objects!';
 $_LANG['AD_MAIN_MENU']            = 'Main menu';
 $_LANG['AD_USER_MENU']            = 'User menu';
+$_LANG['AD_AUTH_MENU']            = 'Auth menu';
 $_LANG['AD_SUBMENU']              = 'Additional menu';
 $_LANG['AD_TITLE']                = 'Title';
 $_LANG['AD_SHARE']                = 'Public access';

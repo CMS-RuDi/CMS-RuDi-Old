@@ -11,7 +11,7 @@
     <table cellpadding="0" cellspacing="0" border="0">
         <?php foreach($photos as $con) { ?>
             <?php if ($col == 1) { ?> <tr> <?php } ?>
-            <td align="center" valign="middle" width="{math equation="100/x" x=$cfg.photo_maxcols}%">
+            <td align="center" valign="middle" width="<?php echo 100/$cfg['photo_maxcols'];?>%">
                 <div class="photo_thumb" align="center">
                     <a class="lightbox-enabled" rel="lightbox-galery" href="/images/photos/medium/<?php echo $con['file']; ?>" title="<?php echo $this->escape($con['title']); ?>">
                         <img class="photo_thumb_img" src="/images/photos/small/<?php echo $con['file']; ?>" alt="<?php echo $this->escape($con['title']); ?>" border="0" />

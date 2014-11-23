@@ -72,6 +72,8 @@ function search() {
             // Получаем сами результаты поиска
             if ($total) {
                 $results = $model->getResults();
+            } else {
+                cmsCore::c('db')->resetConditions();
             }
         }
 

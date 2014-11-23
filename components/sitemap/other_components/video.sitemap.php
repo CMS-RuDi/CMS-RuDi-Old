@@ -194,7 +194,11 @@ class video_sitemap extends cms_rudi_sitemap {
     public function generateMap() {
         $gen_map = parent::generateMap();
         
-        if ($gen_map === false) { return; }
+        if ($gen_map === false) {
+            return false;
+        } else {
+            $this->gOpenFile();
+        }
 
         $is_end = false;
         $access_cats = array();
@@ -284,29 +288,15 @@ class video_sitemap extends cms_rudi_sitemap {
 
     protected function deleteAllFiles() {
         parent::deleteAllFiles();
-        
-        $dir = PATH .'/upload/sitemaps';
-        $pdir = opendir($dir);
-        $page = 1;
-
-        while ($nextfile = readdir($pdir)){
-            $match = array();
-            if (($nextfile != '.') && ($nextfile != '..') && !is_dir($dir .'/'. $nextfile) && preg_match('#'. $this->config['component'] .'_g_[0-9]+#is', $nextfile)){
-                unlink($dir .'/'. $nextfile);
-            }
-        }
+        parent::deleteAllFiles($this->config['component'] .'_g_[0-9]+');
     }
 
-    protected function openFile() {
-        parent::openFile();
-        
+    protected function gOpenFile() {
         $this->g_open_file = fopen(PATH .'/upload/sitemaps/'. $this->config['component'] .'_g_'. $this->g_page .'.xml', 'w');
         fwrite($this->g_open_file, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">' ."\n");
     }
     
-    protected function closeFile() {
-        parent::closeFile();
-        
+    protected function gCloseFile() {
         if (!empty($this->g_open_file)) {
             fwrite($this->g_open_file, '</urlset>');
             fclose($this->g_open_file);
@@ -314,12 +304,10 @@ class video_sitemap extends cms_rudi_sitemap {
         }
     }
 
-    protected function createNewPage() {
-        parent::createNewPage();
-        
-        $this->closeFile();
+    protected function gCreateNewPage() {
+        $this->gCloseFile();
         $this->g_page++;
-        $this->openFile();
+        $this->gOpenFile();
     }
 
     protected function writeMapItem($item) {
@@ -329,12 +317,12 @@ class video_sitemap extends cms_rudi_sitemap {
             return;
         }
         
-        if (empty($item) || empty($item['loc'])) { return false; }
+        if (empty($item) || empty($item['loc'])) { return; }
         
         $this->g_num++;
         
         if ($this->g_num > $this->max_num*$this->g_page) {
-            $this->createNewPage();
+            $this->gCreateNewPage();
         }
             
         $xml  = '    <url>'. "\n";
@@ -372,22 +360,27 @@ class video_sitemap extends cms_rudi_sitemap {
     public function getMapFiles() {
         $files = parent::getMapFiles();
         
-        $num = $this->g_num - $this->max_num*($this->g_page-1);
-        
-        if ($num <= 0) {
-            unlink(PATH .'/upload/sitemaps/'. $this->config['component'] .'_g_'. $this->page .'.xml');
-            
-            if ($this->g_page == 1) {
-                return $files;
-            }
-            
-            $this->g_page--;
-        }
-        
-        for ($i=1; $i <= $this->g_page; $i++) {
-            $files[] = $this->config['component'] .'_g_'. $i .'.xml';
-        }
+        if ($this->g_num > 0) {
+            $num = $this->g_num - $this->max_num*($this->g_page-1);
 
+            if ($num <= 0) {
+                unlink(PATH .'/upload/sitemaps/'. $this->config['component'] .'_g_'. $this->g_page .'.xml');
+
+                if ($this->g_page == 1) {
+                    return $files;
+                }
+
+                $this->g_page--;
+            }
+
+            for ($i=1; $i <= $this->g_page; $i++) {
+                $files[] = $this->config['component'] .'_g_'. $i .'.xml';
+            }
+        } else {
+            $gfiles = parent::getAllMapFiles($this->config['component'] .'_g_[0-9]+');
+            $files = array_merge($files, $gfiles);
+        }
+        
         return $files;
     }
     

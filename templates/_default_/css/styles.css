@@ -1252,65 +1252,76 @@ a.tag {
 }
 
 /*---------------------------PERSONAL MENU -----------------------------------*/
-.mod_user_menu {
+.user_menu_module {
     float: right;
 }
 
-.mod_user_menu span {
-    margin-right: 0px;
-}
-.mod_user_menu span a {
-    padding: 6px;
-    padding-left: 26px;
-    color: #BFDEFF;
-    text-decoration: none;
+.user_menu_module li {
+    float: left;
+    list-style: none;
+    margin: 0;
+    position: relative;
 }
 
-.mod_user_menu span a:hover {
+.user_menu_module li a {
+    color: #bfdeff;
+    display: block;
+    padding: 0 9px 0 26px;
+    margin-right: 1px;
+    text-decoration: none;
+    background-repeat: no-repeat;
+    background-position: 5px center;
+}
+
+.user_menu_module li a:hover, .user_menu_module li a.selected, .user_menu_module li a.hover{ 
     color: #FFF;
     background-color: #5D90D1;
     border-radius: 4px;
 }
 
-.mod_user_menu .my_profile a {
-    background: url(/templates/_default_/images/icons/user.png) no-repeat 6px center;
+.user_menu_module li ul {
+    background: #5d90d1;
+    color: #FFF;
+    display: none;
+    padding: 0;
+    position: absolute;
+    top: 59px;
+    z-index: 1000;
+    min-width: 150px;
+    box-shadow: 2px 4px 3px #555;
 }
-.mod_user_menu .my_messages a {
-    background: url(/templates/_default_/images/icons/message.png) no-repeat 6px 6px;
+
+.user_menu_module li ul li {
+    float: none;
 }
-.mod_user_menu .my_messages a.has_new {
-    color: #FFE900;
+
+.user_menu_module li ul li a:hover {
+    background-color: #1f3147;
 }
-.mod_user_menu .my_gifts a {
-    background: url(/templates/_default_/images/icons/gift.png) no-repeat 6px 6px;
+
+.user_menu_module li ul li a {
+    height: 30px;
+    line-height: 30px;
+    margin: 0;
 }
-.mod_user_menu .my_blog a {
-    background: url(/templates/_default_/images/icons/blog.png) no-repeat 6px center;
+
+.user_menu_module li:last-child a {
+    margin-right: 0;
 }
-.mod_user_menu .my_photos a {
-    background: url(/templates/_default_/images/icons/folder_picture.png) no-repeat 6px center;
-}
-.mod_user_menu .my_content a {
-    background: url(/templates/_default_/images/icons/folder_page.png) no-repeat 6px center;
-}
-.mod_user_menu .add_content a {
-    background: url(/templates/_default_/images/icons/add.png) no-repeat 6px center;
-}
-.mod_user_menu .admin a {
-    background: url(/templates/_default_/images/icons/cpanel.png) no-repeat 6px center;
-}
-.mod_user_menu .logout a {
-    background: url(/templates/_default_/images/icons/logout.png) no-repeat 6px center;
-}
-.mod_user_menu .register a {
-    background: url(/templates/_default_/images/icons/register.png) no-repeat 6px center;
-}
-.mod_user_menu .login a {
-    background: url(/templates/_default_/images/icons/key.png) no-repeat 6px center;
-}
-.mod_user_menu .my_balance a {
-    background: url(/templates/_default_/images/billing/balance.png) no-repeat 6px center;
-}
+
+.user_menu_module li.my_profile a { background-image: url(/templates/_default_/images/icons/user.png); }
+.user_menu_module li.my_messages a { background-image:url(/templates/_default_/images/icons/message.png); }
+.user_menu_module li.my_messages a.has_new { color:#FFE900; }
+.user_menu_module li.my_blog a { background-image:url(/templates/_default_/images/icons/blog.png); }
+.user_menu_module li.my_photos a { background-image:url(/templates/_default_/images/icons/folder_picture.png); }
+.user_menu_module li.add_photos a { background-image:url(/templates/_default_/images/icons/addphoto.png); }
+.user_menu_module li.my_content a { background-image:url(/templates/_default_/images/icons/folder_page.png); }
+.user_menu_module li.add_content a { background-image:url(/templates/_default_/images/icons/add.png); }
+.user_menu_module li.admin a { background-image:url(/templates/_default_/images/icons/cpanel.png); }
+.user_menu_module li.logout a { background-image:url(/templates/_default_/images/icons/logout.png); }
+.user_menu_module li.register a { background-image:url(/templates/_default_/images/icons/register.png); }
+.user_menu_module li.login a { background-image:url(/templates/_default_/images/icons/key.png); }
+.user_menu_module li.my_balance a { background-image:url(/templates/_default_/images/billing/balance.png); }
 
 .usr_msgmenu_bar {
     background-color: #E0EAEF;
@@ -4874,7 +4885,6 @@ span.ajax-loader {
 #langs {
     background: none no-repeat scroll 5px center #375E93;
     border: 1px solid #5D90D1;
-    border-radius: 6px;
     color: #FFF;
     cursor: pointer;
     float: right;
@@ -4898,7 +4908,6 @@ span.ajax-loader {
     top: 22px;
     left: -1px;
     padding: 0;
-    border-radius: 0 0 6px 6px;
     border-top: none;
     color: #FFF;
     font-size: 12px;

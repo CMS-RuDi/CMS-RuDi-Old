@@ -650,7 +650,7 @@ class cmsPage {
         }
 
         while ($mod = cmsCore::c('db')->fetch_assoc($result)) {
-            if (!cmsCore::checkContentAccess($mod['access_list'])) { continue; }
+            if (!cmsCore::checkContentAccess($mod['access_list'], false)) { continue; }
             
             // не показывать модуль на определенных пунктах меню
             if ($mod['hidden_menu_ids']) {

@@ -736,14 +736,14 @@ class cmsCore {
      * иначе подключается компонент для главной страницы
      * @return string $component
      */
-    private function detectComponent(){
+    private function detectComponent() {
         //главная страница
         if (!$this->uri) { return self::c('config')->homecom; }
 
         //определяем, есть ли слэши в адресе
         $first_slash_pos = mb_strpos($this->uri, '/');
 
-        if ($first_slash_pos){
+        if ($first_slash_pos) {
             //если есть слэши, то компонент это сегмент до первого слэша
             $component  = mb_substr($this->uri, 0, $first_slash_pos);
         } else {
@@ -1561,19 +1561,19 @@ class cmsCore {
      * Возвращает ID текущего пункта меню
      * @return int
      */
-    public function menuId(){
+    public function menuId() {
 
         //если menu_id был определен ранее, то вернем и выйдем
         if (isset($this->menu_id)) { return $this->menu_id; }
 
-        if ($this->url_without_com_name){
+        if ($this->url_without_com_name) {
             $uri = mb_substr($this->uri, mb_strlen(cmsConfig::getConfig('com_without_name_in_url').'/'));
         } else {
             $uri = $this->uri;
         }
 
-        $uri      = '/'.$uri;
-		$real_uri = '/'.$this->real_uri;
+        $uri      = '/'. $uri;
+        $real_uri = '/'. $this->real_uri;
 
         //флаг, показывающий было совпадение URI и ссылки пунта меню
         //полным или частичным
@@ -1742,7 +1742,6 @@ class cmsCore {
      * @return array
      */
     public static function getDirsList($root_dir){
-
         $dir = PATH . $root_dir;
         $dir_context = opendir($dir);
 
@@ -1759,7 +1758,28 @@ class cmsCore {
         }
 
         return $list;
+    }
+    
+    /**
+     * Возвращает список файлов внутри указанной директории
+     * @param string $root_dir Например /languages
+     * @return array
+     */
+    public static function getDirFilesList($root_dir){
+        $dir = PATH . $root_dir;
+        $dir_context = opendir($dir);
 
+        $list = array();
+
+        while ($next = readdir($dir_context)){
+            if (in_array($next, array('.', '..')) || is_dir($dir .'/'. $next)) {
+                continue;
+            }
+
+            $list[] = $next;
+        }
+
+        return $list;
     }
     // RATINGS  //////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2899,13 +2919,17 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
         
         foreach ($results as $result) {
             $now = new DateTime(null, new DateTimeZone($result));
-            $offset = $now->getOffset()/3600;
+            $offset = $now->getOffset();
             
-            if (!isset($timezones[$offset])) {
-                $timezones[$offset] = array();
+            $offsetHours = floor(abs($offset)/3600); 
+            $offsetMinutes = floor((abs($offset) - $offsetHours * 3600) / 60); 
+            $offsetString = ($offset < 0 ? '-' : '+') . ($offsetHours < 10 ? '0' : '') . $offsetHours . ':' . ($offsetMinutes < 10 ? '0' : '') . $offsetMinutes;
+            
+            if (!isset($timezones[$offsetString])) {
+                $timezones[$offsetString] = array();
             }
             
-            $timezones[$offset][] = $result;
+            $timezones[$offsetString][] = $result;
         }
         
         ksort($timezones);
@@ -2923,7 +2947,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
         
         foreach ($timezones as $offset => $tzones) {
             foreach ($tzones as $timezone) {
-                $options .= '<option value="'. $timezone .'"'. ($timezone == $sel ? ' selected="selected"' : '') .'>'. ($offset <= 0 ? $offset : '+'. $offset) .'    '. (isset($_LANG[$timezone]) ? $_LANG[$timezone] : $timezone) .'</option>'. "\n";
+                $options .= '<option value="'. $timezone .'"'. ($timezone == $sel ? ' selected="selected"' : '') .'>'. $offset .' '. (isset($_LANG[$timezone]) ? $_LANG[$timezone] : $timezone) .'</option>'. "\n";
             }
         }
         

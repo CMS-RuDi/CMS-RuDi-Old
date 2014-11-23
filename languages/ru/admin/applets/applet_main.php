@@ -16,6 +16,7 @@
 $_LANG['AD_SITE_CONTENT']          = 'Контент сайта';
 $_LANG['AD_PHOTOGALLERY']          = 'Фотогалерея';
 $_LANG['AD_VIDEOGALLERY']          = 'Видеогалерея';
+$_LANG['AD_IAUDIO']                = 'Аудиокаталог';
 $_LANG['AD_GEO_CATALOG']           = 'Гео-каталог';
 $_LANG['AD_ADD_OBJECT']            = 'Добавить объект';
 $_LANG['AD_A&Q']                   = 'Вопросы и ответы';
@@ -41,6 +42,8 @@ $_LANG['AD_RSS_FORUM']             = 'Лента форума';
 $_LANG['AD_RSS_CATALOG']           = 'Лента каталога';
 $_LANG['AD_RSS_CONTENT']           = 'Лента материалов';
 $_LANG['AD_RSS_ADVERTS']           = 'Лента объявлений';
+$_LANG['AD_RSS_VIDEO']             = 'Лента видео';
+$_LANG['AD_RSS_AUDIO']             = 'Лента исполнителей'; 
 $_LANG['AD_RSS_TUNING']            = 'Настройки RSS';
 $_LANG['AD_ICMS_RAVE']             = 'Сообщество InstantCMS';
 $_LANG['AD_ICMS_OFFICIAL']         = 'Официальный сайт InstantCMS';

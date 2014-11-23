@@ -201,6 +201,8 @@ $_LANG['UPLOAD_ERR_INI_SIZE']   = 'Размер файла превышает д
 $_LANG['UPLOAD_ERR_NO_TMP_DIR'] = 'Не найдена папка для временных файлов на сервере';
 $_LANG['UPLOAD_ERR_CANT_WRITE'] = 'Ошибка записи файла на диск';
 $_LANG['UPLOAD_ERR_EXTENSION']  = 'Загрузка файла была прервана PHP-расширением';
+$_LANG['UNKNOWN_ERROR']         = 'Неизвестная ошибка';
+$_LANG['NOT_SUPPORTED_FORMAT']  = 'Фомар файла не поддерживается';
 
 $_LANG['UPLOAD_IMG_IS_DISABLE'] = 'Загрузка изображений запрещена!';
 $_LANG['UPLOAD_IMG_LIMIT']      = 'Достигнут предел количества изображений!';

@@ -1094,6 +1094,7 @@ function cpGetList($listtype, $field_name='title') {
     if ($listtype == 'menu') {
         $list[] = array( 'title' => $_LANG['AD_MAIN_MENU'], 'id' => 'mainmenu' );
         $list[] = array( 'title' => $_LANG['AD_USER_MENU'], 'id' => 'usermenu' );
+        $list[] = array( 'title' => $_LANG['AD_AUTH_MENU'], 'id' => 'authmenu' );
 
         for ($m=1; $m<=20; $m++) {
             $list[] = array( 'title' => $_LANG['AD_SUBMENU'] .' '. $m, 'id' => 'menu'. $m );
@@ -1149,42 +1150,35 @@ function getFullAwardsList(){
  * @return bool
  */
 function files_remove_directory($directory, $is_clear=false){
-
-    if(substr($directory,-1) == '/'){
+    if (substr($directory,-1) == '/') {
         $directory = substr($directory,0,-1);
     }
 
-    if(!file_exists($directory) || !is_dir($directory) || !is_readable($directory)){
+    if (!file_exists($directory) || !is_dir($directory) || !is_readable($directory)) {
         return false;
     }
 
     $handle = opendir($directory);
 
-    while (false !== ($node = readdir($handle))){
-
-        if($node != '.' && $node != '..'){
-
+    while (false !== ($node = readdir($handle))) {
+        if ($node != '.' && $node != '..') {
             $path = $directory.'/'.$node;
 
-            if(is_dir($path)){
+            if (is_dir($path)) {
                 if (!files_remove_directory($path)) { return false; }
             } else {
-                if(!@unlink($path)) { return false; }
+                if (!@unlink($path)) { return false; }
             }
-
         }
-
     }
 
     closedir($handle);
 
-    if ($is_clear == false){
-        if(!@rmdir($directory)){
+    if ($is_clear == false) {
+        if (!@rmdir($directory)) {
             return false;
         }
     }
 
     return true;
-
 }
-?>

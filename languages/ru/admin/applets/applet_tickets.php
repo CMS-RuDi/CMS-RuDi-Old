@@ -36,3 +36,7 @@ $_LANG['AD_TICKET_PRIORITY_3']    = 'Критический';
 $_LANG['AD_TICKET_SENDED']        = 'Тикет успешно отправлен в техподдержку';
 $_LANG['AD_TICKET_UNKNOWN_ERROR'] = 'Неизвестная ошибка';
 $_LANG['AD_TICKET_MSG_SENDED']    = 'Сообщение успешно отправлено в техподдержку';
+
+$_LANG['AD_SUPPORT_CLOSE_TICKET']  = 'Техподдержка закрыла тикет.';
+$_LANG['AD_SUPPORT_DELETE_TICKET'] = 'Техподдержка удалила тикет.';
+$_LANG['AD_SUPPORT_NEW_MSG']       = 'Новое сообщение от техподдержи для тикета «%s». <a href="%s">Прочитать</a>.';

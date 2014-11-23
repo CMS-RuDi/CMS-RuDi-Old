@@ -83,6 +83,7 @@ $_LANG['AD_DELETE_SELECTED']     = 'Удалить выбранные';
 $_LANG['AD_NO_SELECT_OBJECTS']   = 'Нет выбранных объектов!';
 $_LANG['AD_MAIN_MENU']           = 'Главное меню';
 $_LANG['AD_USER_MENU']           = 'Меню пользователя';
+$_LANG['AD_AUTH_MENU']           = 'Меню авторизации';
 $_LANG['AD_SUBMENU']             = 'Дополнительное меню';
 $_LANG['AD_TITLE']               = 'Заголовок';
 $_LANG['AD_SHARE']               = 'Общий доступ';

@@ -265,11 +265,10 @@
         $plg_config = cmsCore::yamlToArray($plg_config);
         if (!isset($plg_config['no_create_thread_cats'])) {
             $plg_nconfig = array(
-                'delete_thread' => $plg_config['AF_DELETE_THREAD'],
-                'link_thread'   => $plg_config['AF_LINK_THREAD'],
-                'forum_id'      => $plg_config['AF_ADDTREADFORUM_ID'],
-                'no_create_thread_cats' => array_map('trim', explode(',', $plg_config['AF_NOCREATETREAD']))
-
+                'delete_thread' => isset($plg_config['AF_DELETE_THREAD']) ? $plg_config['AF_DELETE_THREAD'] : 0,
+                'link_thread'   => isset($plg_config['AF_LINK_THREAD']) ? $plg_config['AF_LINK_THREAD'] : 1,
+                'forum_id'      => isset($plg_config['AF_ADDTREADFORUM_ID']) ? $plg_config['AF_ADDTREADFORUM_ID'] : 1,
+                'no_create_thread_cats' => array_map('trim', explode(',', isset($plg_config['AF_NOCREATETREAD']) ? $plg_config['AF_NOCREATETREAD'] : ''))
             );
             $plg_nconfig = cmsCore::arrayToYaml($plg_nconfig);
             cmsCore::c('db')->query("UPDATE cms_plugins SET config='". cmsCore::c('db')->escape_string($plg_nconfig) ."' WHERE plugin='p_auto_forum' LIMIT 1");
@@ -322,6 +321,101 @@
         }
         //======================================================================
         
+        $last_user_menu = cmsCore::c('db')->get_fields('cms_modules', "title = 'Меню пользователя' AND content = 'mod_menu'");
+        if (!empty($last_user_menu)) {
+            cmsCore::c('db')->query("UPDATE `cms_modules` SET 
+                    `position` = '". $last_user_menu['position'] ."',
+                    `name` = 'Меню',
+                    `title` = 'Меню пользователя',
+                    `is_external` = 1,
+                    `content` = 'mod_menu',
+                    `ordering` = ". $last_user_menu['ordering'] .",
+                    `showtitle` = ". $last_user_menu['showtitle'] .",
+                    `published` = ". $last_user_menu['published'] .",
+                    `user` = 0,
+                    `config` = '---\nmenu: usermenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n',
+                    `original` = 1,
+                    `css_prefix` = 'user_menu_',
+                    `access_list` = '---\n- 1\n- 7\n- 9\n- 2\n',
+                    `hidden_menu_ids` = '',
+                    `cache` = 0,
+                    `cachetime` = 1,
+                    `cacheint` = 'HOUR',
+                    `template` = 'module.tpl',
+                    `is_strict_bind` = 0,
+                    `is_strict_bind_hidden` = 0,
+                    `author` = 'InstantCMS team',
+                    `version` = '1.0' WHERE `id` = ". $last_user_menu['id'] ." LIMIT 1");
+            cmsCore::c('db')->delete('cms_modules', "content = 'mod_usermenu'");
+
+            cmsCore::c('db')->query("INSERT INTO `cms_modules` (`position`, `name`, `title`, `is_external`, `content`, `ordering`, `showtitle`, `published`, `user`, `config`, `original`, `css_prefix`, `access_list`, `hidden_menu_ids`, `cache`, `cachetime`, `cacheint`, `template`, `is_strict_bind`, `is_strict_bind_hidden`, `author`, `version`) VALUES 
+ 	146	('header', 'Меню', 'Меню авторизации', 1, 'mod_menu', 35, 0, 1, 0, '---\nmenu: authmenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n', 1, 'user_menu_', '---\n- 8\n', '', 0, 1, 'HOUR', 'module.tpl', 0, 0, 'InstantCMS team', '1.0');");
+            $aid = cmsCore::c('db')->get_last_id('cms_modules');
+            cmsCore::c('db')->query("INSERT INTO `cms_modules_bind` (`module_id`, `menu_id`, `position`) VALUES (". $aid .", 0, 'header');");
+            
+            echo '<p>Существующий модуль "Меню пользователя" удален.</p>';
+            echo '<p>Новый модуль "Меню авторизации" добавлен. </p>';
+            echo '<p>Новый модуль "Меню пользователя" добавлен. Добавлять/изменять/удалять пункты меню пользователя теперь можно в админке в общем списке меню.</p>';
+
+            // создаем пункты меню
+            // авторизация
+            cmsCore::c('db')->addNsCategory( 'cms_menu', array( 'parent_id' => 1, 'menu' => '---\n- authmenu\n', 'title' => 'Войти', 'css_class' => 'login', 'link' => '/login', 'linkid' => '/login', 'published' => 1 ) );
+            
+            cmsCore::c('db')->addNsCategory( 'cms_menu', array( 'parent_id' => 1, 'menu' => '---\n- authmenu\n', 'title' => 'Регистрация', 'css_class' => 'register', 'link' => '/registration', 'linkid' => '/registration', 'published' => 1 ) );
+
+            // меню пользователя
+            $user_menu = array(
+                array(
+                    'title'     => '{user.nickname}',
+                    'css_class' => 'my_profile',
+                    'link'      => '/users/{user.login}'
+                ),
+                array(
+                    'title'     => 'Сообщения {user.new_msg_count}',
+                    'css_class' => 'my_messages',
+                    'link'      => '/users/{user.id}/messages.html'
+                ),
+                array(
+                    'title'     => 'Мой блог',
+                    'css_class' => 'my_blog',
+                    'link'      => '/blogs/my_blog.html'
+                ),
+                array(
+                    'title'     => 'Фото',
+                    'css_class' => 'my_photos',
+                    'link'      => '/users/{user.id}/photoalbum.html'
+                ),
+                array(
+                    'title'     => 'Статьи',
+                    'css_class' => 'my_content',
+                    'link'      => '/content/my.html'
+                ),
+                array(
+                    'title'     => 'Админка',
+                    'css_class' => 'admin',
+                    'link'      => '/admin/',
+                    'access_list' => '---\n- 2\n'
+                ),
+                array(
+                    'title'     => 'Выход',
+                    'css_class' => 'logout',
+                    'link'      => '/logout'
+                )
+            );
+            
+            foreach ($user_menu as $m) {
+                $id = cmsCore::c('db')->addNsCategory( 'cms_menu', array( 'parent_id' => 1, 'menu' => '---\n- usermenu\n', 'title' => $m['title'], 'css_class' => $m['css_class'], 'link' => $m['link'], 'linkid' => $m['link'], 'access_list' => (empty($m['access_list']) ? '' : $m['access_list']), 'published' => 1 ) );
+                
+                if ($m['css_class'] == 'my_photos') {
+                    cmsCore::c('db')->addNsCategory( 'cms_menu', array( 'parent_id' => $id, 'menu' => '---\n- usermenu\n', 'title' => 'Добавить фото', 'css_class' => 'add_photos', 'link' => '/users/addphoto.html', 'linkid' => '/users/addphoto.html', 'published' => 1 ) );
+                }
+                
+                if ($m['css_class'] == 'my_content') {
+                    cmsCore::c('db')->addNsCategory( 'cms_menu', array( 'parent_id' => $id, 'menu' => '---\n- usermenu\n', 'title' => 'Написать', 'css_class' => 'add_content', 'link' => '/content/add.html', 'linkid' => '/content/add.html', 'published' => 1 ) );
+                }
+            }
+        }
+        
         // Оптимизируем таблицы в БД
         cmsDatabase::optimizeTables();
         
@@ -329,7 +423,7 @@
     }
 
 // ========================================================================== //
-    if ($step == 2){
+    if ($step == 2) {
         $dir_m = PATH .'/images/photos/medium';
         $dir_s = PATH .'/images/photos/small';
         
@@ -338,15 +432,14 @@
         
         $pdir = opendir($dir_m);
 
-        while ($nextfile = readdir($pdir)){
+        while ($nextfile = readdir($pdir)) {
             if (
                     ($nextfile != '.') &&
                     ($nextfile != '..') &&
                     !is_dir($dir_m .'/'. $nextfile) &&
                     (preg_match('#article([0-9]+)#is', $nextfile, $match)))
             {
-                if (cmsCore::c('db')->get_field('cms_content', "id='". $match[1] ."'", 'id')){
-                    
+                if (cmsCore::c('db')->get_field('cms_content', "id='". $match[1] ."'", 'id')) {
                     $id = ceil($match[1]/100);
                     
                     mkdir($new_dir_m .'/'. $id, 0777, true);
@@ -354,7 +447,6 @@
                     
                     copy($dir_m .'/'. $nextfile, $new_dir_m .'/'. $id .'/'. $nextfile);
                     copy($dir_s .'/'. $nextfile, $new_dir_s .'/'. $id .'/'. $nextfile);
-                    
                 }
                 
                 unlink($dir_m .'/'. $nextfile);

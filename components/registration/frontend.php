@@ -430,7 +430,7 @@ if ($do=='auth'){
 
         }
 
-    	if(!mb_strstr(@$_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST'])) { cmsCore::error404(); }
+    	if(!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         // Проверяем каптчу
         if($anti_brute_force && !cmsCore::checkCaptchaCode()) {

@@ -1,4 +1,6 @@
 <form action="/login" method="post" name="authform" style="margin:0px" target="_self" id="authform">
+    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
+    
     <table class="authtable" width="100%" border="0" cellspacing="0" cellpadding="2">
         <tr>
             <td width="60"><?php echo $_LANG['AUTH_LOGIN']; ?>:</td>
@@ -34,7 +36,9 @@
                                 <a href="/passremind.html"><?php echo $_LANG['AUTH_FORGOT']; ?></a>
                             <?php } ?>
                         </td>
-                        <td width="13%" align="right"><input id="login_btn" type="submit" name="Submit" value="<?php echo $_LANG['AUTH_ENTER']; ?>" /></td>
+                        <td width="13%" align="right">
+                            <input id="login_btn" type="submit" name="Submit" value="<?php echo $_LANG['AUTH_ENTER']; ?>" />
+                        </td>
                     </tr>
                 </table>
             </td>

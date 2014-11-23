@@ -328,28 +328,25 @@ class cmsPage {
             // Заголовок страницы
             echo '<title>', htmlspecialchars($this->title), '</title>',"\n";
 
-            //Ключевые слова
+            // Ключевые слова
             echo '<meta name="keywords" content="', htmlspecialchars($this->site_cfg->keywords), '" />',"\n";
 
-            //Описание
+            // Описание
             echo '<meta name="description" content="',htmlspecialchars($this->site_cfg->metadesc),'" />',"\n";
 
-            //Генератор
-            echo '<meta name="generator" content="CMS RuDi v'. CMS_RUDI_V .'" />',"\n";
-
-            //CSS
+            // CSS
             $this->page_css = cmsCore::callEvent('PRINT_ADMIN_PAGE_CSS', $this->page_css);
             foreach ($this->page_css as $value) {
                 echo '<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n";
             }
 
-            //JS
+            // JS
             $this->page_js = cmsCore::callEvent('PRINT_ADMIN_PAGE_JS', $this->page_js);
             foreach ($this->page_js as $value) {
                 echo '<script type="text/javascript" src="'. $value .'"></script>',"\n";
             }
 
-            //Оставшиеся теги
+            // Оставшиеся теги
             $this->page_head = cmsCore::callEvent('PRINT_ADMIN_PAGE_HEAD', $this->page_head);
             foreach($this->page_head as $value) { echo $value,"\n"; }
         }

@@ -8,6 +8,8 @@
     <tr>
         <td valign="top" width="50%">
             <form method="post" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
+                
                 <div class="lf_title"><?php echo $_LANG['LOGIN']; ?> <?php echo $_LANG['OR']; ?> <?php echo $_LANG['EMAIL']; ?></div>
                 <div class="lf_field">
                     <input type="text" name="login" id="login_field" tabindex="1"/> <a href="/registration" class="lf_link"><?php echo $_LANG['REGISTRATION']; ?></a>

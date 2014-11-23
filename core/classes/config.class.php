@@ -114,6 +114,8 @@ class cmsConfig {
         foreach ($cfg as $key => $value) {
             $cfg[$key] = stripslashes($value);
         }
+        
+        $cfg['cookie_key'] = md5($cfg['sitename']);
 
         return $cfg;
     }

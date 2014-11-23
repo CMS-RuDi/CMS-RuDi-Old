@@ -554,7 +554,7 @@ class cmsCore {
             $secure = false;
         }
         
-        setcookie('CMSRuDi['. $name .']', $value, $expire, '/', null, $secure, $httponly);
+        setcookie(self::c('config')->cookie_key .'['. $name .']', $value, $expire, '/', null, $secure, $httponly);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -563,8 +563,8 @@ class cmsCore {
      * Удаляет кукис пользователя
      * @param string $name
      */
-    public static function unsetCookie($name){
-        setcookie('CMSRuDi['. $name .']', '', time()-3600, '/');
+    public static function unsetCookie($name) {
+        setcookie(self::c('config')->cookie_key .'['. $name .']', '', time()-3600, '/');
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -574,8 +574,8 @@ class cmsCore {
      * @param string $name
      * @return string || false
      */
-    public static function getCookie($name){
-        return isset($_COOKIE['CMSRuDi'][$name]) ? $_COOKIE['CMSRuDi'][$name] : false;
+    public static function getCookie($name) {
+        return isset($_COOKIE[self::c('config')->cookie_key][$name]) ? $_COOKIE[self::c('config')->cookie_key][$name] : false;
     }
 
     ////////////////////////////////////////////////////////////////////////////

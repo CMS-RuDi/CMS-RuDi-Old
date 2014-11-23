@@ -2,7 +2,7 @@
 <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data">
     <table cellpadding="5">
         <tr>
-            <td height="30"><span><?php echo $_LANG['CAT_BOARD']; ?>:</span></td>
+            <td width="220"><span><?php echo $_LANG['CAT_BOARD']; ?>:</span></td>
             <td>
                 <select name="category_id" id="category_id" class="text-input" style="width:407px" onchange="getRubric();">
                     <option value="0">-- <?php echo $_LANG['SELECT_CAT']; ?> --</option>
@@ -11,7 +11,7 @@
             </td>
         </tr>
         <tr>
-            <td width="180">
+            <td>
                 <span><?php echo $_LANG['TITLE']; ?>:</span>
             </td>
             <td height="35">
@@ -182,9 +182,31 @@
             <td valign="top" class=""><?php echo cmsPage::getCaptcha(); ?></td>
         </tr>
         <?php } ?>
+        
+        <?php if (($cfg['seo_user_access'] && $is_user) || $is_admin) { ?>
+            <tr>
+                <td valign="top"><?php echo $_LANG['SEO_PAGETITLE']; ?><div class="hint"><?php echo $_LANG['SEO_PAGETITLE_HINT']; ?></div></td>
+                <td>
+                    <input name="pagetitle" style="width:407px" class="text-input" value="<?php echo $this->escape($item['pagetitle']); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><?php echo $_LANG['SEO_METAKEYS']; ?></td>
+                <td>
+                    <input name="meta_keys" style="width:407px" class="text-input" value="<?php echo $this->escape($item['meta_keys']); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><?php echo $_LANG['SEO_METADESCR']; ?><div class="hint"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div></td>
+                <td>
+                    <textarea name="meta_desc" rows="3" style="width:407px" class="text-input"><?php echo $this->escape($item['meta_desc']); ?></textarea>
+                </td>
+            </tr>
+        <?php } ?>
+        
         <tr>
             <td height="40" colspan="2" valign="middle">
-                <input name="submit" type="submit" id="submit" style="margin-top:10px;font-size:18px" value="<?php echo $_LANG['SAVE_ADV']; ?>" <?php if ($is_admin || ($is_billing && $cfg['vip_enabled'])) { ?>onclick="if(!checkBalance())return false;"<?php } ?> />
+                <input name="submit" type="submit" id="submit" value="<?php echo $_LANG['SAVE_ADV']; ?>" <?php if ($is_admin || ($is_billing && $cfg['vip_enabled'])){ ?>onclick="if(!checkBalance())return false;"<?php } ?> />
             </td>
         </tr>
     </table>

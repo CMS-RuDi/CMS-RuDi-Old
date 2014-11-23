@@ -276,3 +276,9 @@ $_LANG['FILE_DUPLICATE'] = 'This file has already been selected:\n$file!';
 $_LANG['AJAX_FILE_UPLOAD_NOT_SUPPORTED'] = 'Your browser does not support Flash, Silverlight and HTML5 downloading files.';
 $_LANG['MODEL_NOT_FOUND'] = 'Fatal Error. Class component model "%s" not found.';
 $_LANG['CLASS_NOT_FOUND'] = 'Fatal Error. Класс "%s" not found.';
+
+$_LANG['SEO_PAGETITLE']      = 'Pagetitle, "title" tag';
+$_LANG['SEO_PAGETITLE_HINT'] = 'If not specified, will use the same name';
+$_LANG['SEO_METAKEYS']       = 'Keywords, meta keywords tag';
+$_LANG['SEO_METADESCR']      = 'Descripion, meta description tag';
+$_LANG['SEO_METADESCR_HINT'] = 'Max length 250 characters'; 

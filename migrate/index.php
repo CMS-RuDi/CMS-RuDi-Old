@@ -59,7 +59,14 @@
             array( 'table' => 'cms_modules',  'name' => 'hidden_menu_ids', 'type' => 'VARCHAR(300)', 'default' => "''" ),
             array( 'table' => 'cms_modules',  'name' => 'is_strict_bind_hidden', 'type' => 'tinyint(1)', 'default' => "0" ),
             
-            array( 'table' => 'cms_search',  'name' => 'imageurl', 'type' => 'VARCHAR(150)', 'default' => "''" )
+            array( 'table' => 'cms_search',  'name' => 'imageurl', 'type' => 'VARCHAR(150)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_board_cats', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_board_cats', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_board_cats', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_board_items', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_board_items', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_board_items', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
         ),
         
         'change_fields' => array(

@@ -44,25 +44,31 @@ $opt = cmsCore::request('opt', 'str', 'list_items');
 if ($opt == 'saveconfig') {
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
-    $cfg['maxcols']   = cmsCore::request('maxcols', 'int', 0);
-    $cfg['obtypes']   = cmsCore::request('obtypes', 'html', '');
-    $cfg['showlat']   = cmsCore::request('showlat', 'str', '');
-    $cfg['public']    = cmsCore::request('public', 'int', 0);
-    $cfg['photos']    = cmsCore::request('photos', 'int', 0);
-    $cfg['srok']      = cmsCore::request('srok', 'int', 0);
-    $cfg['pubdays']   = cmsCore::request('pubdays', 'int', 0);
-    $cfg['watermark'] = cmsCore::request('watermark', 'int', 0);
-    $cfg['aftertime'] = cmsCore::request('aftertime', 'str', '');
-    $cfg['comments']  = cmsCore::request('comments', 'int', 0);
-    $cfg['extend']    = cmsCore::request('extend', 'int', 0);
-    $cfg['auto_link'] = cmsCore::request('auto_link', 'int', 0);
-    $cfg['vip_enabled']    = cmsCore::request('vip_enabled', 'int', 0);
-    $cfg['vip_prolong']    = cmsCore::request('vip_prolong', 'int', 0);
-    $cfg['vip_max_days']   = cmsCore::request('vip_max_days', 'int', 30);
-    $cfg['vip_day_cost']   = cmsCore::request('vip_day_cost', 'str', 5);
-    $cfg['home_perpage']   = cmsCore::request('home_perpage', 'int', 15);
-    $cfg['maxcols_on_home'] = cmsCore::request('maxcols_on_home', 'int', 1);
-    $cfg['publish_after_edit'] = cmsCore::request('publish_after_edit', 'int', 0);
+    $cfg = array(
+        'maxcols'            => cmsCore::request('maxcols', 'int', 0),
+        'obtypes'            => cmsCore::request('obtypes', 'html', ''),
+        'showlat'            => cmsCore::request('showlat', 'str', ''),
+        'public'             => cmsCore::request('public', 'int', 0),
+        'photos'             => cmsCore::request('photos', 'int', 0),
+        'srok'               => cmsCore::request('srok', 'int', 0),
+        'pubdays'            => cmsCore::request('pubdays', 'int', 0),
+        'watermark'          => cmsCore::request('watermark', 'int', 0),
+        'aftertime'          => cmsCore::request('aftertime', 'str', ''),
+        'comments'           => cmsCore::request('comments', 'int', 0),
+        'extend'             => cmsCore::request('extend', 'int', 0),
+        'auto_link'          => cmsCore::request('auto_link', 'int', 0),
+        'vip_enabled'        => cmsCore::request('vip_enabled', 'int', 0),
+        'vip_prolong'        => cmsCore::request('vip_prolong', 'int', 0),
+        'vip_max_days'       => cmsCore::request('vip_max_days', 'int', 30),
+        'vip_day_cost'       => cmsCore::request('vip_day_cost', 'str', 5),
+        'home_perpage'       => cmsCore::request('home_perpage', 'int', 15),
+        'maxcols_on_home'    => cmsCore::request('maxcols_on_home', 'int', 1),
+        'publish_after_edit' => cmsCore::request('publish_after_edit', 'int', 0),
+        'root_description'   => cmsCore::request('root_description', 'html', ''),
+        'meta_keys'          => cmsCore::request('meta_keys', 'str', ''),
+        'meta_desc'          => cmsCore::request('meta_desc', 'str', ''),
+        'seo_user_access'    => cmsCore::request('seo_user_access', 'int', 0)
+    );
 
     $cfg['vip_day_cost'] = str_replace(',', '.', trim($cfg['vip_day_cost']));
 
@@ -136,6 +142,7 @@ if ($opt == 'config') {
             <li><a href="#access"><span><?php echo $_LANG['AD_TAB_ACCESS']; ?></span></a></li>
             <li><a href="#types"><span><?php echo $_LANG['AD_TYPES']; ?></span></a></li>
             <li><a href="#vip"><span><?php echo $_LANG['AD_VIP']; ?></span></a></li>
+            <li><a href="#seo"><span><?php echo $_LANG['AD_SEO']; ?></span></a></li>
         </ul>
 
         <div id="basic">
@@ -325,6 +332,37 @@ if ($opt == 'config') {
                 </div>
             <?php } ?>
         </div>
+        
+        <div id="seo">
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_ROOT_DESCRIPION']; ?>:</label>
+                <textarea class="form-control" name="root_description" rows="6"><?php echo cmsCore::getArrVal($cfg, 'root_description', ''); ?></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_ROOT_METAKEYS']; ?>:</label>
+                <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+                <textarea class="form-control" name="meta_keys" rows="2"><?php echo cmsCore::getArrVal($cfg, 'meta_keys', ''); ?></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_ROOT_METADESC']; ?>:</label>
+                <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
+                <textarea class="form-control" name="meta_desc" rows="4"><?php echo cmsCore::getArrVal($cfg, 'meta_desc', ''); ?></textarea>
+            </div>
+
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_USER_SEO_ACCESS']; ?>:</label>
+                <div class="btn-group" data-toggle="buttons" style="float:right;">
+                    <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'active'; } ?>">
+                        <input type="radio" name="seo_user_access" <?php if(cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
+                    </label>
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'active'; } ?>">
+                        <input type="radio" name="seo_user_access" <?php if (!cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                    </label>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div>
@@ -350,24 +388,29 @@ if ($opt == 'hide_cat') {
 if ($opt == 'submit_cat' || $opt == 'update_cat') {
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
-    $types = array('title'=>array('title', 'str', $_LANG['AD_UNTITLED_CAT']),
-                   'description'=>array('description', 'str', ''),
-                   'published'=>array('published', 'int', 0),
-                   'showdate'=>array('showdate', 'int', 0),
-                   'parent_id'=>array('parent_id', 'int', 0),
-                   'public'=>array('public', 'int', 0),
-                   'orderby'=>array('orderby', 'str', 'pubdate'),
-                   'orderto'=>array('orderto', 'str', 'desc'),
-                   'perpage'=>array('perpage', 'int', 10),
-                   'is_photos'=>array('is_photos', 'int', 0),
-                   'thumb1'=>array('thumb1', 'int', 0),
-                   'thumb2'=>array('thumb2', 'int', 0),
-                   'thumbsqr'=>array('thumbsqr', 'int', 0),
-                   'uplimit'=>array('uplimit', 'int', 0),
-                   'maxcols'=>array('maxcols', 'int', 0),
-                   'orderform'=>array('orderform', 'int', 0),
-                   'form_id'=>array('form_id', 'int', 0),
-                   'obtypes'=>array('obtypes', 'str', ''));
+    $types = array(
+        'title'       => array('title', 'str', $_LANG['AD_UNTITLED_CAT']),
+        'description' => array('description', 'str', ''),
+        'published'   => array('published', 'int', 0),
+        'showdate'    => array('showdate', 'int', 0),
+        'parent_id'   => array('parent_id', 'int', 0),
+        'public'      => array('public', 'int', 0),
+        'orderby'     => array('orderby', 'str', 'pubdate'),
+        'orderto'     => array('orderto', 'str', 'desc'),
+        'perpage'     => array('perpage', 'int', 10),
+        'is_photos'   => array('is_photos', 'int', 0),
+        'thumb1'      => array('thumb1', 'int', 0),
+        'thumb2'      => array('thumb2', 'int', 0),
+        'thumbsqr'    => array('thumbsqr', 'int', 0),
+        'uplimit'     => array('uplimit', 'int', 0),
+        'maxcols'     => array('maxcols', 'int', 0),
+        'orderform'   => array('orderform', 'int', 0),
+        'form_id'     => array('form_id', 'int', 0),
+        'obtypes'     => array('obtypes', 'str', ''),
+        'pagetitle'   => array('pagetitle', 'str', ''),
+        'meta_keys'   => array('meta_keys', 'str', ''),
+        'meta_desc'   => array('meta_desc', 'str', '')
+    );
 
     $item = cmsCore::getArrayFromRequest($types);
 
@@ -672,6 +715,30 @@ if ($opt == 'add_cat' || $opt == 'edit_cat') {
                 <textarea class="form-control" name="obtypes" rows="6"><?php echo cmsCore::getArrVal($mod, 'obtypes', ''); ?></textarea>
                 <div class="help-block"><?php echo $_LANG['AD_NEW_LINE_TYPES']; ?></div>
                 <div class="help-block"><?php echo $_LANG['AD_PARENT_CAT_DEFAULT']; ?></div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="col-sm-5 control-label"><?php echo $_LANG['SEO_PAGETITLE'];?></label>
+            <div class="col-sm-7">
+                <textarea class="form-control" name="pagetitle" rows="2"><?php echo cmsCore::getArrVal($mod, 'pagetitle', ''); ?></textarea>
+                <div class="help-block"><?php echo $_LANG['SEO_PAGETITLE_HINT']; ?></div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="col-sm-5 control-label"><?php echo $_LANG['SEO_METAKEYS'];?></label>
+            <div class="col-sm-7">
+                <textarea class="form-control" name="meta_keys" rows="2"><?php echo cmsCore::getArrVal($mod, 'meta_keys', ''); ?></textarea>
+                <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="col-sm-5 control-label"><?php echo $_LANG['SEO_METADESCR'];?></label>
+            <div class="col-sm-7">
+                <textarea class="form-control" name="meta_desc" rows="4"><?php echo cmsCore::getArrVal($mod, 'meta_desc', ''); ?></textarea>
+                <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
             </div>
         </div>
         

@@ -9,7 +9,7 @@
 </div>
 <?php } ?>
 
-<h1 class="con_heading"><?php echo $pagetitle; ?> <a href="/rss/board/<?php if ($root_id == $category['id']) { ?>all<?php } else { ?><?php echo $category['id']; ?><?php } ?>/feed.rss" title="<?php echo $_LANG['RSS']; ?>"><img src="/images/markers/rssfeed.png" border="0" alt="<?php echo $_LANG['RSS']; ?>"/></a></h1>
+<h1 class="con_heading"><?php echo $category['title']; ?> <a href="/rss/board/<?php if ($root_id == $category['id']) { ?>all<?php } else { ?><?php echo $category['id']; ?><?php } ?>/feed.rss" title="<?php echo $_LANG['RSS']; ?>"><img src="/images/markers/rssfeed.png" border="0" alt="<?php echo $_LANG['RSS']; ?>"/></a></h1>
 
 <?php if ($cats) { ?>
     <table class="board_categorylist" cellspacing="3" width="100%" border="0">
@@ -36,4 +36,5 @@
 <?php } ?>
 <?php if ($category['description']) { ?>
     <p class="usr_photos_notice"><?php echo $category['description']; ?></p>
+    <div class="board_description"><?php echo $category['description']; ?></div>
 <?php } ?>

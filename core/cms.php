@@ -2979,3 +2979,30 @@ function icms_substr_replace($str, $replacement, $offset, $length = NULL){
 
     return implode('', $str_array[0]);
 }
+
+/** 
+ * Обрезает строку по заданному кол-ву символов 
+ * @return str 
+ */ 
+function crop($string, $length = 250, $etc = '') {
+    if ($length == 0) { return ''; }
+    
+    $string = str_replace("\n", ' ', strip_tags($string));
+    
+    if (mb_strlen($string) > $length) {
+        $length -= min($length, mb_strlen($etc));
+        
+        $string = preg_replace('/\s+?(\S+)?$/u', '', mb_substr($string, 0, $length+1));
+        
+        return mb_substr($string, 0, $length) . $etc;
+    } else {
+        return $string;
+    }
+}
+
+function dump($i) {
+    echo '<pre>';
+        print_r($i);
+    echo '</pre>';
+    die;
+}

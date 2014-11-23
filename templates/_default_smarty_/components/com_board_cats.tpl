@@ -7,7 +7,7 @@
 </div>
 {/if}
 
-<h1 class="con_heading">{$pagetitle} <a href="/rss/board/{if $root_id==$category.id}all{else}{$category.id}{/if}/feed.rss" title="{$LANG.RSS}"><img src="/images/markers/rssfeed.png" border="0" alt="{$LANG.RSS}"/></a></h1>
+<h1 class="con_heading">{$category.title} <a href="/rss/board/{if $root_id==$category.id}all{else}{$category.id}{/if}/feed.rss" title="{$LANG.RSS}"><img src="/images/markers/rssfeed.png" border="0" alt="{$LANG.RSS}"/></a></h1>
 
 {if $cats}
 	<table class="board_categorylist" cellspacing="3" width="100%" border="0">
@@ -33,5 +33,5 @@
 	</table>
 {/if}
 {if $category.description}
-<p class="usr_photos_notice">{$category.description}</p>
+    <div class="board_description">{$category.description}</div>
 {/if}

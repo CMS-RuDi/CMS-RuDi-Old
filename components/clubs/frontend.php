@@ -291,30 +291,30 @@ if ($do == 'config'){
         if (!cmsUser::checkCsrfToken()) { return false; }
 
         $description = cmsCore::badTagClear(cmsCore::request('description', 'html', ''));
-        $new_club['description'] 	 = $inDB->escape_string($description);
-		$new_club['title']           = cmsCore::request('title', 'str', '');
-        $new_club['clubtype']		 = cmsCore::request('clubtype', 'str', 'public');
-        $new_club['maxsize'] 		 = cmsCore::request('maxsize', 'int', 0);
-        $new_club['blog_min_karma']	 = cmsCore::request('blog_min_karma', 'int', 0);
-        $new_club['photo_min_karma'] = cmsCore::request('photo_min_karma', 'int', 0);
-        $new_club['album_min_karma'] = cmsCore::request('album_min_karma', 'int', 0);
+        $new_club['description']      = $inDB->escape_string($description);
+        $new_club['title']            = cmsCore::request('title', 'str', $club['title']);
+        $new_club['clubtype']         = cmsCore::request('clubtype', 'str', 'public');
+        $new_club['maxsize']          = cmsCore::request('maxsize', 'int', 0);
+        $new_club['blog_min_karma']   = cmsCore::request('blog_min_karma', 'int', 0);
+        $new_club['photo_min_karma']  = cmsCore::request('photo_min_karma', 'int', 0);
+        $new_club['album_min_karma']  = cmsCore::request('album_min_karma', 'int', 0);
 
-        $new_club['blog_premod']	 = cmsCore::request('blog_premod', 'int', 0);
-        $new_club['photo_premod']	 = cmsCore::request('photo_premod', 'int', 0);
+        $new_club['blog_premod']      = cmsCore::request('blog_premod', 'int', 0);
+        $new_club['photo_premod']     = cmsCore::request('photo_premod', 'int', 0);
 
         $new_club['join_karma_limit'] = cmsCore::request('join_karma_limit', 'int', 0);
-        $new_club['join_min_karma']	  = cmsCore::request('join_min_karma', 'int', 0);
+        $new_club['join_min_karma']   = cmsCore::request('join_min_karma', 'int', 0);
 
-		// загружаем изображение клуба
-		$new_imageurl = $model->uploadClubImage($club['imageurl']);
-		$new_club['imageurl'] = @$new_imageurl['filename'] ? $new_imageurl['filename'] : $club['imageurl'];
+        // загружаем изображение клуба
+        $new_imageurl = $model->uploadClubImage($club['imageurl']);
+        $new_club['imageurl'] = @$new_imageurl['filename'] ? $new_imageurl['filename'] : $club['imageurl'];
 
-		// Сохраняем
+        // Сохраняем
         $model->updateClub($club['id'], $new_club);
 
-		// Обновляем ленту активности
-		cmsActions::updateLog('add_club', array('object' => $new_club['title']), $club['id']);
-		cmsActions::updateLog('add_club_user', array('object' => $new_club['title']), $club['id']);
+        // Обновляем ленту активности
+        cmsActions::updateLog('add_club', array('object' => $new_club['title']), $club['id']);
+        cmsActions::updateLog('add_club_user', array('object' => $new_club['title']), $club['id']);
 
         if ($inUser->is_admin && IS_BILLING){
             $is_vip    = cmsCore::request('is_vip', 'int', 0);
@@ -325,16 +325,16 @@ if ($do == 'config'){
         $moders  = cmsCore::request('moderslist', 'array_int', array());
         $members = cmsCore::request('memberslist', 'array_int', array());
 
-		$all_users = array_merge($members, $moders);
+        $all_users = array_merge($members, $moders);
 
-		// Сохраняем пользователей
+        // Сохраняем пользователей
         $model->clubSaveUsers($club['id'], $all_users);
         $model->clubSetRole($club['id'], $moders, 'moderator');
 
-		// Кешируем количество
-		$model->setClubMembersCount($club['id']);
+        // Кешируем количество
+        $model->setClubMembersCount($club['id']);
 
-		cmsCore::addSessionMessage($_LANG['CONFIG_SAVE_OK'], 'info');
+        cmsCore::addSessionMessage($_LANG['CONFIG_SAVE_OK'], 'info');
 
         cmsCore::redirect('/clubs/'.$club['id']);
 

@@ -3,7 +3,7 @@
 <form action="{$action}" method="post" enctype="multipart/form-data">
     <table cellpadding="5">
         <tr>
-            <td height="30"><span>{$LANG.CAT_BOARD}:</span></td>
+            <td width="220"><span>{$LANG.CAT_BOARD}:</span></td>
             <td>
                 <select name="category_id" id="category_id" class="text-input" style="width:407px" onchange="getRubric();">
                     <option value="0">-- {$LANG.SELECT_CAT} --</option>
@@ -12,7 +12,7 @@
             </td>
         </tr>
         <tr>
-            <td width="180">
+            <td>
                 <span>{$LANG.TITLE}:</span>
             </td>
             <td height="35">
@@ -185,10 +185,31 @@
         </tr>
         {/if}
         
-        <tr>
-                <td height="40" colspan="2" valign="middle">
-                        <input name="submit" type="submit" id="submit" style="margin-top:10px;font-size:18px" value="{$LANG.SAVE_ADV}" {if $is_admin || ($is_billing && $cfg.vip_enabled)}onclick="if(!checkBalance())return false;"{/if} />
+        {if ($cfg.seo_user_access && $is_user) || $is_admin}
+            <tr>
+                <td valign="top">{$LANG.SEO_PAGETITLE}<div class="hint">{$LANG.SEO_PAGETITLE_HINT}</div></td>
+                <td>
+                    <input name="pagetitle" style="width:407px" class="text-input" value="{$item.pagetitle|escape:'html'}" />
                 </td>
+            </tr>
+            <tr>
+                <td valign="top">{$LANG.SEO_METAKEYS}</td>
+                <td>
+                    <input name="meta_keys" style="width:407px" class="text-input" value="{$item.meta_keys|escape:'html'}" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top">{$LANG.SEO_METADESCR}<div class="hint">{$LANG.SEO_METADESCR_HINT}</div></td>
+                <td>
+                    <textarea name="meta_desc" rows="3" style="width:407px" class="text-input">{$item.meta_desc|escape:'html'}</textarea>
+                </td>
+            </tr>
+        {/if}
+        
+        <tr>
+            <td height="40" colspan="2" valign="middle">
+                <input name="submit" type="submit" id="submit" value="{$LANG.SAVE_ADV}" {if $is_admin || ($is_billing && $cfg.vip_enabled)}onclick="if(!checkBalance())return false;"{/if} />
+            </td>
         </tr>
     </table>
 </form>

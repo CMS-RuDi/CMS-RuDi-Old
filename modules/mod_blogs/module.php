@@ -31,8 +31,9 @@ function mod_blogs($module_id, $cfg) {
     }
 
     // получаем аватары владельцев
-    cmsCore::c('db')->addSelect('up.imageurl');
+    cmsCore::c('db')->addSelect('up.imageurl, img.fileurl');
     cmsCore::c('db')->addJoin('LEFT JOIN cms_user_profiles up ON up.user_id = u.id');
+    cmsCore::c('db')->addJoin("LEFT JOIN cms_upload_images img ON img.target_id = p.id AND img.target = 'blog_post' AND img.component = 'blogs'");
 
     cmsCore::c('blog')->whereOnlyPublic();
 

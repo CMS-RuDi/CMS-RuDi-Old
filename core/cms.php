@@ -520,16 +520,16 @@ class cmsCore {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    public static function insertEditor($name, $text='', $height='350', $width='500', $toolbar='') {
+    public static function insertEditor($name, $text='', $height='350', $width='500', $toolbar='full') {
         global $_LANG;
         $editor = self::callEvent(
             'INSERT_WYSIWYG',
             array(
-                'name'=>$name,
-                'text'=>$text,
-                'toolbar'=>$toolbar,
-                'height'=>$height,
-                'width'=>$width
+                'name'    => $name,
+                'text'    => $text,
+                'toolbar' => $toolbar,
+                'height'  => $height,
+                'width'   => $width
             )
         );
 

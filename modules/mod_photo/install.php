@@ -21,16 +21,17 @@ function info_module_mod_photo() {
         'author'      => 'InstantCMS team',
         'version'     => '1.10.5',
         'config'      => array(
-            'is_full'   => 1,
-            'showmore'  => 1,
-            'album_id'  => 0,
-            'whatphoto' => 'all',
-            'shownum'   => 5,
-            'maxcols'   => 2,
-            'sort'      => 'pubdate',
-            'showclubs' => 0,
-            'is_subs'   => 1,
-            'tpl'       => 'mod_photo'
+            'is_full'     => 1,
+            'showmore'    => 1,
+            'album_id'    => 0,
+            'whatphoto'   => 'all',
+            'shownum'     => 5,
+            'maxcols'     => 2,
+            'sort'        => 'pubdate',
+            'showclubs'   => 0,
+            'is_subs'     => 1,
+            'tpl'         => 'mod_photo',
+            'is_lightbox' => 1
         )
     );
 

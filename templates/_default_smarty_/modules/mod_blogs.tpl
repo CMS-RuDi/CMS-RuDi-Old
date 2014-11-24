@@ -2,7 +2,15 @@
     <div class="mod_latest_entry">
 
         <div class="mod_latest_image">
-            <a href="{profile_url login=$post.login}" title="{$post.author|escape:'html'}"><img border="0" class="usr_img_small" src="{$post.author_avatar}" /></a>
+            {if !$post.fileurl}
+                <a href="{profile_url login=$post.login}" title="{$post.author|escape:'html'}">
+                    <img class="usr_img_small img_64" src="{$post.author_avatar}" alt="{$post.author|escape:'html'}" />
+                </a>
+            {else}
+                <a href="{$post.url}">
+                    <img class="usr_img_small img_64" src="{$post.fileurl}" alt="{$post.title|escape:'html'}" />
+                </a>
+            {/if}
         </div>
 
         <a class="mod_latest_blog_title" href="{$post.url}" title="{$post.title|escape:'html'}">{$post.title|truncate:70}</a>

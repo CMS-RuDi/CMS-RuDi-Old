@@ -30,3 +30,4 @@ $_LANG['MOD_WHATPHOTO_OPT_WEEK']  = 'Per week';
 $_LANG['MOD_WHATPHOTO_OPT_MONTH'] = 'Per month';
 $_LANG['MOD_IS_FULL']             = 'Detailed pic display';
 $_LANG['MOD_SHOWMORE']            = 'Show link to the gallery';
+$_LANG['MOD_IS_LIGHTBOX']         = 'Enable lightbox';

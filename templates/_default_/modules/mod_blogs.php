@@ -2,6 +2,15 @@
     <div class="mod_latest_entry">
         <div class="mod_latest_image">
             <a href="<?php echo cmsUser::getProfileURL($post['login']); ?>" title="<?php echo $this->escape($post['author']); ?>"><img border="0" class="usr_img_small" src="<?php echo $post['author_avatar']; ?>" /></a>
+            <?php if (!$post['fileurl']) { ?>
+                <a href="<?php echo cmsUser::getProfileURL($post['login']); ?>" title="<?php echo $this->escape($post['author']); ?>">
+                    <img class="usr_img_small img_64" src="<?php echo $post['author_avatar']; ?>" alt="<?php echo $this->escape($post['author']); ?>" />
+                </a>
+            <?php } else { ?>
+                <a href="<?php echo $post['url']; ?>">
+                    <img class="usr_img_small img_64" src="<?php echo $post['fileurl']; ?>" alt="<?php echo $this->escape($post['title']); ?>" />
+                </a>
+            <?php } ?>
         </div>
 
         <a class="mod_latest_blog_title" href="<?php echo $post['url']; ?>" title="<?php echo $this->escape($post['title']); ?>"><?php echo $this->truncate($post['title'], 70); ?></a>

@@ -311,6 +311,7 @@ if (in_array($opt, array('add', 'edit'))) {
             <div id="sendto_mail" class="form-group" style="display:<?php if (cmsCore::getArrVal($mod, 'sendto', 'mail') == 'mail') { echo 'block'; } else { echo 'none'; } ?>">
                 <label><span class="fa fa-mail-forward"></span><?php echo $_LANG['AD_E-MAIL_ADDR']; ?>:</label>
                 <input type="text" id="email" class="form-control" name="email" size="30" value="<?php echo cmsCore::getArrVal($mod, 'email', ''); ?>" />
+                <div class="help-block"><?php echo $_LANG['AD_E-MAIL_ADDR_HINT']; ?></div>
             </div>
             
             <div id="sendto_user" class="form-group" style="display:<?php if (cmsCore::getArrVal($mod, 'sendto', 'mail') == 'user') { echo 'block'; } else { echo 'none'; } ?>">

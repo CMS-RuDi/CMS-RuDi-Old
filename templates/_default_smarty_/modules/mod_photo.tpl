@@ -38,3 +38,16 @@
     {/if}
 </div>
 {/if}
+{if $cfg.is_lightbox} 
+    <script type="text/javascript">
+        $(function() {
+            $( '.photo_thumb_img' ).each( function( idx ) {
+                var regex = /small\//;
+                var orig = $( this ).attr( 'src' ).replace( regex, 'medium/' );
+                var ss = $( this ).parent( 'a' );
+                ss.attr( 'rel', 'gal' ).attr( 'href', orig ).addClass( 'photobox' );
+            } );
+            $('a.photobox').colorbox( { rel: 'gal', transition: 'none', slideshow: true, width: '650px', height: '650px' } );
+        } );
+    </script>
+{/if}

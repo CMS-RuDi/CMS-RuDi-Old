@@ -28,6 +28,7 @@ $_LANG['AD_PERSON_MESS']             = 'A personal message on the site';
 $_LANG['AD_FORM_ACTION']             = 'The action attribute form';
 $_LANG['AD_FILED_ONLY']              = 'Display only fields';
 $_LANG['AD_E-MAIL_ADDR']             = 'E-mail address';
+$_LANG['AD_E-MAIL_ADDR_HINT']        = 'Separate by comma if multiple';
 $_LANG['AD_RECIPIENT']               = 'Recipient';
 $_LANG['AD_FORM_EXPLANT']            = 'Recipient';
 $_LANG['AD_NOTE']                    = 'Note';

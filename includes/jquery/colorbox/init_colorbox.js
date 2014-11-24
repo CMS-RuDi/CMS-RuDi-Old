@@ -15,19 +15,13 @@ imgError: LANG_CBOX_IMG_ERROR
 //подхватываем от lightbox
 $( '.lightbox-enabled' ).colorbox({ transition: "none"});
 
-// ========================================================================== //
-//Подключение colorbox вместо lightbox
-
-// для лучших фото
-$( '.photo_thumb_img' ).each( function( idx ){
-	var regex = /small\//;
-	var orig = $( this ).attr( "src" ).replace( regex, 'medium/' );
-	var ss = $( this ).parent( 'a' );
-	ss.attr( "rel", "gal" ).attr( "href", orig ).addClass( 'photobox' );
+//статьи анонсы и основной текст
+$( '.con_text img, .con_desc img' ).not('a img:first-child').wrap( function(){
+    var ahref = $( '<a href="' + $( this ).attr( 'src' ) + '" />').colorbox({ transition: "none" });
+    return ahref;
 });
-
 //добавление класса вручную в шаблоне
-$( 'a.photobox' ).colorbox({ rel: 'gal', transition: "none", slideshow: true, width: "650px", height: "650px" });
+$('a.photobox').colorbox({ rel: 'gal', transition: "none", slideshow: true, width: "650px", height: "650px" });
 
 //клубные фотоальбомы
 $( '#view_photo' ).each( function(){

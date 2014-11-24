@@ -90,8 +90,14 @@ function forms(){
         }
 
         // Отправляем форму
-        if ($form['sendto']=='mail'){
-            cmsCore::mailText($form['email'], cmsConfig::getConfig('sitename').': '.$form['title'], $mail_message, $attachment);
+        if ($form['sendto']=='mail') {
+            $emails = explode(',', $form['email']);
+            if (!empty($emails)) {
+                foreach ($emails as $email) {
+                    cmsCore::mailText(trim($email), cmsConfig::getConfig('sitename').': '.$form['title'], $mail_message, $attachment);
+                }
+            }
+            
             // удаляем прикрепленные файлы 
             foreach($attachment as $attach){
                 @unlink($attach);

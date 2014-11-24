@@ -14,15 +14,16 @@
 function mod_photo($module_id, $cfg) {
     $cfg = array_merge(array(
         'user_photos' => 0,
-        'is_full' => 1,
-        'showmore' => 1,
-        'album_id' => 0,
-        'whatphoto' => 'all',
-        'shownum' => 5,
-        'maxcols' => 2,
-        'sort' => 'pubdate',
-        'showclubs' => 0,
-        'is_subs' => 1
+        'is_full'     => 1,
+        'showmore'    => 1,
+        'album_id'    => 0,
+        'whatphoto'   => 'all',
+        'shownum'     => 5,
+        'maxcols'     => 2,
+        'sort'        => 'pubdate',
+        'showclubs'   => 0,
+        'is_subs'     => 1,
+        'is_lightbox' => 1
     ), $cfg);
 
     // Задаем период

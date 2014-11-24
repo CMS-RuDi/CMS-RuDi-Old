@@ -4994,6 +4994,11 @@ span.ajax-loader {
     padding: 1px 0;
 }
 
+.img_64 {
+    width: 64px;
+    height: 64px;
+} 
+
 /* CKEditor styles */
 blockquote {
     font-style: italic;

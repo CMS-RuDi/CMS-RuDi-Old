@@ -390,8 +390,9 @@ if ($do == 'additem') {
             $file['filename'] = '';
             cmsCore::addSessionMessage($_LANG['INFO_CAT_NO_PHOTO'], 'info');
         }
-
-        $item_id = cmsCore::m('board')->addRecord(array(
+        
+        
+        $add = array(
             'category_id' => cmsCore::m('board')->category_id,
             'user_id'     => cmsCore::c('user')->id,
             'obtype'      => $obtype,
@@ -405,10 +406,11 @@ if ($do == 'additem') {
             'meta_keys'   => $meta_keys,
             'meta_desc'   => $meta_desc,
             'file'        => $file['filename']
-        ));
+        );
+        $add['id'] = cmsCore::m('board')->addRecord($add);
 
         if (cmsCore::c('user')->is_admin && $vipdays) {
-            cmsCore::m('board')->setVip($item_id, $vipdays);
+            cmsCore::m('board')->setVip($add['id'], $vipdays);
         }
 
         if (IS_BILLING) {
@@ -422,7 +424,7 @@ if ($do == 'additem') {
 
                 if (cmsCore::c('user')->balance >= $summ) {
                     cmsBilling::pay(cmsCore::c('user')->id, $summ, $_LANG['VIP_ITEM']);
-                    cmsCore::m('board')->setVip($item_id, $vipdays);
+                    cmsCore::m('board')->setVip($add['id'], $vipdays);
                 }
             }
         }
@@ -433,20 +435,20 @@ if ($do == 'additem') {
             //регистрируем событие
             cmsActions::log('add_board', array(
                 'object'      => $obtype .' '. $title,
-                'object_url'  => '/board/read'. $item_id .'.html',
-                'object_id'   => $item_id,
+                'object_url'  => '/board/read'. $add['id'] .'.html',
+                'object_id'   => $add['id'],
                 'target'      => $cat['title'],
                 'target_url'  => '/board/'. $cat['id'],
                 'target_id'   => $cat['id'],
                 'description' => ''
             ));
             cmsCore::addSessionMessage($_LANG['ADV_IS_ADDED'], 'success');
-            cmsCore::callEvent('ADD_BOARD_DONE', array('id'=>$item_id));
-            cmsCore::redirect('/board/read'. $item_id .'.html');
+            cmsCore::callEvent('ADD_BOARD_DONE', $add);
+            cmsCore::redirect('/board/read'. $add['id'] .'.html');
         }
 
         if (!$published) {
-            $link = '<a href="/board/read'. $item_id .'.html">'. $obtype .' '. $title .'</a>';
+            $link = '<a href="/board/read'. $add['id'] .'.html">'. $obtype .' '. $title .'</a>';
             if (cmsCore::c('user')->id) {
                 $user = '<a href="'. cmsUser::getProfileURL(cmsCore::c('user')->login) .'">'. cmsCore::c('user')->nickname .'</a>';
             } else {

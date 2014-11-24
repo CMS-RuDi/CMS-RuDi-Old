@@ -30,6 +30,7 @@ $_LANG['AD_PERSON_MESS']            = 'Личным сообщением на с
 $_LANG['AD_FORM_ACTION']            = 'Атрибут action формы';
 $_LANG['AD_FILED_ONLY']             = 'Выводить только поля формы';
 $_LANG['AD_E-MAIL_ADDR']            = 'Адрес e-mail';
+$_LANG['AD_E-MAIL_ADDR_HINT']       = 'Можно указать несколько, через запятую';
 $_LANG['AD_RECIPIENT']              = 'Получатель';
 $_LANG['AD_FORM_EXPLANT']           = 'Пояснения к форме';
 $_LANG['AD_NOTE']                   = 'Примечание';

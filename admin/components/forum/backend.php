@@ -80,9 +80,10 @@ if ($opt == 'saveconfig') {
            mb_strpos($cfg['fa_ext'], 'ht')) {
         $cfg['fa_ext'] = str_replace(array('htm','php','ht'), '', mb_strtolower($cfg['fa_ext']));
     }
-    $cfg['fa_size']      = cmsCore::request('fa_size', 'int');
-    $cfg['edit_minutes'] = cmsCore::request('edit_minutes', 'int');
-    $cfg['watermark']    = cmsCore::request('watermark', 'int');
+    $cfg['fa_size']       = cmsCore::request('fa_size', 'int');
+    $cfg['edit_minutes']  = cmsCore::request('edit_minutes', 'int');
+    $cfg['watermark']     = cmsCore::request('watermark', 'int');
+    $cfg['min_karma_add'] = cmsCore::request('min_karma_add', 'int', 0);
     
     $cfg['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
     $cfg['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
@@ -283,6 +284,7 @@ if ($opt == 'config') {
             <li><a href="#tab_reviev"><?php echo $_LANG['AD_REVIEV']; ?></a></li>
             <li><a href="#tab_pictures"><?php echo $_LANG['AD_PICTURES']; ?></a></li>
             <li><a href="#tab_inverstments"><?php echo $_LANG['AD_INVESTMENTS']; ?></a></li>
+            <li><a href="#tab_limit"><?php echo $_LANG['AD_LIMIT']; ?></a></li>
             <li><a href="#tab_seo">SEO</a></li>
         </ul>
         
@@ -350,21 +352,6 @@ if ($opt == 'config') {
                             <input type="radio" name="fast_bb" <?php if (!cmsCore::getArrVal($cfg, 'fast_bb', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                         </label>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label><?php echo $_LANG['AD_EDIT_DELIT']; ?></label>
-                    <select class="form-control" name="edit_minutes">
-                        <option value="0" <?php if (!$cfg['edit_minutes']) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_NOT_PROHIBIT']; ?></option>
-                        <option value="-1" <?php if ($cfg['edit_minutes'] == -1) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PROHIBIT']; ?></option>
-                        <option value="1" <?php if ($cfg['edit_minutes'] == 1) { echo 'selected="selected"'; } ?>>1 <?php echo $_LANG['MINUTU1']; ?></option>
-                        <option value="5" <?php if ($cfg['edit_minutes'] == 5) { echo 'selected="selected"'; } ?>>5 <?php echo $_LANG['MINUTE10']; ?></option>
-                        <option value="10" <?php if ($cfg['edit_minutes'] == 10) { echo 'selected="selected"'; } ?>>10 <?php echo $_LANG['MINUTE10']; ?></option>
-                        <option value="15" <?php if ($cfg['edit_minutes'] == 15) { echo 'selected="selected"'; } ?>>15 <?php echo $_LANG['MINUTE10']; ?></option>
-                        <option value="30" <?php if ($cfg['edit_minutes'] == 30) { echo 'selected="selected"'; } ?>>30 <?php echo $_LANG['MINUTE10']; ?></option>
-                        <option value="60" <?php if ($cfg['edit_minutes'] == 60) { echo 'selected="selected"'; } ?>>1 <?php echo $_LANG['HOUR1']; ?></option>
-                    </select>
-                    <div class="help-block"><?php echo $_LANG['AD_EDIT_DELIT_TIME']; ?></div>
                 </div>
             </fieldset>
         </div>
@@ -490,6 +477,28 @@ if ($opt == 'config') {
                     <div class="help-block"><?php echo $_LANG['AD_FILES_MAX_HINT']; ?></div>
                 </div>
             </fieldset>
+        </div>
+        
+        <div id="tab_limit">
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_EDIT_DELIT']; ?></label>
+                <select class="form-control" name="edit_minutes">
+                    <option value="0" <?php if (!$cfg['edit_minutes']) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_NOT_PROHIBIT']; ?></option>
+                    <option value="-1" <?php if ($cfg['edit_minutes'] == -1) { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_PROHIBIT']; ?></option>
+                    <option value="1" <?php if ($cfg['edit_minutes'] == 1) { echo 'selected="selected"'; } ?>>1 <?php echo $_LANG['MINUTU1']; ?></option>
+                    <option value="5" <?php if ($cfg['edit_minutes'] == 5) { echo 'selected="selected"'; } ?>>5 <?php echo $_LANG['MINUTE10']; ?></option>
+                    <option value="10" <?php if ($cfg['edit_minutes'] == 10) { echo 'selected="selected"'; } ?>>10 <?php echo $_LANG['MINUTE10']; ?></option>
+                    <option value="15" <?php if ($cfg['edit_minutes'] == 15) { echo 'selected="selected"'; } ?>>15 <?php echo $_LANG['MINUTE10']; ?></option>
+                    <option value="30" <?php if ($cfg['edit_minutes'] == 30) { echo 'selected="selected"'; } ?>>30 <?php echo $_LANG['MINUTE10']; ?></option>
+                    <option value="60" <?php if ($cfg['edit_minutes'] == 60) { echo 'selected="selected"'; } ?>>1 <?php echo $_LANG['HOUR1']; ?></option>
+                </select>
+                <div class="help-block"><?php echo $_LANG['AD_EDIT_DELIT_TIME']; ?></div>
+            </div>
+            
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_FORUM_MIN_KARMA_ADD']; ?></label>
+                <input type="number" class="form-control" name="min_karma_add" value="<?php echo $cfg['min_karma_add'];?>" size="5" min="0" />
+            </div>
         </div>
         
         <div id="tab_seo">

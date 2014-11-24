@@ -232,6 +232,18 @@ if (in_array($do, array('newthread','newpost','editpost'))){
     $thread_poll   = array();
     // применяется при редактировании поста
     $is_allow_attach = true;
+    
+    // ограничение по карме
+    if (in_array($do, array( 'newthread', 'newpost' ))) {
+        if (($inUser->karma < $model->config['min_karma_add']) && !$inUser->is_admin) {
+            cmsCore::addSessionMessage(sprintf(
+                $_LANG['ADD_KARMA_LIMIT'],
+                cmsCore::spellCount($model->config['min_karma_add'], $_LANG['KPOINT1'], $_LANG['KPOINT2'], $_LANG['KPOINT10']),
+                $inUser->karma
+            ), 'error');
+            cmsCore::redirectBack();
+        }
+    } 
 
     // новая тема
     if ($do == 'newthread') {

@@ -37,7 +37,7 @@ header('Content-Type: text/html; charset=utf-8');
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon" style="width:36px;"><span class="fa fa-user"></span></span>
-                                <input type="text" class="form-control" style="width:300px;" placeholder="<?php echo $_LANG['AD_AUTH_LOGIN']; ?>" required="true" autofocus name="login" />
+                                <input type="text" class="form-control" style="width:300px;" placeholder="<?php echo $_LANG['AD_AUTH_LOGIN']; ?>" required="true"  autofocus="true" name="login" />
                             </div>
                         </div>
                         

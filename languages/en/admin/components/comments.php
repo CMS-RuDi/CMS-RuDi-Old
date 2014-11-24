@@ -1,6 +1,5 @@
 ﻿<?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,7 +7,6 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 $_LANG['AD_ALL_COMENTS']         = 'All comments';
@@ -21,7 +19,6 @@ $_LANG['AD_COMENT_AUTHOR']       = 'Author of Comment:';
 $_LANG['AD_CALENDAR_DATE']       = 'Date of filing:';
 $_LANG['AD_IF_COMENT_PUBLIC']    = 'Post a comment?';
 $_LANG['AD_FORMAT']              = 'Format';
-$_LANG['AD_LIMIT']               = 'Limitation';
 $_LANG['AD_COMENT_EMAIL']        = 'E-mail for Comments:';
 $_LANG['AD_NO_EMAIL']            = 'Leave blank if you do not wish to receive comments by email';
 $_LANG['AD_SUBSCRIPTION']        = 'Subscribe to notifications:';

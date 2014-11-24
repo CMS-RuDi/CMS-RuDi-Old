@@ -1,6 +1,5 @@
 <?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,7 +7,6 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 $_LANG['AD_PLUGINS']              = 'Плагины';
@@ -163,3 +161,4 @@ $_LANG['AD_USER_SEO_ACCESS']      = 'Разрешить пользователю
 $_LANG['AD_ROOT_METAKEYS']        = 'Ключевые слова главной страницы (meta keywords)';
 $_LANG['AD_ROOT_METADESC']        = 'Описание на главной странице (meta description)';
 $_LANG['AD_IF_UNKNOWN_PAGETITLE'] = 'Если не указан, будет совпадать с названием';
+$_LANG['AD_LIMIT']                = 'Ограничения';

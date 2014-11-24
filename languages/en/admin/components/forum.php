@@ -1,6 +1,5 @@
 ﻿<?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,7 +7,6 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 $_LANG['AD_FORUM']                   = 'Forum';
@@ -79,3 +77,4 @@ $_LANG['AD_COST_CREATING']           = 'The cost of creating a thread';
 $_LANG['AD_COST_FREE']               = 'free';
 $_LANG['AD_BILLING_USERS']           = 'Billing users';
 $_LANG['AD_REGUIRED']                = 'required';
+$_LANG['AD_FORUM_MIN_KARMA_ADD']     = 'Karma restriction to create threads or reply';

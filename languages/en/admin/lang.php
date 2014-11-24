@@ -1,6 +1,5 @@
 ﻿<?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,7 +7,6 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 $_LANG['AD_PLUGINS']              = 'Plugins';
@@ -162,3 +160,4 @@ $_LANG['AD_ROOT_DESCRIPION']      = 'Homepage descripion';
 $_LANG['AD_USER_SEO_ACCESS']      = 'Allow user SEO change?';
 $_LANG['AD_ROOT_METAKEYS']        = 'Homepage keywords (meta keywords)';
 $_LANG['AD_ROOT_METADESC']        = 'Homepage descripion (meta description)';
+$_LANG['AD_LIMIT']                = 'Restrictions';

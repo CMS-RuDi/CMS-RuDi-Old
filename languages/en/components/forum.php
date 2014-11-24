@@ -1,6 +1,5 @@
 <?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,7 +7,6 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 $_LANG['ERR_POLL_VARIANT']            = 'Specify at least two possible answers.';
@@ -172,3 +170,7 @@ $_LANG['LATEST_POSTS_ON_FORUM']       = 'Recent forum posts';
 $_LANG['NEW_THREADS']                 = 'Newest threads';
 $_LANG['NEW_THREADS_ON_FORUM']        = 'Newest threads on the forum';
 $_LANG['THREADS_ACT']                 = 'Active threads category';
+$_LANG['ADD_KARMA_LIMIT']             ='You do not have enough karma for writing messages on the forum. You must have %s, you only have %s.';
+$_LANG['KPOINT1']                     = 'point';
+$_LANG['KPOINT2']                     = 'point';
+$_LANG['KPOINT10']                    = 'points';

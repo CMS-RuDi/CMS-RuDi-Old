@@ -26,25 +26,26 @@ class cms_model_forum {
 ////////////////////////////////////////////////////////////////////////////////
     public static function getDefaultConfig() {
         return array (
-            'is_rss'       => 1,
-            'pp_thread'    => 15,
-            'pp_forum'     => 15,
-            'showimg'      => 1,
-            'img_on'       => 1,
-            'img_max'      => 5,
-            'fast_on'      => 1,
-            'fast_bb'      => 1,
-            'fa_on'        => 1,
-            'group_access' => '',
-            'meta_keys'    => '',
-            'meta_desc'    => '',
-            'fa_max'       => 25,
-            'fa_ext'       => 'txt doc zip rar arj png gif jpg jpeg bmp',
-            'fa_size'      => 1024,
-            'edit_minutes' => 0,
-            'watermark'    => 0,
-            'ranks'        => array(),
-            'modrank'      => 0
+            'is_rss'        => 1,
+            'pp_thread'     => 15,
+            'pp_forum'      => 15,
+            'showimg'       => 1,
+            'img_on'        => 1,
+            'img_max'       => 5,
+            'fast_on'       => 1,
+            'fast_bb'       => 1,
+            'fa_on'         => 1,
+            'group_access'  => '',
+            'meta_keys'     => '',
+            'meta_desc'     => '',
+            'fa_max'        => 25,
+            'fa_ext'        => 'txt doc zip rar arj png gif jpg jpeg bmp',
+            'fa_size'       => 1024,
+            'edit_minutes'  => 0,
+            'watermark'     => 0,
+            'min_karma_add' => 0,
+            'ranks'         => array(),
+            'modrank'       => 0
         );
     }
 ////////////////////////////////////////////////////////////////////////////////

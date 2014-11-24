@@ -1059,25 +1059,22 @@ if ($do=='add_photo'){
     }
 
     $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
-	$inPage->addPathway($album['title'], '/clubs/photoalbum'.$album['id']);
+    $inPage->addPathway($album['title'], '/clubs/photoalbum'.$album['id']);
 
-	include 'components/clubs/add_photo.php';
-
+    return include 'components/clubs/add_photo.php';
 }
 ///////////////////////// БЛОГИ КЛУБОВ /////////////////////////////////////////
-if ($do=='club_blogs'){
+if ($do == 'club_blogs') {
+    $bdo     = cmsCore::request('bdo', 'str', 'view_clubs_posts');
+    $post_id = cmsCore::request('post_id', 'int', 0);
+    $cat_id  = cmsCore::request('cat_id', 'int', 0);
+    $seolink = cmsCore::request('seolink', 'str', '');
+    $on_moderate = cmsCore::request('on_moderate', 'int', 0);
 
-	$bdo     = cmsCore::request('bdo', 'str', 'view_clubs_posts');
-	$post_id = cmsCore::request('post_id', 'int', 0);
-	$cat_id  = cmsCore::request('cat_id', 'int', 0);
-	$seolink = cmsCore::request('seolink', 'str', '');
-	$on_moderate = cmsCore::request('on_moderate', 'int', 0);
-
-	$inBlog = $model->initBlog();
+    $inBlog = $model->initBlog();
     $inPage->addHeadJsLang(array('NEW_CAT','RENAME_CAT','YOU_REALY_DELETE_CAT','YOU_REALY_DELETE_POST','NO_PUBLISHED'));
 
-	include 'components/clubs/club_blogs.php';
-
+    return include 'components/clubs/club_blogs.php';
 }
 
 }

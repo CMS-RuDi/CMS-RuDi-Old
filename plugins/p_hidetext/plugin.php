@@ -66,9 +66,9 @@ class p_hidetext extends cmsPlugin {
         if (!$matches) { return $text; }
 
         if ($hidden) {
-            $replacement = '';
+            $replacement = '<noindex>'. $_LANG['P_HIDE_TEXT_MOD'] .'</noindex>';
         } else if (!cmsCore::c('user')->id) {
-            $replacement = '<div class="bb_tag_hide">'. $_LANG['P_HIDE_TEXT'] .'</div>';
+            $replacement = '<noindex><div class="bb_tag_hide">'. $_LANG['P_HIDE_TEXT'] .'</div></noindex>';
         } else {
             if (!$matches[1]) {
                 $replacement = '<div class="bb_tag_hide">${2}</div>';

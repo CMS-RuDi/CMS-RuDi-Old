@@ -2,12 +2,15 @@
     {if $cat.showrss}
         <table cellpadding="0" cellspacing="0" border="0">
             <tr>
-			<td><h1 class="con_heading">{$pagetitle}</h1></td>
-			<td valign="top" style="padding-left:6px">
-                        <div class="con_rss_icon">
-                            <a href="/rss/content/{$cat.id}/feed.rss" title="{$LANG.RSS}"><img src="/templates/{template}/images/icons/rss.png" border="0" alt="{$LANG.RSS}"/></a>
-                        </div>
+                <td><h1 class="con_heading">{$pagetitle}</h1></td>
+                <td valign="top" style="padding-left:6px">
+                    <div class="con_rss_icon">
+                        <a href="/rss/content/{$cat.id}/feed.rss" title="{$LANG.RSS}">
+                            <img src="/templates/{template}/images/icons/rss.png" alt="{$LANG.RSS}"/>
+                        </a>
+                    </div>
                 </td>
+            </tr>
         </table>
     {else}
         <h1 class="con_heading">{$pagetitle}</h1>
@@ -40,7 +43,7 @@
             <td align="center" valign="middle" width="{math equation="100/x" x=$cat_photos.album.maxcols}%">
                 <div class="photo_thumb" align="center">
                     <a class="lightbox-enabled" rel="lightbox-galery" href="/images/photos/medium/{$con.file}" title="{$con.title|escape:'html'}">
-                        <img class="photo_thumb_img" src="/images/photos/small/{$con.file}" alt="{$con.title|escape:'html'}" border="0" />
+                        <img class="photo_thumb_img" src="/images/photos/small/{$con.file}" alt="{$con.title|escape:'html'}" />
                     </a><br />
                     <a href="/photos/photo{$con.id}.html" title="{$con.title|escape:'html'}">{$con.title|truncate:15}</a>
                 </div>
@@ -55,12 +58,10 @@
 
 {if $articles}
     {assign var="col" value="1"}
+    
     <table class="contentlist" cellspacing="2" border="0" width="100%">
     {foreach key=tid item=article from=$articles}
         {if $col==1} <tr> {/if}
-            <td width="20" valign="top">
-                <img src="/templates/{template}/images/icons/article.png" border="0" class="con_icon"/>
-            </td>
             <td width="" valign="top">
                 <div class="con_title">
                     <a href="{$article.url}" class="con_titlelink">{$article.title}</a>
@@ -69,7 +70,7 @@
                     <div class="con_desc">
                         {if $article.image_small}
                             <div class="con_image">
-                                <img src="{$article.image_small}" border="0" alt="{$article.title|escape:'html'}"/>
+                                <img src="{$article.image_small}" alt="{$article.title|escape:'html'}"/>
                             </div>
                         {/if}
                         {$article.description}

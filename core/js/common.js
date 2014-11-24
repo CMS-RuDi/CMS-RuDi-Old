@@ -195,7 +195,7 @@
         
         show_popup_info: function(text, type) {
             this._popup_info(type);
-            $('#popup_info').text(text).show().delay(4000).fadeOut('slow');
+            $('#popup_info').html(text).show().delay(4000).fadeOut('slow');
         },
         
         hide_popup_info: function() {

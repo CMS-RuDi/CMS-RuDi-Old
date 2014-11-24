@@ -2,12 +2,12 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 /////////////////////////////// ДОБАВЛЕНИЕ ПОСТА ////////////////////////////////////
-if (in_array($bdo, array('newpost', 'editpost'))){
-
-	if($bdo=='editpost'){
-
+if (in_array($bdo, array('newpost', 'editpost'))) {
+    if ($bdo=='editpost') {
         $post = $inBlog->getPost($post_id);
-        if (!$post){ cmsCore::error404(); }
+        
+        if (!$post) { cmsCore::error404(); }
+        
         $post['tags'] = cmsTagLine($inBlog->getTarget('tags'), $post['id'], false);
 
             $blog = $inBlog->getBlog($post['blog_id']);
@@ -147,10 +147,9 @@ if (in_array($bdo, array('newpost', 'editpost'))){
             $mod = array_merge($mod, $added);
 
 			if ($mod['published']) {
+                            $mod['seolink'] = $model->getPostURL($club['id'], $mod['seolink']);
 
 				if ($club['clubtype']!='private' && $mod['allow_who'] != 'nobody'){
-
-                    $mod['seolink'] = $model->getPostURL($club['id'], $mod['seolink']);
 
                     cmsCore::callEvent('ADD_POST_DONE', $mod);
 

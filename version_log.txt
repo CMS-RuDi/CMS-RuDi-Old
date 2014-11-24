@@ -70,5 +70,6 @@ CMS RuDi v0.0.9
 Внесены изменения http://trac.instantcms.ru/changeset/1450 от fuze (11/05/14 14:23:12);
     seo board
 Внесены изменения http://trac.instantcms.ru/changeset/1451 от fuze (11/05/14 20:19:34);
+Внесены изменения http://trac.instantcms.ru/changeset/1452 от fuze (11/05/14 23:23:52);
 
 [!] Внимание для этого обновление требуется PHP 5.3+;

@@ -460,7 +460,7 @@ function cpAddParam($query, $param, $value){
     return implode('&', $new_query);
 }
 
-function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $perpage=22) {
+function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $perpage=60) {
     global $_LANG;
     
     $page = cmsCore::request('page', 'int', 1);

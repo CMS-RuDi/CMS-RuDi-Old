@@ -5,7 +5,9 @@
                 <td><h1 class="con_heading"><?php echo $pagetitle; ?></h1></td>
                 <td valign="top" style="padding-left:6px">
                     <div class="con_rss_icon">
-                        <a href="/rss/content/<?php echo $cat['id']; ?>/feed.rss" title="<?php echo $_LANG['RSS']; ?>"><img src="/templates/<?php echo cmsCore::c('config')->template; ?>/images/icons/rss.png" border="0" alt="<?php echo $_LANG['RSS']; ?>"/></a>
+                        <a href="/rss/content/<?php echo $cat['id']; ?>/feed.rss" title="<?php echo $_LANG['RSS']; ?>">
+                            <img src="/templates/<?php echo cmsCore::c('config')->template; ?>/images/icons/rss.png" alt="<?php echo $_LANG['RSS']; ?>"/>
+                        </a>
                     </div>
                 </td>
             </tr>
@@ -41,7 +43,7 @@
             <td align="center" valign="middle" width="<?php echo 100/$cat_photos['album']['maxcols']; ?>%">
                 <div class="photo_thumb" align="center">
                     <a class="lightbox-enabled" rel="lightbox-galery" href="/images/photos/medium/<?php echo $con['file']; ?>" title="<?php echo $this->escape($con['title']); ?>">
-                        <img class="photo_thumb_img" src="/images/photos/small/<?php echo $con['file']; ?>" alt="<?php echo $this->escape($con['title']); ?>" border="0" />
+                        <img class="photo_thumb_img" src="/images/photos/small/<?php echo $con['file']; ?>" alt="<?php echo $this->escape($con['title']); ?>" />
                     </a><br />
                     <a href="/photos/photo<?php echo $con['id']; ?>.html" title="<?php echo $this->escape($con['title']); ?>"><?php echo $this->truncate($con['title'], 15); ?></a>
                 </div>
@@ -56,12 +58,10 @@
 
 <?php if ($articles) { ?>
     <?php $col = 1; ?>
+
     <table class="contentlist" cellspacing="2" border="0" width="100%">
     <?php foreach($articles as $article) { ?>
         <?php if ($col == 1) { ?> <tr> <?php } ?>
-            <td width="20" valign="top">
-                <img src="/templates/<?php echo cmsCore::c('config')->template; ?>/images/icons/article.png" border="0" class="con_icon"/>
-            </td>
             <td width="" valign="top">
                 <div class="con_title">
                     <a href="<?php echo $article['url']; ?>" class="con_titlelink"><?php echo $article['title']; ?></a>
@@ -70,7 +70,7 @@
                     <div class="con_desc">
                         <?php if ($article['image_small']) { ?>
                             <div class="con_image">
-                                <img src="<?php echo $article['image_small']; ?>" border="0" alt="<?php echo $this->escape($article['title']); ?>"/>
+                                <img src="<?php echo $article['image_small']; ?>" alt="<?php echo $this->escape($article['title']); ?>"/>
                             </div>
                         <?php } ?>
                         <?php echo $article['description']; ?>

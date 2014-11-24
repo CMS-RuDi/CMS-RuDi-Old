@@ -31,8 +31,6 @@
     // Выставляем необходимые опции для миграции
     $migrateDB = new migrateDB(array(
         'create_fields' => array(
-            array( 'table' => 'cms_blog_posts', 'name' => 'hits', 'type' => 'INT(11) UNSIGNED', 'default' => "'0'" ),
-            
             array( 'table' => 'cms_modules_bind', 'name' => 'tpl', 'type' => 'VARCHAR(64)' ),
             
             array( 'table' => 'cms_category', 'name' => 'pagetitle', 'type' => 'VARCHAR(255)' ),
@@ -50,25 +48,34 @@
             array( 'table' => 'cms_clubs', 'name' => 'seolink', 'type' => 'VARCHAR(200)' ),
             
             array( 'table' => 'cms_user_groups_access', 'name' => 'hide_for_guest', 'type' => 'TINYINT(1) UNSIGNED', 'default' => "'0'" ),
-            array( 'table' => 'cms_users', 'name' => 'music_count', 'type' => 'INT(11)', 'default' => "'0'" ),
-            array( 'table' => 'cms_users', 'name' => 'timezone', 'type' => 'VARCHAR(32)', 'default' => "''" ),
-            array( 'table' => 'cms_users', 'name' => 'iframe_provider', 'type' => 'VARCHAR(8)', 'default' => "''" ),
-            array( 'table' => 'cms_users', 'name' => 'iframe_user_id', 'type' => 'VARCHAR(32)', 'default' => "''" ),
+            array( 'table' => 'cms_users', 'name' => 'music_count',     'type' => 'INT(11)',     'default' => "'0'" ),
+            array( 'table' => 'cms_users', 'name' => 'timezone',        'type' => 'VARCHAR(32)', 'default' => "''" ),
+            array( 'table' => 'cms_users', 'name' => 'iframe_provider', 'type' => 'VARCHAR(8)',  'default' => "''" ),
+            array( 'table' => 'cms_users', 'name' => 'iframe_user_id',  'type' => 'VARCHAR(32)', 'default' => "''" ),
             
-            array( 'table' => 'cms_menu',  'name' => 'is_lax', 'type' => 'tinyint(1)', 'default' => "'0'" ),
-            array( 'table' => 'cms_menu',  'name' => 'css_class', 'type' => 'VARCHAR(15)', 'default' => "''" ),
+            array( 'table' => 'cms_menu', 'name' => 'is_lax',    'type' => 'tinyint(1)',  'default' => "'0'" ),
+            array( 'table' => 'cms_menu', 'name' => 'css_class', 'type' => 'VARCHAR(15)', 'default' => "''" ),
             
-            array( 'table' => 'cms_modules',  'name' => 'hidden_menu_ids', 'type' => 'VARCHAR(300)', 'default' => "''" ),
-            array( 'table' => 'cms_modules',  'name' => 'is_strict_bind_hidden', 'type' => 'tinyint(1)', 'default' => "0" ),
+            array( 'table' => 'cms_modules', 'name' => 'hidden_menu_ids',       'type' => 'VARCHAR(300)', 'default' => "''" ),
+            array( 'table' => 'cms_modules', 'name' => 'is_strict_bind_hidden', 'type' => 'tinyint(1)',   'default' => "0" ),
             
-            array( 'table' => 'cms_search',  'name' => 'imageurl', 'type' => 'VARCHAR(150)', 'default' => "''" ),
+            array( 'table' => 'cms_search', 'name' => 'imageurl', 'type' => 'VARCHAR(150)', 'default' => "''" ),
             
-            array( 'table' => 'cms_board_cats', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
-            array( 'table' => 'cms_board_cats', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
-            array( 'table' => 'cms_board_cats', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_board_cats',  'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_board_cats',  'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_board_cats',  'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
             array( 'table' => 'cms_board_items', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
             array( 'table' => 'cms_board_items', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
-            array( 'table' => 'cms_board_items', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
+            array( 'table' => 'cms_board_items', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_blog_posts', 'name' => 'hits', 'type' => 'INT(11) UNSIGNED', 'default' => "'0'" ),
+            
+            array( 'table' => 'cms_forums',     'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_forums',     'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_forums',     'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_forum_cats', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_forum_cats', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_forum_cats', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
         ),
         
         'change_fields' => array(

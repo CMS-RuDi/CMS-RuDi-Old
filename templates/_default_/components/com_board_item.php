@@ -1,15 +1,20 @@
 <h1 class="con_heading"><?php echo $item['title']; ?></h1>
+
 <div class="bd_item_details_full">
     <?php if ($item['is_vip']) { ?>
         <span class="bd_item_is_vip"><?php echo $_LANG['VIP_ITEM']; ?></span>
     <?php } ?>
+
     <span class="bd_item_date"><?php echo $item['pubdate']; ?></span>
+
     <span class="bd_item_hits"><?php echo $item['hits']; ?></span>
+
     <?php if ($item['city']) { ?>
         <span class="bd_item_city">
             <a href="/board/city/<?php echo $item['enc_city']; ?>"><?php echo $item['city']; ?></a>
         </span>
     <?php } ?>
+
     <?php if ($item['user']) { ?>
         <span class="bd_item_user">
             <a href="<?php echo cmsUser::getProfileURL($item['user_login']); ?>"><?php echo $item['user']; ?></a>
@@ -17,6 +22,7 @@
     <?php } else { ?>
         <span class="bd_item_user"><?php echo $_LANG['BOARD_GUEST']; ?></span>
     <?php } ?>
+
     <?php if ($item['moderator']) { ?>
         <span class="bd_item_edit"><a href="/board/edit<?php echo $item['id']; ?>.html"><?php echo $_LANG['EDIT']; ?></a></span>
         <?php if (!$item['published'] && ($is_admin || $is_moder)) { ?>
@@ -24,14 +30,18 @@
         <?php } ?>
         <span class="bd_item_delete"><a href="/board/delete<?php echo $item['id']; ?>.html"><?php echo $_LANG['DELETE']; ?></a></span>
     <?php } ?>
+
+    <?php if ($item['is_overdue']) { ?>
+        <span class="bd_item_status_bad"><?php echo $_LANG['ADV_IS_EXTEND']; ?></span>
+    <?php } ?>
 </div>
 
 <table width="100%" height="" cellspacing="" cellpadding="0" class="bd_item_full">
     <tr>
         <?php if ($item['file'] && $cfg['photos']) { ?>
-        <td width="64">
-            <img class="bd_image_small" src="/images/board/medium/<?php echo $item['file']; ?>" border="0" alt="<?php echo $this->escape($item['title']); ?>"/>
-        </td>
+            <td width="64">
+                <img class="bd_image_small" src="/images/board/medium/<?php echo $item['file']; ?>" border="0" alt="<?php echo $this->escape($item['title']); ?>"/>
+            </td>
         <?php } ?>
         <td valign="top">
             <div class="bd_text_full">
@@ -39,16 +49,16 @@
                 <?php if ($formsdata) { ?>
                     <table width="100%" cellspacing="0" cellpadding="2" style="border-top:1px solid #C3D6DF; margin:5px 0 0 0">
                         <?php foreach($formsdata as $form) { ?>
-                        <?php if ($form['field']) { ?>
-                            <tr>
-                                <td valign="top" width="140px">
-                                    <strong><?php echo $form['title']; ?>:</strong>
-                                </td>
-                                <td valign="top">
-                                    <?php echo $form['field']; ?>
-                                </td>
-                            </tr>
-                        <?php } ?>
+                            <?php if ($form['field']) { ?>
+                                <tr>
+                                    <td valign="top" width="140px">
+                                        <strong><?php echo $form['title']; ?>:</strong>
+                                    </td>
+                                    <td valign="top">
+                                        <?php echo $form['field']; ?>
+                                    </td>
+                                </tr>
+                            <?php } ?>
                         <?php } ?>
                      </table>
                 <?php } ?>

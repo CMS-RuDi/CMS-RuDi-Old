@@ -80,9 +80,12 @@ if ($opt == 'saveconfig') {
            mb_strpos($cfg['fa_ext'], 'ht')) {
         $cfg['fa_ext'] = str_replace(array('htm','php','ht'), '', mb_strtolower($cfg['fa_ext']));
     }
-    $cfg['fa_size']    = cmsCore::request('fa_size', 'int');
+    $cfg['fa_size']      = cmsCore::request('fa_size', 'int');
     $cfg['edit_minutes'] = cmsCore::request('edit_minutes', 'int');
-    $cfg['watermark']  = cmsCore::request('watermark', 'int');
+    $cfg['watermark']    = cmsCore::request('watermark', 'int');
+    
+    $cfg['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+    $cfg['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
 
     $is_access = cmsCore::request('is_access', 'int', '');
     if (!$is_access) {
@@ -152,12 +155,6 @@ if ($opt == 'hide_forum'){
 if ($opt == 'submit_forum'){
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
-    $category_id = cmsCore::request('category_id', 'int');
-    $title       = cmsCore::request('title', 'str', 'NO_TITLE');
-    $published   = cmsCore::request('published', 'int');
-    $parent_id   = cmsCore::request('parent_id', 'int');
-    $description = cmsCore::request('description', 'str');
-    $topic_cost  = cmsCore::request('topic_cost', 'int', 0);
     $moder_list  = cmsCore::request('moder_list', 'array_int', array());
     $moder_list  = $moder_list ? cmsCore::arrayToYaml($moder_list) : '';
 
@@ -170,20 +167,20 @@ if ($opt == 'submit_forum'){
     }
 
     $icon = uploadCategoryIcon();
-
-    cmsCore::c('db')->addNsCategory(
-        'cms_forums',
-        array(
-            'category_id' => $category_id,
-            'parent_id' => $parent_id,
-            'title' => $title,
-            'description' => $description,
-            'access_list' => $group_access,
-            'moder_list' => $moder_list,
-            'published' => $published,
-            'icon' => $icon,
-            'topic_cost' => $topic_cost
-        )
+    
+    cmsCore::c('db')->addNsCategory('cms_forums', array(
+        'category_id' => cmsCore::request('category_id', 'int'),
+        'parent_id'   => cmsCore::request('parent_id', 'int'),
+        'title'       => cmsCore::c('db')->escape_string(cmsCore::request('title', 'str', 'NO_TITLE')),
+        'description' => cmsCore::c('db')->escape_string(cmsCore::request('description', 'str', '')),
+        'access_list' => $group_access,
+        'moder_list'  => $moder_list,
+        'published'   => cmsCore::request('published', 'int', 0),
+        'icon'        => $icon,
+        'pagetitle'   => cmsCore::request('pagetitle', 'str', ''),
+        'meta_keys'   => cmsCore::request('meta_keys', 'str', ''),
+        'meta_desc'   => cmsCore::request('meta_desc', 'str', ''),
+        'topic_cost'  => cmsCore::request('topic_cost', 'int', 0))
     );
 
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS'], 'info');
@@ -196,6 +193,9 @@ if ($opt == 'update_forum'){
     $item_id     = cmsCore::request('item_id', 'int');
     $category_id = cmsCore::request('category_id', 'int');
     $title       = cmsCore::request('title', 'str', 'NO_TITLE');
+    $pagetitle   = cmsCore::request('pagetitle', 'str', '');
+    $meta_keys   = cmsCore::request('meta_keys', 'str', '');
+    $meta_desc   = cmsCore::request('meta_desc', 'str', '');
     $published   = cmsCore::request('published', 'int');
     $parent_id   = cmsCore::request('parent_id', 'int');
     $description = cmsCore::request('description', 'str');
@@ -224,13 +224,16 @@ if ($opt == 'update_forum'){
 
     $sql = "UPDATE cms_forums
             SET category_id=". $category_id .",
-                title='". $title ."',
-                description='". $description ."',
+                title='". cmsCore::c('db')->escape_string($title) ."',
+                description='". cmsCore::c('db')->escape_string($description) ."',
                 access_list='". $group_access ."',
                 moder_list='". $moder_list ."',
                 published=". $published .",
                 icon='". $icon ."',
-                topic_cost='". $topic_cost ."'
+                topic_cost='". $topic_cost ."',
+                pagetitle = '". cmsCore::c('db')->escape_string($pagetitle) ."',
+                meta_keys = '". cmsCore::c('db')->escape_string($meta_keys) ."',
+                meta_desc = '". cmsCore::c('db')->escape_string($meta_desc) ."'
             WHERE id = '". $item_id ."'
             LIMIT 1";
 
@@ -280,6 +283,7 @@ if ($opt == 'config') {
             <li><a href="#tab_reviev"><?php echo $_LANG['AD_REVIEV']; ?></a></li>
             <li><a href="#tab_pictures"><?php echo $_LANG['AD_PICTURES']; ?></a></li>
             <li><a href="#tab_inverstments"><?php echo $_LANG['AD_INVESTMENTS']; ?></a></li>
+            <li><a href="#tab_seo">SEO</a></li>
         </ul>
         
         <div id="tab_reviev">
@@ -487,6 +491,20 @@ if ($opt == 'config') {
                 </div>
             </fieldset>
         </div>
+        
+        <div id="tab_seo">
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_ROOT_METAKEYS']; ?></label>
+                <textarea class="form-control" name="meta_keys" rows="2"><?php echo $cfg['meta_keys']; ?></textarea>
+                <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+            </div>
+            
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_ROOT_METADESC']; ?></label>
+                <textarea class="form-control" name="meta_desc" rows="4"><?php echo $cfg['meta_desc'] ?></textarea>
+                <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
+            </div>
+        </div>
     </div>
 
     <div>
@@ -578,6 +596,9 @@ if ($opt == 'submit_cat') {
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
     $cat['title']     = cmsCore::request('title', 'str', 'NO_TITLE');
+    $cat['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+    $cat['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+    $cat['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
     $cat['published'] = cmsCore::request('published', 'int');
     $cat['ordering']  = cmsCore::request('ordering', 'int');
     $cat['seolink']   = $model->getCatSeoLink($cat['title']);
@@ -603,6 +624,9 @@ if ($opt == 'update_cat') {
     $item_id = cmsCore::request('item_id', 'int');
 
     $cat['title']     = cmsCore::request('title', 'str', 'NO_TITLE');
+    $cat['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+    $cat['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+    $cat['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
     $cat['published'] = cmsCore::request('published', 'int');
     $cat['ordering']  = cmsCore::request('ordering', 'int');
     $cat['seolink']   = $model->getCatSeoLink($cat['title'], $item_id);
@@ -654,11 +678,12 @@ if ($opt == 'add_cat' || $opt == 'edit_cat') {
     if ($opt == 'add_cat') {
          echo '<h3>'. $_LANG['AD_CREATE_CATEGORY'] .'</h3>';
          cpAddPathway($_LANG['AD_CREATE_CATEGORY']);
-         $mod = array('published' => 1);
+         $mod = array( 'published' => 1, 'ordering' => (int)cmsCore::c('db')->get_field('cms_forum_cats', '1=1 ORDER BY ordering DESC', 'ordering')+1 );
     } else {
         $mod = $model->getForumCat(cmsCore::request('item_id', 'int', 0));
         if (!$mod) { cmsCore::error404(); }
-
+        
+        cpAddPathway($_LANG['AD_EDIT_CATEGORY']);
         echo '<h3>'. $_LANG['AD_EDIT_CATEGORY'] .'</h3>';
     }
 ?>
@@ -686,6 +711,24 @@ if ($opt == 'add_cat' || $opt == 'edit_cat') {
         <div class="form-group">
             <label><?php echo $_LANG['AD_SERIAL_NUMBER']; ?>:</label>
             <input type="number" class="form-control" name="ordering" size="30" value="<?php echo cmsCore::getArrVal($mod, 'ordering', ''); ?>" />
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['SEO_PAGETITLE']; ?>:</label>
+            <textarea class="form-control" name="pagetitle" rows="2"><?php echo cmsCore::getArrVal($mod, 'pagetitle', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['SEO_PAGETITLE_HINT']; ?></div>
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['SEO_METAKEYS']; ?>:</label>
+            <textarea class="form-control" name="meta_keys" rows="2"><?php echo cmsCore::getArrVal($mod, 'meta_keys', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['SEO_METADESCR']; ?>:</label>
+            <textarea class="form-control" name="meta_desc" rows="4"><?php echo cmsCore::getArrVal($mod, 'meta_desc', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
         </div>
     </div>
     
@@ -866,6 +909,24 @@ if ($opt == 'add_forum' || $opt == 'edit_forum') {
                 <?php echo $_LANG['AD_REGUIRED']; ?> &laquo;<a href="http://www.instantcms.ru/billing/about.html"><?php echo $_LANG['AD_BILLING_USERS']; ?></a>&raquo;
             <?php } ?>
             <div class="help-block">0 &mdash; <?php echo $_LANG['AD_COST_FREE']; ?></div>
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['SEO_PAGETITLE']; ?>:</label>
+            <textarea class="form-control" name="pagetitle" rows="2"><?php echo cmsCore::getArrVal($mod, 'pagetitle', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['SEO_PAGETITLE_HINT']; ?></div>
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['SEO_METAKEYS']; ?>:</label>
+            <textarea class="form-control" name="meta_keys" rows="2"><?php echo cmsCore::getArrVal($mod, 'meta_keys', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['SEO_METADESCR']; ?>:</label>
+            <textarea class="form-control" name="meta_desc" rows="4"><?php echo cmsCore::getArrVal($mod, 'meta_desc', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
         </div>
     </div>
     <div>

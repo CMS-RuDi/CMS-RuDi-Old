@@ -654,6 +654,9 @@ CREATE TABLE `#__forums` (
   `thread_count` int(11) NOT NULL DEFAULT '0',
   `post_count` int(11) NOT NULL DEFAULT '0',
   `last_msg` text NOT NULL,
+  `pagetitle` varchar(200) NOT NULL DEFAULT '',
+  `meta_keys` varchar(250) NOT NULL DEFAULT '',
+  `meta_desc` varchar(250) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `category_id` (`category_id`),
   KEY `parent_id` (`parent_id`),
@@ -670,6 +673,9 @@ CREATE TABLE `#__forum_cats` (
   `published` tinyint(1) NOT NULL DEFAULT '1',
   `ordering` int(11) NOT NULL,
   `seolink` varchar(200) NOT NULL,
+  `pagetitle` varchar(200) NOT NULL DEFAULT '',
+  `meta_keys` varchar(250) NOT NULL DEFAULT '',
+  `meta_desc` varchar(250) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `seolink` (`seolink`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -12,8 +12,7 @@
 /******************************************************************************/
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function forum(){
-
+function forum() {
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
     $inDB   = cmsDatabase::getInstance();
@@ -30,9 +29,10 @@ function forum(){
 
 	$inPage->addPathway($pagetitle, '/forum');
 	$inPage->setTitle($pagetitle);
-	$inPage->setDescription($pagetitle);
+	$inPage->setDescription($model->config['meta_desc'] ? $model->config['meta_desc'] : $pagetitle);
+        $inPage->setKeywords($model->config['meta_keys'] ? $model->config['meta_keys'] : $pagetitle);
 
-	$id	  = cmsCore::request('id', 'int', 0);
+	$id   = cmsCore::request('id', 'int', 0);
 	$do   = $inCore->do;
 	$page = cmsCore::request('page', 'int', 1);
 
@@ -79,9 +79,11 @@ if ($do=='forum'){
 		return;
 	}
 
-    $inPage->setTitle($forum['title']);
-    $inPage->setDescription($forum['description'] ? $forum['description'] : $forum['title']);
 	$inPage->addHead('<link rel="alternate" type="application/rss+xml" title="'.htmlspecialchars($forum['title']).'" href="'.HOST.'/rss/forum/'.$forum['id'].'/feed.rss">');
+        
+        $inPage->setTitle(($forum['pagetitle'] ? $forum['pagetitle'] : $forum['title']));
+        $inPage->setDescription(($forum['meta_desc'] ? $forum['meta_desc'] : crop($forum['description'] ? $forum['description'] : $forum['title'])));
+        $inPage->setKeywords(($forum['meta_keys'] ? $forum['meta_keys'] : $forum['title']));
 
 	// Получаем дерево форумов
     $path_list = $inDB->getNsCategoryPath('cms_forums', $forum['NSLeft'], $forum['NSRight'], 'id, title, access_list, moder_list');
@@ -154,9 +156,6 @@ if ($do=='thread'){
     }
     $inPage->addPathway($thread['title'], '/forum/thread'.$thread['id'].'.html');
 
-	$inPage->setTitle($thread['title']);
-	$inPage->setDescription($thread['description'] ? $thread['description'] : $thread['title']);
-
     if(!$thread['is_mythread']){
         $inDB->setFlag('cms_forum_threads', $thread['id'], 'hits', $thread['hits']+1);
     }
@@ -167,6 +166,29 @@ if ($do=='thread'){
     $inDB->limitPage($page, $model->config['pp_thread']);
     $posts = $model->getPosts();
     if(!$posts){ cmsCore::error404(); }
+    
+    // SEO
+    $inPage->setTitle($thread['title']);
+    
+    // meta description
+    if (!$thread['description']) {
+        $first_post = current($posts);
+        $first_post_content = strip_tags($first_post['content_html']);
+        if (mb_strlen($first_post_content) >= 100) {
+            $inPage->setDescription(crop($first_post_content));
+        } else {
+            $inPage->setDescription($thread['title']);
+        }
+    } else {
+        $inPage->setDescription(crop($thread['description']));
+    }
+    // meta keywords
+    $all_post_content = '';
+    foreach ($posts as $p) {
+        $all_post_content .= ' '.strip_tags($p['content_html']);
+    }
+    $meta_keys = cmsCore::getKeywords($all_post_content);
+    $inPage->setKeywords($meta_keys ? $meta_keys : $thread['title']);
     
     cmsCore::initAutoGrowText('#message');
 
@@ -1163,13 +1185,13 @@ if ($do=='latest_thread'){
 //============================================================================//
 //========================== Просмотр категории ==============================//
 //============================================================================//
-if ($do=='view_cat'){
-
+if ($do == 'view_cat') {
     $cat = $model->getForumCat(cmsCore::request('seolink', 'str', ''));
-    if(!$cat){ cmsCore::error404(); }
+    if (!$cat) { cmsCore::error404(); }
 
-    $inPage->setTitle($cat['title']);
-    $inPage->setDescription($cat['title']);
+    $inPage->setTitle(($cat['pagetitle'] ? $cat['pagetitle'] : $cat['title']));
+    $inPage->setDescription(($cat['meta_desc'] ? $cat['meta_desc'] : $cat['title']));
+    $inPage->setKeywords(($cat['meta_keys'] ? $cat['meta_keys'] : $cat['title']));
     $inPage->addPathway($cat['title']);
 
     $model->whereForumCatIs($cat['id']);

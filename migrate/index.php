@@ -75,9 +75,17 @@
             array( 'table' => 'cms_forums',     'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
             array( 'table' => 'cms_forum_cats', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
             array( 'table' => 'cms_forum_cats', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
-            array( 'table' => 'cms_forum_cats', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
+            array( 'table' => 'cms_forum_cats', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_photo_albums', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_photo_albums', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_photo_albums', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_photo_files', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_photo_files', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_photo_files', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
         ),
-        
+
         'change_fields' => array(
             array( 'table' => 'cms_plugins', 'name' => 'plugin_type', 'new_name' => 'type', 'type' => 'VARCHAR(10)' ),
             array( 'table' => 'cms_banner_hits', 'name' => 'pubdate', 'type' => 'TIMESTAMP', 'default' => 'CURRENT_TIMESTAMP' ),

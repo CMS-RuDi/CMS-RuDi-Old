@@ -284,7 +284,7 @@ $_LANG['CLASS_NOT_FOUND'] = 'Критическая ошибка. Класс "/c
 $_LANG['CLASS_METHOD_NOT_FOUND'] = 'Критическая ошибка. Метод "%s" в классе "%s" из файла "/core/classes/%s.class.php" отсутствует.';
 
 $_LANG['SEO_PAGETITLE']      = 'Название страницы, тег title';
-$_LANG['SEO_PAGETITLE_HINT'] = 'Если не указан, будет совпадать с названием';
+$_LANG['SEO_PAGETITLE_HINT'] = 'Если не указано, будет совпадать с названием';
 $_LANG['SEO_METAKEYS']       = 'Ключевые слова, тег meta keywords';
 $_LANG['SEO_METADESCR']      = 'Описание, тег meta description';
 $_LANG['SEO_METADESCR_HINT'] = 'Не более 250 символов';

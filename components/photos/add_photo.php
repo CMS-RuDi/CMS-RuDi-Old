@@ -1,7 +1,7 @@
 <?php
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-/////////////////////////////// форма загрузки фотографий 1 шаг ////////////////////////////////////
+///////////////////////// форма загрузки фотографий 1 шаг //////////////////////
 if ($do_photo == 'addphoto'){
 
 	$inPage->addPathway($_LANG['ADD_PHOTO'].': '.$_LANG['STEP_1']);
@@ -13,10 +13,11 @@ if ($do_photo == 'addphoto'){
 		$autocomplete_js = $inPage->getAutocompleteJS('tagsearch', 'tags');
 
 		cmsPage::initTemplate('components', 'com_photos_add1')->
-                assign('no_tags', false)->
-                assign('is_admin', $inUser->is_admin)->
-                assign('autocomplete_js', $autocomplete_js)->
-                display();
+                    assign('no_tags', false)->
+                    assign('is_admin', $inUser->is_admin)->
+                    assign('cfg', $model->config)->
+                    assign('autocomplete_js', $autocomplete_js)->
+                    display();
 
 	}
 
@@ -29,6 +30,12 @@ if ($do_photo == 'addphoto'){
 		$mod['is_multi']    = cmsCore::request('only_mod', 'int', 0);
 		$mod['tags']        = cmsCore::request('tags', 'str');
 		$mod['comments']    = $inUser->is_admin ? cmsCore::request('comments', 'int') : 1;
+                
+                if ($model->config['seo_user_access'] || $inUser->is_admin) {
+                    $mod['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+                    $mod['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+                    $mod['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
+                }
 
 		cmsUser::sessionPut('mod', $mod);
 
@@ -38,7 +45,7 @@ if ($do_photo == 'addphoto'){
 
 }
 
-/////////////////////////////// форма загрузки фотографий 2 шаг /////////////////////////////////////////////////////////////////////////////
+/////////////////////// форма загрузки фотографий 2 шаг ////////////////////////
 if ($do_photo == 'submit_photo'){
 
 	$mod = cmsUser::sessionGet('mod');
@@ -74,12 +81,8 @@ if ($do_photo == 'submit_photo'){
 
 }
 
-///////////////////////////////// фотографии загружены ///////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////// фотографии загружены //////////////////////////////
 if ($do_photo == 'uploaded'){
-
-	cmsUser::sessionDel('mod');
-	cmsCore::redirect('/photos/'.$album['id']);
-
+    cmsUser::sessionDel('mod');
+    cmsCore::redirect('/photos/'.$album['id']);
 }
-
-?>

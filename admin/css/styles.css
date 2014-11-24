@@ -685,11 +685,9 @@ div.filter {
 .sess_messages {
     padding:10px;
     background:#E0EAEF;
-    margin-bottom:15px;
+    margin:10px;
     display:block;
     clear:both;
-    border-radius:8px;
-    -moz-border-radius:8px;
 }
 
 .sess_messages div{

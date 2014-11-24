@@ -19,9 +19,9 @@
 <div class="usr_photos_notice">{$LANG.PHOTO_PLEASE_NOTE}</div>
 
 <form action="" method="POST">
-    <table width="550" cellpadding="4">
+    <table width="100%" cellpadding="4">
         <tr>
-            <td width="180" id="text_title"><strong>{$LANG.PHOTO_TITLE}:</strong></td>
+            <td width="260" id="text_title"><strong>{$LANG.PHOTO_TITLE}:</strong></td>
             <td>
                 <input name="title" type="text" id="title" class="text-input" style="width:350px;" maxlength="250" value="{$mod.title|escape:'html'}" />
             </td>
@@ -55,11 +55,33 @@
                 </td>
             </tr>
         {/if}
+        
+        {if $cfg.seo_user_access || $is_admin}
+            <tr>
+                <td valign="top"><strong>{$LANG.SEO_PAGETITLE}</strong><div class="hint">{$LANG.SEO_PAGETITLE_HINT}</div></td>
+                <td>
+                    <input name="pagetitle" style="width:350px" class="text-input" value="{$mod.pagetitle|escape:'html'}" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong>{$LANG.SEO_METAKEYS}</strong></td>
+                <td>
+                    <input name="meta_keys" style="width:350px" class="text-input" value="{$mod.meta_keys|escape:'html'}" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong>{$LANG.SEO_METADESCR}</strong><div class="hint">{$LANG.SEO_METADESCR_HINT}</div></td>
+                <td>
+                    <textarea name="meta_desc" rows="3" style="width:350px" class="text-input">{$mod.meta_desc|escape:'html'}</textarea>
+                </td>
+            </tr>
+        {/if}
+        
         <tr>
             <td colspan="2" valign="top">
                 <input type="submit" name="submit" id="text_subm" value="{$LANG.GO_TO_UPLOAD}" /> <input id="only_mod" name="only_mod" type="checkbox" value="1" onclick="mod_text()" />
                 <label for="only_mod">{$LANG.ADD_MULTY}</label>
             </td>
         </tr>
-    </table>							
+    </table>
 </form>

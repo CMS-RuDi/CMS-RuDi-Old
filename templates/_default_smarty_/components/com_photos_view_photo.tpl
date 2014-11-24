@@ -14,7 +14,7 @@
 
 <table cellpadding="0" cellspacing="0" border="0" class="photo_layout">
     <tr>
-        <td valign="top" style="padding-right:15px">
+        <td valign="top" style="padding-right:15px;max-width:630px;">
             <img src="/images/photos/medium/{$photo.file}" border="0" alt="{$photo.title|escape:'html'}" style="max-width: 650px;" />
 
             {if $photo.album_nav}
@@ -34,7 +34,6 @@
         </td>
         <td width="250" valign="top">
             <div class="photo_details">
-
                 <table cellpadding="0" cellspacing="0" border="0" width="100%">
                     <tr>
                         <td>
@@ -55,7 +54,6 @@
                 {if $cfg.link}
                     <p class="photo_date_details"><a class="lightbox-enabled" rel="lightbox-galery" href="/images/photos/{$photo.file}" title="{$photo.title|escape:'html'}">{$LANG.OPEN_ORIGINAL}</a></p>
                 {/if}
-
             </div>
 
             {if $photo.album_nav}
@@ -68,14 +66,13 @@
             {if $photo.a_bbcode}
             <div class="photo_details" style="margin-top:5px;font-size: 12px">
                 {$LANG.CODE_INPUT_TO_FORUMS}:<br/>
-                <input type="text" class="photo_bbinput" value="{$bbcode}"/>
+                <input onclick="$(this).select();" type="text" class="photo_bbinput" value="{$bbcode}"/>
             </div>
             {/if}
 
             <div class="photo_sub_details" style="padding:0px 20px">
                 {$tagbar}
             </div>
-
         </td>
     </tr>
 </table>

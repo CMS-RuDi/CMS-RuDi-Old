@@ -1,6 +1,5 @@
 <?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,12 +7,9 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function photos(){
-
+function photos() {
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
     $inDB   = cmsDatabase::getInstance();
@@ -37,10 +33,13 @@ function photos(){
 	$inPage->addPathway($inCore->getComponentTitle(), '/photos');
 
 	// только авторизованные пользуются js
-	if($inUser->id){
-		$inPage->addHeadJS('components/photos/js/photos.js');
-        $inPage->addHeadJsLang(array('NO_PUBLISH','EDIT_PHOTO','YOU_REALLY_DELETE_PHOTO','MOVE_PHOTO'));
+	if ($inUser->id) {
+            $inPage->addHeadJS('components/photos/js/photos.js');
+            $inPage->addHeadJsLang(array('NO_PUBLISH','EDIT_PHOTO','YOU_REALLY_DELETE_PHOTO','MOVE_PHOTO'));
 	}
+        
+        $inPage->setDescription($model->config['meta_desc'] ? $model->config['meta_desc'] : $pagetitle);
+        $inPage->setKeywords($model->config['meta_keys'] ? $model->config['meta_keys'] : $pagetitle);
 
 /////////////////////////////// Просмотр альбома ///////////////////////////////////////////////////////////////////////////////////////////
 if ($do=='view'){
@@ -53,23 +52,21 @@ if ($do=='view'){
 	$album = cmsCore::callEvent('GET_PHOTO_ALBUM', $album);
 
 	// если не корневой альбом
-	if($album['id'] != $root_album_id){
+	if ($album['id'] != $root_album_id) {
+            $path_list = $inDB->getNsCategoryPath('cms_photo_albums', $album['NSLeft'], $album['NSRight'], 'id, title, NSLevel');
 
-		$path_list = $inDB->getNsCategoryPath('cms_photo_albums', $album['NSLeft'], $album['NSRight'], 'id, title, NSLevel');
+            if ($path_list) {
+                foreach ($path_list as $pcat) {
+                    $inPage->addPathway($pcat['title'], '/photos/'.$pcat['id']);
+                }
+            }
 
-		if ($path_list){
-			foreach($path_list as $pcat){
-				$inPage->addPathway($pcat['title'], '/photos/'.$pcat['id']);
-			}
-		}
-
-		$pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : ($album['title']  . ' - '.$_LANG['PHOTOGALLERY']);
-		$inPage->setTitle($pagetitle);
-
+            $pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : ($album['title']  . ' - '.$_LANG['PHOTOGALLERY']);
+            $inPage->setTitle($album['pagetitle'] ? $album['pagetitle'] : $pagetitle);
 	} else {
-		$pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : $_LANG['PHOTOGALLERY'];
-		$inPage->setTitle($pagetitle);
-		$album['title'] = $pagetitle;
+            $pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : $_LANG['PHOTOGALLERY'];
+            $inPage->setTitle($pagetitle);
+            $album['title'] = $pagetitle;
 	}
 
 	//Формируем подкатегории альбома
@@ -99,7 +96,35 @@ if ($do=='view'){
     $inDB->limitPage($page, $album['perpage']);
 
 	$photos = $inPhoto->getPhotos($inUser->is_admin, $album['showdate']);
-	if(!$photos && $page > 1){ cmsCore::error404(); }
+	if (!$photos && $page > 1) { cmsCore::error404(); }
+        
+        if ($album['id'] != $root_album_id) {
+            // meta description
+            if ($album['meta_desc']) {
+                $meta_desc = $album['meta_desc'];
+            } else if(mb_strlen(strip_tags($album['description'])) >= 250) {
+                $meta_desc = crop($album['description']);
+            } else {
+                $meta_desc = $album['title'];
+            }
+            
+            $inPage->setDescription($meta_desc);
+            
+            // meta keywords
+            if ($album['meta_keys']) {
+                $meta_keys = $album['meta_keys'];
+            } else if($photos) {
+                foreach ($photos as $p) {
+                    $k[] = $p['title'];
+                }
+                
+                $meta_keys = implode(', ', $k);
+            } else {
+                $meta_keys = $album['title'];
+            }
+            
+            $inPage->setKeywords($meta_keys);
+        }
 
 	cmsPage::initTemplate('components', 'com_photos_view')->
             assign('root_album_id', $root_album_id)->
@@ -145,7 +170,17 @@ if($do=='viewphoto'){
 	}
 
 	$inPage->addPathway($photo['title']);
-	$inPage->setTitle($photo['title']);
+	$inPage->setTitle($photo['pagetitle'] ? $photo['pagetitle'] : $photo['title']);
+        $inPage->setKeywords($photo['meta_keys'] ? $photo['meta_keys'] : $photo['title']);
+        if (!$photo['meta_desc']) {
+            if ($photo['description']) {
+                $inPage->setDescription(crop($photo['description']));
+            } else {
+                $inPage->setDescription($photo['title']);
+            }
+        } else {
+            $inPage->setDescription($photo['meta_desc']);
+        }
 
 	// Обновляем количество просмотров фотографии
 	if(!$is_author){
@@ -244,6 +279,12 @@ if ($do=='editphoto'){
 		$mod['description'] = cmsCore::request('description', 'str', '');
 		$mod['tags']        = cmsCore::request('tags', 'str', '');
 		$mod['comments']    = $inUser->is_admin ? cmsCore::request('comments', 'int') : $photo['comments'];
+                
+                if ($model->config['seo_user_access'] || $inUser->is_admin) {
+                    $mod['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+                    $mod['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+                    $mod['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
+                } 
 
 		$file = $model->initUploadClass($inDB->getNsCategory('cms_photo_albums', $photo['album_id']))->uploadPhoto($photo['file']);
 		$mod['file'] = $file['filename'] ? $file['filename'] : $photo['file'];
@@ -263,11 +304,12 @@ if ($do=='editphoto'){
 		$photo['tags'] = cmsTagLine('photo', $photo['id'], false);
 
 		cmsPage::initTemplate('components', 'com_photos_edit')->
-                assign('photo', $photo)->
-                assign('form_action', '/photos/editphoto'.$photo['id'].'.html')->
-                assign('no_tags', false)->
-                assign('is_admin', $inUser->is_admin)->
-                display();
+                    assign('photo', $photo)->
+                    assign('form_action', '/photos/editphoto'.$photo['id'].'.html')->
+                    assign('no_tags', false)->
+                    assign('is_admin', $inUser->is_admin)->
+                    assign('cfg', $model->config)->
+                    display();
 
 		cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
 
@@ -381,15 +423,14 @@ if ($do=='publish_photo'){
 	cmsCore::halt('ok');
 
 }
-/////////////////////////////// VIEW LATEST/BEST PHOTOS //////////////////////////////////////////////////////////////////////////////
-if (in_array($do, array('latest', 'best'))){
-
-	if($do=='latest'){
-    	$inDB->orderBy('f.pubdate', 'DESC');
-		$pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : $_LANG['NEW_PHOTO_IN_GALLERY'];
+//////////////////////////// VIEW LATEST/BEST PHOTOS ///////////////////////////
+if (in_array($do, array('latest', 'best'))) {
+	if ($do == 'latest') {
+            $inDB->orderBy('f.pubdate', 'DESC');
+            $pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : $_LANG['NEW_PHOTO_IN_GALLERY'];
 	} else {
-		$inDB->orderBy('f.rating', 'DESC');
-		$pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : $_LANG['BEST_PHOTOS'];
+            $inDB->orderBy('f.rating', 'DESC');
+            $pagetitle = ($pagetitle && $inCore->isMenuIdStrict()) ? $pagetitle : $_LANG['BEST_PHOTOS'];
 	}
 
     $inDB->limit($model->config['best_latest_perpage']);
@@ -411,7 +452,4 @@ if (in_array($do, array('latest', 'best'))){
             display();
 
 }
-/////////////////////////////// /////////////////////////////// /////////////////////////////// /////////////////////////////// //////
-
 }
-?>

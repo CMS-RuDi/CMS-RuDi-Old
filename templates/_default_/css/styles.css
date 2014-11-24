@@ -773,6 +773,9 @@ h3 {
     border: solid 1px #444;
 }
 /*------------------------- COMPONENT "PHOTOS" -------------------------------*/
+.photo_thumb img, .photo_layout img {
+    width: 100%;
+}
 .photo_layout {
     margin-bottom: 15px;
 }

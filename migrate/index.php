@@ -83,7 +83,15 @@
             
             array( 'table' => 'cms_photo_files', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
             array( 'table' => 'cms_photo_files', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
-            array( 'table' => 'cms_photo_files', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
+            array( 'table' => 'cms_photo_files', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_blogs', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_blogs', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_blogs', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_blog_posts', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_blog_posts', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_blog_posts', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
         ),
 
         'change_fields' => array(

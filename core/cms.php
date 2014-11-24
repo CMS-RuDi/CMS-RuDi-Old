@@ -1,6 +1,5 @@
 <?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,14 +7,13 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
 define('CMS_RUDI_V', '0.0.9');
-define('CMS_RUDI_V_DATE', '26.10.2014');
+define('CMS_RUDI_V_DATE', '25.11.2014');
 
 class cmsCore {
     private static   $instance;

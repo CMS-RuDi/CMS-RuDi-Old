@@ -1,6 +1,5 @@
 <?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,10 +7,7 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
-
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function blogs() {
     $inCore = cmsCore::getInstance();
@@ -37,7 +33,8 @@ function blogs() {
 
     cmsCore::c('page')->addPathway($pagetitle, '/blogs');
     cmsCore::c('page')->setTitle($pagetitle);
-    cmsCore::c('page')->setDescription($pagetitle);
+    cmsCore::c('page')->setDescription(cmsCore::m('blogs')->config['meta_desc'] ? cmsCore::m('blogs')->config['meta_desc'] : $pagetitle);
+    cmsCore::c('page')->setKeywords(cmsCore::m('blogs')->config['meta_keys'] ? cmsCore::m('blogs')->config['meta_keys'] : $pagetitle);
     cmsCore::c('page')->addHeadJsLang(array('CONFIG_BLOG','DEL_BLOG','YOU_REALY_DELETE_BLOG','NEW_CAT','RENAME_CAT','YOU_REALY_DELETE_CAT','YOU_REALY_DELETE_POST','NO_PUBLISHED'));
 
     ///////////////////////// МОЙ БЛОГ /////////////////////////////////////////
@@ -185,6 +182,7 @@ function blogs() {
                 assign('users_list', cmsUser::getUsersList(false, $authors))->
                 assign('is_restrictions', (!cmsCore::c('user')->is_admin && cmsCore::m('blogs')->config['min_karma']))->
                 assign('cfg', cmsCore::m('blogs')->config)->
+                assign('is_admin', cmsCore::c('user')->is_admin)->
                 display();
 
             cmsCore::jsonOutput(array('error' => false, 'html' => ob_get_clean()));
@@ -200,7 +198,13 @@ function blogs() {
             $forall    = cmsCore::request('forall', 'int', 1);
             $showcats  = cmsCore::request('showcats', 'int', 1);
             $authors   = cmsCore::request('authorslist', 'array_int', array());
-
+            if (cmsCore::m('blogs')->config['seo_user_access'] || cmsCore::c('user')->is_admin) {
+                $page_title = cmsCore::request('pagetitle', 'str', '');
+                $meta_keys  = cmsCore::request('meta_keys', 'str', '');
+                $meta_desc  = cmsCore::request('meta_desc', 'str', '');
+            } else {
+                $page_title = $meta_keys = $meta_desc = '';
+            }
             //Проверяем настройки
             if (mb_strlen($title)<5) { $title = $blog['title']; }
 
@@ -224,7 +228,17 @@ function blogs() {
             cmsCore::c('blog')->updateBlogAuthors($blog['id'], $authors);
 
             //сохраняем настройки блога
-            $blog['seolink_new'] = cmsCore::c('blog')->updateBlog($blog['id'], array('title'=>$title, 'allow_who'=>$allow_who, 'showcats'=>$showcats, 'ownertype'=>$ownertype, 'premod'=>$premod, 'forall'=>$forall), cmsCore::m('blogs')->config['update_seo_link_blog']);
+            $blog['seolink_new'] = cmsCore::c('blog')->updateBlog($blog['id'], array(
+                'title'     => $title,
+                'pagetitle' => $page_title,
+                'meta_keys' => $meta_keys,
+                'meta_desc' => $meta_desc,
+                'allow_who' => $allow_who,
+                'showcats'  => $showcats,
+                'ownertype' => $ownertype,
+                'premod'    => $premod,
+                'forall'    => $forall
+            ), cmsCore::m('blogs')->config['update_seo_link_blog']);
 
             $blog['seolink'] = $blog['seolink_new'] ? $blog['seolink_new'] : $blog['seolink'];
 
@@ -243,7 +257,6 @@ function blogs() {
     if ($inCore->do=='view_blogs'){
         // rss в адресной строке
         cmsCore::c('page')->addHead('<link rel="alternate" type="application/rss+xml" title="'.$_LANG['BLOGS'].'" href="'.HOST.'/rss/blogs/all/feed.rss">');
-        cmsCore::c('page')->setDescription($_LANG['BLOGS'].' - '.$_LANG['PERSONALS'].', '.$_LANG['COLLECTIVES']);
 
         // тип блога
         if($ownertype && $ownertype != 'all'){
@@ -266,21 +279,32 @@ function blogs() {
         switch ($ownertype){
             case 'all':
                 cmsCore::c('page')->setTitle($_LANG['ALL_BLOGS']);
+                cmsCore::c('page')->setDescription($_LANG['BLOGS'] .' - '. $_LANG['ALL_BLOGS']);
                 cmsCore::c('page')->addPathway($_LANG['ALL_BLOGS']);
                 $link = '/blogs/all-%page%.html';
             break;
         
             case 'single':
                 cmsCore::c('page')->setTitle($_LANG['PERSONALS']);
+                cmsCore::c('page')->setDescription($_LANG['PERSONALS'] .' '. $_LANG['BLOGS']);
                 cmsCore::c('page')->addPathway($_LANG['PERSONALS']);
                 $link = '/blogs/single-%page%.html';
             break;
         
             case 'multi':
                 cmsCore::c('page')->setTitle($_LANG['COLLECTIVES']);
+                cmsCore::c('page')->setDescription($_LANG['COLLECTIVES'] .' '. $_LANG['BLOGS']);
                 cmsCore::c('page')->addPathway($_LANG['COLLECTIVES']);
                 $link = '/blogs/multi-%page%.html';
             break;
+        }
+        
+        if ($blogs) {
+            foreach ($blogs as $b) {
+                $k[] = $b['title'];
+            }
+            
+            cmsCore::c('page')->setKeywords(implode(', ', $k));
         }
 
         cmsPage::initTemplate('components', 'com_blog_view_all')->
@@ -312,10 +336,7 @@ function blogs() {
         $myblog = (cmsCore::c('user')->id && cmsCore::c('user')->id == $blog['user_id']); // автор блога
         $is_writer = cmsCore::c('blog')->isUserBlogWriter($blog, cmsCore::c('user')->id); // может ли пользователь писать в блог
 
-        // Заполняем head страницы
-        cmsCore::c('page')->setTitle($blog['title']);
         cmsCore::c('page')->addPathway($blog['title'], cmsCore::m('blogs')->getBlogURL($blog['seolink']));
-        cmsCore::c('page')->setDescription($blog['title']);
         // rss в адресной строке
         cmsCore::c('page')->addHead('<link rel="alternate" type="application/rss+xml" title="'.htmlspecialchars(strip_tags($blog['title'])).'" href="'.HOST.'/rss/blogs/'.$blog['id'].'/feed.rss">');
         if($myblog || cmsCore::c('user')->is_admin){
@@ -388,6 +409,22 @@ function blogs() {
         } else {
             $pagination = cmsPage::getPagebar($total, $page, cmsCore::m('blogs')->config['perpage'], $blog['blog_link'].'/page-%page%');
         }
+        
+        // SEO
+        cmsCore::c('page')->setTitle($blog['pagetitle'] ? $blog['pagetitle'] : $blog['title']);
+        cmsCore::c('page')->setDescription($blog['meta_desc'] ? $blog['meta_desc'] : $blog['title']);
+        // keywords
+        if ($blog['meta_keys']) {
+            $meta_keys = $blog['meta_keys'];
+        } else if ($posts) {
+            foreach ($posts as $p) {
+                $k[] = $p['title'];
+            }
+            $meta_keys = implode(', ', $k);
+        } else {
+            $meta_keys = $blog['title'];
+        }
+        cmsCore::c('page')->setKeywords($meta_keys);
 
         cmsPage::initTemplate('components', 'com_blog_view')->
             assign('myblog', $myblog)->
@@ -486,6 +523,7 @@ function blogs() {
                 assign('bb_toolbar', $bb_toolbar)->
                 assign('smilies', $smilies)->
                 assign('is_admin', cmsCore::c('user')->is_admin)->
+                assign('cfg', cmsCore::m('blogs')->config)->
                 assign('myblog', $myblog)->
                 assign('user_can_iscomments', cmsUser::isUserCan('comments/iscomments'))->
                 assign('autocomplete_js', $autocomplete_js)->
@@ -505,6 +543,13 @@ function blogs() {
             $mod['allow_who']= cmsCore::request('allow_who', 'str', $blog['allow_who']);
             $mod['tags']     = cmsCore::request('tags', 'str', '');
             $mod['comments'] = cmsCore::request('comments', 'int', 1);
+            
+            if (cmsCore::m('blogs')->config['seo_user_access'] || cmsCore::c('user')->is_admin) {
+                $mod['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+                $mod['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+                $mod['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
+            }
+            
             $mod['published']= ($myblog || !$blog['premod']) ? 1 : 0;
             $mod['blog_id']  = $blog['id'];
 
@@ -719,13 +764,15 @@ function blogs() {
             cmsCore::redirect(cmsCore::m('blogs')->getBlogURL($blog['seolink']));
         }
 
-        if(cmsCore::c('user')->id){
+        if (cmsCore::c('user')->id) {
             cmsCore::c('page')->addHeadJS('components/blogs/js/blog.js');
         }
         cmsCore::c('page')->addPathway($blog['title'], cmsCore::m('blogs')->getBlogURL($blog['seolink']));
-        cmsCore::c('page')->setTitle($post['title']);
         cmsCore::c('page')->addPathway($post['title']);
-        cmsCore::c('page')->setDescription($post['title']);
+        
+        cmsCore::c('page')->setTitle($post['pagetitle'] ? $post['pagetitle'] : $post['title']);
+        cmsCore::c('page')->setDescription($post['meta_desc'] ? $post['meta_desc'] : crop($post['content_html']));
+        cmsCore::c('page')->setKeywords($post['meta_keys'] ? $post['meta_keys'] : $post['title']);
 
         if ($post['cat_id']){
             $cat = cmsCore::c('blog')->getBlogCategory($post['cat_id']);
@@ -892,4 +939,3 @@ function blogs() {
     }
 
 }
-?>

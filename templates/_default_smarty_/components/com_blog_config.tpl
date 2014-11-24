@@ -1,7 +1,7 @@
 <form action="{$form_action}" method="post" name="cfgform" id="cfgform" style="margin-top:5px">
     <table width="100%" border="0" cellpadding="4" cellspacing="0">
 	<tr>
-            <td width="180"><strong>{$LANG.BLOG_TITLE}: </strong></td>
+            <td width="240"><strong>{$LANG.BLOG_TITLE}: </strong></td>
             <td><input name="title" type="text" id="title" class="text-input" value="{$blog.title|escape:'html'}" style="width:360px"/></td>
 	</tr>
 	<tr>
@@ -23,10 +23,31 @@
                 </select>
             </td>
 	</tr>
+        
+        {if $cfg.seo_user_access || $is_admin}
+            <tr>
+                <td valign="top"><strong>{$LANG.SEO_PAGETITLE}</strong><div class="hint">{$LANG.SEO_PAGETITLE_HINT}</div></td>
+                <td>
+                    <input name="pagetitle" style="width:360px" class="text-input" value="{$blog.pagetitle|escape:'html'}" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong>{$LANG.SEO_METAKEYS}</strong></td>
+                <td>
+                    <input name="meta_keys" style="width:360px" class="text-input" value="{$blog.meta_keys|escape:'html'}" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong>{$LANG.SEO_METADESCR}</strong><div class="hint">{$LANG.SEO_METADESCR_HINT}</div></td>
+                <td>
+                    <textarea name="meta_desc" rows="3" style="width:360px" class="text-input">{$blog.meta_desc|escape:'html'}</textarea>
+                </td>
+            </tr>
+        {/if}
     </table>
     <table width="100%" border="0" cellpadding="4" cellspacing="0">
 	<tr>
-            <td width="180"><strong>{$LANG.BLOG_TYPE}: </strong></td>
+            <td width="240"><strong>{$LANG.BLOG_TYPE}: </strong></td>
             <td>
                 <select name="ownertype" id="ownertype" onchange="selectOwnerType()" style="width:360px" class="text-input">
                     <option value="single" {if ($blog.ownertype == 'single')} selected {/if}>{$LANG.PERSONAL} {if $is_restrictions && $cfg.min_karma_private>0}({$LANG.BLOG_KARMA_NEED} {$cfg.min_karma_private}){/if}</option>
@@ -37,7 +58,7 @@
     </table>
     <table width="100%" border="0" cellpadding="4" cellspacing="0" id="multiblogcfg" style="display:{if $blog.ownertype=='single'}none;{else}block;{/if}">
 	<tr>
-            <td width="180"><strong>{$LANG.PREMODER_POST}: </strong></td>
+            <td width="240"><strong>{$LANG.PREMODER_POST}: </strong></td>
             <td>
                 <select name="premod" id="premod" style="width:360px" class="text-input">
                     <option value="1" {if ($blog.premod == 1)} selected {/if}>{$LANG.ON}</option>

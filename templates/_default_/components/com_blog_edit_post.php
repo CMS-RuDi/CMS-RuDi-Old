@@ -3,7 +3,7 @@
 <form style="margin-top:15px" action="" method="post" name="msgform" enctype="multipart/form-data">
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
         <tr>
-            <td width="160"><strong><?php echo $_LANG['TITLE_POST']; ?>: </strong></td>
+            <td width="240"><strong><?php echo $_LANG['TITLE_POST']; ?>: </strong></td>
             <td><input name="title" class="text-input" type="text" id="title" style="width:400px" value="<?php echo $this->escape($mod['title']); ?>"/></td>
         </tr>
         
@@ -71,6 +71,29 @@
                 </script>
             </td>
         </tr>
+        
+        <?php if ($cfg['seo_user_access'] || $is_admin) { ?>
+        <tr>
+            <td valign="top"><strong><?php echo $_LANG['SEO_PAGETITLE']; ?></strong></td>
+            <td>
+                <input name="pagetitle" style="width:400px" class="text-input" value="<?php echo $this->escape($mod['pagetitle']); ?>" />
+                <div class="hinttext" style="font-size:11px"><?php echo $_LANG['SEO_PAGETITLE_HINT']; ?></div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"><strong><?php echo $_LANG['SEO_METAKEYS']; ?></strong></td>
+            <td>
+                <input name="meta_keys" style="width:400px" class="text-input" value="<?php echo $this->escape($mod['meta_keys']); ?>" />
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"><strong><?php echo $_LANG['SEO_METADESCR']; ?></strong></td>
+            <td>
+                <textarea name="meta_desc" rows="3" style="width:400px" class="text-input"><?php echo $this->escape($mod['meta_desc']); ?></textarea>
+                <div class="hinttext" style="font-size:11px"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
+            </td>
+        </tr>
+        <?php } ?>
         
         <tr>
             <td colspan="2">

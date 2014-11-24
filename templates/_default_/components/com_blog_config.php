@@ -1,7 +1,7 @@
 <form action="<?php echo $form_action; ?>" method="post" name="cfgform" id="cfgform" style="margin-top:5px">
     <table width="100%" border="0" cellpadding="4" cellspacing="0">
         <tr>
-          <td width="180"><strong><?php echo $_LANG['BLOG_TITLE']; ?>: </strong></td>
+          <td width="240"><strong><?php echo $_LANG['BLOG_TITLE']; ?>: </strong></td>
           <td><input name="title" type="text" id="title" class="text-input" value="<?php echo $this->escape($blog['title']); ?>" style="width:360px"/></td>
         </tr>
         <tr>
@@ -23,10 +23,31 @@
                 </select>
             </td>
         </tr>
+        
+        <?php if ($cfg['seo_user_access'] || $is_admin) { ?>
+            <tr>
+                <td valign="top"><strong><?php echo $_LANG['SEO_PAGETITLE']; ?></strong><div class="hint"><?php echo $_LANG['SEO_PAGETITLE_HINT']; ?></div></td>
+                <td>
+                    <input name="pagetitle" style="width:360px" class="text-input" value="<?php echo $this->escape($blog['pagetitle']); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong><?php echo $_LANG['SEO_METAKEYS']; ?></strong></td>
+                <td>
+                    <input name="meta_keys" style="width:360px" class="text-input" value="<?php echo $this->escape($blog['meta_keys']); ?>" />
+                </td>
+            </tr>
+            <tr>
+                <td valign="top"><strong><?php echo $_LANG['SEO_METADESCR']; ?></strong><div class="hint"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div></td>
+                <td>
+                    <textarea name="meta_desc" rows="3" style="width:360px" class="text-input"><?php echo $this->escape($blog['meta_desc']); ?></textarea>
+                </td>
+            </tr>
+        <?php } ?>
     </table>
     <table width="100%" border="0" cellpadding="4" cellspacing="0">
         <tr>
-            <td width="180"><strong><?php echo $_LANG['BLOG_TYPE']; ?>: </strong></td>
+            <td width="240"><strong><?php echo $_LANG['BLOG_TYPE']; ?>: </strong></td>
             <td>
                 <select name="ownertype" id="ownertype" onchange="selectOwnerType()" style="width:360px" class="text-input">
                     <option value="single" <?php if ($blog['ownertype'] == 'single') { ?> selected <?php } ?>><?php echo $_LANG['PERSONAL']; ?> <?php if ($is_restrictions && $cfg['min_karma_private'] > 0) { ?>(<?php echo $_LANG['BLOG_KARMA_NEED']; ?> <?php echo $cfg['min_karma_private']; ?>)<?php } ?></option>
@@ -37,7 +58,7 @@
     </table>
     <table width="100%" border="0" cellpadding="4" cellspacing="0" id="multiblogcfg" style="display:<?php if ($blog['ownertype'] == 'single') { ?>none;<?php } else { ?>block;<?php } ?>">
         <tr>
-            <td width="180"><strong><?php echo $_LANG['PREMODER_POST']; ?>: </strong></td>
+            <td width="240"><strong><?php echo $_LANG['PREMODER_POST']; ?>: </strong></td>
             <td>
                 <select name="premod" id="premod" style="width:360px" class="text-input">
                     <option value="1" <?php if ($blog['premod'] == 1) { ?> selected <?php } ?>><?php echo $_LANG['ON']; ?></option>

@@ -3,7 +3,7 @@
 <form style="margin-top:15px" action="" method="post" name="msgform" enctype="multipart/form-data">
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
         <tr>
-            <td width="160"><strong>{$LANG.TITLE_POST}: </strong></td>
+            <td width="240"><strong>{$LANG.TITLE_POST}: </strong></td>
             <td><input name="title" class="text-input" type="text" id="title" style="width:400px" value="{$mod.title|escape:'html'}"/></td>
         </tr>
         
@@ -71,6 +71,29 @@
                 </script>
             </td>
         </tr>
+        
+        {if $cfg.seo_user_access || $is_admin}
+        <tr>
+            <td valign="top"><strong>{$LANG.SEO_PAGETITLE}</strong></td>
+            <td>
+                <input name="pagetitle" style="width:400px" class="text-input" value="{$mod.pagetitle|escape:'html'}" />
+                <div class="hinttext" style="font-size:11px">{$LANG.SEO_PAGETITLE_HINT}</div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"><strong>{$LANG.SEO_METAKEYS}</strong></td>
+            <td>
+                <input name="meta_keys" style="width:400px" class="text-input" value="{$mod.meta_keys|escape:'html'}" />
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"><strong>{$LANG.SEO_METADESCR}</strong></td>
+            <td>
+                <textarea name="meta_desc" rows="3" style="width:400px" class="text-input">{$mod.meta_desc|escape:'html'}</textarea>
+                <div class="hinttext" style="font-size:11px">{$LANG.SEO_METADESCR_HINT}</div>
+            </td>
+        </tr>
+        {/if}
         
         <tr>
             <td colspan="2">

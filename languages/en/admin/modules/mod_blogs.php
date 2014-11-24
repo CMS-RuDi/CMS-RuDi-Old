@@ -15,6 +15,7 @@ $_LANG['MOD_SORT']                    = 'Sorting of the results';
 $_LANG['MOD_SORT_OPT_RATING']         = 'Top rated';
 $_LANG['MOD_SORT_OPT_COMMENTS_COUNT'] = 'Most commented';
 $_LANG['MOD_SORT_OPT_PUBDATE']        = 'Recently added';
+$_LANG['MOD_SORT_OPT_HITS']           = 'Most viewed';
 $_LANG['MOD_OWNER']                   = 'What blogs to show';
 $_LANG['MOD_OWNER_OPT_USER']          = 'Users blogs';
 $_LANG['MOD_OWNER_OPT_CLUB']          = 'Club blogs';

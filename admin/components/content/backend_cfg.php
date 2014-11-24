@@ -32,6 +32,11 @@ $com_cfg = array(
                         'title' => $_LANG['AD_GENERATE_KEY_DESCR']
                     ),
                     array(
+                        'type' => 'btn_yes_no',
+                        'name' => 'hide_root',
+                        'title' => $_LANG['AD_HIDE_ROOT_CATS']
+                    ),
+                    array(
                         'type' => 'number',
                         'name' => 'perpage',
                         'title' => $_LANG['AD_NUMBER_PER_PAGE']

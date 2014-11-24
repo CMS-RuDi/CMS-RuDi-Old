@@ -51,17 +51,42 @@ if ($do == 'view') {
     // если не корень категорий
     if ($cat['NSLevel'] > 0) {
         cmsCore::c('page')->setTitle(empty($cat['pagetitle']) ? $cat['title'] : $cat['pagetitle']);
-        if (!empty($cat['meta_keys'])) { cmsCore::c('page')->setKeywords($cat['meta_keys']); }
-        if (!empty($cat['meta_desc'])) { cmsCore::c('page')->setDescription($cat['meta_desc']); }
+        
+        // meta description
+        if (!empty($cat['meta_desc'])) {
+            $meta_desc = $cat['meta_desc'];
+        } else if (mb_strlen(strip_tags($cat['description']))>=250) {
+            $meta_desc = crop($cat['description']);
+        } else {
+            $meta_desc = $cat['title'];
+        }
+        
+        cmsCore::c('page')->setDescription($meta_desc);
+
+        // meta keywords
+        if (!empty($cat['meta_keys'])) {
+            $meta_keys = $cat['meta_keys'];
+        } else if ($content_list) {
+            foreach($content_list as $c) {
+                $k[] = $c['title'];
+            }
+            $meta_keys = implode(', ', $k);
+        } else {
+            $meta_keys = $cat['title'];
+        }
+        
+        cmsCore::c('page')->setKeywords($meta_keys);
         
         $pagetitle = $cat['title'];
         $showdate  = $cat['showdate'];
         $showcomm  = $cat['showcomm'];
-        cmsCore::c('page')->addHead('<link rel="alternate" type="application/rss+xml" title="'.htmlspecialchars($cat['title']).'" href="'.HOST.'/rss/content/'.$cat['id'].'/feed.rss">');
+        cmsCore::c('page')->addHead('<link rel="alternate" type="application/rss+xml" title="'. htmlspecialchars($cat['title']) .'" href="'. HOST .'/rss/content/'. $cat['id'] .'/feed.rss">');
     }
 
     // Если корневая категория
     if ($cat['NSLevel'] == 0) {
+        if ($model->config['hide_root']) { cmsCore::error404(); }
+        
         cmsCore::c('page')->setTitle(empty(cmsCore::m('content')->config['pagetitle']) ? $_LANG['CATALOG_ARTICLES'] : cmsCore::m('content')->config['pagetitle']);
         if (!empty(cmsCore::m('content')->config['meta_keys'])) {
             cmsCore::c('page')->setKeywords(cmsCore::m('content')->config['meta_keys']);

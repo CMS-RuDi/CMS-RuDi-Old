@@ -37,6 +37,7 @@
 </table>
 
 <div class="blog_post_body"><?php echo $post['content_html']; ?></div>
+<div class="blog_post_hits"><?php echo $this->spellcount($post['hits'], $_LANG['HIT'], $_LANG['HIT2'], $_LANG['HIT10']); ?></div>
 <?php echo $post['tags']; ?>
 <?php if ($navigation && ($navigation['prev'] || $navigation['next'])) { ?>
     <div class="blog_post_nav">

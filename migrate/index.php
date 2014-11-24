@@ -31,6 +31,8 @@
     // Выставляем необходимые опции для миграции
     $migrateDB = new migrateDB(array(
         'create_fields' => array(
+            array( 'table' => 'cms_blog_posts', 'name' => 'hits', 'type' => 'INT(11) UNSIGNED', 'default' => "'0'" ),
+            
             array( 'table' => 'cms_modules_bind', 'name' => 'tpl', 'type' => 'VARCHAR(64)' ),
             
             array( 'table' => 'cms_category', 'name' => 'pagetitle', 'type' => 'VARCHAR(255)' ),

@@ -37,6 +37,7 @@
 </table>
 
 <div class="blog_post_body">{$post.content_html}</div>
+<div class="blog_post_hits">{$post.hits|spellcount:$LANG.HIT:$LANG.HIT2:$LANG.HIT10}</div>
 {$post.tags}
 {if $navigation && ($navigation.prev || $navigation.next)}
 	<div class="blog_post_nav">

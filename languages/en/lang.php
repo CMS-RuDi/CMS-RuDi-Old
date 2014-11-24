@@ -191,6 +191,9 @@ $_LANG['MONTH2']                ='months';
 $_LANG['MONTH10']               ='months';
 $_LANG['TIME1']                 ='time';
 $_LANG['TIME2']                 ='times';
+$_LANG['HIT']                   = 'view';
+$_LANG['HIT2']                  = 'views';
+$_LANG['HIT10']                 = 'views';
 
 $_LANG['UPLOAD_ERR_NO_FILE']    = 'File not uploaded';
 $_LANG['UPLOAD_ERR_PARTIAL']    = 'File was not completely downloaded.';
@@ -277,8 +280,9 @@ $_LANG['AJAX_FILE_UPLOAD_NOT_SUPPORTED'] = 'Your browser does not support Flash,
 $_LANG['MODEL_NOT_FOUND'] = 'Fatal Error. Class component model "%s" not found.';
 $_LANG['CLASS_NOT_FOUND'] = 'Fatal Error. Класс "%s" not found.';
 
-$_LANG['SEO_PAGETITLE']      = 'Pagetitle, "title" tag';
-$_LANG['SEO_PAGETITLE_HINT'] = 'If not specified, will use the same name';
-$_LANG['SEO_METAKEYS']       = 'Keywords, meta keywords tag';
-$_LANG['SEO_METADESCR']      = 'Descripion, meta description tag';
-$_LANG['SEO_METADESCR_HINT'] = 'Max length 250 characters'; 
+$_LANG['SEO_PAGETITLE']           = 'Pagetitle, "title" tag';
+$_LANG['SEO_PAGETITLE_HINT']      = 'If not specified, will use the same name';
+$_LANG['SEO_METAKEYS']            = 'Keywords, meta keywords tag';
+$_LANG['SEO_METADESCR']           = 'Descripion, meta description tag';
+$_LANG['SEO_METADESCR_HINT']      = 'Max length 250 characters';
+$_LANG['AD_IF_UNKNOWN_PAGETITLE'] = 'If not specified, will use the same name';

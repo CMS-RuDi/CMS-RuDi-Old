@@ -48,6 +48,7 @@
                             <a class="blog_user" href="<?php echo cmsUser::getProfileURL($post['login']); ?>"><?php echo $post['author']; ?></a>
                             <span class="blog_entry_date"><?php if (!$post['published']) { ?><span style="color:#CC0000"><?php echo $_LANG['ON_MODERATE']; ?></span><?php } else { ?><?php echo $post['fpubdate']; ?><?php } ?></span>
                             <span class="post_karma"><?php echo $this->rating($post['rating']); ?></span>
+                            <span class="post_hits"><?php echo $post['hits']; ?></span>
                             <?php if ($post['comments_count'] > 0) { ?>
                             <a class="blog_comments_link" href="<?php echo $post['url']; ?>#c"><?php echo $this->spellcount($post['comments_count'], $_LANG['COMMENT'], $_LANG['COMMENT2'], $_LANG['COMMENT10']); ?></a>
                             <?php } else { ?>

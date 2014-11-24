@@ -25,3 +25,4 @@ $_LANG['AD_PHOTO_SQUARE']          = 'Square';
 $_LANG['AD_ALLOW_USERS_TO']        = 'Allow to users';
 $_LANG['AD_ALLOW_USERS_TO_HINT']   = 'Allowing users to add photos to their articles';
 $_LANG['AD_WATERMARK_HINT']        = 'If it is enabled, an image from a file will be applied to a large thumbnail of the articles';
+$_LANG['AD_HIDE_ROOT_CATS']        = 'Hide root cats from link /content';

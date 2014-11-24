@@ -68,9 +68,6 @@ function applet_cats() {
             $category['parent_id']   = cmsCore::request('parent_id', 'int');
             $category['description'] = cmsCore::request('description', 'html', '');
             $category['description'] = cmsCore::c('db')->escape_string($category['description']);
-            $category['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
-            $category['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
-            $category['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
             $category['published']   = cmsCore::request('published', 'int', 0);
             $category['showdate']    = cmsCore::request('showdate', 'int', 0);
             $category['showcomm']    = cmsCore::request('showcomm', 'int', 0);
@@ -83,12 +80,16 @@ function applet_cats() {
             $category['showdesc']    = cmsCore::request('showdesc', 'int', 0);
             $category['is_public']   = cmsCore::request('is_public', 'int', 0);
             $category['url']         = cmsCore::request('url', 'str', '');
+            $category['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
+            $category['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
+            $category['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
+            
             if (!empty($category['url'])) {
                 $category['url'] = cmsCore::strToURL($category['url'], cmsCore::m('content')->config['is_url_cyrillic']);
             }
             $category['tpl']         = cmsCore::request('tpl', 'str', 'com_content_view');
+            
             $category['cost']        = cmsCore::request('cost', 'str', '');
-
             if (!is_numeric($category['cost'])) { $category['cost'] = ''; }
 
             $album = array();
@@ -107,21 +108,18 @@ function applet_cats() {
 
             // получаем старую категорию
             $old = cmsCore::c('db')->get_fields('cms_category', "id='". $category['id'] ."'", '*');
-
+            if (!$old) { cmsCore::error404(); } 
+            
             // если сменили категорию
             if ($old['parent_id'] != $category['parent_id']) {
                 // перемещаем ее в дереве
                 $inCore->nestedSetsInit('cms_category')->MoveNode($category['id'], $category['parent_id']);
-
                 // обновляем сеолинки категорий
                 cmsCore::c('db')->updateNsCategorySeoLink('cms_category', $category['id'], cmsCore::m('content')->config['is_url_cyrillic']);
-
                 // Обновляем ссылки меню на категории
                 cmsCore::m('content')->updateCatMenu();
-
                 // обновляем сеолинки всех вложенных статей
                 cmsCore::m('content')->updateArticlesSeoLink($category['id']);
-
                 cmsCore::addSessionMessage($_LANG['AD_CATEGORY_NEW_URL'], 'info');
             }
 
@@ -132,13 +130,10 @@ function applet_cats() {
             if (cmsCore::inRequest('update_seolink') && ($old['parent_id'] == $category['parent_id'])) {
                 // обновляем сеолинки категорий
                 cmsCore::c('db')->updateNsCategorySeoLink('cms_category', $category['id'], cmsCore::m('content')->config['is_url_cyrillic']);
-
                 // Обновляем ссылки меню на категории
                 cmsCore::m('content')->updateCatMenu();
-
                 // обновляем сеолинки всех вложенных статей
                 cmsCore::m('content')->updateArticlesSeoLink($category['id']);
-
                 cmsCore::addSessionMessage($_LANG['AD_SECTION_AND_ARTICLES_NEW_URL'], 'info');
             }
 
@@ -151,8 +146,8 @@ function applet_cats() {
 
             cmsCore::addSessionMessage($_LANG['AD_CATEGORY_SAVED'], 'success');
 
-            if (!isset($_SESSION['editlist']) || @sizeof($_SESSION['editlist'])==0) {
-                cmsCore::redirect('?view=tree&cat_id='.$category['id']);
+            if (!isset($_SESSION['editlist']) || @sizeof($_SESSION['editlist']) == 0) {
+                cmsCore::redirect('?view=tree&cat_id='. $category['id']);
             } else {
                 cmsCore::redirect('?view=tree');
             }
@@ -170,9 +165,6 @@ function applet_cats() {
         $category['parent_id']   = cmsCore::request('parent_id', 'int');
         $category['description'] = cmsCore::request('description', 'html', '');
         $category['description'] = cmsCore::c('db')->escape_string($category['description']);
-        $category['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
-        $category['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
-        $category['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
         $category['published']   = cmsCore::request('published', 'int', 0);
         $category['showdate']    = cmsCore::request('showdate', 'int', 0);
         $category['showcomm']    = cmsCore::request('showcomm', 'int', 0);
@@ -185,6 +177,9 @@ function applet_cats() {
         $category['showdesc']    = cmsCore::request('showdesc', 'int', 0);
         $category['is_public']   = cmsCore::request('is_public', 'int', 0);
         $category['tpl']         = cmsCore::request('tpl', 'str', 'com_content_view');
+        $category['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
+        $category['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
+        $category['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
 
         $category['cost']        = cmsCore::request('cost', 'str', 0);
         if (!is_numeric($category['cost'])) { $category['cost'] = ''; }
@@ -525,18 +520,18 @@ function applet_cats() {
                         <div class="form-group">
                             <label><?php echo $_LANG['AD_PAGE_TITLE']; ?></label>
                             <input type="text" id="pagetitle" class="form-control" name="pagetitle" value="<?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'pagetitle', '')); ?>" />
-                            <div class="help-block"><?php echo $_LANG['AD_IF_UNKNOWN']; ?></div>
+                            <div class="help-block"><?php echo $_LANG['AD_IF_UNKNOWN_PAGETITLE']; ?></div>
                         </div>
                             
                         <div class="form-group">
                             <label><?php echo $_LANG['KEYWORDS']; ?></label>
-                            <textarea class="form-control" name="meta_keys" rows="2"><?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'meta_keys', ''));?></textarea>
+                            <textarea class="form-control" name="meta_keys" rows="4"><?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'meta_keys', ''));?></textarea>
                             <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
                         </div>
                             
                         <div class="form-group">
                             <label><?php echo $_LANG['DESCRIPTION']; ?></label>
-                            <textarea class="form-control" name="meta_desc" rows="4"><?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'meta_desc', ''));?></textarea>
+                            <textarea class="form-control" name="meta_desc" rows="6"><?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'meta_desc', ''));?></textarea>
                             <div class="help-block"><?php echo $_LANG['AD_LESS_THAN']; ?></div>
                         </div>
                     </div>

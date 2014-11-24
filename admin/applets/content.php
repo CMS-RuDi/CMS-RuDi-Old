@@ -470,7 +470,7 @@ function applet_content() {
                         <div class="form-group">
                             <label><?php echo $_LANG['AD_ARTICLE_URL']; ?></label>
                             <input type="text" class="form-control" name="url" value="<?php echo $mod['url']; ?>" />
-                            <div class="help-block"><?php echo $_LANG['AD_IF_UNKNOWN']; ?></div>
+                            <div class="help-block"><?php echo $_LANG['AD_IF_UNKNOWN_PAGETITLE']; ?></div>
                         </div>
                             
                         <div class="form-group">
@@ -511,13 +511,13 @@ function applet_content() {
                             
                         <div class="form-group">
                             <label><?php echo $_LANG['KEYWORDS']; ?></label>
-                            <textarea class="form-control" name="meta_keys" rows="2"><?php echo htmlspecialchars($mod['meta_keys']);?></textarea>
+                            <textarea class="form-control" name="meta_keys" rows="4"><?php echo htmlspecialchars($mod['meta_keys']);?></textarea>
                             <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
                         </div>
                             
                         <div class="form-group">
                             <label><?php echo $_LANG['DESCRIPTION']; ?></label>
-                            <textarea class="form-control" name="meta_desc" rows="4"><?php echo htmlspecialchars($mod['meta_desc']);?></textarea>
+                            <textarea class="form-control" name="meta_desc" rows="6"><?php echo htmlspecialchars($mod['meta_desc']);?></textarea>
                             <div class="help-block"><?php echo $_LANG['AD_LESS_THAN']; ?></div>
                         </div>
                             

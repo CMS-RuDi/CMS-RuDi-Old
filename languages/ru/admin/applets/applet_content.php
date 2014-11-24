@@ -23,7 +23,6 @@ $_LANG['AD_ARTICLE_URL']          = 'URL страницы';
 $_LANG['AD_ARTICLE_AUTHOR']       = 'Автор статьи';
 $_LANG['AD_ARTICLE_TIME']         = 'Срок показа статьи';
 $_LANG['AD_ARTICLE_NAME']         = 'Название статьи';
-
 $_LANG['AD_PUBLIC_DATE']          = 'Дата публикации';
 $_LANG['AD_VIEW_DATE_AND_AUTHOR'] = 'Показывать дату и автора';
 $_LANG['AD_ARTICLE_TEMPLATE']     = 'Шаблон статьи';
@@ -51,10 +50,7 @@ $_LANG['AD_UNLIMITED']            = 'Не ограничен';
 $_LANG['AD_TO_FINAL_TIME']        = 'По дату окончания';
 $_LANG['AD_FINAL_TIME']           = 'Дата окончания';
 $_LANG['AD_CALENDAR_FORMAT']      = 'В формате ДД.ММ.ГГГГ';
-$_LANG['AD_IF_UNKNOWN']           = 'Если не указан, будет совпадать с названием';
 $_LANG['AD_IF_NOTED']             = 'Если отмечено, материал виден всем посетителям. Снимите галочку, чтобы вручную выбрать разрешенные группы пользователей.';
 $_LANG['AD_CREATE_CONTENT']       = 'Создать материал';
 $_LANG['AD_SAVE_CONTENT']         = 'Сохранить материал';
 $_LANG['AD_RESTRICTIONS']         = 'Ограничения';
-
-?>

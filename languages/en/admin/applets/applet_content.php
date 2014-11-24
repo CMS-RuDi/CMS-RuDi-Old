@@ -36,7 +36,6 @@ $_LANG['AD_PATHWAY_NAME_ONLY']    = 'Depth gauge: Name only';
 $_LANG['AD_PATHWAY_FULL']         = 'Depth gauge: Full path';
 $_LANG['AD_PHOTO']                = 'Picture';
 $_LANG['AD_PHOTO_REMOVE']         = 'Delete picture';
-$_LANG['AD_IF_UNKNOWN']           = 'If it is not indicated, it is generated from the title';
 $_LANG['AD_PUBLIC_PARAMETRS']     = 'Publication parameters';
 $_LANG['AD_VIEW_NEW_ARTICLES']    = 'Show in "new articles"';
 $_LANG['AD_ENABLE_COMMENTS']      = 'Enable comments';

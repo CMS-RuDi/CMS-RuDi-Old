@@ -126,6 +126,7 @@
                             <a class="blog_user" href="{profile_url login=$post.login}">{$post.author}</a>
                             <span class="blog_entry_date">{if !$post.published}<span style="color:#CC0000">{$LANG.ON_MODERATE}</span>{else}{$post.fpubdate}{/if}</span>
                             <span class="post_karma">{$post.rating|rating}</span>
+                            <span class="post_hits">{$post.hits}</span>
                             {if ($post.comments_count > 0)}
                                 <a class="blog_comments_link" href="{$post.url}#c">{$post.comments_count|spellcount:$LANG.COMMENT:$LANG.COMMENT2:$LANG.COMMENT10}</a>
                             {else}

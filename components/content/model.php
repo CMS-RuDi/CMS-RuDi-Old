@@ -11,8 +11,6 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
-
 class cms_model_content {
     public $config;
     
@@ -39,6 +37,7 @@ class cms_model_content {
             'img_big_w' => 200,
             'img_sqr' => 1,
             'img_users' => 1,
+            'hide_root' => 0,
             'watermark' => 1,
             'pagetitle' => '',
             'meta_keys' => '',

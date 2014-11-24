@@ -13,7 +13,7 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function blogs(){
+function blogs() {
     $inCore = cmsCore::getInstance();
     
     cmsCore::c('blog')->owner = 'user';
@@ -734,6 +734,11 @@ function blogs(){
         $post['tags'] = cmsTagBar('blogpost', $post['id']);
 
         $is_author = (cmsCore::c('user')->id && cmsCore::c('user')->id == $post['user_id']);
+        
+        // увеличиваем кол-во просмотров
+        if (!$is_author) {
+            cmsCore::c('db')->setFlag('cms_blog_posts', $post['id'], 'hits', $post['hits']+1);
+        }
 
         cmsPage::initTemplate('components', 'com_blog_view_post')->
             assign('post', $post)->

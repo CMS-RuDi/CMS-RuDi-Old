@@ -14,7 +14,6 @@
 $_LANG['AD_ALBUMS']                 = 'Photo Albums';
 $_LANG['AD_ALBUM']                  = 'Album';
 $_LANG['AD_SHOW_LINKS_ORIGINAL']    = 'Show links to the original';
-$_LANG['AD_RETAIN_BOOT']            = 'Retain the original during booting<br />of members photo';
 $_LANG['AD_NUMBER_COLUMS']          = 'Number of columns for<br />a list of albums';
 $_LANG['AD_ALBUM_SORT']             = 'Sort album list';
 $_LANG['AD_SHOW_LINKS_LATEST']      = 'Show links to the latest and best photos';

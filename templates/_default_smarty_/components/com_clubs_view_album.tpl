@@ -13,8 +13,8 @@
             {if $col==1} <tr> {/if}
             <td align="center" valign="middle" width="{math equation="100/x" x=$cfg.photo_maxcols}%">
                 <div class="photo_thumb" align="center">
-                    <a class="lightbox-enabled" rel="lightbox-galery" href="/images/photos/medium/{$con.file}" title="{$con.title|escape:'html'}">
-                        <img class="photo_thumb_img" src="/images/photos/small/{$con.file}" alt="{$con.title|escape:'html'}" border="0" />
+                    <a href="/images/photos/medium/{$con.file}" title="{$con.title|escape:'html'}">
+                        <img class="photo_thumb_img" src="/images/photos/small/{$con.file}" alt="{$con.title|escape:'html'}" />
                     </a><br />
                     <a href="/clubs/photo{$con.id}.html" title="{$con.title|escape:'html'}">{$con.title|truncate:18}</a>
                     {if !$con.published}
@@ -24,12 +24,12 @@
             </td>
         {if $col==$cfg.photo_maxcols} </tr> {assign var="col" value="1"} {else} {math equation="x + 1" x=$col assign="col"} {/if}
         {/foreach}
-        {if $col>1} 
+        {if $col>1}
             <td colspan="{math equation="x - y + 1" x=$col y=$cfg.photo_maxcols}">&nbsp;</td></tr>
         {/if}
    </table>
 </div>
 {$pagebar}
 {else}
-<p>{$LANG.NOT_PHOTOS_IN_ALBUM}</p>    
+<p>{$LANG.NOT_PHOTOS_IN_ALBUM}</p>
 {/if}

@@ -12,16 +12,22 @@
       <td width="150px" valign="middle" align="center">
       <?php if ($photo['previd']) { ?>
         <cite><?php echo $_LANG['PREVIOUS']; ?></cite><br>
-        <a href="/clubs/photo<?php echo $photo['previd']['id']; ?>.html#main"><img border="0" alt="{$photo.previd.title|escape:'html'}" src="/images/photos/small/<?php echo $photo['previd']['file']; ?>"></a>
+        <a href="/clubs/photo<?php echo $photo['previd']['id']; ?>.html#main"><img alt="{$photo.previd.title|escape:'html'}" src="/images/photos/small/<?php echo $photo['previd']['file']; ?>"></a>
       <?php } ?>
       </td>
       <td align="center" valign="top">
-      	<img src="/images/photos/medium/<?php echo $photo['file']; ?>" border="0" alt="<?php echo $this->escape($photo['title']); ?>" id="view_photo" />
+      	<?php if ($is_exists_original) { ?>
+            <a href="/images/photos/<?php echo $photo['file']; ?>" class="photobox">
+                <img src="/images/photos/medium/<?php echo $photo['file']; ?>" alt="<?php echo $this->escape($photo['title']); ?>" id="view_photo" />
+            </a>
+        <?php } else { ?>
+            <img src="/images/photos/medium/<?php echo $photo['file']; ?>" alt="<?php echo $this->escape($photo['title']); ?>" id="view_photo" />
+        <?php } ?>
       </td>
       <td width="150px" valign="middle" align="center">
       <?php if ($photo['nextid']) { ?>
       	<cite><?php echo $_LANG['NEXT']; ?></cite><br>
-        <a href="/clubs/photo<?php echo $photo['nextid']['id']; ?>.html#main"><img border="0" alt="{$photo.nextid.title|escape:'html'}" src="/images/photos/small/<?php echo $photo['nextid']['file']; ?>"></a>
+        <a href="/clubs/photo<?php echo $photo['nextid']['id']; ?>.html#main"><img alt="{$photo.nextid.title|escape:'html'}" src="/images/photos/small/<?php echo $photo['nextid']['file']; ?>"></a>
       <?php } ?>
       </td>
     </tr>

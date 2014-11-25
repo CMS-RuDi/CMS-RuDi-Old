@@ -1,7 +1,6 @@
 <?php
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -9,7 +8,6 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 function cpPriceInput($item) {
@@ -252,6 +250,9 @@ if ($opt == 'submit_cat' || $opt == 'update_cat') {
     $cat['is_public']      = cmsCore::request('is_public', 'int', 0);
     $cat['can_edit']       = cmsCore::request('can_edit', 'int', 0);
     $cat['cost']           = cmsCore::request('cost', 'str', '');
+    $cat['pagetitle']      = cmsCore::request('pagetitle', 'str', '');
+    $cat['meta_desc']      = cmsCore::request('meta_desc', 'str', '');
+    $cat['meta_keys']      = cmsCore::request('meta_keys', 'str', '');
     if (!is_numeric($cat['cost'])) { $cat['cost'] = ''; }
 
     if (cmsCore::request('copy_parent_struct')) {
@@ -556,6 +557,7 @@ if ($opt == 'add_cat' || $opt == 'edit_cat') {
                         <li><a href="#tab_publish"><?php echo $_LANG['AD_TAB_PUBLISH']; ?></a></li>
                         <li><a href="#tab_items"><?php echo $_LANG['AD_ITEMS']; ?></a></li>
                         <li><a href="#tab_access"><?php echo $_LANG['AD_TAB_ACCESS']; ?></a></li>
+                        <li><a href="#tab_seo">SEO</a></li>
                     </ul>
                     
                     <div id="tab_publish">
@@ -738,6 +740,26 @@ if ($opt == 'add_cat' || $opt == 'edit_cat') {
                             <div class="help-block"><?php echo $_LANG['AD_IF_ALLOW_EDIT'];?></div>
                         </div>
                     </div>
+                    
+                    <div id="tab_seo">
+                        <div class="form-group">
+                            <label><?php echo $_LANG['AD_PAGE_TITLE']; ?></label>
+                            <input type="text" id="pagetitle" class="form-control" name="pagetitle" value="<?php echo htmlspecialchars(@$mod['pagetitle']); ?>" />
+                            <div class="help-block"><?php echo $_LANG['AD_IF_UNKNOWN_PAGETITLE'];?></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><?php echo $_LANG['KEYWORDS']; ?></label>
+                            <textarea id="meta_keys" class="form-control" name="meta_keys" rows="4"><?php echo htmlspecialchars(@$mod['meta_keys']);?></textarea>
+                            <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA'];?></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><?php echo $_LANG['DESCRIPTION']; ?></label>
+                            <textarea id="meta_desc" class="form-control" name="meta_desc" rows="4"><?php echo htmlspecialchars(@$mod['meta_desc']);?></textarea>
+                            <div class="help-block"><?php echo $_LANG['AD_LESS_THAN'];?></div>
+                        </div>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -856,6 +878,8 @@ if ($opt == 'saveconfig') {
     $cfg['watermark']   = cmsCore::request('watermark', 'int', 1);
     $cfg['small_size']  = cmsCore::request('small_size', 'int', 100);
     $cfg['medium_size'] = cmsCore::request('medium_size', 'int', 250);
+    $cfg['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
+    $cfg['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
 
     $inCore->saveComponentConfig('catalog', $cfg);
 
@@ -947,6 +971,18 @@ if ($opt == 'config') {
         <div class="form-group">
             <label><?php echo $_LANG['AD_SMALL_SIZE']; ?></label>
             <input type="number" class="form-control" name="small_size" value="<?php echo cmsCore::getArrVal($cfg, 'small_size', ''); ?>"/>
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['AD_ROOT_METAKEYS']; ?></label>
+            <textarea class="form-control" name="meta_keys" rows="2"><?php echo cmsCore::getArrVal($cfg, 'meta_keys', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+        </div>
+        
+        <div class="form-group">
+            <label><?php echo $_LANG['AD_ROOT_METADESC']; ?></label>
+            <textarea class="form-control" name="meta_desc" rows="4"><?php echo cmsCore::getArrVal($cfg, 'meta_desc', ''); ?></textarea>
+            <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
         </div>
         
         <div class="form-group">
@@ -1181,7 +1217,5 @@ if ($opt == 'import_xls') {
                 }
             echo '</div>';
         }
-
     }
-
 }

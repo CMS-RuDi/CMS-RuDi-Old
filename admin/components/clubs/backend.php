@@ -38,32 +38,36 @@ $toolmenu[] = array( 'icon' => 'config.gif', 'title' => $_LANG['AD_SETTINGS'], '
 if ($opt == 'saveconfig') {
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
-    $cfg = array();
-    $cfg['seo_club']           = cmsCore::request('seo_club', 'str');
-    $cfg['enabled_blogs']      = cmsCore::request('enabled_blogs', 'str');
-    $cfg['enabled_photos']     = cmsCore::request('enabled_photos', 'str');
-    $cfg['thumb1']             = cmsCore::request('thumb1', 'int');
-    $cfg['thumb2']             = cmsCore::request('thumb2', 'int');
-    $cfg['thumbsqr']           = cmsCore::request('thumbsqr', 'int');
-    $cfg['cancreate']          = cmsCore::request('cancreate', 'int');
-    $cfg['perpage']            = cmsCore::request('perpage', 'int');
-    $cfg['member_perpage']     = cmsCore::request('member_perpage', 'int');
-    $cfg['club_perpage']       = cmsCore::request('club_perpage', 'int');
-    $cfg['wall_perpage']       = cmsCore::request('wall_perpage', 'int');
-    $cfg['club_album_perpage'] = cmsCore::request('club_album_perpage', 'int');
-    $cfg['posts_perpage']      = cmsCore::request('posts_perpage', 'int');
-    $cfg['club_posts_perpage'] = cmsCore::request('club_posts_perpage', 'int');
-    $cfg['photo_perpage']      = cmsCore::request('photo_perpage', 'int');
-    $cfg['create_min_karma']   = cmsCore::request('create_min_karma', 'int');
-    $cfg['create_min_rating']  = cmsCore::request('create_min_rating', 'int');
-    $cfg['notify_in']          = cmsCore::request('notify_in', 'int');
-    $cfg['notify_out']         = cmsCore::request('notify_out', 'int');
-    $cfg['every_karma']        = cmsCore::request('every_karma', 'int', 100);
-    $cfg['photo_watermark']    = cmsCore::request('photo_watermark', 'int', 0);
-    $cfg['photo_thumb_small']  = cmsCore::request('photo_thumb_small', 'int', 96);
-    $cfg['photo_thumbsqr']     = cmsCore::request('photo_thumbsqr', 'int', 0);
-    $cfg['photo_thumb_medium'] = cmsCore::request('photo_thumb_medium', 'int', 450);
-    $cfg['photo_maxcols']      = cmsCore::request('photo_maxcols', 'int', 4);
+    $cfg = array(
+        'enabled_blogs'      => cmsCore::request('enabled_blogs', 'str'),
+        'enabled_photos'     => cmsCore::request('enabled_photos', 'str'),
+        'thumb1'             => cmsCore::request('thumb1', 'int'),
+        'thumb2'             => cmsCore::request('thumb2', 'int'),
+        'thumbsqr'           => cmsCore::request('thumbsqr', 'int'),
+        'cancreate'          => cmsCore::request('cancreate', 'int'),
+        'perpage'            => cmsCore::request('perpage', 'int'),
+        'member_perpage'     => cmsCore::request('member_perpage', 'int'),
+        'club_perpage'       => cmsCore::request('club_perpage', 'int'),
+        'wall_perpage'       => cmsCore::request('wall_perpage', 'int'),
+        'club_album_perpage' => cmsCore::request('club_album_perpage', 'int'),
+        'posts_perpage'      => cmsCore::request('posts_perpage', 'int'),
+        'club_posts_perpage' => cmsCore::request('club_posts_perpage', 'int'),
+        'photo_perpage'      => cmsCore::request('photo_perpage', 'int'),
+        'create_min_karma'   => cmsCore::request('create_min_karma', 'int'),
+        'create_min_rating'  => cmsCore::request('create_min_rating', 'int'),
+        'notify_in'          => cmsCore::request('notify_in', 'int'),
+        'notify_out'         => cmsCore::request('notify_out', 'int'),
+        'every_karma'        => cmsCore::request('every_karma', 'int', 100),
+        'photo_watermark'    => cmsCore::request('photo_watermark', 'int', 0),
+        'photo_thumb_small'  => cmsCore::request('photo_thumb_small', 'int', 96),
+        'photo_thumbsqr'     => cmsCore::request('photo_thumbsqr', 'int', 0),
+        'photo_thumb_medium' => cmsCore::request('photo_thumb_medium', 'int', 450),
+        'photo_maxcols'      => cmsCore::request('photo_maxcols', 'int', 4),
+        'meta_keys'          => cmsCore::request('meta_keys', 'str', ''),
+        'meta_desc'          => cmsCore::request('meta_desc', 'str', ''),
+        'seo_user_access'    => cmsCore::request('seo_user_access', 'int', 0),
+        'is_saveorig'        => cmsCore::request('is_saveorig', 'int', 0)
+    );
 
     $inCore->saveComponentConfig('clubs', $cfg);
 
@@ -376,21 +380,10 @@ if ($opt == 'config') {
             <li><a href="#limits"><span><?php echo $_LANG['AD_LISTS_LIMIT']; ?></span></a></li>
             <li><a href="#photos"><span><?php echo $_LANG['AD_FOTO']; ?></span></a></li>
             <li><a href="#restrict"><span><?php echo $_LANG['LIMITS']; ?></span></a></li>
+            <li><a href="#tab_seo"><span><?php echo $_LANG['AD_SEO']; ?></span></a></li>
         </ul>
 
         <div id="basic">
-            <div class="form-group">
-                <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SEO_FOR_CLUB'];?></label>
-                <div class="col-sm-7">
-                    <select class="form-control" name="seo_club">
-                        <option value="deskr" <?php if ($cfg['seo_club'] == 'deskr') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_SEO_FOR_CLUB_DESCR']; ?></option>
-                        <option value="title" <?php if ($cfg['seo_club'] == 'title') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_SEO_FOR_CLUB_TITLE']; ?></option>
-                        <option value="def" <?php if ($cfg['seo_club'] == 'def') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_SEO_FOR_CLUB_DEFAULT']; ?></option>
-                    </select>
-                    <div class="help-block"><?php echo $_LANG['AD_SEO_FOR_CLUB_HINT']; ?></div>
-                </div>
-            </div>
-            
             <div class="form-group">
                 <label class="col-sm-5 control-label"><?php echo $_LANG['CLUB_BLOG'];?></label>
                 <div class="col-sm-7 btn-group" data-toggle="buttons">
@@ -544,6 +537,18 @@ if ($opt == 'config') {
             </div>
             
             <div class="form-group">
+                <label class="col-sm-5 control-label"><?php echo $_LANG['AD_RETAIN_BOOT'];?></label>
+                <div class="col-sm-7 btn-group" data-toggle="buttons">
+                    <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'is_saveorig', false)) { echo 'active'; } ?>">
+                        <input type="radio" name="is_saveorig" <?php if(cmsCore::getArrVal($cfg, 'is_saveorig', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
+                    </label>
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'is_saveorig', false)) { echo 'active'; } ?>">
+                        <input type="radio" name="is_saveorig" <?php if (!cmsCore::getArrVal($cfg, 'is_saveorig', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
                 <label class="col-sm-5 control-label"><?php echo $_LANG['AD_PHOTO_SMALL_WIDTH'];?> (<?php echo $_LANG['AD_PX']; ?>)</label>
                 <div class="col-sm-7">
                     <input type="number" class="form-control" name="photo_thumb_small" min="0" value="<?php echo $cfg['photo_thumb_small']; ?>">
@@ -583,7 +588,7 @@ if ($opt == 'config') {
                         <input type="radio" name="cancreate" <?php if(cmsCore::getArrVal($cfg, 'cancreate', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
                     </label>
                     <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'cancreate', false)) { echo 'active'; } ?>">
-                        <input type="radio" name="cancreate" <?php if (!cmsCore::getArrVal($cfg, 'photo_watermark', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        <input type="radio" name="cancreate" <?php if (!cmsCore::getArrVal($cfg, 'cancreate', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
                     </label>
                     <div style="clear:both;"></div>
                     <div class="help-block"><?php echo $_LANG['AD_CANCREATE_HINT']; ?></div>
@@ -611,6 +616,36 @@ if ($opt == 'config') {
                 <div class="col-sm-7">
                     <input type="number" class="form-control" name="create_min_rating" min="0" value="<?php echo $cfg['create_min_rating']; ?>" />
                     <div class="help-block"><?php echo $_LANG['AD_CREATE_MIN_RATING_HINT']; ?></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab_seo">
+            <div class="form-group">
+                <label class="col-sm-5 control-label"><?php echo $_LANG['AD_ROOT_METAKEYS'];?></label>
+                <div class="col-sm-7">
+                    <textarea class="form-control" name="meta_keys" rows="2"><?php echo $cfg['meta_keys'] ?></textarea>
+                    <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-sm-5 control-label"><?php echo $_LANG['AD_ROOT_METADESC'];?></label>
+                <div class="col-sm-7">
+                    <textarea class="form-control" name="meta_desc" rows="2"><?php echo $cfg['meta_desc'] ?></textarea>
+                    <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-sm-5 control-label"><?php echo $_LANG['AD_USER_SEO_ACCESS'];?></label>
+                <div class="col-sm-7 btn-group" data-toggle="buttons">
+                    <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'active'; } ?>">
+                        <input type="radio" name="seo_user_access" <?php if(cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'checked="checked"'; } ?> value="1"> <?php echo $_LANG['YES']; ?>
+                    </label>
+                    <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'active'; } ?>">
+                        <input type="radio" name="seo_user_access" <?php if (!cmsCore::getArrVal($cfg, 'seo_user_access', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                    </label>
                 </div>
             </div>
         </div>

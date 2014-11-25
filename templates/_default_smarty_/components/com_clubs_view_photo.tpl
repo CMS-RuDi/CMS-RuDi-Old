@@ -12,11 +12,17 @@
       <td width="150px" valign="middle" align="center">
       {if $photo.previd}
         <cite>{$LANG.PREVIOUS}</cite><br>
-        <a href="/clubs/photo{$photo.previd.id}.html#main"><img border="0" alt="{$photo.previd.title|escape:'html'}" src="/images/photos/small/{$photo.previd.file}"></a>
+        <a href="/clubs/photo{$photo.previd.id}.html#main"><img alt="{$photo.previd.title|escape:'html'}" src="/images/photos/small/{$photo.previd.file}"></a>
       {/if}
       </td>
       <td align="center" valign="top">
-      	<img src="/images/photos/medium/{$photo.file}" border="0" alt="{$photo.title|escape:'html'}" id="view_photo" />
+      	{if $is_exists_original}
+            <a href="/images/photos/{$photo.file}" class="photobox">
+                <img src="/images/photos/medium/{$photo.file}" alt="{$photo.title|escape:'html'}" id="view_photo" />
+            </a>
+        {else}
+            <img src="/images/photos/medium/{$photo.file}" alt="{$photo.title|escape:'html'}" id="view_photo" />
+        {/if}
       </td>
       <td width="150px" valign="middle" align="center">
       {if $photo.nextid}

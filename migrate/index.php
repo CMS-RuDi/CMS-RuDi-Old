@@ -91,7 +91,15 @@
             
             array( 'table' => 'cms_blog_posts', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
             array( 'table' => 'cms_blog_posts', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
-            array( 'table' => 'cms_blog_posts', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
+            array( 'table' => 'cms_blog_posts', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_uc_cats', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_uc_cats', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_uc_cats', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            
+            array( 'table' => 'cms_clubs', 'name' => 'pagetitle', 'type' => 'VARCHAR(200)', 'default' => "''" ),
+            array( 'table' => 'cms_clubs', 'name' => 'meta_keys', 'type' => 'VARCHAR(250)', 'default' => "''" ),
+            array( 'table' => 'cms_clubs', 'name' => 'meta_desc', 'type' => 'VARCHAR(250)', 'default' => "''" )
         ),
 
         'change_fields' => array(

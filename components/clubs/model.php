@@ -13,62 +13,56 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-class cms_model_clubs{
+class cms_model_clubs {
+    private $club_members_ids;
+    public $club_total_members = 1;
+    public $last_message = '';
+    private $clubs = array();
 
-	private $club_members_ids;
-	public $club_total_members = 1;
-	public $last_message = '';
-	private $clubs = array();
+    public function __construct() {
+        $this->inDB   = cmsDatabase::getInstance();
+        $this->config = cmsCore::getInstance()->loadComponentConfig('clubs');
+        cmsCore::loadLanguage('components/clubs');
+        cmsCore::loadLib('karma');
+    }
 
-	public function __construct(){
-            $this->inDB   = cmsDatabase::getInstance();
-            $this->config = cmsCore::getInstance()->loadComponentConfig('clubs');
-            cmsCore::loadLanguage('components/clubs');
-            cmsCore::loadLib('karma');
-        }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
     /**
      * Настройки по умолчанию для компонента
      * @return array
      */
     public static function getDefaultConfig() {
-
-        $cfg = array (
-				  'seo_club' => 'title',
-				  'enabled_blogs' => 1,
-				  'enabled_photos' => 1,
-				  'thumb1' => 48,
-				  'thumb2' => 200,
-				  'thumbsqr' => 1,
-				  'cancreate' => 1,
-				  'perpage' => 10,
-				  'club_perpage' => 4,
-				  'member_perpage' => 10,
-				  'club_album_perpage' => 3,
-				  'club_posts_perpage' => 5,
-				  'posts_perpage' => 10,
-				  'photo_perpage' => 18,
-				  'wall_perpage' => 10,
-				  'photo_watermark' => 1,
-				  'photo_thumb_small' => 96,
-				  'photo_thumbsqr' => 1,
-				  'photo_thumb_medium' => 450,
-				  'photo_maxcols' => 6,
-				  'create_min_karma' => 0,
-				  'create_min_rating' => 0,
-				  'notify_in' => 1,
-				  'notify_out' => 1,
-				  'every_karma' => 100
-				);
-
-        return $cfg;
-
+        return array (
+            'enabled_blogs'      => 1,
+            'enabled_photos'     => 1,
+            'thumb1'             => 48,
+            'thumb2'             => 200,
+            'thumbsqr'           => 1,
+            'cancreate'          => 1,
+            'perpage'            => 10,
+            'club_perpage'       => 4,
+            'member_perpage'     => 10,
+            'club_album_perpage' => 3,
+            'club_posts_perpage' => 5,
+            'posts_perpage'      => 10,
+            'photo_perpage'      => 18,
+            'wall_perpage'       => 10,
+            'photo_watermark'    => 1,
+            'photo_thumb_small'  => 96,
+            'photo_thumbsqr'     => 1,
+            'photo_thumb_medium' => 450,
+            'photo_maxcols'      => 6,
+            'create_min_karma'   => 0,
+            'create_min_rating'  => 0,
+            'is_saveorig'        => 0,
+            'notify_in'          => 1,
+            'notify_out'         => 1,
+            'every_karma'        => 100,
+            'meta_keys'          => '',
+            'meta_desc'          => '',
+            'seo_user_access'    => 0
+        );
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
    //
    // этот метод вызывается компонентом comments при создании нового комментария
    // метод обновляет количество комментариев для поста и для блога в целом
@@ -82,10 +76,7 @@ class cms_model_clubs{
         return cmsBlogs::updateCommentsCount($target, $target_id);
 
     }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
+    
     public function getCommentTarget($target, $target_id) {
 
         $result = array();
@@ -685,22 +676,19 @@ class cms_model_clubs{
      * @return obj
      */
     public function initUploadClass() {
+        cmsCore::loadClass('upload_photo');
+        $inUploadPhoto = cmsUploadPhoto::getInstance();
+        // Выставляем конфигурационные параметры
+        $inUploadPhoto->upload_dir    = PATH.'/images/photos/';
+        $inUploadPhoto->small_size_w  = $this->config['photo_thumb_small'];
+        $inUploadPhoto->medium_size_w = $this->config['photo_thumb_medium'];
+        $inUploadPhoto->thumbsqr      = $this->config['photo_thumbsqr'];
+        $inUploadPhoto->is_watermark  = $this->config['photo_watermark'];
+        $inUploadPhoto->is_saveorig   = $this->config['is_saveorig'];
 
-		cmsCore::loadClass('upload_photo');
-		$inUploadPhoto = cmsUploadPhoto::getInstance();
-		// Выставляем конфигурационные параметры
-		$inUploadPhoto->upload_dir    = PATH.'/images/photos/';
-		$inUploadPhoto->small_size_w  = $this->config['photo_thumb_small'];
-		$inUploadPhoto->medium_size_w = $this->config['photo_thumb_medium'];
-		$inUploadPhoto->thumbsqr      = $this->config['photo_thumbsqr'];
-		$inUploadPhoto->is_watermark  = $this->config['photo_watermark'];
-
-		return $inUploadPhoto;
-
+        return $inUploadPhoto;
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
     /**
      * Сохраняет настройки клуба
      * @return bool

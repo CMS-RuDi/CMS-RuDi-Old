@@ -1,6 +1,5 @@
 <?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,7 +7,6 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
@@ -199,10 +197,15 @@ function subCatsList($parent_id=0, $left_key=0, $right_key=0){
     $cats = $model->getSubCats($parent_id, $left_key, $right_key);
 
     if ($cats){
-        $html = cmsPage::initTemplate('components', 'com_catalog_cats')->
-            assign('cfg', $inCore->loadComponentConfig('catalog'))->
-            assign('cats', $cats)->
-            fetch();
+
+        ob_start();
+
+        cmsPage::initTemplate('components', 'com_catalog_cats')->
+                assign('cfg', $inCore->loadComponentConfig('catalog'))->
+                assign('cats', $cats)->
+                display('com_catalog_cats.tpl');
+
+        $html = ob_get_clean();
     }
 
     return $html;
@@ -227,7 +230,9 @@ function catalog(){
 
 	$inPage->addPathway($pagetitle, '/catalog');
 	$inPage->setTitle($pagetitle);
-	$inPage->setDescription($pagetitle);
+
+	$inPage->setDescription($model->config['meta_desc'] ? $model->config['meta_desc'] : $pagetitle);
+    $inPage->setKeywords($model->config['meta_keys'] ? $model->config['meta_keys'] : $pagetitle);
 
     $cfg = $inCore->loadComponentConfig('catalog');
 
@@ -331,7 +336,7 @@ function catalog(){
                         assign('id', $id)->
                         assign('cat', $cat)->
                         assign('fstruct', $fstruct_ready)->
-                        display();
+                        display('com_catalog_search.tpl');
 
             } else { cmsCore::error404(); }
         }//search form
@@ -387,199 +392,216 @@ function catalog(){
                 assign('cfg', $cfg)->
                 assign('title', $pagetitle)->
                 assign('cats_html', $cats_html)->
-                display();
+                display('com_catalog_index.tpl');
 
     }
 
     //////////////////////////// VIEW CATEGORY ///////////////////////////////////////////////////////////////////////
     if ($do == 'cat'){
+
         //get category data
         $sql = "SELECT * FROM cms_uc_cats WHERE id = $id";
         $catres = $inDB->query($sql);
+        if (!$inDB->num_rows($catres)){ cmsCore::error404(); }
 
-        if ($inDB->num_rows($catres)>0){
+        $cat     = $inDB->fetch_assoc($catres);
+        $fstruct = cmsCore::yamlToArray($cat['fieldsstruct']);
 
-            $cat        = $inDB->fetch_assoc($catres);
-            $fstruct    = cmsCore::yamlToArray($cat['fieldsstruct']);
+        $inPage->addHead('<link rel="alternate" type="application/rss+xml" title="'.$_LANG['CATALOG'].'" href="'.HOST.'/rss/catalog/'.$cat['id'].'/feed.rss">');
 
-			$inPage->addHead('<link rel="alternate" type="application/rss+xml" title="'.$_LANG['CATALOG'].'" href="'.HOST.'/rss/catalog/'.$cat['id'].'/feed.rss">');
-
-            //heading
-            //PATHWAY ENTRY
-            $left_key   = $cat['NSLeft'];
-            $right_key  = $cat['NSRight'];
-
-            $path_list  = $model->getCategoryPath($left_key, $right_key);
-
-            if ($path_list){
-                foreach($path_list as $pcat){
-                    $inPage->addPathway($pcat['title'], '/catalog/'.$pcat['id']);
-                }
+        //heading
+        //PATHWAY ENTRY
+        $path_list = $model->getCategoryPath($cat['NSLeft'], $cat['NSRight']);
+        if ($path_list){
+            foreach($path_list as $pcat){
+                $inPage->addPathway($pcat['title'], '/catalog/'.$pcat['id']);
             }
+        }
+        $inPage->setTitle($cat['pagetitle'] ? $cat['pagetitle'] : $cat['title']);
 
-            $inPage->addPathway($cat['title'], '/catalog/'.$cat['id']);
-            $inPage->setTitle($cat['title']);
+        //subcategories
+        $subcats = subCatsList($cat['id'], $cat['NSLeft'], $cat['NSRight']);
 
-            //subcategories
-            $subcats = subCatsList($cat['id'], $cat['NSLeft'], $cat['NSRight']);
+        //alphabetic list
+        if ($cat['showabc']){ $alphabet = getAlphaList($cat['id']);	} else { $alphabet = ''; }
 
-            //alphabetic list
-            if ($cat['showabc']){ $alphabet = getAlphaList($cat['id']);	} else { $alphabet = ''; }
+        //Tool links
+        $shopcartlink = shopCartLink();
 
-            //Tool links
-            $shopcartlink = shopCartLink();
+        //get items SQL
+        if (!isset($findsql)){
+            $sql = "SELECT i.* , IFNULL(AVG( r.points ), 0) AS rating, i.price as price
+                    FROM cms_uc_items i
+                    LEFT JOIN cms_uc_ratings r ON r.item_id = i.id
+                    WHERE i.published = 1 AND i.category_id = $id
+                    GROUP BY i.id";
+        } else {
+            $sql = $findsql;
+            if (!$advsearch){ $inPage->addPathway(icms_ucfirst($query)); } else
+            { $inPage->addPathway($_LANG['SEARCH_RESULT']); }
+        }
 
-            //get items SQL
-            if (!isset($findsql)){
-                $sql = "SELECT i.* , IFNULL(AVG( r.points ), 0) AS rating, i.price as price
-                        FROM cms_uc_items i
-                        LEFT JOIN cms_uc_ratings r ON r.item_id = i.id
-                        WHERE i.published = 1 AND i.category_id = $id
-                        GROUP BY i.id";
+        // сортировка
+        if(cmsCore::inRequest('orderby')){
+            $orderby = cmsCore::request('orderby', array('hits','rating','pubdate','title','price'), $cat['orderby']);
+            cmsUser::sessionPut('uc_orderby', $orderby);
+        } elseif(cmsUser::sessionGet('uc_orderby')){
+            $orderby = cmsUser::sessionGet('uc_orderby');
+        } else {
+            $orderby = $cat['orderby'];
+        }
+        if(cmsCore::inRequest('orderto')){
+            $orderto = cmsCore::request('orderto', array('asc','desc'), $cat['orderto']);
+            cmsUser::sessionPut('uc_orderto', $orderto);
+        } elseif(cmsUser::sessionGet('uc_orderto')){
+            $orderto = cmsUser::sessionGet('uc_orderto');
+        } else {
+            $orderto = $cat['orderto'];
+        }
+
+        $sql .=  " ORDER BY ".$orderby." ".$orderto;
+
+        //get total items count
+        $result = $inDB->query($sql);
+        $itemscount = $inDB->num_rows($result);
+
+        if (!$itemscount){ cmsCore::error404(); }
+
+        //can user add items here?
+        $is_cat_access = $model->checkCategoryAccess($cat['id'], $cat['is_public'], $inUser->group_id);
+        $is_can_add = $is_cat_access || $inUser->is_admin;
+
+        $tpl = cmsPage::initTemplate('components', 'com_catalog_view')->
+                assign('id', $id)->
+                assign('cat', $cat)->
+                assign('subcats', $subcats)->
+                assign('alphabet', $alphabet)->
+                assign('shopcartlink', $shopcartlink)->
+                assign('itemscount', $itemscount)->
+                assign('is_can_add', $is_can_add)->
+                assign('orderform', orderForm($orderby, $orderto, ($cat['view_type']=='shop')));
+
+        //pagination
+        if (!@$advsearch) { $perpage = $cat['perpage']; } else { $perpage='100'; }
+        $page = $inCore->request('page', 'int', 1);
+
+        //request items using pagination
+        $sql .= " LIMIT ".(($page-1)*$perpage).", $perpage";
+        $result = $inDB->query($sql) ;
+
+        //search details, if needed
+        $search_details = '';
+        if (isset($findsql)){
+            if ($advsearch){
+                $search_details = '<div class="uc_queryform"><strong>'.$_LANG['SEARCH_RESULT'].' - </strong> '.$_LANG['FOUNDED'].': '.$itemscount.' | <a href="/catalog/'.$cat['id'].'">'.$_LANG['CANCEL_SEARCH'].'</a></div>';
             } else {
-                $sql = $findsql;
-                if (!$advsearch){ $inPage->addPathway(icms_ucfirst($query)); } else
-                { $inPage->addPathway($_LANG['SEARCH_RESULT']); }
+                $search_details = '<div class="uc_queryform"><strong>'.$_LANG['SEARCH_BY_TAG'].'</strong> "'.htmlspecialchars(icms_ucfirst(stripslashes($query))).'" ('.$_LANG['MATCHES'].': '.$itemscount.') <a href="/catalog/'.$cat['id'].'">'.$_LANG['CANCEL_SEARCH'].'</a></div>';
             }
+        }
 
-            // сортировка
-            if(cmsCore::inRequest('orderby')){
-                $orderby = cmsCore::request('orderby', array('hits','rating','pubdate','title','price'), $cat['orderby']);
-                cmsUser::sessionPut('uc_orderby', $orderby);
-            } elseif(cmsUser::sessionGet('uc_orderby')){
-                $orderby = cmsUser::sessionGet('uc_orderby');
-            } else {
-                $orderby = $cat['orderby'];
-            }
-            if(cmsCore::inRequest('orderto')){
-                $orderto = cmsCore::request('orderto', array('asc','desc'), $cat['orderto']);
-                cmsUser::sessionPut('uc_orderto', $orderto);
-            } elseif(cmsUser::sessionGet('uc_orderto')){
-                $orderto = cmsUser::sessionGet('uc_orderto');
-            } else {
-                $orderto = $cat['orderto'];
-            }
+        $items = array();
+        while($item = $inDB->fetch_assoc($result)){
+            $item['ratingdata'] = ratingData($item['id']);
+            $item['fdata'] = cmsCore::yamlToArray($item['fieldsdata']);
+            $item['price'] = number_format(shopDiscountPrice($item['id'], $item['category_id'], $item['price']), 2, '.', ' ');
+            $item['rating'] = cms_model_catalog::buildRating($item['ratingdata']['rating']);
+            $item['is_new'] = isNew($item['id'], $cat['shownew'], $cat['newint']);
+            $item['tagline'] = tagLine($item['tags'], $cat['id']);
 
-            $sql .=  " ORDER BY ".$orderby." ".$orderto;
+            $item['can_edit'] = ($cat['can_edit'] && $is_cat_access && ($inUser->id == $item['user_id'])) || $inUser->is_admin;
 
-            //get total items count
-            $result = $inDB->query($sql);
-            $itemscount = $inDB->num_rows($result);
+            $item['fields'] = array();
 
-            //can user add items here?
-            $is_cat_access = $model->checkCategoryAccess($cat['id'], $cat['is_public'], $inUser->group_id);
-            $is_can_add = $is_cat_access || $inUser->is_admin;
+            if (sizeof($fstruct)>0){
+                $fields_show = 0;
+                foreach($fstruct as $key=>$value){
+                    if ($fields_show < $cat['fields_show']){
 
-            $tpl = cmsPage::initTemplate('components', 'com_catalog_view')->
-                    assign('id', $id)->
-                    assign('cat', $cat)->
-                    assign('subcats', $subcats)->
-                    assign('alphabet', $alphabet)->
-                    assign('shopcartlink', $shopcartlink)->
-                    assign('itemscount', $itemscount)->
-                    assign('is_can_add', $is_can_add)->
-                    assign('orderform', orderForm($orderby, $orderto, ($cat['view_type']=='shop')));
+                        if ($item['fdata'][$key]){
 
-            if ($itemscount>0){
-
-                //pagination
-                if (!@$advsearch) { $perpage = $cat['perpage']; } else { $perpage='100'; }
-                $page = $inCore->request('page', 'int', 1);
-
-                //request items using pagination
-                $sql .= " LIMIT ".(($page-1)*$perpage).", $perpage";
-                $result = $inDB->query($sql) ;
-
-                //search details, if needed
-                $search_details = '';
-                if (isset($findsql)){
-                    if ($advsearch){
-                        $search_details = '<div class="uc_queryform"><strong>'.$_LANG['SEARCH_RESULT'].' - </strong> '.$_LANG['FOUNDED'].': '.$itemscount.' | <a href="/catalog/'.$cat['id'].'">'.$_LANG['CANCEL_SEARCH'].'</a></div>';
-                    } else {
-                        $search_details = '<div class="uc_queryform"><strong>'.$_LANG['SEARCH_BY_TAG'].'</strong> "'.htmlspecialchars(icms_ucfirst(stripslashes($query))).'" ('.$_LANG['MATCHES'].': '.$itemscount.') <a href="/catalog/'.$cat['id'].'">'.$_LANG['CANCEL_SEARCH'].'</a></div>';
-                    }
-                }
-
-                $items = array();
-                while($item = $inDB->fetch_assoc($result)){
-                    $item['ratingdata'] = ratingData($item['id']);
-                    $item['fdata'] = cmsCore::yamlToArray($item['fieldsdata']);
-                    $item['price'] = number_format(shopDiscountPrice($item['id'], $item['category_id'], $item['price']), 2, '.', ' ');
-                    $item['rating'] = cms_model_catalog::buildRating($item['ratingdata']['rating']);
-                    $item['is_new'] = isNew($item['id'], $cat['shownew'], $cat['newint']);
-                    $item['tagline'] = tagLine($item['tags'], $cat['id']);
-
-                    $item['can_edit'] = ($cat['can_edit'] && $is_cat_access && ($inUser->id == $item['user_id'])) || $inUser->is_admin;
-
-                    $item['fields'] = array();
-
-                    if (sizeof($fstruct)>0){
-                        $fields_show = 0;
-                        foreach($fstruct as $key=>$value){
-                            if ($fields_show < $cat['fields_show']){
-
-                                if ($item['fdata'][$key]){
-
-                                    if (mb_strstr($value, '/~h~/')){ $value = str_replace('/~h~/', '', $value); $is_html = true; } else { $is_html = false; }
-                                    if (mb_strstr($value, '/~m~/')){
-                                        $value = str_replace('/~m~/', '', $value);
-                                        $makelink = true;
-                                    } else {$makelink = false; }
-                                    if (!$is_html){
-                                        if (mb_strstr($value, '/~l~/')){
-                                            if (@$item['fdata'][$key]!=''){
-                                                $field = '<a class="uc_fieldlink" href="/load/url=-'.base64_encode($item['fdata'][$key]).'" target="_blank">'.str_replace('/~l~/', '', $value).'</a> ('.$inCore->fileDownloadCount($item['fdata'][$key]).')';
-                                            }
-                                        } else {
-                                            if ($makelink){
-                                                $field = $model->getUCSearchLink($cat['id'], $item['fdata'][$key]);
-                                            } else {
-                                                $field = $item['fdata'][$key];
-                                            }
-                                        }
+                            if (mb_strstr($value, '/~h~/')){ $value = str_replace('/~h~/', '', $value); $is_html = true; } else { $is_html = false; }
+                            if (mb_strstr($value, '/~m~/')){
+                                $value = str_replace('/~m~/', '', $value);
+                                $makelink = true;
+                            } else {$makelink = false; }
+                            if (!$is_html){
+                                if (mb_strstr($value, '/~l~/')){
+                                    if (@$item['fdata'][$key]!=''){
+                                        $field = '<a class="uc_fieldlink" href="/load/url=-'.base64_encode($item['fdata'][$key]).'" target="_blank">'.str_replace('/~l~/', '', $value).'</a> ('.$inCore->fileDownloadCount($item['fdata'][$key]).')';
+                                    }
+                                } else {
+                                    if ($makelink){
+                                        $field = $model->getUCSearchLink($cat['id'], $item['fdata'][$key]);
                                     } else {
                                         $field = $item['fdata'][$key];
                                     }
-
-                                    if (isset($query)) { if (mb_stristr($field, $query)) { $field .= '<span class="uc_findsame"> &larr; <i>'.$_LANG['MATCHE'].'</i></span>';} }
-                                    $fields_show++;
-
-                                    $item['fields'][stripslashes($value)] = stripslashes($field);
-
                                 }
+                            } else {
+                                $field = $item['fdata'][$key];
+                            }
 
-                            } else { break; }
+                            if (isset($query)) { if (mb_stristr($field, $query)) { $field .= '<span class="uc_findsame"> &larr; <i>'.$_LANG['MATCHE'].'</i></span>';} }
+                            $fields_show++;
+
+                            $item['fields'][stripslashes($value)] = stripslashes($field);
+
                         }
-                    }
 
-                    $items[] = $item;
+                    } else { break; }
                 }
-
-                if (!@$pagemode){
-                    $pagebar = cmsPage::getPagebar($itemscount, $page, $perpage, '/catalog/'.$id.'-%page%');
-                } else {
-
-                    if ($pagemode=='findfirst'){
-                        $pagebar = cmsPage::getPagebar($itemscount, $page, $perpage, '/catalog/'.$id.'-%page%/find-first/'.urlencode(urlencode($query)));
-                    }
-
-                    if ($pagemode=='find'){
-                        $pagebar = cmsPage::getPagebar($itemscount, $page, $perpage, '/catalog/'.$id.'-%page%/find/'.urlencode(urlencode($query)));
-                    }
-
-                }
-
-                $tpl->assign('cfg', $cfg)->
-                      assign('page', $page)->
-                      assign('search_details', $search_details)->
-                      assign('fstruct', $fstruct)->
-                      assign('items', $items)->
-                      assign('pagebar', $pagebar);
             }
 
-            $tpl->display();
+            $items[] = $item;
+        }
 
-        } else { cmsCore::error404(); }
+        if (!@$pagemode){
+            $pagebar = cmsPage::getPagebar($itemscount, $page, $perpage, '/catalog/'.$id.'-%page%');
+        } else {
+
+            if ($pagemode=='findfirst'){
+                $pagebar = cmsPage::getPagebar($itemscount, $page, $perpage, '/catalog/'.$id.'-%page%/find-first/'.urlencode(urlencode($query)));
+            }
+
+            if ($pagemode=='find'){
+                $pagebar = cmsPage::getPagebar($itemscount, $page, $perpage, '/catalog/'.$id.'-%page%/find/'.urlencode(urlencode($query)));
+            }
+
+        }
+
+        // SEO
+        if($cat['NSLevel'] > 0){
+
+            // meta description
+            if($cat['meta_desc']){
+                $meta_desc = $cat['meta_desc'];
+            } elseif(mb_strlen(strip_tags($cat['description']))>=250){
+                $meta_desc = crop($cat['description']);
+            } else {
+                $meta_desc = $cat['title'];
+            }
+            $inPage->setDescription($meta_desc);
+            // meta keywords
+            if($cat['meta_keys']){
+                $meta_keys = $cat['meta_keys'];
+            } elseif($items){
+                foreach($items as $c){
+                    $k[] = $c['title'];
+                }
+                $meta_keys = implode(', ', $k);
+            } else {
+                $meta_keys = $cat['title'];
+            }
+            $inPage->setKeywords($meta_keys);
+
+        }
+
+        $tpl->assign('cfg', $cfg)->
+              assign('page', $page)->
+              assign('search_details', $search_details)->
+              assign('fstruct', $fstruct)->
+              assign('items', $items)->
+              assign('pagebar', $pagebar)->
+              display('com_catalog_view.tpl');
 
         return true;
 
@@ -587,132 +609,129 @@ function catalog(){
 
     //////////////////////////// VIEW ITEM DETAILS ///////////////////////////////////////////////////////////////////////
     if ($do == 'item'){
-        $id = $inCore->request('id', 'int');
+
+        $id  = $inCore->request('id', 'int');
         $sql = "SELECT * FROM cms_uc_items WHERE id = '$id'";
         $itemres = $inDB->query($sql) ;
 
-        if ($inDB->num_rows($itemres)>0){
-            $item = $inDB->fetch_assoc($itemres);
+        if (!$inDB->num_rows($itemres)){ cmsCore::error404(); }
 
-            if ((!$item['published'] || $item['on_moderate']) && !$inUser->is_admin){
-                cmsCore::error404();
+        $item = $inDB->fetch_assoc($itemres);
+
+        if ((!$item['published'] || $item['on_moderate']) && !$inUser->is_admin){
+            cmsCore::error404();
+        }
+
+        $fdata = cmsCore::yamlToArray($item['fieldsdata']);
+
+        if ($item['meta_keys']) { $inPage->setKeywords($item['meta_keys']); }
+        if ($item['meta_desc']) { $inPage->setDescription($item['meta_desc']); }
+
+        $ratingdata = ratingData($id);
+
+        $sql = "SELECT * FROM cms_uc_cats WHERE id = '{$item['category_id']}'";
+        $catres = $inDB->query($sql) ;
+        $cat = $inDB->fetch_assoc($catres);
+        $fstruct = cmsCore::yamlToArray($cat['fieldsstruct']);
+
+        $is_cat_access = $inUser->id ?
+                            $model->checkCategoryAccess($cat['id'], $cat['is_public'], $inUser->group_id) : false;
+        $item['can_edit'] = ($cat['can_edit'] && $is_cat_access && ($inUser->id == $item['user_id'])) || $inUser->is_admin;
+
+        //PATHWAY ENTRY
+        $path_list  = $model->getCategoryPath($cat['NSLeft'], $cat['NSRight']);
+
+        if ($path_list){
+            foreach($path_list as $pcat){
+                $inPage->addPathway($pcat['title'], '/catalog/'.$pcat['id']);
             }
+        }
+        $inPage->addPathway($item['title'], '/catalog/item'.$item['id'].'.html');
 
-            $fdata = cmsCore::yamlToArray($item['fieldsdata']);
-
-            if ($item['meta_keys']) { $inPage->setKeywords($item['meta_keys']); }
-            if ($item['meta_desc']) { $inPage->setDescription($item['meta_desc']); }
-
-            $ratingdata = ratingData($id);
-
-            $sql = "SELECT * FROM cms_uc_cats WHERE id = '{$item['category_id']}'";
-            $catres = $inDB->query($sql) ;
-            $cat = $inDB->fetch_assoc($catres);
-            $fstruct = cmsCore::yamlToArray($cat['fieldsstruct']);
-
-            $is_cat_access = $inUser->id ?
-                                $model->checkCategoryAccess($cat['id'], $cat['is_public'], $inUser->group_id) : false;
-            $item['can_edit'] = ($cat['can_edit'] && $is_cat_access && ($inUser->id == $item['user_id'])) || $inUser->is_admin;
-
-            //PATHWAY ENTRY
-            $left_key   = $cat['NSLeft'];
-            $right_key  = $cat['NSRight'];
-
-            $path_list  = $model->getCategoryPath($left_key, $right_key);
-
-            if ($path_list){
-                foreach($path_list as $pcat){
-                    $inPage->addPathway($pcat['title'], '/catalog/'.$pcat['id']);
-                }
-            }
-
-            $inPage->addPathway($item['title'], '/catalog/item'.$item['id'].'.html');
-            $inPage->setTitle($item['title']);
+        $inPage->setTitle($item['title']);
 
 
-            if ($cat['view_type']=='shop'){
+        if ($cat['view_type']=='shop'){
 
-				$shopCartLink=shopCartLink();
+            $shopCartLink=shopCartLink();
 
-            }
+        }
 
-            //update hits
-            $inDB->query("UPDATE cms_uc_items SET hits = hits + 1 WHERE id = '$id'") ;
+        //update hits
+        $inDB->query("UPDATE cms_uc_items SET hits = hits + 1 WHERE id = '$id'") ;
 
-            //print item details
-			$fields = array();
+        //print item details
+        $fields = array();
 
-            if (sizeof($fstruct)>0){
-                foreach($fstruct as $key=>$value){
-                    if (@$fdata[$key]){
-                        if (mb_strstr($value, '/~h~/')){
-                            $value = str_replace('/~h~/', '', $value);
-                            $htmlfield = true;
-                        }
-                        if (mb_strstr($value, '/~m~/')){
-                            $value = str_replace('/~m~/', '', $value);
-                            $makelink = true;
-                        } else {$makelink = false; }
-                        $field = (string)str_replace('<p>', '<p style="margin-top:0px; margin-bottom:5px">', $fdata[$key]);
-                        if (mb_strstr($value, '/~l~/')){
-                            $field = '<a class="uc_detaillink" href="/load/url=-'.base64_encode($field).'" target="_blank">'.str_replace('/~l~/', '', $value).'</a> ('.$inCore->fileDownloadCount($field).')';
+        if (sizeof($fstruct)>0){
+            foreach($fstruct as $key=>$value){
+                if (@$fdata[$key]){
+                    if (mb_strstr($value, '/~h~/')){
+                        $value = str_replace('/~h~/', '', $value);
+                        $htmlfield = true;
+                    }
+                    if (mb_strstr($value, '/~m~/')){
+                        $value = str_replace('/~m~/', '', $value);
+                        $makelink = true;
+                    } else {$makelink = false; }
+                    $field = (string)str_replace('<p>', '<p style="margin-top:0px; margin-bottom:5px">', $fdata[$key]);
+                    if (mb_strstr($value, '/~l~/')){
+                        $field = '<a class="uc_detaillink" href="/load/url=-'.base64_encode($field).'" target="_blank">'.str_replace('/~l~/', '', $value).'</a> ('.$inCore->fileDownloadCount($field).')';
 
-                        } else {
+                    } else {
 
-                            if (isset($htmlfield)) {
-                                if ($makelink) {
-                                     $field = $model->getUCSearchLink($cat['id'], $field);
-                                } else {
-                                    //PROCESS FILTERS, if neccessary
-                                    if ($cat['filters']){
-                                        $filters = $inCore->getFilters();
-                                        if ($filters){
-                                            foreach($filters as $id=>$_data){
-                                                require_once PATH.'/filters/'.$_data['link'].'/filter.php';
-                                                $_data['link']($field);
-                                            }
+                        if (isset($htmlfield)) {
+                            if ($makelink) {
+                                 $field = $model->getUCSearchLink($cat['id'], $field);
+                            } else {
+                                //PROCESS FILTERS, if neccessary
+                                if ($cat['filters']){
+                                    $filters = $inCore->getFilters();
+                                    if ($filters){
+                                        foreach($filters as $id=>$_data){
+                                            require_once PATH.'/filters/'.$_data['link'].'/filter.php';
+                                            $_data['link']($field);
                                         }
                                     }
-                                    $field =  stripslashes($field);
                                 }
-                            } else {
-                                if ($makelink) {
-                                     $field =  $model->getUCSearchLink($cat['id'], $field);
-                                }
+                                $field =  stripslashes($field);
                             }
-
+                        } else {
+                            if ($makelink) {
+                                 $field =  $model->getUCSearchLink($cat['id'], $field);
+                            }
                         }
-						$fields[stripslashes($value)] = stripslashes($field);
+
                     }
+                    $fields[stripslashes($value)] = stripslashes($field);
                 }
             }
-            if ($cat['view_type']=='shop'){
-                $item['price'] = number_format(shopDiscountPrice($item['id'], $item['category_id'], $item['price']), 2, '.', ' ');
-            }
+        }
+        if ($cat['view_type']=='shop'){
+            $item['price'] = number_format(shopDiscountPrice($item['id'], $item['category_id'], $item['price']), 2, '.', ' ');
+        }
 
-            $user = $inDB->get_fields('cms_users', "id='{$item['user_id']}'", 'login, nickname');
-            $getProfileLink = cmsUser::getProfileLink($user['login'], $user['nickname']);
+        $user = $inDB->get_fields('cms_users', "id='{$item['user_id']}'", 'login, nickname');
+        $getProfileLink = cmsUser::getProfileLink($user['login'], $user['nickname']);
 
-            if ($cat['is_ratings']){
-				$ratingForm = ratingForm($ratingdata, $item['id']);
-            }
+        if ($cat['is_ratings']){
+            $ratingForm = ratingForm($ratingdata, $item['id']);
+        }
 
-			cmsPage::initTemplate('components', 'com_catalog_item')->
-                    assign('shopCartLink', (isset($shopCartLink) ? $shopCartLink : ''))->
-                    assign('getProfileLink', $getProfileLink)->
-                    assign('tagline', tagLine($item['tags'], $cat['id']))->
-                    assign('item', $item)->
-                    assign('cat', $cat)->
-                    assign('fields', $fields)->
-                    assign('ratingForm', (isset($ratingForm) ? $ratingForm : ''))->
-                    display();
+        cmsPage::initTemplate('components', 'com_catalog_item')->
+                assign('shopCartLink', (isset($shopCartLink) ? $shopCartLink : ''))->
+                assign('getProfileLink', $getProfileLink)->
+                assign('tagline', tagLine($item['tags'], $cat['id']))->
+                assign('item', $item)->
+                assign('cat', $cat)->
+                assign('fields', $fields)->
+                assign('ratingForm', (isset($ratingForm) ? $ratingForm : ''))->
+                display('com_catalog_item.tpl');
 
-            if($item['is_comments'] && $inCore->isComponentInstalled('comments')){
-                cmsCore::includeComments();
-                comments('catalog', $item['id']);
-            }
-
-        } else { cmsCore::error404(); }
+        if($item['is_comments'] && $inCore->isComponentInstalled('comments')){
+            cmsCore::includeComments();
+            comments('catalog', $item['id']);
+        }
 
         return true;
     }
@@ -858,7 +877,7 @@ function catalog(){
                 assign('cfg', $cfg)->
                 assign('is_admin', $inUser->is_admin)->
                 assign('cat_id', $cat['id'])->
-                display();
+                display('com_catalog_add.tpl');
 
         return;
 
@@ -993,9 +1012,9 @@ function catalog(){
             $message = str_replace('%link%', $link, $message);
 
             cmsUser::sendMessage(USER_UPDATER, 1, $message);
-            
+
             cmsCore::addSessionMessage($_LANG['ITEM_PREMOD_NOTICE'], 'info');
-            
+
             cmsCore::redirect('/catalog/'.$item['category_id']);
 
         }
@@ -1064,4 +1083,3 @@ function catalog(){
     }
 
 }
-?>

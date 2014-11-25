@@ -18,9 +18,9 @@ class cmsPage {
     public $page_js    = array();
     public $page_css   = array();
     public $page_meta  = array();
-    
     public $page_keys  = '';
     public $page_desc  = '';
+    public $page_img   = '';
     public $page_body  = '';
 
     private $page_lang = array();
@@ -36,8 +36,10 @@ class cmsPage {
     private static $instance;
 
     private function __construct() {
-        $this->site_cfg = cmsConfig::getInstance();
-        $this->title    = $this->homeTitle();
+        $this->site_cfg  = cmsConfig::getInstance();
+        $this->title     = $this->homeTitle();
+        $this->page_keys = $this->site_cfg->keywords;
+        $this->page_desc = $this->site_cfg->metadesc;
         $this->setTplInfo();
     }
 
@@ -280,7 +282,7 @@ class cmsPage {
      * @param string
      * @return $this
      */
-    public function setTitle($title='') {
+    public function setTitle($title) {
         if (cmsCore::getInstance()->menuId() == 1 || empty($title)) {
             return $this;
         }
@@ -296,7 +298,12 @@ class cmsPage {
      * @return $this
      */
     public function setKeywords($keywords) {
+        if (cmsCore::getInstance()->menuId() == 1 || empty($keywords)) {
+            return $this;
+        }
+        
         $this->page_keys = trim(strip_tags($keywords));
+        
         return $this;
     }
     
@@ -306,7 +313,12 @@ class cmsPage {
      * @return $this
      */
     public function setDescription($text) {
+        if (cmsCore::getInstance()->menuId() == 1 || empty($text)) {
+            return $this;
+        }
+        
         $this->page_desc = trim(strip_tags($text));
+        
         return $this;
     }
     
@@ -375,15 +387,15 @@ class cmsPage {
         echo '<title>', htmlspecialchars($this->title), '</title>',"\n";
 
         //Ключевые слова
-        if (!$this->page_keys) { $this->page_keys = $this->site_cfg->keywords; }
         echo $indent_str,'<meta name="keywords" content="', htmlspecialchars($this->page_keys), '" />',"\n";
 
         //Описание
-        if (!$this->page_desc) { $this->page_desc = $this->site_cfg->metadesc; }
         echo $indent_str,'<meta name="description" content="',htmlspecialchars($this->page_desc),'" />',"\n";
-
-        //Генератор
-        echo $indent_str,'<meta name="generator" content="CMS RuDi" />',"\n";
+        
+        // Изображение
+        if ($this->page_img) {
+            echo $indent_str,'<link rel="image_src" href="',htmlspecialchars($this->page_img),'" />',"\n";
+        }
 
         //CSS
         if ($full_print === true || $full_print === 'css') {

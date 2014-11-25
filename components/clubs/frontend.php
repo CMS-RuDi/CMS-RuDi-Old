@@ -13,7 +13,7 @@
 
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function clubs(){
+function clubs() {
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
     $inDB   = cmsDatabase::getInstance();
@@ -40,6 +40,8 @@ function clubs(){
 	$page = cmsCore::request('page', 'int', 1);
 
 	$inPage->setTitle($pagetitle);
+        $inPage->setDescription($model->config['meta_desc'] ? $model->config['meta_desc'] : $pagetitle);
+        $inPage->setKeywords($model->config['meta_keys'] ? $model->config['meta_keys'] : $pagetitle);
 	$inPage->addPathway($pagetitle, '/clubs');
     $inPage->addHeadJsLang(array('NO_PUBLISH','EDIT_PHOTO','YOU_REALLY_DELETE_PHOTO','YOU_REALLY_DELETE_ALBUM','RENAME_ALBUM','ALBUM_TITLE','ADD_PHOTOALBUM','REALY_EXIT_FROM_CLUB','JOINING_CLUB','SEND_MESSAGE','CREATE','CREATE_CLUB','SEND_INVITE_CLUB','YOU_NO_SELECT_USER'));
 
@@ -82,7 +84,14 @@ if ($do=='view'){
 	$total = $model->getClubsCount();
 
         $clubs = $model->getClubs();
-	if(!$clubs && $page > 1){ return false; }
+	if (!$clubs && $page > 1) { return false; }
+        
+        if ($page > 1) {
+            foreach ($clubs as $c) {
+                $keys[] = $c['title'];
+            }
+            $inPage->setKeywords(implode(',', $keys));
+        }
 
 	cmsPage::initTemplate('components', 'com_clubs_view')->
             assign('pagetitle', $pagetitle)->
@@ -95,27 +104,29 @@ if ($do=='view'){
 }
 /////////////////////// ПРОСМОТР КЛУБА /////////////////////////////////////////
 if ($do=='club'){
+    $club = $model->getClub($id);
+    if (!$club) { return false; }
 
-	$club = $model->getClub($id);
-	if (!$club) { return false; }
+    if (!$club['published'] && !$inUser->is_admin) { return false; }
 
-	if (!$club['published'] && !$inUser->is_admin) { return false; }
-
-    $inPage->setTitle($club['title']);
+    $inPage->setTitle($club['pagetitle'] ? $club['pagetitle'] : $club['title']);
+    $inPage->setKeywords($club['meta_keys'] ? $club['meta_keys'] : $club['title']);
+    if (!$club['meta_desc']) {
+        if ($club['description']) {
+            $inPage->setDescription(crop($club['description']));
+        } else {
+            $inPage->setDescription($club['title']);
+        }
+    } else {
+        $inPage->setDescription($club['meta_desc']);
+    }
+        
     $inPage->addPathway($club['title']);
     $inPage->addHeadJsLang(array('NEW_POST_ON_WALL','CONFIRM_DEL_POST_ON_WALL'));
 
-	// meta description
-	switch ($model->config['seo_club']){
-		case 'deskr': 	$inPage->setDescription(strip_tags(($club['description'])));
-						break;
-		case 'title': 	$inPage->setDescription($club['title']);
-						break;
-	}
-
-	// Инициализируем участников клуба
-	$model->initClubMembers($club['id']);
-	// права доступа
+    // Инициализируем участников клуба
+    $model->initClubMembers($club['id']);
+    // права доступа
     $is_admin  = $inUser->is_admin || ($inUser->id == $club['admin_id']);
     $is_moder  = $model->checkUserRightsInClub('moderator');
     $is_member = $model->checkUserRightsInClub('member');
@@ -298,12 +309,15 @@ if ($do == 'config'){
         $new_club['blog_min_karma']   = cmsCore::request('blog_min_karma', 'int', 0);
         $new_club['photo_min_karma']  = cmsCore::request('photo_min_karma', 'int', 0);
         $new_club['album_min_karma']  = cmsCore::request('album_min_karma', 'int', 0);
-
         $new_club['blog_premod']      = cmsCore::request('blog_premod', 'int', 0);
         $new_club['photo_premod']     = cmsCore::request('photo_premod', 'int', 0);
-
         $new_club['join_karma_limit'] = cmsCore::request('join_karma_limit', 'int', 0);
         $new_club['join_min_karma']   = cmsCore::request('join_min_karma', 'int', 0);
+        if ($model->config['seo_user_access'] || $inUser->is_admin) {
+            $new_club['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+            $new_club['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+            $new_club['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
+        }
 
         // загружаем изображение клуба
         $new_imageurl = $model->uploadClubImage($club['imageurl']);
@@ -378,15 +392,15 @@ if ($do == 'config'){
         if ($members) { $members_list = cmsUser::getAuthorsList($members); } else { $members_list = ''; }
 
         cmsPage::initTemplate('components', 'com_clubs_config')->
-                assign('club', $club)->
-                assign('moders_list', $moders_list)->
-                assign('members_list', $members_list)->
-                assign('friends_list', $friends_list)->
-                assign('fr_members_list', $fr_members_list)->
-                assign('is_billing', IS_BILLING)->
-                assign('is_admin', $inUser->is_admin)->
-                display();
-
+            assign('club', $club)->
+            assign('moders_list', $moders_list)->
+            assign('members_list', $members_list)->
+            assign('friends_list', $friends_list)->
+            assign('fr_members_list', $fr_members_list)->
+            assign('is_billing', IS_BILLING)->
+            assign('is_admin', $inUser->is_admin)->
+            assign('cfg', $model->config)->
+            display();
     }
 
 }
@@ -659,7 +673,8 @@ if ($do=='members'){
 	if (!$club['published'] && !$inUser->is_admin) { return false; }
 
     $inPage->setTitle($_LANG['CLUB_MEMBERS'].' - '.$club['title']);
-	$inPage->addPathway($club['title'], '/clubs/'.$club['id']);
+    $inPage->setDescription($_LANG['CLUB_MEMBERS'].' - '.$club['title']);
+    $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
     $inPage->addPathway($_LANG['CLUB_MEMBERS'].' - '.$club['title']);
 
 	// Инициализируем участников клуба
@@ -706,12 +721,12 @@ if ($do=='view_albums'){
 	$pagetitle = $_LANG['PHOTOALBUMS'].' - '.$club['title'];
 
     $inPage->setTitle($pagetitle);
-	$inPage->addPathway($club['title'], '/clubs/'.$club['id']);
+    $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
     $inPage->addPathway($_LANG['PHOTOALBUMS']);
 
-	// Инициализируем участников клуба
-	$model->initClubMembers($club['id']);
-	// права доступа
+    // Инициализируем участников клуба
+    $model->initClubMembers($club['id']);
+    // права доступа
     $is_admin  = $inUser->is_admin || ($inUser->id == $club['admin_id']);
     $is_moder  = $model->checkUserRightsInClub('moderator');
     $is_member = $model->checkUserRightsInClub('member');
@@ -726,6 +741,14 @@ if ($do=='view_albums'){
 	$inDB->orderBy('f.pubdate', 'DESC');
 	$club['photo_albums'] = $inPhoto->getAlbums(0, 'club'.$club['id']);
 	if(!$club['photo_albums']) { return false; }
+        
+        // SEO
+        $inPage->setDescription($pagetitle);
+        $keys = array($club['title'], $_LANG['PHOTOALBUMS']);
+        foreach ($club['photo_albums'] as $p) {
+            $keys[] = $p['title'];
+        }
+        $inPage->setKeywords(implode(',', $keys));
 
 	cmsPage::initTemplate('components', 'com_clubs_albums')->
             assign('club', $club)->
@@ -781,12 +804,21 @@ if ($do=='view_album'){
     //устанавливаем номер текущей страницы и кол-во фото на странице
     $inDB->limitPage($page, $model->config['photo_perpage']);
 
-	$photos = $inPhoto->getPhotos($hidden);
+    $photos = $inPhoto->getPhotos($hidden);
+    if (!$photos && $page > 1) { cmsCore::error404(); }
 
     $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
-	$inPage->addPathway($album['title'], '/clubs/photoalbum'.$album['id']);
-	$inPage->setTitle($album['title']);
-	$inPage->setDescription($album['title'].' - '.$_LANG['CLUB_PHOTO_ALBUM'].' "'.$club['title'].'"');
+    $inPage->addPathway($album['title'], '/clubs/photoalbum'.$album['id']);
+    $inPage->setTitle($album['title']);
+    $inPage->setDescription($album['title'].' - '.$_LANG['CLUB_PHOTO_ALBUM'].' "'.$club['title'].'"');
+    
+    $keys = array($album['title'], $club['title']);
+    if ($photos) {
+        foreach ($photos as $p) {
+            $keys[] = $p['title'];
+        }
+    }
+    $inPage->setKeywords(implode(',', $keys));
 
     cmsPage::initTemplate('components', 'com_clubs_view_album')->
             assign('club', $club)->
@@ -858,10 +890,20 @@ if ($do=='view_photo'){
 	// Фото приватного клуба показываем только участникам
     if ($club['clubtype']=='private' && !$is_member && !$is_admin){ return false; }
 
-    $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
-	$inPage->addPathway($photo['cat_title'], '/clubs/photoalbum'.$photo['album_id']);
-	$inPage->addPathway($photo['title']);
-	$inPage->setTitle($photo['title']);
+    $inPage->addPathway($club['title'], '/clubs/'. $club['id']);
+    $inPage->addPathway($photo['cat_title'], '/clubs/photoalbum'.$photo['album_id']);
+    $inPage->addPathway($photo['title']);
+    $inPage->setTitle($photo['pagetitle'] ? $photo['pagetitle'] : $photo['title']);
+    $inPage->setKeywords($photo['meta_keys'] ? $photo['meta_keys'] : $photo['title']);
+    if (!$photo['meta_desc']) {
+        if ($photo['description']) {
+            $inPage->setDescription(crop($photo['description']));
+        } else {
+            $inPage->setDescription($photo['title']);
+        }
+    } else {
+        $inPage->setDescription($photo['meta_desc']);
+    } 
 
 	// ссылки вперед назад
 	$photo['nextid'] = $inDB->get_fields('cms_photo_files', 'id<'.$photo['id'].' AND album_id = '.$photo['album_id'], 'id, file, title', 'id DESC');
@@ -881,6 +923,7 @@ if ($do=='view_photo'){
             assign('photo', $photo)->
             assign('is_admin', $is_admin)->
             assign('is_moder', $is_moder)->
+            assign('is_exists_original', (file_exists(PATH.'/images/photos/'. $photo['file'])))->
             assign('is_author', $is_author)->
             display();
 
@@ -965,6 +1008,12 @@ if ($do=='edit_photo'){
 		$mod['title']       = $mod['title'] ? $mod['title'] : $photo['title'];
 		$mod['description'] = cmsCore::request('description', 'str', '');
 		$mod['comments']    = ($is_admin || $is_moder) ? cmsCore::request('comments', 'int') : $photo['comments'];
+                
+                if ($model->config['seo_user_access'] || $inUser->is_admin) {
+                    $mod['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+                    $mod['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+                    $mod['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
+                }
 
 		$file = $model->initUploadClass()->uploadPhoto($photo['file']);
 		$mod['file'] = $file['filename'] ? $file['filename'] : $photo['file'];

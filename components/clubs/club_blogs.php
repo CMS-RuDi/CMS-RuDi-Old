@@ -121,6 +121,11 @@ if (in_array($bdo, array('newpost', 'editpost'))) {
         $mod['tags'] 	  = cmsCore::request('tags', 'str', '');
         $mod['comments']  = cmsCore::request('comments', 'int', 1);
         $mod['blog_id']   = $blog['id'];
+        if ($model->config['seo_user_access'] || $inUser->is_admin) {
+            $mod['pagetitle'] = cmsCore::request('pagetitle', 'str', '');
+            $mod['meta_keys'] = cmsCore::request('meta_keys', 'str', '');
+            $mod['meta_desc'] = cmsCore::request('meta_desc', 'str', '');
+        }
 
         //Проверяем их
         if (mb_strlen($mod['title'])<2) {  cmsCore::addSessionMessage($_LANG['POST_ERR_TITLE'], 'error'); $errors = true; }
@@ -218,7 +223,7 @@ if (in_array($bdo, array('newpost', 'editpost'))) {
     }
 
 }
-////////////////////////// ПРОСМОТР ПОСТА /////////////////////////////////////////////////////////////////////////
+////////////////////////// ПРОСМОТР ПОСТА //////////////////////////////////////
 if($bdo=='post'){
 
 	$post = $inBlog->getPost($seolink);
@@ -252,10 +257,12 @@ if($bdo=='post'){
     if ($club['clubtype']=='private' && !$is_member && !$is_admin){ cmsCore::error404(); }
 
     $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
-	$inPage->addPathway($blog['title'], $model->getBlogURL($club['id']));
-    $inPage->setTitle($post['title']);
+    $inPage->addPathway($blog['title'], $model->getBlogURL($club['id']));
     $inPage->addPathway($post['title']);
-	$inPage->setDescription($post['title']);
+    
+    $inPage->setTitle($post['pagetitle'] ? $post['pagetitle'] : $post['title']);
+    $inPage->setDescription($post['meta_desc'] ? $post['meta_desc'] : crop($post['content_html']));
+    $inPage->setKeywords($post['meta_keys'] ? $post['meta_keys'] : $post['title']);
 
     if ($post['cat_id']){
         $cat = $inBlog->getBlogCategory($post['cat_id']);
@@ -286,7 +293,7 @@ if($bdo=='post'){
     }
 
 }
-///////////////////////// УДАЛЕНИЕ ПОСТА /////////////////////////////////////////////////////////////////////////////
+///////////////////////// УДАЛЕНИЕ ПОСТА ///////////////////////////////////////
 if ($bdo == 'delpost'){
 	if (!cmsUser::checkCsrfToken()) { cmsCore::halt(); }
 
@@ -327,7 +334,7 @@ if ($bdo == 'delpost'){
 
     cmsCore::jsonOutput(array('error' => false, 'redirect'  => '/clubs/'.$club['id']));
 }
-////////// ПРОСМОТР БЛОГА ////////////////////////////////////////////////////////////////////////////////////////
+////////// ПРОСМОТР БЛОГА //////////////////////////////////////////////////////
 if ($bdo=='blog'){
     $club = $model->getClub($id);
     if(!$club) { cmsCore::error404(); }
@@ -349,9 +356,7 @@ if ($bdo=='blog'){
     if ($club['clubtype']=='private' && !$is_member && !$is_admin){ cmsCore::error404(); }
 
     $inPage->addPathway($club['title'], '/clubs/'.$club['id']);
-	$inPage->addPathway($blog['title'], $model->getBlogURL($club['id']));
-    $inPage->setTitle($blog['title']);
-	$inPage->setDescription($blog['title']);
+    $inPage->addPathway($blog['title'], $model->getBlogURL($club['id']));
 
 	$inDB->addSelect('b.user_id as bloglink');
 
@@ -417,6 +422,20 @@ if ($bdo=='blog'){
 	} else {
 		$pagination = cmsPage::getPagebar($total, $page, $model->config['posts_perpage'], $blog['blog_link'].'/page-%page%');
 	}
+        
+        // SEO
+        $inPage->setTitle($blog['title']);
+        $inPage->setDescription($blog['title']);
+        // keywords
+        if ($posts) {
+            foreach ($posts as $p) {
+                $k[] = $p['title'];
+            }
+            $meta_keys = implode(', ', $k);
+        } else {
+            $meta_keys = $blog['title'];
+        }
+        $inPage->setKeywords($meta_keys);
 
 	cmsPage::initTemplate('components', 'com_blog_view')->
             assign('myblog', ($is_admin || $is_moder))->
@@ -434,7 +453,7 @@ if ($bdo=='blog'){
             display();
 
 }
-////////// НОВАЯ РУБРИКА / РЕДАКТИРОВАНИЕ РУБРИКИ //////////////////////////////////////////////////////
+////////// НОВАЯ РУБРИКА / РЕДАКТИРОВАНИЕ РУБРИКИ //////////////////////////////
 if (in_array($bdo, array('newcat','editcat'))){
 	if (!cmsCore::isAjax() || !$inUser->id) { return false; }
 
@@ -501,7 +520,7 @@ if (in_array($bdo, array('newcat','editcat'))){
     }
 
 }
-///////////////////////// УДАЛЕНИЕ РУБРИКИ /////////////////////////////////////////////////////////////////////////
+///////////////////////// УДАЛЕНИЕ РУБРИКИ /////////////////////////////////////
 if ($bdo == 'delcat'){
 	if (!cmsCore::isAjax() || !$inUser->id) { return false; }
 
@@ -531,7 +550,7 @@ if ($bdo == 'delcat'){
 
     cmsCore::jsonOutput(array('error' => false, 'redirect'  => $model->getBlogURL($club['id'])));
 }
-///////////////////////// ПУБЛИКАЦИЯ ПОСТА /////////////////////////////////////////////////////////////////////////
+///////////////////////// ПУБЛИКАЦИЯ ПОСТА /////////////////////////////////////
 if ($bdo == 'publishpost'){
 	if (!cmsCore::isAjax() || !$inUser->id) { return false; }
 

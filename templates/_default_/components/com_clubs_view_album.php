@@ -13,8 +13,8 @@
             <?php if ($col == 1) { ?> <tr> <?php } ?>
             <td align="center" valign="middle" width="<?php echo 100/$cfg['photo_maxcols'];?>%">
                 <div class="photo_thumb" align="center">
-                    <a class="lightbox-enabled" rel="lightbox-galery" href="/images/photos/medium/<?php echo $con['file']; ?>" title="<?php echo $this->escape($con['title']); ?>">
-                        <img class="photo_thumb_img" src="/images/photos/small/<?php echo $con['file']; ?>" alt="<?php echo $this->escape($con['title']); ?>" border="0" />
+                    <a href="/images/photos/medium/<?php echo $con['file']; ?>" title="<?php echo $this->escape($con['title']); ?>">
+                        <img class="photo_thumb_img" src="/images/photos/small/<?php echo $con['file']; ?>" alt="<?php echo $this->escape($con['title']); ?>" />
                     </a><br />
                     <a href="/clubs/photo<?php echo $con['id']; ?>.html" title="<?php echo $this->escape($con['title']); ?>"><?php echo $this->truncate($con['title'], 18); ?></a>
                     <?php if (!$con['published']) { ?>
@@ -24,12 +24,12 @@
             </td>
         <?php if ($col == $cfg['photo_maxcols']) { $col = 1; echo '</tr>'; } else { $col++; } ?>
         <?php } ?>
-        <?php if ($col > 1) { ?> 
+        <?php if ($col > 1) { ?>
         <td colspan="<?php echo (($cfg['photo_maxcols'] + 1) - $col); ?>">&nbsp;</td></tr>
         <?php } ?>
    </table>
 </div>
 <?php echo $pagebar; ?>
 <?php } else { ?>
-    <p><?php echo $_LANG['NOT_PHOTOS_IN_ALBUM']; ?></p>    
+    <p><?php echo $_LANG['NOT_PHOTOS_IN_ALBUM']; ?></p>
 <?php } ?>

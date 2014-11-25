@@ -1,6 +1,5 @@
 <?php
 /******************************************************************************/
-//                                                                            //
 //                           InstantCMS v1.10.4                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
@@ -8,7 +7,6 @@
 //                produced by InstantSoft, (www.instantsoft.ru)               //
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
-//                                                                            //
 /******************************************************************************/
 
 
@@ -22,11 +20,6 @@ $_LANG['AD_IS_ENABLED']             = 'Включено';
 $_LANG['AD_IS_DISABLED']            = 'Отключено';
 $_LANG['AD_MEMBERS_EDIT_ON_SITE']   = 'Участников и модераторов клуба вы можете ';
 $_LANG['AD_EDIT_ON_SITE']           = 'редактировать на сайте';
-$_LANG['AD_SEO_FOR_CLUB']           = 'SEO для клубов';
-$_LANG['AD_SEO_FOR_CLUB_HINT']      = 'Чем заполнять тег meta description при просмотре клуба';
-$_LANG['AD_SEO_FOR_CLUB_DESCR']     = 'Из описания клуба';
-$_LANG['AD_SEO_FOR_CLUB_TITLE']     = 'Из заголовка клуба';
-$_LANG['AD_SEO_FOR_CLUB_DEFAULT']   = 'По умолчанию для сайта';
 $_LANG['AD_LOGO_SMALL_WIDTH']       = 'Ширина маленькой копии лого';
 $_LANG['AD_LOGO_MEDIUM_WIDTH']      = 'Ширина основной копии лого';
 $_LANG['AD_SQUARE_LOGO']            = 'Квадратные логотипы';

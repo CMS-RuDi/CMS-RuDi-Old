@@ -18,6 +18,10 @@
         <?php if ($is_admin) { ?>
         <li><a href="#vip"><span>VIP</span></a></li>
         <?php } ?>
+        
+        <?php if ($cfg['seo_user_access'] || $is_admin) { ?>
+            <li><a href="#seo"><span>SEO</span></a></li>
+        <?php } ?>
     </ul>
 
     <div id="about">
@@ -27,7 +31,7 @@
                     <strong><?php echo $_LANG['CLUB_NAME']; ?>: </strong>
                 </td>
                 <td>
-                    <input name="title"  type="text" style="width:270px;" value="<?php echo $this->escape($club['title']); ?>" />
+                    <input name="title" class="text-input" type="text" style="width:270px;" value="<?php echo $this->escape($club['title']); ?>" />
                 </td>
             </tr>
             <tr>
@@ -40,7 +44,7 @@
                     <label><?php echo $_LANG['UPLOAD_LOGO']; ?>:</label>
                 </td>
                 <td>
-                    <input name="picture" type="file" id="picture" style="width:270px;" />
+                    <input class="text-input" name="picture" type="file" id="picture" style="width:270px;" />
                 </td>
             </tr>
         </table>
@@ -57,7 +61,7 @@
             <tr>
                 <td align="center" valign="top">
                     <p><strong><?php echo $_LANG['CLUB_MODERATORS']; ?>: </strong></p>
-                    <select name="moderslist[]" size="10" multiple id="moderslist" style="width:200px">
+                    <select class="text-input" name="moderslist[]" size="10" multiple id="moderslist" style="width:200px">
                         <?php echo $moders_list; ?>
                     </select>
                 </td>
@@ -67,7 +71,7 @@
                 </td>
                 <td align="center" valign="top">
                     <p><strong><?php echo $_LANG['MY_FRIENDS_AND_CLUB_USERS']; ?>:</strong></p>
-                    <select name="userslist1" size="10" multiple id="userslist1" style="width:200px">
+                    <select class="text-input" name="userslist1" size="10" multiple id="userslist1" style="width:200px">
                         <?php echo $fr_members_list; ?>
                     </select>
                 </td>
@@ -79,14 +83,14 @@
         <table width="550" border="0" cellspacing="0" cellpadding="10">
             <tr>
                 <td><?php echo $_LANG['MAX_MEMBERS']; ?>:<br/><span style="color:#5F98BF"><?php echo $_LANG['MAX_MEMBERS_TEXT']; ?></span> </td>
-                <td><input name="maxsize" type="text" style="width:200px"  value="<?php echo $club['maxsize']; ?>"/></td>
+                <td><input class="text-input" name="maxsize" type="text" style="width:200px"  value="<?php echo $club['maxsize']; ?>"/></td>
             </tr>
             <tr>
                 <td>
                     <label><?php echo $_LANG['SELECT_CLUB_TYPE']; ?>:</label>
                 </td>
                 <td width="200">
-                    <select name="clubtype" id="clubtype" style="width:200px" onchange="$('#minkarma').toggle();">
+                    <select class="text-input" name="clubtype" id="clubtype" style="width:200px" onchange="$('#minkarma').toggle();">
                         <option value="public" <?php if ($club['clubtype'] == 'public') { ?>selected="selected"<?php } ?>><?php echo $_LANG['PUBLIC']; ?> (public)</option>
                         <option value="private" <?php if ($club['clubtype'] == 'private') { ?>selected="selected"<?php } ?>><?php echo $_LANG['PRIVATE']; ?> (private)</option>
                      </select>
@@ -107,7 +111,7 @@
                     <?php echo $_LANG['LIMITS_KARMA']; ?>: <br/><span style="color:#5F98BF"><?php echo $_LANG['LIMITS_KARMA_TEXT']; ?></span>
                 </td>
                 <td width="200" valign="top">
-                    &ge; <input name="join_min_karma" type="text" style="width:60px" value="<?php echo $club['join_min_karma']; ?>"/> <?php echo $_LANG['POINTS']; ?>
+                    &ge; <input class="text-input" name="join_min_karma" type="text" style="width:60px" value="<?php echo $club['join_min_karma']; ?>"/> <?php echo $_LANG['POINTS']; ?>
                 </td>
             </tr>
         </table>
@@ -116,7 +120,7 @@
             <tr>
                 <td align="center" valign="top">
                     <p><strong><?php echo $_LANG['CLUB_MEMBERS']; ?>: </strong></p>
-                    <select name="memberslist[]" size="10" multiple id="memberslist" style="width:200px">
+                    <select class="text-input" name="memberslist[]" size="10" multiple id="memberslist" style="width:200px">
                         <?php echo $members_list; ?>
                     </select>
                 </td>
@@ -126,7 +130,7 @@
                 </td>
                 <td align="center" valign="top">
                     <p><strong><?php echo $_LANG['MY_FRIENDS_ARE']; ?>:</strong></p>
-                    <select name="userslist2" size="10" multiple id="userslist2" style="width:200px">
+                    <select class="text-input" name="userslist2" size="10" multiple id="userslist2" style="width:200px">
                         <?php echo $friends_list; ?>
                     </select>
                 </td>
@@ -164,7 +168,7 @@
                         <td>
                             <label><?php echo $_LANG['KARMA_LIMITS_FOR_NEW_POSTS']; ?>:</label>
                         </td>
-                        <td width="150">&ge; <input name="blog_min_karma" type="text" style="width:60px" value="<?php echo $club['blog_min_karma']; ?>"/> <?php echo $_LANG['POINTS']; ?>
+                        <td width="150">&ge; <input class="text-input" name="blog_min_karma" type="text" style="width:60px" value="<?php echo $club['blog_min_karma']; ?>"/> <?php echo $_LANG['POINTS']; ?>
                         </td>
                     </tr>
                 <?php } ?>
@@ -185,7 +189,7 @@
                             <label><?php echo $_LANG['KARMA_LIMITS_NEW_PHOTOALBUM']; ?>:</label>
                         </td>
                         <td width="150">
-                            &ge; <input name="album_min_karma" type="text" style="width:60px" value="<?php echo $club['album_min_karma']; ?>"/> <?php echo $_LANG['POINTS']; ?>
+                            &ge; <input class="text-input" name="album_min_karma" type="text" style="width:60px" value="<?php echo $club['album_min_karma']; ?>"/> <?php echo $_LANG['POINTS']; ?>
                         </td>
                     </tr>
                 <?php } ?>
@@ -214,12 +218,43 @@
                             <label><?php echo $_LANG['VIP_CLUB_JOIN_COST']; ?>:</label>
                         </td>
                         <td width="150">
-                            <input name="join_cost" type="text" style="width:60px" value="<?php echo $club['join_cost']; ?>"/> <?php echo $_LANG['BILLING_POINT10']; ?>
+                            <input class="text-input" name="join_cost" type="text" style="width:60px" value="<?php echo $club['join_cost']; ?>"/> <?php echo $_LANG['BILLING_POINT10']; ?>
                         </td>
                     </tr>
                 </table>
             <?php } ?>
 	</div>
+    <?php } ?>
+    
+    <?php if ($cfg['seo_user_access'] || $is_admin) { ?>
+        <div id="seo">
+            <table width="100%" border="0" cellspacing="0" cellpadding="10">
+                <tr>
+                    <td valign="top">
+                        <strong><?php echo $_LANG['SEO_PAGETITLE']; ?></strong>
+                        <div class="hinttext"><?php echo $_LANG['SEO_PAGETITLE_HINT']; ?></div>
+                    </td>
+                    <td>
+                        <input name="pagetitle" style="width:400px" class="text-input" value="<?php echo $this->escape($club['pagetitle']); ?>" />
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top"><strong><?php echo $_LANG['SEO_METAKEYS']; ?></strong></td>
+                    <td>
+                        <input name="meta_keys" style="width:400px" class="text-input" value="<?php echo $this->escape($club['meta_keys']); ?>" />
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">
+                        <strong><?php echo $_LANG['SEO_METADESCR']; ?></strong>
+                        <div class="hinttext"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
+                    </td>
+                    <td>
+                        <textarea name="meta_desc" rows="3" style="width:400px" class="text-input"><?php echo $this->escape($club['meta_desc']); ?></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
     <?php } ?>
 </div>
 

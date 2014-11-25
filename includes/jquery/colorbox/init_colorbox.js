@@ -23,14 +23,6 @@ $( '.con_text img, .con_desc img' ).not('a img:first-child').wrap( function(){
 //добавление класса вручную в шаблоне
 $('a.photobox').colorbox({ rel: 'gal', transition: "none", slideshow: true, width: "650px", height: "650px" });
 
-//клубные фотоальбомы
-$( '#view_photo' ).each( function(){
-	var image = $( this );
-	var link = $( this ).attr( 'src' );
-    image.wrap( '<a class="club_photo" href="' + link + '" />' );
-    $( '.club_photo').colorbox({ transition: "none" });
-});
-
 $( '.bd_image_small' ).each( function(){
 	var regex = /(small\/|medium\/)/;
 	var link = $( this ).attr( 'src' );

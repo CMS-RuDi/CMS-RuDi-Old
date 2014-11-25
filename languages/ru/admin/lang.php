@@ -162,3 +162,4 @@ $_LANG['AD_ROOT_METAKEYS']        = 'Ключевые слова главной 
 $_LANG['AD_ROOT_METADESC']        = 'Описание на главной странице (meta description)';
 $_LANG['AD_IF_UNKNOWN_PAGETITLE'] = 'Если не указан, будет совпадать с названием';
 $_LANG['AD_LIMIT']                = 'Ограничения';
+$_LANG['AD_RETAIN_BOOT']          = 'Сохранять оригиналы при загрузке<br />фотографий пользователями';

@@ -23,8 +23,9 @@ function cmsInsertTags($tagstr, $target, $item_id){
     $tags = explode(',', $tagstr);
 
     foreach ($tags as $tag){
+        $tag = mb_substr(trim($tag), 0, 240);
         if(mb_strlen($tag)>=3){
-            $tag = cmsCore::c('db')->escape_string(mb_substr(trim($tag), 0, 240));
+            $tag = cmsCore::c('db')->escape_string($tag);
             cmsCore::c('db')->query("INSERT INTO cms_tags (tag, target, item_id) VALUES ('". $tag ."', '". $target ."', ". $item_id .")");
         }
     }

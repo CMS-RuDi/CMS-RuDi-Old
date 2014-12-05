@@ -36,9 +36,7 @@
     
     if (cmsCore::c('user')->is_admin){
         $this->addHeadJS('admin/js/modconfig.js');
-        $this->addHeadJS('templates/'. cmsCore::c('config')->template .'/js/nyromodal.js');
         $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/modconfig.min.css');
-        $this->addHeadCSS('templates/'. cmsCore::c('config')->template .'/css/nyromodal.min.css');
     }
     
     // подключаем jQuery и js ядра в самое начало

@@ -276,7 +276,7 @@ class cmsDatabase {
 // ============================================================================ //
 // ============================================================================ //
 
-    public function get_fields($table, $where, $fields, $order='id ASC'){
+    public function get_fields($table, $where, $fields='*', $order='id ASC'){
         $sql    = "SELECT $fields FROM $table WHERE $where ORDER BY $order LIMIT 1";
         $result = $this->query($sql);
 

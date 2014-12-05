@@ -45,7 +45,7 @@ function mod_blogs($module_id, $cfg) {
         cmsCore::c('blog')->whereBlogIs($cfg['blog_id']);
     }
 
-    cmsCore::c('db')->orderBy('p.'.$cfg['sort'], 'DESC');
+    cmsCore::c('db')->orderBy('p.'.$cfg['sort'], 'DESC')->groupBy('p.id');
     cmsCore::c('db')->limit($cfg['shownum']);
 
     $posts = cmsCore::c('blog')->getPosts(false, cmsCore::m( $cfg['owner'] == 'club' ? 'clubs' : 'blogs' ));

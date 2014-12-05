@@ -59,8 +59,11 @@
 
 #mc_module_cfg .params-buttons {
     text-align:center;
+    margin: 10px 0 0;
 }
 #mc_module_cfg .params-buttons input{
-    font-size: 14px;
+    font-size: 15px;
 }
-
+#mc_module_cfg {
+    margin: 5px 0 0;
+}

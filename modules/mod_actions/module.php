@@ -34,9 +34,12 @@ function mod_actions($module_id, $cfg) {
 
     cmsCore::c('actions')->onlySelectedTypes($cfg['action_types']);
     cmsCore::c('db')->limitIs($cfg['limit']);
+    
+    $actions = cmsCore::c('actions')->getActionsLog();
+    if (!$actions) { return false; }
 
     cmsPage::initTemplate('modules', $cfg['tpl'])->
-        assign('actions', cmsCore::c('actions')->getActionsLog())->
+        assign('actions', $actions)->
         assign('cfg', $cfg)->
         assign('user_id', cmsCore::c('user')->id)->
         display();

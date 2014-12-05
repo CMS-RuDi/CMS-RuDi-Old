@@ -2170,7 +2170,7 @@ class cmsCore {
             self::c('jevix')->cfgAllowTagParams('span', array('style'));
             self::c('jevix')->cfgAllowTagParams('li', array('style'));
             self::c('jevix')->cfgAllowTagParams('p', array('style'));
-            self::c('jevix')->cfgAllowTagParams('table', array('width'=>'#int', 'class' => '#text', 'cellpadding'=>'#int', 'cellspacing'=>'#int', 'align',  'border'=>'#int'));
+            self::c('jevix')->cfgAllowTagParams('table', array('width'=>'#text', 'class' => '#text', 'cellpadding'=>'#int', 'cellspacing'=>'#int', 'align',  'border'=>'#int'));
             self::c('jevix')->cfgAllowTagParams('caption', array('class' => '#text','style'));
             self::c('jevix')->cfgAllowTagParams('th', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
             self::c('jevix')->cfgAllowTagParams('tr', array('class' => '#text','style'));

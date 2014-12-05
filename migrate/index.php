@@ -361,7 +361,7 @@
         }
         //======================================================================
         
-        $last_user_menu = cmsCore::c('db')->get_fields('cms_modules', "title = 'Меню пользователя' AND content = 'mod_menu'");
+        $last_user_menu = cmsCore::c('db')->get_fields('cms_modules', "title = 'Меню пользователя' AND content = 'mod_usermenu'", '*');
         if (!empty($last_user_menu)) {
             cmsCore::c('db')->query("UPDATE `cms_modules` SET 
                     `position` = '". $last_user_menu['position'] ."',
@@ -388,8 +388,7 @@
                     `version` = '1.0' WHERE `id` = ". $last_user_menu['id'] ." LIMIT 1");
             cmsCore::c('db')->delete('cms_modules', "content = 'mod_usermenu'");
 
-            cmsCore::c('db')->query("INSERT INTO `cms_modules` (`position`, `name`, `title`, `is_external`, `content`, `ordering`, `showtitle`, `published`, `user`, `config`, `original`, `css_prefix`, `access_list`, `hidden_menu_ids`, `cache`, `cachetime`, `cacheint`, `template`, `is_strict_bind`, `is_strict_bind_hidden`, `author`, `version`) VALUES 
- 	146	('header', 'Меню', 'Меню авторизации', 1, 'mod_menu', 35, 0, 1, 0, '---\nmenu: authmenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n', 1, 'user_menu_', '---\n- 8\n', '', 0, 1, 'HOUR', 'module.tpl', 0, 0, 'InstantCMS team', '1.0');");
+            cmsCore::c('db')->query("INSERT INTO `cms_modules` (`position`, `name`, `title`, `is_external`, `content`, `ordering`, `showtitle`, `published`, `user`, `config`, `original`, `css_prefix`, `access_list`, `hidden_menu_ids`, `cache`, `cachetime`, `cacheint`, `template`, `is_strict_bind`, `is_strict_bind_hidden`, `author`, `version`) VALUES ('header', 'Меню', 'Меню авторизации', 1, 'mod_menu', 35, 0, 1, 0, '---\nmenu: authmenu\nshow_home: 0\ntpl: mod_menu.tpl\nis_sub_menu: 0\n', 1, 'user_menu_', '---\n- 8\n', '', 0, 1, 'HOUR', 'module.tpl', 0, 0, 'InstantCMS team', '1.0');");
             $aid = cmsCore::c('db')->get_last_id('cms_modules');
             cmsCore::c('db')->query("INSERT INTO `cms_modules_bind` (`module_id`, `menu_id`, `position`) VALUES (". $aid .", 0, 'header');");
             

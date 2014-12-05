@@ -211,12 +211,11 @@ class miniCurl {
         $cfg = self::getDefaultConfig();
         
         curl_setopt($ch, CURLOPT_USERAGENT, $cfg['user_agent']);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $cfg['follow_location']);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, $cfg['header']);
         curl_setopt($ch, CURLOPT_HTTP_VERSION, $cfg['http_version']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, $cfg['return_transfer']);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $cfg['connect_timeout']);
-        curl_setopt($ch, CURLOPT_AUTOREFERER, $cfg['auto_referer']);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_URL, $src);
         curl_setopt($ch, CURLOPT_FILE, $file);

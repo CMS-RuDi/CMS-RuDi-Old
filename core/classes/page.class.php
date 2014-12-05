@@ -673,7 +673,7 @@ class cmsPage {
 
             // формируем html модуля
             $m = $this->renderModule($mod);
-            if(!$m){ continue; }
+            if (!$m) { continue; }
 
             // список модулей на позицию
             $modules[$mod['mb_position']][] = $m;

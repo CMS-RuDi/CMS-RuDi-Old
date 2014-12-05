@@ -15,7 +15,7 @@
                     <table border="0" cellpadding="0" cellspacing="0" >
                         <tr>
                             <td width="140">
-                                <img src="/templates/<?php echo TEMPLATE; ?>/special/images/error404.png" />
+                                <img src="/templates/_default_smarty_/special/images/error404.png" />
                             </td>
                             <td>
                                 <h2><?php echo $_LANG['404']; ?></h2>

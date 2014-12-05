@@ -272,15 +272,16 @@ $(function(){
 			if(data.can_create == true){
 				$('#popup_ok').val(LANG_CREATE).show();
 			}
-			core.show_popup_info(result.text, 'error');
+                        $('#popup_message').html(data.html);
+                        $('#popup_progress').hide();
 			$('#popup_ok').click(function(){
-				$('#popup_ok').prop('disabled', true);
-				$('.ajax-loader').show();
-				var options = {
-					success: clubs.doCreate,
-					dataType: 'json'
-				};
-				$('#create_club').ajaxSubmit(options);
+                            $('#popup_ok').prop('disabled', true);
+                            $('.ajax-loader').show();
+                            var options = {
+                                    success: clubs.doCreate,
+                                    dataType: 'json'
+                            };
+                            $('#create_club').ajaxSubmit(options);
 			});
 		} else {
 			core.alert(data.text, LANG_ERROR);

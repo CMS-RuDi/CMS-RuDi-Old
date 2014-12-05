@@ -15,7 +15,7 @@
  * об изображении нанесение водяного знака и других операций с изображениями
  * 
  * @author DS Soft <support@ds-soft.ru>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class rudi_graphics {
     private static $instance;
@@ -50,9 +50,7 @@ class rudi_graphics {
            $new_bh;
     
     private function __construct() {
-        if (class_exists('Imagick')) {
-            $this->Imagick = true;
-        }
+        $this->Imagick = self::checkImagick();
     }
     private function __clone() {}
 
@@ -63,6 +61,10 @@ class rudi_graphics {
         return self::$instance;
     }
     
+    public static function checkImagick() {
+        return class_exists('Imagick');
+    }
+
     public static function getImgInfo($image_file) {
         $info = getimagesize($image_file);
         
@@ -132,8 +134,9 @@ class rudi_graphics {
     }
     
     private function createThumb($src, $dist, $new_w, $new_h, $resize_type, $watermark) {
-        if (file_exists($dist) && !is_writable($dist)) {
-            return false;
+        if (file_exists($dist)) {
+            if (!is_writable($dist)) { return false; }
+            unlink($dist);
         }
         
         if (!in_array($resize_type, array('exact', 'auto', 'crop', 'portrait', 'landscape'))) {
@@ -248,7 +251,7 @@ class rudi_graphics {
             }
             
             if (!empty($watermark)) {
-                self::addWatermark($dist, PATH .'/images/'. $this->inConf->wmark, $watermark);
+                self::addWatermark($dist, false, $watermark);
             }
         } else if ($new_w == 'copy') {
             copy($src, $dist);
@@ -293,10 +296,6 @@ class rudi_graphics {
                 return false;
             }
         }
-
-        if ($this->watermark || $this->mwatermark) {
-            $this->inConf = cmsConfig::getInstance();
-        }
         
         $this->createThumb(
             $image_file,
@@ -334,7 +333,11 @@ class rudi_graphics {
         return $filename;
     }
 
-    public static function addWatermark($src_img, $wm_img, $pos='rb', $q=80){
+    public static function addWatermark($src_img, $wm_img, $pos='rb', $q=80) {
+        if ($wm_img === false) {
+            $wm_img = cmsConfig::getInstance()->wmark;
+        }
+        
         if (!$src_img || !$wm_img) { return false; }
         
         $size_src = self::getImgInfo($src_img);
@@ -342,7 +345,7 @@ class rudi_graphics {
         
         if (!$size_src || !$size_wm) { return false; }
         
-        if ($this->Imagick === true) {
+        if (self::checkImagick() === true) {
             $image = new Imagick($src_img);
             $wm    = new Imagick($wm_img);
             

@@ -84,7 +84,7 @@
 
 </form>
         <p class="usr_photos_add_st"><?php echo $_LANG['TEXT_TO_NO_FLASH']; ?> <a href="/users/addphotosingle.html"><?php echo $_LANG['PHOTO_ST_UPLOAD']; ?>.</a></p>
-    {elseif $uload_type == 'single'}
+        <?php } else if ($uload_type == 'single') { ?>
         <?php if ($max_limit) { ?>
          <p class="usr_photos_add_limit"><?php echo $_LANG['YOU_CAN_UPLOAD']; ?> <strong><?php echo $max_files; ?></strong> <?php echo $_LANG['PHOTO_SHORT']; ?></p>
         <?php } ?>

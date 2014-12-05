@@ -156,7 +156,7 @@ function applet_usergroups() {
         
         <div class="form-group">
             <label><?php echo $_LANG['AD_ALIAS'];?>:</label>
-            <input type="text" class="form-control" name="alias" size="30" value="<?php echo cmsCore::getArrVal($mod, 'alias', ''); ?>" />
+            <input type="text" class="form-control" name="alias" size="30" <?php if (cmsCore::getArrVal($mod, 'alias', '') == 'guest') { echo 'readonly="readonly"'; } ?> value="<?php echo cmsCore::getArrVal($mod, 'alias', ''); ?>" />
             <?php if ($do == 'edit') { ?>
                 <div class="help-block"><?php echo $_LANG['AD_DONT_CHANGE']; ?></div>
             <?php } ?>

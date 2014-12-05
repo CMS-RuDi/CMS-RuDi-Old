@@ -43,3 +43,5 @@ $_LANG['AD_PLUGIN_FAILURE']              = 'Plugin installer is not downloaded.'
 $_LANG['AD_OPT_INSTALL_MODULES']         = 'Extra modules are installed';
 $_LANG['AD_OPT_INSTALL_PLUGINS']         = 'Extra plugins are installed';
 $_LANG['AD_COMPONENT_IS_DELETED']        = 'Component is deleted from the system';
+$_LANG['AD_ENABLE_PLUGIN']               = 'Enable it to start working';
+$_LANG['AD_REMOVE_PLUGIN_OK']            = 'Plugin is successfully deleted from system';

@@ -45,25 +45,9 @@ function applet_plugins() {
 
         cpToolMenu($toolmenu);
 
-        $plugin_id = cmsCore::request('installed', 'str', '');
-
-        if ($plugin_id) {
-            $task = cmsCore::request('task', 'str', 'install');
-
-            if ($task == 'install' || $task == 'upgrade') {
-                $plugin   = $inCore->loadPlugin($plugin_id);
-                $task_str = ($task=='install') ? $_LANG['AD_IS_INSTALL'] : $_LANG['AD_IS_UPDATE'];
-                echo '<div style="color:green;margin-top:12px;margin-bottom:5px;">'. $_LANG['AD_PLUGIN'] .' <strong>"'. $plugin->info['title'] .'"</strong> '. $task_str .'. '. $_LANG['AD_ENABLE_PLUGIN'] .'.</div>';
-            }
-
-            if ($task == 'remove') {
-                echo '<div style="color:green;margin-top:12px;margin-bottom:5px;">'. $_LANG['AD_REMOVE_PLUGIN_OK'] .'.</div>';
-            }
-        }
-
         $fields = array(
             array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
-            array( 'title' => $_LANG['TITLE'], 'field' => 'title', 'width' => '250' ),
+            array( 'title' => $_LANG['TITLE'], 'field' => 'title', 'link'=>'?view=plugins&do=config&id=%id%', 'width' => '250' ),
             array( 'title' => $_LANG['DESCRIPTION'], 'field' => 'description', 'width' => '' ),
             array( 'title' => $_LANG['AD_AUTHOR'], 'field' => 'author', 'width' => '160' ),
             array( 'title' => $_LANG['AD_VERSION'], 'field' => 'version', 'width' => '80' ),
@@ -97,8 +81,43 @@ function applet_plugins() {
 
         $inCore->savePluginConfig($plugin_name, $config);
 
-        cmsUser::clearCsrfToken();
-
+        cmsCore::addSessionMessage($_LANG['AD_CONFIG_SAVE_SUCCESS'], 'success');
+        cmsCore::redirect('index.php?view=plugins');
+    }
+    
+    if ($do == 'save_auto_config') {
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+        
+        $plugin_name = cmsCore::request('plugin', 'str', '');
+        
+        $xml_file = PATH.'/plugins/'.$plugin_name.'/backend.xml';
+        if(!file_exists($xml_file)){ cmsCore::error404(); }
+        
+        $cfg = array();
+        
+        $backend = simplexml_load_file($xml_file);
+        
+        foreach($backend->params->param as $param){
+            $name    = (string) $param['name'];
+            $type    = (string) $param['type'];
+            $default = (string) $param['default'];
+            
+            switch($param['type']){
+                case 'number':  $value = cmsCore::request($name, 'int', $default); break;
+                case 'string':  $value = cmsCore::request($name, 'str', $default); break;
+                case 'flag':    $value = cmsCore::request($name, 'int', 0); break;
+                case 'list':    $value = (is_array($_POST[$name]) ? cmsCore::request($name, 'array_str', $default) : cmsCore::request($name, 'str', $default)); break;
+                case 'list_function': $value = cmsCore::request($name, 'str', $default); break;
+                case 'list_db': $value = (is_array($_POST[$name]) ? cmsCore::request($name, 'array_str', $default) : cmsCore::request($name, 'str', $default)); break;
+            }
+            
+            $cfg[$name] = $value;
+        }
+        
+        if (!$cfg || !$plugin_name) { cmsCore::redirectBack(); }
+        
+        $inCore->savePluginConfig($plugin_name, $cfg);
+        
         cmsCore::addSessionMessage($_LANG['AD_CONFIG_SAVE_SUCCESS'], 'success');
         cmsCore::redirect('index.php?view=plugins');
     }
@@ -116,13 +135,28 @@ function applet_plugins() {
         cpAddPathway($plugin->info['title'], 'index.php?view=plugins&do=config&id='. $id);
 
         echo '<fieldset style="width:610px;"><legend>'. $plugin->info['title'] .'</legend>';
+        
+        $xml_file = PATH .'/plugins/'. $plugin_name .'/backend.xml';
 
-        if (!$config) {
+        if (!$config && empty($plugin_cfg_fields) && !file_exists($xml_file)) {
             echo '<p>'. $_LANG['AD_PLUGIN_DISABLE'] .'.</p>';
             echo '<p><a href="javascript:window.history.go(-1);">'. $_LANG['BACK'] .'</a></p>';
         } else {
             echo '<form action="index.php?view=plugins&do=save_config&plugin='. $plugin_name .'" method="POST">';
-                if (empty($plugin_cfg_fields)) {
+                if (!empty($plugin_cfg_fields)) {
+                    echo '<div style="width:610px;">'. cmsCore::c('form_gen')->generateForm($plugin->getConfigFields(), $config) .'</div>';
+                } else if (file_exists($xml_file)) {
+                    $toolmenu[] = array('icon'=>'save.gif', 'title'=>$_LANG['SAVE'], 'link'=>'javascript:document.addform.submit();');
+                    $toolmenu[] = array('icon'=>'cancel.gif', 'title'=>$_LANG['CANCEL'], 'link'=>'index.php?view=modules');
+                    
+                    cpToolMenu($toolmenu);
+                    
+                    cmsCore::loadClass('formgen');
+                    
+                    $formGen = new cmsFormGen($xml_file, $config);
+                    
+                    echo $formGen->getHTML();
+                } else {
                     echo '<input type="hidden" name="csrf_token" value="'. cmsUser::getCsrfToken() .'" />';
                     echo '<table class="proptable" width="605" cellpadding="8" cellspacing="0" border="0">';
                         foreach ($config as $field => $value) {
@@ -132,14 +166,15 @@ function applet_plugins() {
                             echo '</tr>';
                         }
                     echo '</table>';
-                } else {
-                    echo '<div style="width:610px;">'. cmsCore::c('form_gen')->generateForm($plugin->getConfigFields(), $config) .'</div>';
                 }
-
-                echo '<div style="margin-top:6px;">';
-                    echo '<input type="submit" class="btn btn-primary" name="save" value="'. $_LANG['SAVE'] .'" /> ';
-                    echo '<input type="button" class="btn btn-default" name="back" value="'. $_LANG['CANCEL'] .'" onclick="window.history.go(-1)" />';
-                echo '</div>';
+                
+                if (!file_exists($xml_file)) {
+                    echo '<input type="hidden" name="do" value="save_config" />';
+                    echo '<div style="margin-top:6px;">';
+                        echo '<input type="submit" class="btn btn-primary" name="save" value="'. $_LANG['SAVE'] .'" /> ';
+                        echo '<input type="button" class="btn btn-default" name="back" value="'. $_LANG['CANCEL'] .'" onclick="window.history.go(-1)" />';
+                    echo '</div>';
+                }
 
             echo '</form>';
         }

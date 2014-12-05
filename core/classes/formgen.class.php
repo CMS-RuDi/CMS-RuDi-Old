@@ -12,7 +12,6 @@
 /******************************************************************************/
 
 class cmsFormGen {
-
     private $xml;
     private $html;
     private $default_cfg;
@@ -23,7 +22,14 @@ class cmsFormGen {
 //============================================================================//
 
     public function __construct($xml_file, $default_cfg) {
-        $this->xml         = simplexml_load_file($xml_file);
+        $this->xml = simplexml_load_file($xml_file);
+        
+        //Поддержка старой разметки
+        if (!isset($this->xml->info)) {
+            $this->xml->info->type = 'module';
+            $this->xml->info->id   = $this->xml->module->id;
+        }
+        
         $this->default_cfg = $default_cfg;
 
         $this->parseParams();
@@ -38,8 +44,11 @@ class cmsFormGen {
 
     private function parseParams(){
         global $_LANG;
-        // подключим LANG файл для модуля
-        cmsCore::loadLanguage('admin/modules/'.(string)$this->xml->module->id);
+        
+        // подключим LANG файл
+        cmsCore::loadLanguage('admin/'. (string)$this->xml->info->type .'s/'. (string)$this->xml->info->id);
+        
+        $pref = mb_strtoupper(substr($this->xml->info->type, 0, 3));
 
         foreach($this->xml->params->param as $p){       
             $param = array();
@@ -59,8 +68,9 @@ class cmsFormGen {
                     foreach($o->attributes() as $k => $v) {
                         $opt[$k] = (string)$v;
                     }
-                    $tolk = 'MOD_'.mb_strtoupper($param['name'].'_OPT'.($opt['value'] ? '_'.$opt['value'] : ''));
+                    $tolk = $pref .'_'. mb_strtoupper($param['name'] .'_OPT'. ($opt['value'] ? '_'.$opt['value'] : ''));
                     $opt['title'] = isset($_LANG[$tolk]) ? $_LANG[$tolk] : (isset($opt['title']) ? $opt['title'] : '');
+                    if (!$opt['title']) { $opt['title'] = $opt['value']; }
                     $param['tag_option'][] = $opt;
                 }
             }
@@ -71,11 +81,12 @@ class cmsFormGen {
             // на его основе и строим ключи
             // если таких элеменов в массиве $_LANG нет, предполагаем, что соответствующие элементы
             // title, hint и units заданы в xml и используем их
-            $ulk = 'MOD_'.mb_strtoupper($param['name']).'_UNITS';
-            $tlk = 'MOD_'.mb_strtoupper($param['name']);
-            $hlk = 'MOD_'.mb_strtoupper($param['name']).'_HINT';
+            $ulk = $pref .'_'. mb_strtoupper($param['name']) .'_UNITS';
+            $tlk = $pref .'_'. mb_strtoupper($param['name']);
+            $hlk = $pref .'_'. mb_strtoupper($param['name']) .'_HINT';
 
             $param['title'] = isset($_LANG[$tlk]) ? $_LANG[$tlk] : $param['title'];
+            if(!$param['title']) { $param['title'] = $param['name']; }
             $param['hint']  = isset($_LANG[$hlk]) ? $_LANG[$hlk] :
                                                     (isset($param['hint']) ? $param['hint'] : '');
             $param['units'] = isset($_LANG[$ulk]) ? $_LANG[$ulk] :
@@ -130,8 +141,8 @@ class cmsFormGen {
 
             global $tpl_data;
 
-            $tpl_data['module'] = $this->xml->module;
             $tpl_data['fields'] = $this->params;
+            $tpl_data['info']   = $this->xml->info;
 
             cmsPage::includeTemplateFile('admin/autoform.php');
 
@@ -177,11 +188,13 @@ class cmsFormGen {
     }
 
     private function renderList($param){
-        $html = '<select id="'.$param['name'].'" name="'.$param['name'].'" class="form-control">' . "\n";
+        $html = '<select id="'.$param['name'].'" name="'.$param['name'].(isset($param['multiple']) ? '[]' : '').'"'.(isset($param['multiple']) ? (' size="'.(isset($param['size']) ? (int)$param['size'] : '5').'" multiple="multiple"') : '').' class="param-list">' . "\n";
+        
+        $values = explode('|', $param['value']);
 
         foreach($param['tag_option'] as $option){
 
-            $html .= "\t" . '<option value="'.htmlspecialchars($option['value']).'" '.($param['value'] == $option['value'] ? 'selected="selected"' : '').'>'.$option['title'].'</option>' . "\n";
+            $html .= "\t" . '<option value="'.htmlspecialchars($option['value']).'" '.((isset($param['multiple']) ? in_array($option['value'], $values) : $param['value'] == $option['value']) ? 'selected="selected"' : '').'>'.$option['title'].'</option>' . "\n";
 
         }
 
@@ -293,10 +306,4 @@ class cmsFormGen {
             cmsCore::insertEditor($param['name'], $param['value'], $param['height'], $param['width'], $param['toolbar']);
         return ob_get_clean();
     }
-
-
-//============================================================================//
-//============================================================================//
-
-
 }

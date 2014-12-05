@@ -20,7 +20,7 @@ class p_auto_forum extends cmsPlugin {
             'title'       => 'Автофорум',
             'description' => 'Создает тему на форуме для обсуждения статьи',
             'author'      => 'InstantCMS Team',
-            'version'     => '1.1'
+            'version'     => '1.10'
         );
         
         $this->config = array(

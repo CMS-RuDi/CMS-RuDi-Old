@@ -184,24 +184,14 @@ function insertTag(kind){
         text = '{СТРАНИЦА=' + document.addform.ptitle.value + '}';
     }
 
-    wysiwygInsertHtml(text) ;
+    wysiwygInsertHtml(text);
 }
 
-function InsertPagebreak()
-{
-    // Get the editor instance that we want to interact with.
-    var oEditor = FCKeditorAPI.GetInstance('content') ;
-
-    // Check the active editing mode.
-    if ( oEditor.EditMode == FCK_EDITMODE_WYSIWYG )
-    {
-        // Insert the desired HTML.
-        oEditor.InsertHtml( '{pagebreak}' ) ;
-    }
-    else
-        adminAlert(LANG_AD_SWITCH_EDITOR) ;
+function InsertPagebreak() {
+    wysiwygInsertHtml('{pagebreak}');
 }
-function checkGroupList(){
+
+function checkGroupList() {
     if ($('#is_public').prop('checked')) {
         $('select#showin').prop('disabled', true);
     } else {

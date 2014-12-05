@@ -432,7 +432,8 @@ function applet_install() {
         if (!$plugin) { $error = $_LANG['AD_PLUGIN_FAILURE']	; }
 
         if (!$error && $plugin->install()) {
-            cmsCore::redirect('/admin/index.php?view=plugins&installed='. $plugin_id .'&task=install');
+            cmsCore::addSessionMessage($_LANG['AD_PLUGIN'] .' <strong>"'. $plugin->info['title'] .'"</strong> '. $_LANG['AD_SUCCESS'] . $_LANG['AD_IS_INSTALL'] .'. '. $_LANG['AD_ENABLE_PLUGIN'], 'success');
+            cmsCore::redirect('/admin/index.php?view=plugins');
         }
 
         if ($error) { echo '<p style="color:red">'. $error .'</p>'; }
@@ -457,7 +458,8 @@ function applet_install() {
         if (!$plugin) { $error = $_LANG['AD_PLUGIN_FAILURE']; }
 
         if (!$error && $plugin->upgrade()) {
-            cmsCore::redirect('/admin/index.php?view=plugins&installed='. $plugin_id .'&task=upgrade');
+            cmsCore::addSessionMessage($_LANG['AD_PLUGIN'] .' <strong>"'. $plugin->info['title'] .'"</strong> '. $_LANG['AD_SUCCESS'] . $_LANG['AD_IS_UPDATE'], 'success');
+            cmsCore::redirect('/admin/index.php?view=plugins');
         }
 
         if ($error) { echo '<p style="color:red">'. $error .'</p>'; }
@@ -477,13 +479,10 @@ function applet_install() {
 
         if (!$plugin) { $error = $_LANG['AD_PLUGIN_FAILURE']; }
         
-        if (method_exists($plugin, 'uninstall')) {
-            $plugin->uninstall();
-        } else {
-            $inCore->removePlugin($plugin);
-        }
-
-        cmsCore::redirect('/admin/index.php?view=plugins&installed='. $plugin_name .'&task=remove');
+        $plugin->uninstall();
+        
+        cmsCore::addSessionMessage($_LANG['AD_REMOVE_PLUGIN_OK'], 'success');
+        cmsCore::redirect('/admin/index.php?view=plugins');
     }
     //==========================================================================
 }

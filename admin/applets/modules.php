@@ -98,6 +98,8 @@ function applet_modules() {
     }
 
     if ($do == 'save_auto_config') {
+        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+        
         $module_name = cpModuleById($id);
 
         $is_ajax = cmsCore::inRequest('ajax');
@@ -130,7 +132,7 @@ function applet_modules() {
                     case 'string': $value = cmsCore::request($name, 'str', $default); break;
                     case 'html': $value = cmsCore::request($name, 'html', $default); break;
                     case 'flag': $value = cmsCore::request($name, 'int', 0); break;
-                    case 'list': $value = cmsCore::request($name, 'str', $default); break;
+                    case 'list': $value = (is_array($_POST[$name]) ? cmsCore::request($name, 'array_str', $default) : cmsCore::request($name, 'str', $default)); break;
                     case 'list_function': $value = cmsCore::request($name, 'str', $default); break;
                     case 'list_db': $value = (is_array($_POST[$name]) ? cmsCore::request($name, 'array_str', $default) : cmsCore::request($name, 'str', $default)); break;
                 }

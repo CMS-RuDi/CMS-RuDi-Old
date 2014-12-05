@@ -91,8 +91,8 @@ $_LANG['ON_MODERATE']           ='On moderation';
 $_LANG['FILE']                  ='File';
 $_LANG['NOT_FOUND']             ='not found';
 $_LANG['USER_IS_DELETE']        ='User deleted';
-$_LANG['INSERT_WYSIWYG_ERROR']  ='<p><div>Visual editor is not found or is not included.</div><div>If editor is installed, enable it in the admin panel (menu <em>Addons</em> &rarr; <em>Plugins</em>).</div></p>';
-$_LANG['INSERT_CAPTCHA_ERROR']  ='<p><div>Captcha is not found or is not included.</div><div>If captcha is installed, enable it in the admin panel (menu <em>Addons</em> &rarr; <em>Plugins</em>).</div></p>';
+$_LANG['INSERT_WYSIWYG_ERROR']  = '<p>WYSIWYG editor not found or not enable.<br/>If editor is installed, enable it in the admin panel (menu <em>Addons</em> &rarr; <em>Plugins</em>).</p>';
+$_LANG['INSERT_CAPTCHA_ERROR']  = '<p>Captcha not found or not enable.<br/>If captcha is installed, enable it in the admin panel (menu <em>Addons</em> &rarr; <em>Plugins</em>).</p>';
 
 // For All Modules
 $_LANG['CONFIG_MODULE']         ='Configure module';

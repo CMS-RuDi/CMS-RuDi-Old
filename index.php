@@ -45,6 +45,11 @@ cmsCore::c('user')->autoLogin();
 // проверяем что пользователь не удален и не забанен и загружаем его данные
 if (!cmsCore::c('user')->update() && !$_SERVER['REQUEST_URI'] !== '/logout') { cmsCore::halt(); }
 
+if((is_dir(PATH .'/install') || is_dir(PATH .'/migrate')) && cmsCore::c('user')->is_admin) {
+    cmsPage::includeTemplateFile('special/installation.php');
+    cmsCore::halt();
+}
+
 //Если сайт выключен и пользователь не администратор,
 //то показываем шаблон сообщения о том что сайт отключен
 if (cmsCore::c('config')->siteoff &&

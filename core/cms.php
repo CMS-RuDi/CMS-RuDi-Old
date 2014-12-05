@@ -2205,11 +2205,11 @@ class cmsCore {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     /**
-     * Проверяет совпадения кода каптчи с кодом введенным пользователем
+     * Валидация каптчи
      * @return bool
      */
-    public static function checkCaptchaCode($var=false){
-        $result = self::callEvent('CHECK_CAPTCHA', $var);
+    public static function checkCaptchaCode(){
+        $result = self::callEvent('CHECK_CAPTCHA', false);
         
         if (!is_bool($result)) { return false; }
         

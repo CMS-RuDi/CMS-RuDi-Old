@@ -805,7 +805,7 @@ class cmsPage {
      * Возвращает html-код каптчи
      * @return html
      */
-    public static function getCaptcha($var=false){
+    public static function getCaptcha() {
         $captcha_code = cmsCore::callEvent('INSERT_CAPTCHA', false);
         
         if ($captcha_code === false) {
@@ -814,6 +814,14 @@ class cmsPage {
         }
         
         return $captcha_code;
+    }
+    
+    /**
+     * Валидация каптчи
+     * @return bool
+     */
+    public static function checkCaptchaCode(){
+        return cmsCore::checkCaptchaCode();
     }
     
     /**

@@ -157,13 +157,14 @@ class cmsFormGen {
 
     private function getParamHTML($param) {
         switch ($param['type']) {
-            case 'number':  return $this->renderNumber($param); break;
-            case 'string':  return $this->renderString($param); break;
-            case 'flag':    return $this->renderFlag($param); break;
-            case 'list':    return $this->renderList($param); break;
-            case 'list_db': return $this->renderListDB($param); break;
-            case 'html': return $this->renderHtml($param); break;
-            case 'list_function': return $this->renderListFunction($param); break;
+            case 'number':  return $this->renderNumber($param);
+            case 'string':  return $this->renderString($param);
+            case 'html':    return $this->renderHtml($param);
+            case 'flag':    return $this->renderFlag($param);
+            case 'list':    return $this->renderList($param);
+            case 'list_db': return $this->renderListDB($param);
+            case 'html':    return $this->renderHtml($param);
+            case 'list_function': return $this->renderListFunction($param);
         }
 
         return;
@@ -171,7 +172,14 @@ class cmsFormGen {
 
 //============================================================================//
 //============================================================================//
-
+    private function renderHtml($param) {
+        ob_start();
+        
+        cmsCore::insertEditor($param['name'], $param['value'], $param['height'], $param['width'], $param['toolbar']);
+        
+        return ob_get_clean();
+    }
+    
     private function renderNumber($param) {
         return '<input type="number" id="'. $param['name'] .'" class="form-control" name="'. $param['name'] .'" value="'. $param['value'] .'" /> ';
     }

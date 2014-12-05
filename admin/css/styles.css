@@ -712,7 +712,8 @@ div.filter {
 .userform_table label{ color: #666666; }
 .userform_fieldtitle .edit_links { display: none; margin: 0 0 0 5px; }
 .userform_fieldtitle .edit_links img { width: 13px; margin: 0 2px; }
-
+.hoverRow { color:#FF3300; background-color:#ecf0f1;}
+.clickedRow { color:#009900; background-color:#bdc3c7;} 
 
 .blockdiv_dashed{
     padding: 5px;

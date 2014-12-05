@@ -4,6 +4,7 @@
 ?>
 
 <input type="hidden" name="do" value="save_auto_config" />
+<input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
 
 <?php foreach($fields as $fid=>$field) { ?>
     <div id="f<?php echo $fid; ?>" class="form-group">

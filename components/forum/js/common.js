@@ -1,5 +1,12 @@
 $(function(){
   forum = {
+    clearAllPosts: function(user_id, csrf_token) {
+        core.confirm(LANG_CONFIRM_DELETE_ALL_USER_POSTS, null, function() {
+            $.post('/forum/delete_all_user_posts', {csrf_token: csrf_token, user_id: user_id}, function(result){
+                window.location.href = '/forum';
+            });
+        });
+    },
     votePost: function(post_id, vote) {
         $('#votes'+post_id).html('<img src="/images/ajax-loader.gif" border="0"/>');
         $.post('/components/forum/vote.php', { post_id: post_id, vote: vote }, function(data){

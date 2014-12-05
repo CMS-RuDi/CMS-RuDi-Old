@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -10,10 +10,8 @@
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
-function comments($target='', $target_id=0, $labels=array()){
-
+function comments($target='', $target_id=0, $labels=array()) {
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
     $inDB   = cmsDatabase::getInstance();
@@ -59,6 +57,8 @@ if ($do == 'view' && !$target && !$target_id){
 	}
 	$inPage->setTitle($page_title);
 	$inPage->addPathway($page_title);
+        $inPage->setDescription($model->config['meta_desc'] ? $model->config['meta_desc'] : $page_title);
+        $inPage->setKeywords($model->config['meta_keys'] ? $model->config['meta_keys'] : $page_title);
 
 	// флаг модератора
 	$is_moder = ($inUser->is_admin || $model->is_can_moderate);

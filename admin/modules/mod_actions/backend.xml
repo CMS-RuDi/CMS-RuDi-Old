@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_actions</id>
-    </module>
+    </info>
     <params>
         <param type="number" name="limit" default="15" />
         <param type="flag" name="show_target" default="off" />

@@ -1,6 +1,6 @@
 ﻿<?php
 /******************************************************************************/
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //

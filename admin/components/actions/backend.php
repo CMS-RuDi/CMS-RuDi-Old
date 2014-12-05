@@ -2,7 +2,7 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -78,6 +78,8 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
         $cfg['perpage_tab'] = cmsCore::request('perpage_tab', 'int', 15);
         $cfg['is_all']      = cmsCore::request('is_all', 'int', 0);
        	$cfg['act_type']    = cmsCore::request('act_type', 'array_str', array());
+        $cfg['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
+        $cfg['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
 
         $inCore->saveComponentConfig('actions', $cfg);
 
@@ -137,6 +139,19 @@ if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
                     ?>
                 </div>
             </div>
+            
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_ROOT_METAKEYS']; ?>:</label>
+                <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+                <textarea class="form-control" name="meta_keys" rows="2"><?php echo cmsCore::m('actions')->config['meta_keys'] ?></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label><?php echo $_LANG['AD_ROOT_METADESC']; ?>:</label>
+                <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
+                <textarea class="form-control" name="meta_keys" rows="2"><?php echo cmsCore::m('actions')->config['meta_desc'] ?></textarea>
+            </div>
+            
             <p>
                 <input type="submit" id="save" class="btn btn-primary" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
                 <input type="button" id="back" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components';"/>

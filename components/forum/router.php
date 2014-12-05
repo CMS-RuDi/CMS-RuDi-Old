@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -12,6 +12,11 @@
 /******************************************************************************/
 
     function routes_forum(){
+        
+        $routes[] = array(
+            '_uri'  => '/^forum\/delete_all_user_posts$/i',
+            'do'    => 'delete_all_user_posts'
+        );
 
         $routes[] = array(
                             '_uri'  => '/^forum\/my_activity.html$/i',

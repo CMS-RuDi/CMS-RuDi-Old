@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_polls</id>
-    </module>
+    </info>
     <params>
         <param type="flag" name="shownum" default="off" />
         <param type="list_db" name="poll_id" src="cms_polls">

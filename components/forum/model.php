@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -752,6 +752,20 @@ class cms_model_forum {
         return $this->inDB->update('cms_forum_threads', $thread, $thread_id);
 
     }
+    
+    public function deleteAllUserPosts($user_id){
+        $this->inDB->query("DELETE FROM cms_forum_threads WHERE user_id = '{$user_id}'");
+        $this->inDB->query("DELETE FROM cms_forum_posts WHERE user_id = '{$user_id}'");
+        $this->inDB->query("DELETE FROM cms_forum_votes WHERE user_id = '{$user_id}'");
+        
+        $action_add_thread_id = (int)$this->inDB->get_field('cms_actions', "name='add_thread'", 'id');
+        $action_add_fpost_id  = (int)$this->inDB->get_field('cms_actions', "name='add_fpost'", 'id');
+        
+        $this->inDB->query("DELETE FROM cms_actions_log WHERE action_id IN({$action_add_thread_id},{$action_add_fpost_id}) AND user_id = '{$user_id}'");
+        
+        return true;
+    }
+    
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////////// методы для прикрепленных файлов ////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

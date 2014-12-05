@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_cart</id>
-    </module>
+    </info>
     <params>
 
         <param type="list" name="showtype">

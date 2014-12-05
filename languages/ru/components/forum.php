@@ -1,6 +1,6 @@
 <?php
 /******************************************************************************/
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -174,3 +174,6 @@ $_LANG['ADD_KARMA_LIMIT']            = 'У вас не хватает кармы
 $_LANG['KPOINT1']                    = 'пункт';
 $_LANG['KPOINT2']                    = 'пункта';
 $_LANG['KPOINT10']                   = 'пунктов';
+$_LANG['CONFIRM_DELETE_ALL_USER_POSTS'] = 'Удалить все сообщения и темы этого пользователя безвозратно?';
+$_LANG['DELETE_ALL_USER_POSTS']       = 'Удалить все сообщения';
+$_LANG['ALL_USERPOSTS_ISDELETED']     = 'Все темы и сообщения пользователя успешно удалены';

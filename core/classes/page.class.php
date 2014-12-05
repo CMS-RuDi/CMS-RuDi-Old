@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -725,6 +725,7 @@ class cmsPage {
                 } else {
                     $cfg = cmsCore::yamlToArray($mod['config']);
                     
+                    // переходный костыль для указания шаблона
                     if (empty($cfg['tpl'])) {
                         $cfg['tpl'] = $mod['content'];
                     }

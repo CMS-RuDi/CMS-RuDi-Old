@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_photo</id>
-    </module>
+    </info>
     <params>
         <param type="flag" name="user_photos" default="off" />
         
@@ -25,7 +26,7 @@
             <option value="month" />
         </param>
         <param type="flag" name="is_full" default="off" />
-        <param type="flag" name="showmore" default="on" />
         <param type="flag" name="is_lightbox" default="off" />
+        <param type="flag" name="showmore" default="on" />
     </params>
 </backend>

@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -69,10 +69,8 @@ if ($do == 'sendremind') {
 
         cmsCore::addSessionMessage($_LANG['NEW_PAS_SENDED'], 'info');
 
-        cmsCore::redirect('/users');
-
+        cmsCore::redirect('/login');
     }
-
 }
 
 //============================================================================//

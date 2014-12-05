@@ -1,6 +1,6 @@
 <?php
 /******************************************************************************/
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -174,3 +174,6 @@ $_LANG['ADD_KARMA_LIMIT']             ='You do not have enough karma for writing
 $_LANG['KPOINT1']                     = 'point';
 $_LANG['KPOINT2']                     = 'point';
 $_LANG['KPOINT10']                    = 'points';
+$_LANG['CONFIRM_DELETE_ALL_USER_POSTS'] = 'Delete all forum posts and threads from this user?';
+$_LANG['DELETE_ALL_USER_POSTS']       = 'Delete all forum posts';
+$_LANG['ALL_USERPOSTS_ISDELETED']     = 'All forum user posts and threads is deleted';

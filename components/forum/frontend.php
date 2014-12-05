@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -10,7 +10,6 @@
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
 /******************************************************************************/
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 function forum() {
     $inCore = cmsCore::getInstance();
@@ -37,7 +36,7 @@ function forum() {
 	$page = cmsCore::request('page', 'int', 1);
 
     $inPage->addHeadJS('components/forum/js/common.js');
-    $inPage->addHeadJsLang(array('CONFIRM_DELETE_POLL','CONFIRM_DEL_POST','CONFIRM_DEL_THREAD','MOVE_THREAD','MOVE_POST','RENAME_THREAD','CONFIRM_DELETE_FILE','SELECT_NEW_FILE_UPLOAD','SELECT_TEXT_QUOTE'));
+    $inPage->addHeadJsLang(array('CONFIRM_DELETE_POLL','CONFIRM_DEL_POST','CONFIRM_DEL_THREAD','MOVE_THREAD','MOVE_POST','RENAME_THREAD','CONFIRM_DELETE_FILE','SELECT_NEW_FILE_UPLOAD','SELECT_TEXT_QUOTE','CONFIRM_DELETE_ALL_USER_POSTS'));
 
 //============================================================================//
 //=============================== Список Форумов  ============================//
@@ -210,7 +209,8 @@ if ($do=='thread'){
             assign('lastpage', ceil($thread['post_count'] / $model->config['pp_thread']))->
             assign('pagebar', cmsPage::getPagebar($thread['post_count'], $page, $model->config['pp_thread'], '/forum/thread'.$thread['id'].'-%page%.html'))->
             assign('user_id', $inUser->id)->
-            assign('do', $do)->assign('is_moder', $is_forum_moder)->
+            assign('do', $do)->
+            assign('is_moder', $is_forum_moder)->
             assign('is_admin', $inUser->is_admin)->
             assign('is_can_add_post', cmsUser::isUserCan('forum/add_post'))->
             assign('cfg', $model->config)->
@@ -1303,12 +1303,31 @@ if ($do=='user_activity'){
             assign('pagetitle', $pagetitle)->
             assign('sub_do', $sub_do)->
             assign('page', $page)->
+            assign('user_id', $user['id'])->
+            assign('my_profile', $my_profile)->
+            assign('is_admin', $inUser->is_admin)->
+            assign('is_moderator', cmsUser::isUserCan('forum/moderate'))->
             assign('pagination', $pagination)->
             assign('link', '/forum/'.$user['login'].'_activity.html')->
             display();
 
 }
-////////////////////////////////////////////////////////////////////////////////
+
+if ($do=='delete_all_user_posts'){
+    if (!$inUser->id){ cmsCore::error404(); }
+    
+    if (!$inUser->is_admin && !cmsUser::isUserCan('forum/moderate')){ cmsCore::error404(); }
+    
+    if(!cmsUser::checkCsrfToken()) { cmsCore::halt(); }
+    
+    $user = cmsUser::getShortUserData(cmsCore::request('user_id', 'int', 0));
+    
+    if(!$user || $user['id'] == $inUser->id){ cmsCore::error404(); }
+    
+    $model->deleteAllUserPosts($user['id']);
+    
+    cmsCore::addSessionMessage($_LANG['ALL_USERPOSTS_ISDELETED'], 'success');
+    cmsCore::halt();
+}
 
 }
-?>

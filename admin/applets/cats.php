@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -295,7 +295,8 @@ function applet_cats() {
                 <div class="form-group">
                     <label><?php echo $_LANG['AD_PARENT_PARTITION'];?></label>
                     <div class="parent_notice" style="color:red;margin:4px 0px;display:none"><?php echo $_LANG['AD_ANOTHER_PARENT'];?></div>
-                    <select id="parent_id" class="form-control" name="parent_id" size="12" onchange="if($(this).val()=='<?php echo cmsCore::getArrVal($mod, 'id', ''); ?>'){ $('.parent_notice').show();$('#add_mod').prop('disabled', true); } else { $('.parent_notice').hide();$('#add_mod').prop('disabled', false); }">
+
+                    <select name="parent_id" size="12" id="parent_id" class="form-control" onchange="if($('option:selected',this).data('nsleft')>='<?php echo cmsCore::getArrVal($mod, 'NSLeft', 0); ?>' && $('option:selected',this).data('nsright')<='<?php echo cmsCore::getArrVal($mod, 'NSRight', 0); ?>'){ $('.parent_notice').show();$('#add_mod').prop('disabled', true); } else { $('.parent_notice').hide();$('#add_mod').prop('disabled', false); }">
                         <?php $rootid = cmsCore::c('db')->getNsRootCatId('cms_category'); ?>
                         <option value="<?php echo $rootid; ?>" <?php if (!isset($mod['parent_id']) || cmsCore::getArrVal($mod, 'parent_id', '') == $rootid) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_SECTION'];?></option>
                         <?php echo $inCore->getListItemsNS('cms_category', cmsCore::getArrVal($mod, 'parent_id', $rootid)); ?>

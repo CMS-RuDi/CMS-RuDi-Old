@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_tags</id>
-    </module>
+    </info>
     <params>
 
         <param type="list_db" multiple="1" name="targets" src="cms_tag_targets" src_title="title" src_value="target" />

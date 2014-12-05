@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_arhive</id>
-    </module>
+    </info>
     <params>
         <param type="list_db" name="cat_id" src="cms_category" src_title="title" src_value="id" src_where="published='1' AND NSLevel>0" tree="1" >
             <option value="0" />

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_rss</id>
-    </module>
+    </info>
     <params>
         <param type="string" name="rssurl" default="http://www.lenta.ru/rss" />
         <param type="flag" name="showdesc" default="on" />

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_userfiles</id>
-    </module>
+    </info>
     <params>
         <param type="flag" name="sw_latest" default="on" />
         <param type="flag" name="sw_popular" default="on" />

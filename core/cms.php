@@ -1,6 +1,6 @@
 <?php
 /******************************************************************************/
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -1258,9 +1258,15 @@ class cmsCore {
     public function loadModuleConfig($module_id){
         if (isset($this->module_configs[$module_id])) { return $this->module_configs[$module_id]; }
 
-        $config_yaml = self::c('db')->get_field('cms_modules', "id='{$module_id}'", 'config');
-
-        $config = self::yamlToArray($config_yaml);
+        $mod = self::c('db')->get_fields('cms_modules', "id='{$module_id}'", 'content, config');
+        if (!$mod) { return array(); }
+        
+        $config = self::yamlToArray($mod['config']);
+        
+        // переходный костыль для указания шаблона
+        if (empty($config['tpl'])) {
+            $config['tpl'] = $mod['content'];
+        }
 
         $this->cacheModuleConfig($module_id, $config);
 
@@ -1725,7 +1731,7 @@ class cmsCore {
                     
                     $padding = $no_padding ? '' : str_repeat('--', $node['NSLevel']) . ' ';
 
-                    $html .= '<option value="'.htmlspecialchars($node['id']).'" '.$s.'>'.$padding.$node['title'].'</option>' ."\n";
+                    $html .= '<option data-nsleft="'. $node['NSLeft'].'" data-nsright="'. $node['NSRight'] .'" value="'.htmlspecialchars($node['id']).'" '.$s.'>'.$padding.$node['title'].'</option>' ."\n";
                 }
             }
         }

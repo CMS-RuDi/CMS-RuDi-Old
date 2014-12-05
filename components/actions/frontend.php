@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -11,9 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
-
-function actions(){
+function actions() {
     $inCore = cmsCore::getInstance();
     
     global $_LANG;
@@ -26,8 +24,10 @@ function actions(){
 
     cmsCore::c('page')->setTitle($pagetitle);
     cmsCore::c('page')->addPathway($pagetitle, '/actions');
+    cmsCore::c('page')->setDescription(cmsCore::m('actions')->config['meta_desc'] ? cmsCore::m('actions')->config['meta_desc'] : $pagetitle);
+    cmsCore::c('page')->setKeywords(cmsCore::m('actions')->config['meta_keys'] ? cmsCore::m('actions')->config['meta_keys'] : $pagetitle);
 
-//======================================================================================================================//
+//============================================================================//
 
     if ($inCore->do == 'delete'){
         if (!cmsCore::c('user')->is_admin) { cmsCore::error404(); }
@@ -40,7 +40,7 @@ function actions(){
         cmsCore::redirectBack();
     }
 
-//======================================================================================================================//
+//============================================================================//
 
     if ($inCore->do == 'view'){
         cmsCore::c('actions')->showTargets(cmsCore::m('actions')->config['show_target']);
@@ -65,7 +65,7 @@ function actions(){
             display();
     }
 
-//======================================================================================================================//
+//============================================================================//
 
     if ($inCore->do == 'view_user_feed'){
         if (!cmsCore::c('user')->id) { cmsCore::error404(); }
@@ -98,7 +98,7 @@ function actions(){
             assign('friends_total', $friends_total)->
             display();
     }
-//======================================================================================================================//
+//============================================================================//
     if ($inCore->do == 'view_user_feed_only'){
         if(!cmsCore::c('user')->id) { cmsCore::error404(); }
 
@@ -128,7 +128,7 @@ function actions(){
             assign('cfg', cmsCore::m('actions')->config)->
             display();
     }
-//======================================================================================================================//
+//============================================================================//
     if ($inCore->do == 'view_user_friends_only'){
         if(!cmsCore::c('user')->id) { cmsCore::error404(); }
 

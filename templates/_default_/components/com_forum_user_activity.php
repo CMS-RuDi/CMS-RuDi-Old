@@ -4,6 +4,8 @@
 <?php } else { ?>
     <?php if ($thread_count) { ?><a class="ajaxlink" href="javascript:" onclick="forum.getUserActivity('threads', '<?php echo $link; ?>', '1');"><?php echo $_LANG['THREADS']; ?> (<?php echo $thread_count; ?>)</a> | <?php } ?><a class="ajaxlink" href="javascript:" onclick="forum.getUserActivity('posts', '<?php echo $link; ?>', '1');"><strong><?php echo $_LANG['MESSAGES1']; ?> (<?php echo $post_count; ?>)</strong></a>
 <?php } ?>
+
+<?php if (($is_admin || $is_moderator) && !$my_profile) { ?> | <a class="ajaxlink" href="javascript:" onclick="forum.clearAllPosts('<?php echo $user_id; ?>', '<?php echo cmsUser::getCsrfToken(); ?>');"><?php echo $_LANG['DELETE_ALL_USER_POSTS']; ?></a><?php } ?>
 </div>
 
 <h1 class="con_heading"><?php echo $pagetitle; ?></h1>

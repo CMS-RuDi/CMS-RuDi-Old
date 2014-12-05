@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_whoonline</id>
-    </module>
+    </info>
     <params>
         <param type="flag" name="show_today" default="on" />
 		<param type="flag" name="admin_editor" default="on" />

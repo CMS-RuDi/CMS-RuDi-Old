@@ -2,7 +2,7 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -67,6 +67,8 @@ if ($opt == 'saveconfig') {
     $cfg['max_level'] 	   = cmsCore::request('max_level', 'int');
     $cfg['edit_minutes']   = cmsCore::request('edit_minutes', 'int');
     $cfg['watermark'] 	   = cmsCore::request('watermark', 'int');
+    $cfg['meta_keys']      = cmsCore::request('meta_keys', 'str', '');
+    $cfg['meta_desc']      = cmsCore::request('meta_desc', 'str', '');
 
     $inCore->saveComponentConfig('comments', $cfg);
 
@@ -217,7 +219,26 @@ if ($opt == 'config') {
             <li><a href="#format"><span><?php echo $_LANG['AD_FORMAT']; ?></span></a></li>
             <li><a href="#access"><span><?php echo $_LANG['AD_TAB_ACCESS']; ?></span></a></li>
             <li><a href="#restrict"><span><?php echo $_LANG['AD_LIMIT']; ?></span></a></li>
+            <li><a href="#seo"><span><?php echo $_LANG['AD_SEO']; ?></span></a></li>
         </ul>
+        
+        <div id="seo">
+            <div class="form-group">
+                <label class="col-sm-5 control-label"><?php echo $_LANG['AD_ROOT_METAKEYS']; ?>:</label>
+                <div class="col-sm-7">
+                    <textarea class="form-control" name="meta_keys" rows="2"><?php echo $cfg['meta_keys'] ?></textarea>
+                    <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="col-sm-5 control-label"><?php echo $_LANG['AD_ROOT_METADESC']; ?>:</label>
+                <div class="col-sm-7">
+                    <textarea class="form-control" name="meta_keys" rows="2"><?php echo $cfg['meta_desc'] ?></textarea>
+                    <div class="help-block"><?php echo $_LANG['SEO_METADESCR_HINT']; ?></div>
+                </div>
+            </div>
+        </div>
 
         <div id="basic">
             <div class="form-group">

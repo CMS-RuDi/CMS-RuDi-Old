@@ -1,6 +1,6 @@
 ﻿<?php
 /******************************************************************************/
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -162,3 +162,4 @@ $_LANG['AD_ROOT_METAKEYS']        = 'Homepage keywords (meta keywords)';
 $_LANG['AD_ROOT_METADESC']        = 'Homepage descripion (meta description)';
 $_LANG['AD_LIMIT']                = 'Restrictions';
 $_LANG['AD_RETAIN_BOOT']          = 'Save original photos<br />when users loading';
+$_LANG['MOD_TPL']                 = 'Module template';

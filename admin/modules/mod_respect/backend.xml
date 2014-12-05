@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
-        <id dfs="">mod_respect</id>
-    </module>
+    <info>
+        <type>module</type>
+        <id>mod_respect</id>
+    </info>
     <params>
         <param type="number" name="limit" default="5" />
         <param type="flag" name="show_awards" default="off" />

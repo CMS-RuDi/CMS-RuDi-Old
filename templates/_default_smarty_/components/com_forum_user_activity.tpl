@@ -4,6 +4,7 @@
 {else}
     {if $thread_count}<a class="ajaxlink" href="javascript:" onclick="forum.getUserActivity('threads', '{$link}', '1');">{$LANG.THREADS} ({$thread_count})</a> | {/if}<a class="ajaxlink" href="javascript:" onclick="forum.getUserActivity('posts', '{$link}', '1');"><strong>{$LANG.MESSAGES1} ({$post_count})</strong></a>
 {/if}
+{if ($is_admin || $is_moderator) && !$my_profile} | <a class="ajaxlink" href="javascript:" onclick="forum.clearAllPosts('{$user_id}', '{csrf_token}');">{$LANG.DELETE_ALL_USER_POSTS}</a>{/if} 
 </div>
 
 <h1 class="con_heading">{$pagetitle}</h1>

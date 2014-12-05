@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_uc_random</id>
-    </module>
+    </info>
     <params>
 
         <param type="list_db" name="cat_id" src="cms_uc_cats" src_title="title" src_value="id" tree="1" src_where="NSLevel>0">

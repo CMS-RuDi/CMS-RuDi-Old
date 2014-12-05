@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_menu</id>
-    </module>
+    </info>
     <params>
         <param type="list_function" name="menu" function="cpGetList" key_title="title" key_value="id" param="menu" />
 

@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -105,6 +105,7 @@ function applet_plugins() {
             switch($param['type']){
                 case 'number':  $value = cmsCore::request($name, 'int', $default); break;
                 case 'string':  $value = cmsCore::request($name, 'str', $default); break;
+                case 'html':    $value = cmsCore::badTagClear(cmsCore::request($name, 'html', $default)); break;
                 case 'flag':    $value = cmsCore::request($name, 'int', 0); break;
                 case 'list':    $value = (is_array($_POST[$name]) ? cmsCore::request($name, 'array_str', $default) : cmsCore::request($name, 'str', $default)); break;
                 case 'list_function': $value = cmsCore::request($name, 'str', $default); break;

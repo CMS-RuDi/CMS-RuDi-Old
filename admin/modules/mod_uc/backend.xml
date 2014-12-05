@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <backend>
-    <module>
+    <info>
+        <type>module</type>
         <id>mod_uc</id>
-    </module>
+    </info>
     <params>
         <param type="number" name="num" default="5" />
         <param type="list" name="sort">

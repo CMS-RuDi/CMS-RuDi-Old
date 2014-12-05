@@ -1,7 +1,7 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.4                               //
+//                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
 //                                                                            //
 //                   written by InstantCMS Team, 2007-2014                    //
@@ -11,9 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
-
-class cms_model_comments{
+class cms_model_comments {
     private $childs;
     public $is_can_delete    = false;
     public $is_can_moderate  = false;
@@ -28,58 +26,40 @@ class cms_model_comments{
         $this->labels = array_merge(self::getDefaultLabels(), $labels);
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
     public static function getDefaultConfig() {
-
-        $cfg = array (
-				  'email' => '',
-				  'regcap' => 0,
-				  'subscribe' => 1,
-				  'min_karma' => 0,
-				  'min_karma_show' => 0,
-				  'min_karma_add' => 0,
-				  'perpage' => 20,
-				  'cmm_ajax' => 0,
-				  'cmm_ip' => 1,
-				  'max_level' => 5,
-				  'edit_minutes' => 0,
-				  'watermark' => 0
-				);
-
-        return $cfg;
-
+        return array (
+            'email'          => '',
+            'regcap'         => 0,
+            'subscribe'      => 1,
+            'min_karma'      => 0,
+            'min_karma_show' => 0,
+            'min_karma_add'  => 0,
+            'perpage'        => 20,
+            'cmm_ajax'       => 0,
+            'cmm_ip'         => 1,
+            'max_level'      => 5,
+            'edit_minutes'   => 0,
+            'watermark'      => 0,
+            'meta_keys'      => '',
+            'meta_desc'      => ''
+        );
     }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
 
     public static function getDefaultLabels() {
-
-		global $_LANG;
+        global $_LANG;
 
         return array('comments' => $_LANG['COMMENTS'], 'add' => $_LANG['ADD_COMM'], 'rss' => $_LANG['RSS_COMM'], 'not_comments' => $_LANG['NOT_COMMENT_TEXT']);
-
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
     public function initAccess() {
-
-		$this->is_can_delete    = cmsUser::isUserCan('comments/delete');
-		$this->is_can_moderate  = cmsUser::isUserCan('comments/moderate');
-		$this->is_can_bbcode    = cmsUser::isUserCan('comments/bbcode');
-		$this->is_can_add       = cmsUser::isUserCan('comments/add');
-		$this->is_add_published = cmsUser::isUserCan('comments/add_published');
-
+        $this->is_can_delete    = cmsUser::isUserCan('comments/delete');
+        $this->is_can_moderate  = cmsUser::isUserCan('comments/moderate');
+        $this->is_can_bbcode    = cmsUser::isUserCan('comments/bbcode');
+        $this->is_can_add       = cmsUser::isUserCan('comments/add');
+        $this->is_add_published = cmsUser::isUserCan('comments/add_published');
     }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
 
     public function addComment($item) {
-
         $item = cmsCore::callEvent('ADD_COMMENT', $item);
 
         $item['target_title'] = $this->inDB->escape_string($item['target_title']);
@@ -89,24 +69,17 @@ class cms_model_comments{
         cmsCore::setIdUploadImage('comment', $comment_id, 'comments');
 
         return $comment_id;
-
     }
 
     public function updateComment($id, $comment) {
-
         if (!$id) { return false; }
 
-       $this->inDB->update('cms_comments', $comment, $id);
+        $this->inDB->update('cms_comments', $comment, $id);
 
-       return true;
-
+        return true;
     }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
+    
     public function getTargetAuthor($table, $target_id) {
-
         $sql = "SELECT u.id, u.email
                 FROM cms_users u, {$table} p
                 WHERE p.user_id = u.id AND p.id = '{$target_id}' AND u.is_locked = 0 AND u.is_deleted = 0
@@ -117,32 +90,17 @@ class cms_model_comments{
         if ($this->inDB->num_rows($result)!==1){ return false; }
 
         return $this->inDB->fetch_assoc($result);
-
     }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
 
     public function getCommentAuthorId($comment_id) {
-
         return $this->inDB->get_field('cms_comments', "id='$comment_id'", 'user_id');
-
     }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
 
     public function isAuthorNeedMail($author_id) {
-
         return $this->inDB->get_field('cms_user_profiles', "user_id='$author_id'", 'email_newmsg');
-
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
     private function getCommentChilds($comment_id) {
-
         $sql = "SELECT id FROM cms_comments WHERE parent_id = '$comment_id'";
 
         $result = $this->inDB->query($sql);
@@ -155,14 +113,9 @@ class cms_model_comments{
         }
 
         return true;
-
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
     public function deleteComment($comment_id) {
-
         cmsCore::callEvent('DELETE_COMMENT', $comment_id);
 
         $this->childs = array();
@@ -187,29 +140,21 @@ class cms_model_comments{
         }
 
         return true;
-
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
     public function isEditable($pubdate) {
+        if (cmsUser::getInstance()->is_admin) { return true; }
 
-		if(cmsUser::getInstance()->is_admin) { return true; }
-
-		if(!$this->config['edit_minutes']) { return false; }
+        if (!$this->config['edit_minutes']) { return false; }
 
         $now      = time();
         $date     = strtotime($pubdate);
         $diff_sec = $now - $date;
-		$end_min  = $this->config['edit_minutes'] - round($diff_sec/60);
+        $end_min  = $this->config['edit_minutes'] - round($diff_sec/60);
 
         return $end_min > 0 ? $end_min : false;
-
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
     /**
      * Условия выборки
      */
@@ -231,45 +176,41 @@ class cms_model_comments{
 
     public function whereTargetIn($targets) {
         $t_list = '';
-		foreach($targets as $t){
-			$t_list .= "'$t',";
+        foreach($targets as $t){
+            $t_list .= "'$t',";
         }
-		$t_list = rtrim($t_list, ',');
-		$this->inDB->where("c.target IN ({$t_list})");
+        $t_list = rtrim($t_list, ',');
+        $this->inDB->where("c.target IN ({$t_list})");
     }
 
     public function whereIsShow() {
         $this->inDB->where("c.is_hidden=0");
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
     /**
      * Получаем комментарии по заданным параметрам
      * @return array
      */
     public function getComments($only_published=true, $is_tree=false, $from_module = false) {
-
-		$inUser = cmsUser::getInstance();
+        $inUser = cmsUser::getInstance();
 
         $comments = array();
 
-		global $_LANG;
+        global $_LANG;
 
         $published = $only_published ? 'c.published = 1' : '1=1';
 
         $sql = "SELECT c.*,
-					   IFNULL(u.nickname, 0) as nickname,
-					   IFNULL(u.login, 0) as login,
-					   IFNULL(u.is_deleted, 0) as is_deleted,
-					   IFNULL(p.imageurl, 0) as imageurl,
-					   IFNULL(p.gender, 0) as gender
+                       IFNULL(u.nickname, 0) as nickname,
+                       IFNULL(u.login, 0) as login,
+                       IFNULL(u.is_deleted, 0) as is_deleted,
+                       IFNULL(p.imageurl, 0) as imageurl,
+                       IFNULL(p.gender, 0) as gender
                 FROM cms_comments c
-				LEFT JOIN cms_users u ON u.id = c.user_id
-				LEFT JOIN cms_user_profiles p ON p.user_id = u.id
+                        LEFT JOIN cms_users u ON u.id = c.user_id
+                        LEFT JOIN cms_user_profiles p ON p.user_id = u.id
                 WHERE {$published}
-					{$this->inDB->where}
+                    {$this->inDB->where}
 
                 {$this->inDB->group_by}
 
@@ -287,59 +228,56 @@ class cms_model_comments{
 
         while($comment = $this->inDB->fetch_assoc($result)){
 
-			$comment['level'] = 0;
-			$comment['is_editable'] = $this->isEditable($comment['pubdate']);
-			$comment['fpubdate']    = cmsCore::dateFormat($comment['pubdate'], true, true);
+            $comment['level'] = 0;
+            $comment['is_editable'] = $this->isEditable($comment['pubdate']);
+            $comment['fpubdate']    = cmsCore::dateFormat($comment['pubdate'], true, true);
 
-			if ($comment['guestname']){
-				$comment['author']     = $comment['guestname'];
-				$comment['is_profile'] = false;
-				$comment['ip']  	   = in_array($this->config['cmm_ip'], array(1,2)) ? $comment['ip'] : '';
-			} else {
-				$comment['author']['nickname'] = $comment['nickname'];
-				$comment['author']['login']    = $comment['login'];
-				$comment['is_profile'] 	= true;
-				$comment['user_image'] 	= cmsUser::getUserAvatarUrl($comment['user_id'], 'small', $comment['imageurl'], $comment['is_deleted']);
-				$comment['ip']  		= ($this->config['cmm_ip'] == 2 && $comment['ip']) ? $comment['ip'] : '';
-			}
+            if ($comment['guestname']){
+                $comment['author']     = $comment['guestname'];
+                $comment['is_profile'] = false;
+                $comment['ip']  	   = in_array($this->config['cmm_ip'], array(1,2)) ? $comment['ip'] : '';
+            } else {
+                $comment['author']['nickname'] = $comment['nickname'];
+                $comment['author']['login']    = $comment['login'];
+                $comment['is_profile'] 	= true;
+                $comment['user_image'] 	= cmsUser::getUserAvatarUrl($comment['user_id'], 'small', $comment['imageurl'], $comment['is_deleted']);
+                $comment['ip']  		= ($this->config['cmm_ip'] == 2 && $comment['ip']) ? $comment['ip'] : '';
+            }
 
-			switch ($comment['gender']){
-					case 'm': 	$comment['gender'] = $_LANG['COMMENTS_MALE'];
-								break;
-					case 'f':	$comment['gender'] = $_LANG['COMMENTS_FEMALE'];
-								break;
-					default:	$comment['gender'] = $_LANG['COMMENTS_GENDER'];
-			}
+            switch ($comment['gender']){
+                case 'm': 	$comment['gender'] = $_LANG['COMMENTS_MALE'];
+                                        break;
+                case 'f':	$comment['gender'] = $_LANG['COMMENTS_FEMALE'];
+                                        break;
+                default:	$comment['gender'] = $_LANG['COMMENTS_GENDER'];
+            }
 
-			$comment['show']  = (!$this->config['min_karma'] || $comment['rating'] >= $this->config['min_karma_show']) || cmsUser::userIsAdmin($comment['user_id']);
-			$comment['is_my'] = ($inUser->id == $comment['user_id']);
-			if ($inUser->id){
-				$comment['is_voted'] = $comment['is_my'] ? true : cmsUser::isRateUser('comment', $inUser->id, $comment['id']);
-			} else {
-				$comment['is_voted'] = true;
-			}
+            $comment['show']  = (!$this->config['min_karma'] || $comment['rating'] >= $this->config['min_karma_show']) || cmsUser::userIsAdmin($comment['user_id']);
+            $comment['is_my'] = ($inUser->id == $comment['user_id']);
+            if ($inUser->id){
+                $comment['is_voted'] = $comment['is_my'] ? true : cmsUser::isRateUser('comment', $inUser->id, $comment['id']);
+            } else {
+                $comment['is_voted'] = true;
+            }
 
             $comments[] = $comment;
 
         }
 
-		if($is_tree){
-			$comments = $this->buildTree(0, 0, $comments);
-		}
+        if($is_tree){
+            $comments = $this->buildTree(0, 0, $comments);
+        }
 
         return $from_module ? cmsCore::callEvent('GET_COMMENTS_MODULE', $comments) : cmsCore::callEvent('GET_COMMENTS', $comments);
 
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
     /**
      * Возвращает количество комментариев по заданным параметрам
      * @return int
      */
     public function getCommentsCount($only_published=true) {
-
-		$published = $only_published ? 'c.published = 1' : '1=1';
+        $published = $only_published ? 'c.published = 1' : '1=1';
 
         $sql = "SELECT 1
                 FROM cms_comments c
@@ -351,13 +289,9 @@ class cms_model_comments{
         $result = $this->inDB->query($sql);
 
         return $this->inDB->num_rows($result);
-
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
     public function getComment($id) {
-
         $sql = "SELECT c.*,
 					   IFNULL(u.nickname, 0) as nickname,
 					   IFNULL(u.login, 0) as login,
@@ -375,16 +309,12 @@ class cms_model_comments{
 
         $comment = $this->inDB->fetch_assoc($result);
 
-		$comment['is_editable'] = $this->isEditable($comment['pubdate']);
+        $comment['is_editable'] = $this->isEditable($comment['pubdate']);
 
         return cmsCore::callEvent('GET_COMMENT', $comment);
-
     }
 
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
-    private function buildTree($parent_id, $level, $comments, $tree=array()){
+    private function buildTree($parent_id, $level, $comments, $tree=array()) {
         $level++;
         foreach($comments as $comment){
             if ($comment['parent_id']==$parent_id){
@@ -393,10 +323,6 @@ class cms_model_comments{
                 $tree = $this->buildTree($comment['id'], $level, $comments, $tree);
             }
         }
-		return $tree;
+	return $tree;
     }
-
-/* ==================================================================================================== */
-/* ==================================================================================================== */
-
 }

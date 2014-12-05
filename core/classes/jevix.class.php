@@ -669,7 +669,7 @@ class Jevix{
 			return false;
 		}
 
-		while((($this->curChClass & self::NAME) == self::NAME || ($minus && $this->curCh=='-'))){
+		while((($this->curChClass & self::NAME) == self::NAME || ($minus && in_array($this->curCh, array('-','_'))))){
 			$name.=$this->curCh;
 			$this->getCh();
 		}

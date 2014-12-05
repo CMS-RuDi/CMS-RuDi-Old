@@ -2124,20 +2124,13 @@ class cmsCore {
      * @return str
      */
     public static function badTagClear($string){
-
-        $my_domen_regexp = str_replace('.', '\.', HOST);
-        $my_domen_regexp = str_replace('/', '\/', $my_domen_regexp);
-
         $bad_tags = array (
             "'<script[^>]*?>.*?</script>'siu",
             "'<style[^>]*?>.*?</style>'siu",
-            "'<meta[^>]*?>'siu",
-            '/<iframe.*?src=(?!"\/\/www\.youtube\.com\/embed\/|"http:\/\/vk\.com\/video_ext\.php\?|"'.$my_domen_regexp.').*?>.*?<\/iframe>/iu',
-            '/<iframe.*>.+<\/iframe>/iu'
+            "'<meta[^>]*?>'siu"
         );
 
         return self::htmlCleanUp(preg_replace($bad_tags, '', $string));
-
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -2153,7 +2146,7 @@ class cmsCore {
             self::c('jevix')->cfgAllowTags(empty($allowTags) ? explode(',', self::c('config')->JevixAllowTags) : $allowTags);
             
             // Устанавливаем коротие теги. (не имеющие закрывающего тега)
-            self::c('jevix')->cfgSetTagShort(array('br','img', 'hr', 'input'));
+            self::c('jevix')->cfgSetTagShort(array('br','img', 'hr', 'input','embed'));
             // Устанавливаем преформатированные теги. (в них все будет заменятся на HTML сущности)
             self::c('jevix')->cfgSetTagPreformatted(array('code','video'));
             
@@ -2164,7 +2157,11 @@ class cmsCore {
             self::c('jevix')->cfgAllowTagParams('input', array('type'=>'#text', 'style', 'onclick' => '#text', 'value' => '#text'));
             self::c('jevix')->cfgAllowTagParams('a', array('class' => '#text', 'title', 'href', 'style', 'rel' => '#text', 'name' => '#text'));
             self::c('jevix')->cfgAllowTagParams('img', array('src' => '#text', 'style', 'alt' => '#text', 'title', 'align' => array('right', 'left', 'center'), 'width' => '#int', 'height' => '#int', 'hspace' => '#int', 'vspace' => '#int'));
-            self::c('jevix')->cfgAllowTagParams('div', array('class' => '#text', 'style','align' => array('right', 'left', 'center')));
+            elf::$jevix->cfgAllowTagParams('div', array(
+                'class' => '#text', 'style',
+                'data-align' => '#text','data-oembed' => '#link','data-oembed_provider' => '#text','data-resizetype' => '#text',
+                'align' => array('right', 'left', 'center')
+            )); 
             self::c('jevix')->cfgAllowTagParams('object', array('width' => '#int', 'height' => '#int', 'data' => '#text'));
             self::c('jevix')->cfgAllowTagParams('param', array('name' => '#text', 'value' => '#text'));
             self::c('jevix')->cfgAllowTagParams('embed', array('src' => '#image','type' => '#text','allowscriptaccess' => '#text','allowFullScreen' => '#text','width' => '#int','height' => '#int','flashvars'=> '#text','wmode'=> '#text'));
@@ -2178,7 +2175,7 @@ class cmsCore {
             self::c('jevix')->cfgAllowTagParams('th', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
             self::c('jevix')->cfgAllowTagParams('tr', array('class' => '#text','style'));
             self::c('jevix')->cfgAllowTagParams('td', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
-            self::c('jevix')->cfgAllowTagParams('iframe', array('width' => '#int', 'frameborder' => '#int', 'allowfullscreen' => '#int', 'height' => '#int', 'src' => array('#domain'=>array('youtube.com','vimeo.com','vk.com', self::getHost()))));
+            self::$jevix->cfgAllowTagParams('iframe', array('width' => '#int', 'frameborder' => '#int', 'allowfullscreen' => '#text', 'height' => '#int', 'src' => array('#domain'=>array('youtube.com','vimeo.com','vk.com', 'rutube.ru', 'w.soundcloud.com','dailymotion.com', self::getHost()))));
             
             // Устанавливаем параметры тегов являющиеся обязательными. Без них вырезает тег оставляя содержимое.
             self::c('jevix')->cfgSetTagParamsRequired('img', 'src');
@@ -2190,7 +2187,7 @@ class cmsCore {
             self::c('jevix')->cfgSetTagChilds('object','embed',false,false);
             
             // Если нужно оставлять пустые не короткие теги
-            self::c('jevix')->cfgSetTagIsEmpty(array('param','embed','a','iframe'));
+            self::c('jevix')->cfgSetTagIsEmpty(array('param','embed','a','iframe','div'));
             self::c('jevix')->cfgSetTagParamDefault('embed','wmode','opaque',true);
             
             // Устанавливаем автозамену

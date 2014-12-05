@@ -32,6 +32,7 @@ header('Content-Type: text/html; charset=utf-8');
                 </div>
                 <div class="panel-body">
                     <form action="/login" method="post" role="form">
+                        <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
                         <input type="hidden" name="is_admin" value="1" />
                         
                         <div class="form-group">

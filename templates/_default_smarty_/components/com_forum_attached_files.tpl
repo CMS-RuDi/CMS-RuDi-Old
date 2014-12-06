@@ -18,7 +18,8 @@
                 </td>
         </tr></table>
     </div>
-    {assign var="file_count" value=`$file_count+1`}
+
+    {$file_count=$file_count+1}
 {/foreach}
 <input type="hidden" name="file_count" id="file_count" value="{$file_count}" />
 </div>

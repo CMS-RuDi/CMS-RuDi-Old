@@ -118,7 +118,7 @@
             <td style="vertical-align: top">
             {foreach key=id item=moderator from=$moderators}
                 {if $q}, {/if}<a href="{profile_url login=$moderator.login}">{$moderator.nickname}</a>
-                {assign var="q" value="1"}
+                {$q=1}
             {/foreach}
         </td>
         {/if}

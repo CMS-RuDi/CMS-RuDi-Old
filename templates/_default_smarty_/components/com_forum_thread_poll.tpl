@@ -65,7 +65,7 @@
         {else}
             {foreach key=answer item=num from=$thread_poll.answers}
 
-                {assign var="percent" value="`$num/$thread_poll.vote_count*100`"}
+                {$percent = $num/$thread_poll.vote_count*100}
 
                 <span class="forum_poll_gauge_title">{$answer} ({$num})</span>
                 {if $percent > 0}

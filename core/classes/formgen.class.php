@@ -174,9 +174,7 @@ class cmsFormGen {
 //============================================================================//
     private function renderHtml($param) {
         ob_start();
-        
-        cmsCore::insertEditor($param['name'], $param['value'], $param['height'], $param['width'], $param['toolbar']);
-        
+            cmsCore::insertEditor($param['name'], $param['value'], $param['height'], $param['width'], $param['toolbar']);
         return ob_get_clean();
     }
     
@@ -196,7 +194,7 @@ class cmsFormGen {
     }
 
     private function renderList($param){
-        $html = '<select id="'.$param['name'].'" name="'.$param['name'].(isset($param['multiple']) ? '[]' : '').'"'.(isset($param['multiple']) ? (' size="'.(isset($param['size']) ? (int)$param['size'] : '5').'" multiple="multiple"') : '').' class="param-list">' . "\n";
+        $html = '<select id="'.$param['name'].'" name="'.$param['name'].(isset($param['multiple']) ? '[]' : '').'"'.(isset($param['multiple']) ? (' size="'.(isset($param['size']) ? (int)$param['size'] : '5').'" multiple="multiple"') : '').' class="param-list form-control">' . "\n";
         
         $values = explode('|', $param['value']);
 
@@ -307,11 +305,5 @@ class cmsFormGen {
         }
 
         return $html;
-    }
-    
-    private function renderHtml($param) {
-        ob_start();
-            cmsCore::insertEditor($param['name'], $param['value'], $param['height'], $param['width'], $param['toolbar']);
-        return ob_get_clean();
     }
 }

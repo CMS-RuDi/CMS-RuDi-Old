@@ -13,7 +13,7 @@ if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
 define('CMS_RUDI_V', '0.0.9');
-define('CMS_RUDI_V_DATE', '25.11.2014');
+define('CMS_RUDI_V_DATE', '08.12.2014');
 
 class cmsCore {
     private static   $instance;
@@ -2139,70 +2139,82 @@ class cmsCore {
      * @param string $text
      * @return string
      */
-    public static function htmlCleanUp($text, $allowTags='', $TagCutWithContent=''){
-        
-        if(!isset(self::$classes['jevix'])){
+    public static function htmlCleanUp($text, $allowTags='', $TagCutWithContent='') {
+        if (!isset(self::$classes['jevix'])) {
             // Устанавливаем разрешённые теги. (Все не разрешенные теги считаются запрещенными.)
             self::c('jevix')->cfgAllowTags(empty($allowTags) ? explode(',', self::c('config')->JevixAllowTags) : $allowTags);
-            
+
             // Устанавливаем коротие теги. (не имеющие закрывающего тега)
             self::c('jevix')->cfgSetTagShort(array('br','img', 'hr', 'input','embed'));
+
             // Устанавливаем преформатированные теги. (в них все будет заменятся на HTML сущности)
             self::c('jevix')->cfgSetTagPreformatted(array('code','video'));
-            
+
             // Устанавливаем теги, которые необходимо вырезать из текста вместе с контентом.
             self::c('jevix')->cfgSetTagCutWithContent(empty($TagCutWithContent) ? explode(',', self::c('config')->JevixTagCutWithContent) : $TagCutWithContent);
-            
+
             // Устанавливаем разрешённые параметры тегов. Также можно устанавливать допустимые значения этих параметров.
             self::c('jevix')->cfgAllowTagParams('input', array('type'=>'#text', 'style', 'onclick' => '#text', 'value' => '#text'));
+
             self::c('jevix')->cfgAllowTagParams('a', array('class' => '#text', 'title', 'href', 'style', 'rel' => '#text', 'name' => '#text'));
+
             self::c('jevix')->cfgAllowTagParams('img', array('src' => '#text', 'style', 'alt' => '#text', 'title', 'align' => array('right', 'left', 'center'), 'width' => '#int', 'height' => '#int', 'hspace' => '#int', 'vspace' => '#int'));
-            elf::$jevix->cfgAllowTagParams('div', array(
-                'class' => '#text', 'style',
-                'data-align' => '#text','data-oembed' => '#link','data-oembed_provider' => '#text','data-resizetype' => '#text',
+
+            self::c('jevix')->cfgAllowTagParams('div', array(
+                'class' => '#text',
+                'style' => '#text',
+                'data-align' => '#text',
+                'data-oembed' => '#link',
+                'data-oembed_provider' => '#text',
+                'data-resizetype' => '#text',
                 'align' => array('right', 'left', 'center')
-            )); 
+            ));
+
             self::c('jevix')->cfgAllowTagParams('object', array('width' => '#int', 'height' => '#int', 'data' => '#text'));
+
             self::c('jevix')->cfgAllowTagParams('param', array('name' => '#text', 'value' => '#text'));
             self::c('jevix')->cfgAllowTagParams('embed', array('src' => '#image','type' => '#text','allowscriptaccess' => '#text','allowFullScreen' => '#text','width' => '#int','height' => '#int','flashvars'=> '#text','wmode'=> '#text'));
+
             self::c('jevix')->cfgAllowTagParams('acronym', array('title'));
             self::c('jevix')->cfgAllowTagParams('abbr', array('title'));
             self::c('jevix')->cfgAllowTagParams('span', array('style'));
             self::c('jevix')->cfgAllowTagParams('li', array('style'));
             self::c('jevix')->cfgAllowTagParams('p', array('style'));
             self::c('jevix')->cfgAllowTagParams('table', array('width'=>'#text', 'class' => '#text', 'cellpadding'=>'#int', 'cellspacing'=>'#int', 'align',  'border'=>'#int'));
+
             self::c('jevix')->cfgAllowTagParams('caption', array('class' => '#text','style'));
             self::c('jevix')->cfgAllowTagParams('th', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
             self::c('jevix')->cfgAllowTagParams('tr', array('class' => '#text','style'));
             self::c('jevix')->cfgAllowTagParams('td', array('class' => '#text','style', 'width'=>'#int', 'height'=>'#int', 'align', 'valign', 'colspan'=>'#int', 'rowspan'=>'#int'));
-            self::$jevix->cfgAllowTagParams('iframe', array('width' => '#int', 'frameborder' => '#int', 'allowfullscreen' => '#text', 'height' => '#int', 'src' => array('#domain'=>array('youtube.com','vimeo.com','vk.com', 'rutube.ru', 'w.soundcloud.com','dailymotion.com', self::getHost()))));
-            
+            self::c('jevix')->cfgAllowTagParams('iframe', array('width' => '#int', 'frameborder' => '#int', 'allowfullscreen' => '#text', 'height' => '#int', 'src' => array('#domain'=>array('youtube.com','vimeo.com','vk.com', 'rutube.ru', 'w.soundcloud.com','dailymotion.com', self::getHost()))));
+
             // Устанавливаем параметры тегов являющиеся обязательными. Без них вырезает тег оставляя содержимое.
             self::c('jevix')->cfgSetTagParamsRequired('img', 'src');
-            
+
             // Устанавливаем теги которые может содержать тег контейнер
             self::c('jevix')->cfgSetTagChilds('ul',array('li'),false,true);
             self::c('jevix')->cfgSetTagChilds('ol',array('li'),false,true);
             self::c('jevix')->cfgSetTagChilds('object','param',false,true);
             self::c('jevix')->cfgSetTagChilds('object','embed',false,false);
-            
+
             // Если нужно оставлять пустые не короткие теги
             self::c('jevix')->cfgSetTagIsEmpty(array('param','embed','a','iframe','div'));
             self::c('jevix')->cfgSetTagParamDefault('embed','wmode','opaque',true);
-            
+
             // Устанавливаем автозамену
             self::c('jevix')->cfgSetAutoReplace(array('+/-', '(c)', '(с)', '(r)', '(C)', '(С)', '(R)'), array('±', '©', '©', '®', '©', '©', '®'));
+
             // выключаем режим замены переноса строк на тег <br/>
             self::c('jevix')->cfgSetAutoBrMode(false);
+            
             // выключаем режим автоматического определения ссылок
             self::c('jevix')->cfgSetAutoLinkMode(false);
             
             // Отключаем типографирование в определенном теге
             self::c('jevix')->cfgSetTagNoTypography('code','video','object','iframe');
         }
-
-        return self::c('jevix')->parse($text,$errors);
         
+        return self::c('jevix')->parse($text,$errors);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -2738,13 +2750,34 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
 
     }
 
-    public static function jsonOutput($data = array(), $is_header = true){
-        // очищаем буфер
+    /**
+     * 
+     * @param mixed $data Данные для кодирования
+     * @param boolean $is_header Выставлять хидер application/json или нет
+     * @param boolean $unescaped_unicode Не кодировать многобайтные символы Unicode (по умолчанию они кодируются как \uXXXX)
+     */
+    public static function jsonOutput($data = array(), $is_header = true, $unescaped_unicode = false){
         ob_end_clean();
+        
         if ($is_header) {
             header('Content-type: application/json; charset=utf-8');
         }
-        self::halt(json_encode($data));
+        
+        if ($unescaped_unicode) {
+            if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+                $data = json_encode($data, JSON_UNESCAPED_UNICODE);
+            } else {
+                $data = str_replace(
+                    array ( '\u0430', '\u0410', '\u0431', '\u0411', '\u0432', '\u0412', '\u0433', '\u0413', '\u0434', '\u0414', '\u0435', '\u0415', '\u0451', '\u0401', '\u0436', '\u0416', '\u0437', '\u0417', '\u0438', '\u0418', '\u0439', '\u0419', '\u043a', '\u041a', '\u043b', '\u041b', '\u043c', '\u041c', '\u043d', '\u041d', '\u043e', '\u041e', '\u043f', '\u041f', '\u0440', '\u0420', '\u0441', '\u0421', '\u0442', '\u0422', '\u0443', '\u0423', '\u0444', '\u0424', '\u0445', '\u0425', '\u0446', '\u0426', '\u0447', '\u0427', '\u0448', '\u0428', '\u0449', '\u0429', '\u044a', '\u042a', '\u044b', '\u042b', '\u044c', '\u042c', '\u044d', '\u042d', '\u044e', '\u042e', '\u044f', '\u042f' ),
+                    array ( 'а', 'А', 'б', 'Б', 'в', 'В', 'г', 'Г', 'д', 'Д', 'е', 'Е', 'ё', 'Ё', 'ж', 'Ж', 'з', 'З', 'и', 'И', 'й', 'Й', 'к', 'К', 'л', 'Л', 'м', 'М', 'н', 'Н', 'о', 'О', 'п', 'П', 'р', 'Р', 'с', 'С', 'т', 'Т', 'у', 'У', 'ф', 'Ф', 'х', 'Х', 'ц', 'Ц', 'ч', 'Ч', 'ш', 'Ш', 'щ', 'Щ', 'ъ', 'Ъ', 'ы', 'Ы', 'ь', 'Ь', 'э', 'Э', 'ю', 'Ю', 'я', 'Я' ),
+                    json_encode($data)
+                );
+            }
+        } else {
+            $data = json_encode($data);
+        }
+        
+        self::halt($data);
     }
     
     /**

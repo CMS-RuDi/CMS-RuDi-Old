@@ -80,6 +80,7 @@ function applet_config() {
         $newCFG['user_stats']         = cmsCore::request('user_stats', 'int', 0);
         
         $newCFG['seo_url_count']      = cmsCore::request('seo_url_count', 'int', 0);
+        $newCFG['max_pagebar_links']  = cmsCore::request('max_pagebar_links', 'int', 0);
         $newCFG['allow_ip']           = cmsCore::request('allow_ip', 'str', '');
         
         $newCFG['iframe_enable']      = cmsCore::request('iframe_enable', 'int', 0);
@@ -281,6 +282,13 @@ function applet_config() {
                     <div class="col-sm-7">
                         <input type="number" class="form-control" name="seo_url_count" value="<?php echo $config['seo_url_count']; ?>" />
                         <div class="help-block"><?php echo $_LANG['AD_SEO_URL_COUNT_HINT']; ?></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_PAGEBAR_MAX_LINKS']; ?></label>
+                    <div class="col-sm-7">
+                        <input type="number" class="form-control" name="max_pagebar_links" value="<?php echo $config['max_pagebar_links']; ?>" />
                     </div>
                 </div>
             </div>

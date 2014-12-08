@@ -1013,10 +1013,9 @@ class cmsPage {
         if ($total_pages == 1) { return; }
 
         //configure for the starting links per page
-        $max = 10;
 
         //used in the loop
-        $max_links = $max + 1;
+        $max_links = ceil(cmsCore::c('config')->max_pagebar_links/2) + 1;
         $current = 1;
 
         //if page is above max link
@@ -1044,14 +1043,14 @@ class cmsPage {
         }
         
         return self::initTemplate('special', 'pagebar')->
-                assign('LANG', $_LANG)->
-                assign('pagebar', $pagebar)->
-                assign('total_pages', $total_pages)->
-                assign('max_links', $max_links)->
-                assign('page', $page)->
-                assign('current', $current)->
-                assign('href', $href)->
-                fetch();
+            assign('LANG', $_LANG)->
+            assign('pagebar', $pagebar)->
+            assign('total_pages', $total_pages)->
+            assign('max_links', $max_links)->
+            assign('page', $page)->
+            assign('current', $current)->
+            assign('href', $href)->
+            fetch();
     }
     
     /**

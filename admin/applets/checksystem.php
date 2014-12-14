@@ -70,7 +70,7 @@ function applet_checksystem() {
     $toolmenu = array(
         array( 'icon' => 'liststuff.gif', 'title' => $_LANG['AD_LAST_CHECK_RESULT'], 'link' => 'index.php?view=checksystem&do=last_check' ),
         array( 'icon' => 'start.png', 'title' => $_LANG['AD_START_NEW_CHECK'], 'link' => 'index.php?view=checksystem&do=start' ),
-        array( 'icon' => 'save.png', 'title' => $_LANG['AD_CREATE_NEW_IMG'], 'link' => 'index.php?view=checksystem&do=save&csrf_token='. cmsUser::getCsrfToken() )
+        array( 'icon' => 'save.png', 'title' => $_LANG['AD_CREATE_NEW_IMG'], 'link' => 'index.php?view=checksystem&do=save' )
     );
 
     cpToolMenu($toolmenu, 'last_check', 'do');
@@ -198,8 +198,6 @@ function applet_checksystem() {
     }
     
     if ($do == 'save') {
-        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
-        
         $GLOBALS['SYSTEM_IMAGE'] = array();
         
         genSystemImage(PATH);

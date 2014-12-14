@@ -54,16 +54,16 @@ if (cmsCore::inRequest('install')) {
     $errors = false;
     
     $_CFG = array(
-        'offtext' => $_LANG['CFG_OFFTEXT'],
-        'keywords' => $_LANG['CFG_KEYWORDS'],
-        'metadesc' => $_LANG['CFG_METADESC'],
-        'sitename' => cmsCore::request('sitename', 'html', $_LANG['CFG_SITENAME']),
-        'db_host' => cmsCore::request('db_server', 'html', ''),
-        'db_base' => cmsCore::request('db_base', 'html', ''),
-        'db_user' => cmsCore::request('db_user', 'html', ''),
-        'db_pass' => cmsCore::request('db_password', 'html', ''),
+        'offtext'   => $_LANG['CFG_OFFTEXT'],
+        'keywords'  => $_LANG['CFG_KEYWORDS'],
+        'metadesc'  => $_LANG['CFG_METADESC'],
+        'sitename'  => cmsCore::request('sitename', 'html', $_LANG['CFG_SITENAME']),
+        'db_host'   => cmsCore::request('db_server', 'html', ''),
+        'db_base'   => cmsCore::request('db_base', 'html', ''),
+        'db_user'   => cmsCore::request('db_user', 'html', ''),
+        'db_pass'   => cmsCore::request('db_password', 'html', ''),
         'db_prefix' => cmsCore::request('db_prefix', 'html', 'cms'),
-        'lang' => cmsCore::c('config')->lang
+        'lang'      => cmsCore::c('config')->lang
     );
 
     $sql_file = PATH .'/install/'. (cmsCore::request('demodata', 'int') ? $sqldumpdemo : $sqldumpempty);
@@ -108,9 +108,7 @@ if (cmsCore::inRequest('install')) {
 
     cmsCore::c('db')->importFromFile($sql_file);
 
-    $d_cfg = cmsCore::c('config')->getDefaultConfig();
-    $_CFG = array_merge($d_cfg, $_CFG);
-    cmsCore::c('config')->saveToFile($_CFG);
+    cmsConfig::saveToFile(array_merge(cmsConfig::getDefaultConfig(), $_CFG));
 
     cmsCore::c('db')->query("UPDATE cms_users SET password = md5('". $admin_password ."'), login = '". $admin_login ."' WHERE id = 1");
     cmsCore::c('db')->query("UPDATE cms_users SET password = md5('". $admin_password ."') WHERE id > 1");

@@ -147,12 +147,12 @@ class cmsUser {
     private function checkSpoofingSession() {
         // первый раз зашли
         if (!isset($_SESSION['user_net'])) {
-            $octets = explode('.', $_SERVER['REMOTE_ADDR']);
-            $_SESSION['user_net'] = rtrim($_SERVER['REMOTE_ADDR'], end($octets));
+            $octets = explode('.', self::getRemoteAddr());
+            $_SESSION['user_net'] = rtrim(self::getRemoteAddr(), end($octets));
             return true;
         }
 
-        return mb_strstr($_SERVER['REMOTE_ADDR'], $_SESSION['user_net']);
+        return mb_strstr(self::getRemoteAddr(), $_SESSION['user_net']);
     }
 
 // ============================================================================ //
@@ -183,7 +183,7 @@ class cmsUser {
 
         $info = cmsCore::c('db')->fetch_assoc($result);
 
-        $info['ip'] = cmsCore::strClear($_SERVER['REMOTE_ADDR']);
+        $info['ip'] = cmsCore::strClear(self::getRemoteAddr());
 
         $info['imageurl'] = self::getUserAvatarUrl($info['id'], 'small', $info['imageurl'], $info['is_deleted']);
 
@@ -1100,7 +1100,7 @@ $this->logout();
                 $data['group_id'] = $data['id'];
                 $data['access']   = explode(',', str_replace(', ', ',', $data['access']));
                 $data['id']       = 0;
-                $data['ip']       = cmsCore::strClear($_SERVER['REMOTE_ADDR']);
+                $data['ip']       = cmsCore::strClear(self::getRemoteAddr());
                 $data['is_admin'] = 0;
                 $data['karma']    = -1000000;
                 $data['logdate']  = self::getUserLogdate();
@@ -2198,6 +2198,20 @@ $this->logout();
 
         return in_array($access_type, $inUser->access);
 
+    }
+    
+    public static function getRemoteAddr() {
+        if ($_SERVER['REMOTE_ADDR'] == $_SERVER['SERVER_ADDR']) {
+            if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+                return $_SERVER['HTTP_X_REAL_IP'];
+            } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                return $_SERVER['HTTP_X_FORWARDED_FOR'];
+            }
+        } else {
+            return $_SERVER['REMOTE_ADDR'];
+        }
+        
+        return $_SERVER['REMOTE_ADDR'];
     }
 
 // ============================================================================ //

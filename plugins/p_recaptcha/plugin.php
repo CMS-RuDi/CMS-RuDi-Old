@@ -49,14 +49,14 @@ class p_recaptcha extends cmsPlugin {
                         'name' => 'rpc_domens'
                     ),
                     array(
-                        'type' => 'text',
+                        'type'  => 'text',
                         'title' => $_LANG['PRC_PUBLIC_KEY'],
-                        'name' => 'rpc_public_key'
+                        'name'  => 'rpc_public_key'
                     ),
                     array(
-                        'type' => 'text',
+                        'type'  => 'text',
                         'title' => $_LANG['PRC_PRIVATE_KEY'],
-                        'name' => 'rpc_private_key'
+                        'name'  => 'rpc_private_key'
                     ),
                 )
             ),

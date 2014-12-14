@@ -962,7 +962,7 @@ INSERT INTO `#__modules_bind` (`id`, `module_id`, `menu_id`, `position`, `tpl`) 
 (607, 83, 15, 'sidebar', '_default_'),
 (616, 75, 1, 'sidebar', '_default_'),
 (615, 87, 1, 'maintop', '_default_'),
-(620, 88, 0, 'header');
+(620, 88, 0, 'header', '_default_');
 
 DROP TABLE IF EXISTS `#__ns_transactions`;
 CREATE TABLE `#__ns_transactions` (

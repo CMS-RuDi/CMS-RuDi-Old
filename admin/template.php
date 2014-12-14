@@ -31,7 +31,6 @@ cmsCore::c('page')->addHeadJS('admin/js/hltable.js');
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap.min.css');
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap-theme.min.css');
 cmsCore::c('page')->addHeadJS('includes/bootstrap/js/bootstrap.min.js');
-
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>

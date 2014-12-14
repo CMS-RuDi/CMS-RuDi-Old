@@ -21,6 +21,15 @@
     define('PATH', $_SERVER['DOCUMENT_ROOT']);
 
     include(PATH.'/core/cms.php');
+    
+    if (file_exists(PATH .'/includes/config.inc.php')) {
+        cmsCore::c('config');
+        include PATH .'/includes/config.inc.php';
+        cmsConfig::saveToFile($_CFG);
+        unlink(PATH .'/includes/config.inc.php');
+        cmsCore::redirect('/migrate');
+    }
+    
     $inCore = cmsCore::getInstance();
 
     // принудительно включаем дебаг

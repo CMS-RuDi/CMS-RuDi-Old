@@ -315,10 +315,12 @@ class cmsCore {
      */
     public function getEventPlugins($event) {
         $plugins_list = array();
-
-        foreach ($this->plugins as $plugin){
-            if($plugin['event'] == $event){
-                $plugins_list[] = $plugin['plugin'];
+        
+        if (is_array($this->plugins)) {
+            foreach ($this->plugins as $plugin){
+                if($plugin['event'] == $event){
+                    $plugins_list[] = $plugin['plugin'];
+                }
             }
         }
 
@@ -543,7 +545,7 @@ class cmsCore {
      * @param string $name Название
      * @param string $value Значение
      * @param integer $expire Время жизни
-     * @param boolean $httponly Если задано TRUE, cookie будут доступны только через HTTP протокол и не будет доступна javascript
+     * @param boolean $httponly Если задано true, cookie будут доступны только через HTTP протокол и не будет доступна javascript
      */
     public static function setCookie($name, $value, $expire=0, $httponly=true) {
         if (mb_substr(cmsCore::c('config')->host, 0, 8) == 'https://') {
@@ -2751,7 +2753,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
     }
 
     /**
-     * 
+     * Выводит в браузер json закодированную строку
      * @param mixed $data Данные для кодирования
      * @param boolean $is_header Выставлять хидер application/json или нет
      * @param boolean $unescaped_unicode Не кодировать многобайтные символы Unicode (по умолчанию они кодируются как \uXXXX)
@@ -2763,6 +2765,16 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
             header('Content-type: application/json; charset=utf-8');
         }
         
+        self::halt(self::jsonEncode($data, $unescaped_unicode));
+    }
+    
+    /**
+     * Кодирует входные данные в строку json
+     * @param mixed $data Данные для кодирования
+     * @param boolean $unescaped_unicode Не кодировать многобайтные символы Unicode (по умолчанию они кодируются как \uXXXX)
+     * @return string
+     */
+    public static function jsonEncode($data = array(), $unescaped_unicode = false) {
         if ($unescaped_unicode) {
             if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
                 $data = json_encode($data, JSON_UNESCAPED_UNICODE);
@@ -2777,7 +2789,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
             $data = json_encode($data);
         }
         
-        self::halt($data);
+        return $data;
     }
     
     /**

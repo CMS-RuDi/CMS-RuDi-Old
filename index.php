@@ -19,7 +19,7 @@ define('PATH', dirname(__FILE__));
 define('VALID_CMS', 1);
 
 // Проверяем, что система установлена
-if (!file_exists(PATH .'/includes/config.inc.php')) {
+if (!file_exists(PATH .'/includes/config/config.inc.json')) {
     header('location:/install/');
     die();
 }

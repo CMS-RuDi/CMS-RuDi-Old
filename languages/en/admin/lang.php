@@ -163,3 +163,5 @@ $_LANG['AD_ROOT_METADESC']        = 'Homepage descripion (meta description)';
 $_LANG['AD_LIMIT']                = 'Restrictions';
 $_LANG['AD_RETAIN_BOOT']          = 'Save original photos<br />when users loading';
 $_LANG['MOD_TPL']                 = 'Module template';
+
+$_LANG['AD_CHECK_SYSTEM']         = 'Check system';

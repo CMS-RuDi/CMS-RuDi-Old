@@ -111,7 +111,7 @@ function applet_config() {
         cmsCore::redirect('index.php?view=config');
     }
 
-    cpCheckWritable('/includes/config.inc.php');
+    cpCheckWritable('/includes/config/config.inc.json');
 ?>
 <form class="form-horizontal" role="form" action="/admin/index.php?view=config" method="post" name="CFGform" target="_self" id="CFGform" style="margin-bottom:30px">
     <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />

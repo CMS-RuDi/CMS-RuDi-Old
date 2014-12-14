@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-$_LANG['AD_CONFIG_SITE_ERROR']         = 'File /includes/config.inc.php is not writable';
+$_LANG['AD_CONFIG_SITE_ERROR']         = 'File /includes/config/config.inc.json is not writable';
 $_LANG['AD_SITE']                      = 'Site';
 $_LANG['AD_DESIGN']                    = 'Design';
 $_LANG['AD_TIME']                      = 'Time';
@@ -52,7 +52,7 @@ $_LANG['AD_TEMPLATE_INFO']             = 'Template author: "%s";<br>templating -
 $_LANG['AD_TEMPLATE_CONFIG']           = 'Template config';
 $_LANG['AD_SEARCH_RESULT']             = 'Highlighting search results';
 $_LANG['AD_TIME_ARREA']                = 'Time zone:';
-$_LANG['AD_MYSQL_CONFIG']              = 'All MySQL details are set in file /includes/config.inc.php';
+$_LANG['AD_MYSQL_CONFIG']              = 'All MySQL details are set in file /includes/config/config.inc.json';
 $_LANG['AD_DB_SIZE']                   = 'Database size (approximately)';
 $_LANG['AD_DB_SIZE_ERROR']             = 'It is impossible to determine';
 $_LANG['AD_SITE_EMAIL']                = 'Website e-mail:';
@@ -66,9 +66,9 @@ $_LANG['AD_SMTP_MAILER']               = 'SMTP - server';
 $_LANG['AD_ENCRYPTING']                = 'SMTP encryption:';
 $_LANG['AD_SMTP_LOGIN']                = 'SMTP authorization:';
 $_LANG['AD_SMTP_USER']                 = 'SMTP user:';
-$_LANG['AD_IF_CHANGE_USER']            = 'You can change the username in the file /includes/config.inc.php';
+$_LANG['AD_IF_CHANGE_USER']            = 'You can change the username in the file /includes/config/config.inc.json';
 $_LANG['AD_SMTP_PASS']                 = 'SMTP password:';
-$_LANG['AD_IF_CHANGE_PASS']            = 'You can change the password in the file /includes/config.inc.php';
+$_LANG['AD_IF_CHANGE_PASS']            = 'You can change the password in the file /includes/config/config.inc.json';
 $_LANG['AD_SMTP_HOST']                 = 'SMTP host:';
 $_LANG['AD_SOME_HOST']                 = 'You can specify multiple, separated by semicolons';
 $_LANG['AD_SMTP_PORT']                 = 'SMTP port:';
@@ -86,7 +86,7 @@ $_LANG['AD_YES_ONLINESTATS']           = 'clear the statistics for each reload o
 $_LANG['AD_CRON_ONLINESTATS']          = 'clear the stats by CRON (task "clearOnlineUsers")';
 $_LANG['AD_SEO_URL_COUNT']             = 'SEO URL length';
 $_LANG['AD_SEO_URL_COUNT_HINT']        = 'Seo url characters count';
-$_LANG['AD_ATTENTION']                 = '<strong>Attention:</strong> after configuring you need to change the files owner for security reasons /includes/config.inc.php and set the permissions on it 644.<br /> Note : after the full site configuration on the server you must set the access rights <strong>644 for all files</strong> and <strong>755 for all directories,</strong> except for the upload files directory. Also make sure that the owner of the site files is a different user from the one who works with the web server and an interpreter php.';
+$_LANG['AD_ATTENTION']                 = '<strong>Attention:</strong> after configuring you need to change the files owner for security reasons /includes/config/config.inc.json and set the permissions on it 644.<br /> Note : after the full site configuration on the server you must set the access rights <strong>644 for all files</strong> and <strong>755 for all directories,</strong> except for the upload files directory. Also make sure that the owner of the site files is a different user from the one who works with the web server and an interpreter php.';
 
 $_LANG['AD_SOC_APPS']                  = 'Social Networks';
 $_LANG['AD_IFRAME_ENABLE']             = 'The operation of the site as an iframe application of social networks';

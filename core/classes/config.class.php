@@ -15,7 +15,7 @@ class cmsConfig {
     private static $instance = null;
     private static $config = array();
 
-    private function __construct(){
+    private function __construct() {
         mb_internal_encoding("UTF-8");
 
         self::$config = self::getDefaultConfig();
@@ -103,9 +103,10 @@ class cmsConfig {
             'JevixTagCutWithContent' => 'script,style,meta'
         );
 
-        $f = PATH .'/includes/config.inc.php';
+        $f = PATH .'/includes/config/config.inc.json';
+
         if (file_exists($f)) {
-            require($f);
+            $_CFG = json_decode(trim(file_get_contents($f)), true);
         } else {
             $_CFG = array();
         }
@@ -143,33 +144,21 @@ class cmsConfig {
      * Сохраняет массив в файл конфигурации
      * @param array $_CFG
      */
-    public static function saveToFile($_CFG, $file='config.inc.php'){
+    public static function saveToFile($_CFG, $file='config.inc.json') {
         global $_LANG;
-        $filepath = PATH .'/includes/'. $file;
+        $filepath = PATH .'/includes/config/'. $file;
 
         if (file_exists($filepath)) {
-            if (!@is_writable($filepath)) { die(sprintf($_LANG['FILE_NOT_WRITABLE'], '/includes/'. $file)); }
-        } else {
-            if (!@is_writable(dirname($filepath))) { die(sprintf($_LANG['DIR_NOT_WRITABLE'], '/includes')); }
-        }
-
-        $cfg_file = fopen($filepath, 'w+');
-
-        fputs($cfg_file, "<?php \n");
-        fputs($cfg_file, "if(!defined('VALID_CMS')) { die('ACCESS DENIED'); } \n");
-        fputs($cfg_file, '$_CFG = array();'."\n");
-
-        foreach ($_CFG as $key => $value) {
-            if (is_int($value)) {
-                $s = '$_CFG' . "['$key'] \t= $value;\n";
-            } else {
-                $s = '$_CFG' . "['$key'] \t= '".addslashes($value)."';\n";
+            if (!@is_writable($filepath)) {
+                die(sprintf($_LANG['FILE_NOT_WRITABLE'], '/includes/config/'. $file));
             }
-            fwrite($cfg_file, $s);
+        } else {
+            if (!@is_writable(dirname($filepath))) {
+                die(sprintf($_LANG['DIR_NOT_WRITABLE'], '/includes/config'));
+            }
         }
-
-        fwrite($cfg_file, "?>");
-        fclose($cfg_file);
+        
+        file_put_contents($filepath, cmsCore::jsonEncode($_CFG, true));
 
         return true;
     }

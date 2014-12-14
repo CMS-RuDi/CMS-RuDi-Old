@@ -17,6 +17,6 @@ include('kcaptcha.php');
 
 $captcha = new KCAPTCHA();
 
-$captcha_id = (int)$_GET['captcha_id'];
+$captcha_id = filter_input('INPUT_GET', 'captcha_id', FILTER_VALIDATE_INT);
 
 $_SESSION['captcha'][$captcha_id] = $captcha->getKeyString();

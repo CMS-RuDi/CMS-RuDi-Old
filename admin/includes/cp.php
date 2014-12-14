@@ -42,7 +42,7 @@ function cpCheckWritable($file, $type='file'){
 }
 
 /////////////////////////// PAGE GENERATION ////////////////////////////////////////////////////////////////
-function cpHead(){
+function cpHead() {
     /* Костыль скоро будет удален */
     if (!empty($GLOBALS['cp_page_title'])) {
         cmsCore::c('page')->setAdminTitle($GLOBALS['cp_page_title']);
@@ -58,7 +58,7 @@ function cpHead(){
     return;
 }
 
-function cpMenu(){
+function cpMenu() {
     global $_LANG;
     global $adminAccess;
 
@@ -303,6 +303,11 @@ function cpMenu(){
                         </a>
                     </li>
                     <li>
+                        <a class="fa fa-pie-chart" href="index.php?view=checksystem">
+                            <?php echo $_LANG['AD_CHECK_SYSTEM']; ?>
+                        </a>
+                    </li>
+                    <li>
                         <a class="fa fa-trash-o" href="index.php?view=clearcache">
                             <?php echo $_LANG['AD_CLEAR_SYS_CACHE']; ?>
                         </a>
@@ -372,13 +377,15 @@ function cpBody(){
 
 //////////////////////////////////////////////// PATHWAY ///////////////////////////////////////////////////////
 function cpPathway() {
-    if (count($GLOBALS['cp_pathway']) <= 1) { return; }
-    
-    echo '<ol class="breadcrumb">';
-	foreach($GLOBALS['cp_pathway'] as $key => $value) {
-            echo '<li'. ($key == count($GLOBALS['cp_pathway']) ? ' class="active"' : '') .'><a href="'. $GLOBALS['cp_pathway'][$key]['link'] .'">'. $GLOBALS['cp_pathway'][$key]['title'] .'</a></li>';
-	}
-    echo '</ol>';
+    $n = count($GLOBALS['cp_pathway']);
+
+    if ($n > 1) { 
+        echo '<ol class="breadcrumb">';
+            foreach($GLOBALS['cp_pathway'] as $k => $path) {
+                echo '<li'. ($k == $n ? ' class="active"' : '') .'><a href="'. $path['link'] .'">'. $path['title'] .'</a></li>';
+            }
+        echo '</ol>';
+    }
 }
 
 function cpAddPathway($title, $link){

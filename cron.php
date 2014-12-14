@@ -33,7 +33,7 @@ $jobs = cmsCron::getJobs();
 // если есть задачи
 if (is_array($jobs)) {
     // выполняем их
-    foreach($jobs as $job){
+    foreach($jobs as $job) {
         // проверяем интервал запуска
         if (!$job['job_interval'] || ($job['hours_ago'] > $job['job_interval']) || $job['is_new']) {
             // запускаем задачу

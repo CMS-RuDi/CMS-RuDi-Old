@@ -1,6 +1,6 @@
 <?php
 if (!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
-/* * **************************************************************************/
+/******************************************************************************/
 //                                                                            //
 //                           InstantCMS v1.10.5                               //
 //                        http://www.instantcms.ru/                           //
@@ -10,7 +10,7 @@ if (!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
 //                                                                            //
-/* * **************************************************************************/
+/******************************************************************************/
 function autoOrder($form_id) {
     $sql = "SELECT * FROM cms_form_fields WHERE form_id = '". $form_id ."' ORDER BY ordering";
     $rs  = cmsCore::c('db')->query($sql);
@@ -31,7 +31,7 @@ function moveField($id, $form_id, $dir) {
     $current = cmsCore::c('db')->get_field('cms_form_fields', "id='". $id ."'", 'ordering');
     if ($current === false) { return false; }
 
-    if ($dir>0) {
+    if ($dir > 0) {
         $sql = "UPDATE cms_form_fields
                 SET ordering = ordering-1
                 WHERE form_id='". $form_id ."' AND ordering = (". $current ."+1)
@@ -163,13 +163,13 @@ if (in_array($opt, array('submit', 'update'))) {
 
     $item['title']       = cmsCore::request('title', 'str', $_LANG['AD_FORM_UNTITLED']);
     $item['description'] = cmsCore::c('db')->escape_string(cmsCore::request('description', 'html', ''));
-    $item['sendto']  = cmsCore::request('sendto', 'str', '');
-    $item['email']   = cmsCore::request('email', 'email', '');
-    $item['user_id'] = cmsCore::request('user_id', 'int', 0);
+    $item['sendto']      = cmsCore::request('sendto', 'str', '');
+    $item['email']       = cmsCore::request('email', 'email', '');
+    $item['user_id']     = cmsCore::request('user_id', 'int', 0);
     $item['form_action'] = cmsCore::request('form_action', 'str', '/forms/process');
     $item['only_fields'] = cmsCore::request('only_fields', 'int', 0);
-    $item['showtitle'] = cmsCore::request('showtitle', 'int', 0);
-    $item['tpl']       = cmsCore::request('tpl', 'str', 'form');
+    $item['showtitle']   = cmsCore::request('showtitle', 'int', 0);
+    $item['tpl']         = cmsCore::request('tpl', 'str', 'form');
 
     if ($opt == 'submit') {
         $form_id = cmsCore::c('db')->insert('cms_forms', cmsCore::callEvent('ADD_FORM', $item));
@@ -214,8 +214,8 @@ if ($opt == 'list') {
         array( 'title'=> $_LANG['EDIT'], 'icon' => 'edit.gif', 'link' => '?view=components&do=config&id='. $id .'&opt=edit&item_id=%id%' ),
         array( 'title'=> $_LANG['DELETE'], 'icon' => 'delete.gif', 'confirm' => $_LANG['AD_FORM_DELETE'], 'link' => '?view=components&do=config&id='. $id .'&opt=delete&item_id=%id%' )
     );
-
-    cpListTable('cms_forms', $fields, $actions);
+    
+    cpListTable('cms_forms', $fields, $actions, '', 'id DESC');
 }
 
 if (in_array($opt, array('add', 'edit'))) {

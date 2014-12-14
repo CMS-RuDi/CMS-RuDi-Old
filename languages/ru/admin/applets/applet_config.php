@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-$_LANG['AD_CONFIG_SITE_ERROR']         = 'Файл /includes/config.inc.php недоступен для записи';
+$_LANG['AD_CONFIG_SITE_ERROR']         = 'Файл /includes/config/config.inc.json недоступен для записи';
 $_LANG['AD_SITE']                      = 'Сайт';
 $_LANG['AD_DESIGN']                    = 'Дизайн';
 $_LANG['AD_TIME']                      = 'Время';
@@ -52,7 +52,7 @@ $_LANG['AD_TEMPLATE_INFO']             = 'Автор шаблона: "%s";<br>ш
 $_LANG['AD_TEMPLATE_CONFIG']           = 'Настройки шаблона';
 $_LANG['AD_SEARCH_RESULT']             = 'Подсветка результатов поиска';
 $_LANG['AD_TIME_ARREA']                = 'Часовой пояс:';
-$_LANG['AD_MYSQL_CONFIG']              = 'Все реквизиты MySQL настраиваются в файле /includes/config.inc.php';
+$_LANG['AD_MYSQL_CONFIG']              = 'Все реквизиты MySQL настраиваются в файле /includes/config/config.inc.json';
 $_LANG['AD_DB_SIZE']                   = 'Размер базы данных (примерно)';
 $_LANG['AD_DB_SIZE_ERROR']             = 'Невозможно определить';
 $_LANG['AD_SITE_EMAIL']                = 'E-mail сайта:';
@@ -66,9 +66,9 @@ $_LANG['AD_SMTP_MAILER']               = 'SMTP - сервер';
 $_LANG['AD_ENCRYPTING']                = 'Шифрование:';
 $_LANG['AD_SMTP_LOGIN']                = 'SMTP авторизация:';
 $_LANG['AD_SMTP_USER']                 = 'SMTP пользователь:';
-$_LANG['AD_IF_CHANGE_USER']            = 'имя пользователя вы можете сменить в файле /includes/config.inc.php';
+$_LANG['AD_IF_CHANGE_USER']            = 'имя пользователя вы можете сменить в файле /includes/config/config.inc.json';
 $_LANG['AD_SMTP_PASS']                 = 'SMTP пароль:';
-$_LANG['AD_IF_CHANGE_PASS']            = 'пароль вы можете сменить в файле /includes/config.inc.php';
+$_LANG['AD_IF_CHANGE_PASS']            = 'пароль вы можете сменить в файле /includes/config/config.inc.json';
 $_LANG['AD_SMTP_HOST']                 = 'SMTP хост:';
 $_LANG['AD_SOME_HOST']                 = 'Можно указать несколько, через точку с запятой, в порядке приоритета';
 $_LANG['AD_SMTP_PORT']                 = 'SMTP порт:';
@@ -86,7 +86,7 @@ $_LANG['AD_YES_ONLINESTATS']           = 'очищать статистику п
 $_LANG['AD_CRON_ONLINESTATS']          = 'очищать статистику по CRON (задача "clearOnlineUsers")';
 $_LANG['AD_SEO_URL_COUNT']             = 'Длина генерируемых SEO URL';
 $_LANG['AD_SEO_URL_COUNT_HINT']        = 'Количество символов в генерируемых seo url';
-$_LANG['AD_ATTENTION']                 = '<strong>Внимание:</strong> после конфигурирования в целях безопасности необходимо сменить владельца файла /includes/config.inc.php и выставить права доступа на него 644.<br /> Так же обращаем Ваше внимание: после полной настройки сайта на сервере необходимо выставить права доступа <strong>644 для всех файлов</strong> и <strong>755 для всех каталогов,</strong> кроме директорий загрузки файлов. Кроме того, убедитесь, что владелец файлов сайта - пользователь, отличный от того, под которым работает web сервер и интерпретатор php.';
+$_LANG['AD_ATTENTION']                 = '<strong>Внимание:</strong> после конфигурирования в целях безопасности необходимо сменить владельца файла /includes/config/config.inc.json и выставить права доступа на него 644.<br /> Так же обращаем Ваше внимание: после полной настройки сайта на сервере необходимо выставить права доступа <strong>644 для всех файлов</strong> и <strong>755 для всех каталогов,</strong> кроме директорий загрузки файлов. Кроме того, убедитесь, что владелец файлов сайта - пользователь, отличный от того, под которым работает web сервер и интерпретатор php.';
 
 $_LANG['AD_SOC_APPS']                  = 'Соц Сети';
 $_LANG['AD_IFRAME_ENABLE']             = 'Работа сайта как iframe приложение соц сетей';

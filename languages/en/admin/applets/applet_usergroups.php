@@ -30,3 +30,5 @@ $_LANG['AD_SETTINGS_CONTROL']         = 'Site settings control';
 $_LANG['AD_COMPONENTS_SETTINGS_FREE'] = 'Available components for settings:';
 $_LANG['AD_COMPONENTS_SETTINGS_ON']   = 'Remember to enable "Components control"';
 $_LANG['AD_GROUP_RULE']               = 'Group rights:';
+$_LANG['AD_TICKETS_CONTROL']          = 'Manage ticket';
+$_LANG['AD_CHECKSYSTEM_CONTROL']      = 'System Check';

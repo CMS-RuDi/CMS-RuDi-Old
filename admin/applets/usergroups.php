@@ -243,6 +243,13 @@ function applet_usergroups() {
                             <?php echo $_LANG['AD_TICKETS_CONTROL']; ?>
                         </label>
                     </div>
+                    
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="admin_config" name="access[]" value="admin/checksystem" <?php if (isset($mod['access'])) { if (in_array('admin/checksystem', $mod['access'])) { echo 'checked="checked"'; } } ?> />
+                            <?php echo $_LANG['AD_CHECKSYSTEM_CONTROL']; ?>
+                        </label>
+                    </div>
                 </div>
                 
                 <div class="help-block"><?php echo $_LANG['AD_ALL_SECTIONS']; ?></div>

@@ -1,7 +1,6 @@
 <?php foreach ($posts as $post) { ?>
     <div class="mod_latest_entry">
         <div class="mod_latest_image">
-            <a href="<?php echo cmsUser::getProfileURL($post['login']); ?>" title="<?php echo $this->escape($post['author']); ?>"><img border="0" class="usr_img_small" src="<?php echo $post['author_avatar']; ?>" /></a>
             <?php if (!$post['fileurl']) { ?>
                 <a href="<?php echo cmsUser::getProfileURL($post['login']); ?>" title="<?php echo $this->escape($post['author']); ?>">
                     <img class="usr_img_small img_64" src="<?php echo $post['author_avatar']; ?>" alt="<?php echo $this->escape($post['author']); ?>" />

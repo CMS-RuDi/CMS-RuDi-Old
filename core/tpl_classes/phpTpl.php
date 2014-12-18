@@ -32,6 +32,8 @@ class phpTpl{
         global $_LANG;
         
         $is_ajax = cmsCore::isAjax();
+        $user_id = cmsCore::c('user')->id;
+        $is_admin = cmsCore::c('user')->is_admin;
         
         extract($this->tpl_vars);
 

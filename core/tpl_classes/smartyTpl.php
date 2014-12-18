@@ -43,6 +43,8 @@ class smartyTpl {
         $this->smarty->compile_id = $tpl_folder[count($tpl_folder)-1];
         
         $this->smarty->assign('LANG', $_LANG);
+        $this->smarty->assign('user_id', cmsCore::c('user')->id);
+        $this->smarty->assign('is_admin', cmsCore::c('user')->is_admin);
         
         $this->smarty->rudi_tpl_file = $tpl_file;
     }

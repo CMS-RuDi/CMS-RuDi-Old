@@ -25,7 +25,7 @@ class p_new_msg extends cmsPlugin {
     }
 
     // ==================================================================== //
-    public function execute($event, $data) {
+    public function execute($event='', $data=array()) {
         parent::execute();
         
         switch ($event) {

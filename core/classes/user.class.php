@@ -2052,11 +2052,11 @@ $this->logout();
         if ($_SESSION['user']['id']){
             if ($first_time_auth) { $cfg['auth_redirect'] = $cfg['first_auth_redirect']; }
 
-            switch ($cfg['auth_redirect']){
-                case 'none':        $url = $auth_back_url; break;
+            switch ($cfg['auth_redirect']) {
                 case 'index':       $url = '/'; break;
                 case 'profile':     $url = cmsUser::getProfileURL($user['login']); break;
                 case 'editprofile': $url = '/users/'.$user['id'].'/editprofile.html'; break;
+                default:            $url = $auth_back_url; break;
             }
 
             return $url;

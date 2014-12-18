@@ -144,14 +144,14 @@
     <script type="text/javascript">
         $(function(){
             $('#sess_messages').hide().fadeIn();
-            $('#topmenu .menu li, #usermenu li'').hover(
+            $('#topmenu .menu li, #usermenu li').hover(
                 function() {
                     $(this).find('ul:first').fadeIn('fast');
-                    $(this).find('a:first').addClass("hover");
+                    $(this).find('a:first').addClass('hover');
                 },
                 function() {
                     $(this).find('ul:first').hide();
-                    $(this).find('a:first').removeClass("hover");
+                    $(this).find('a:first').removeClass('hover');
                 }
             );
         });

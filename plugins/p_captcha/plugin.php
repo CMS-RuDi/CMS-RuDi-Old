@@ -48,11 +48,7 @@ class p_captcha extends cmsPlugin {
         $captcha_code = cmsCore::request('captcha_code', 'str', '');
         $captcha_id   = cmsCore::request('captcha_id', 'int', 0);
         
-        if (
-            empty($captcha_code) ||
-            empty($captcha_id) ||
-            empty($_SESSION['captcha'][$captcha_id])
-        ) {
+        if (empty($captcha_code) || empty($_SESSION['captcha'][$captcha_id])) {
             return false;
         }
         

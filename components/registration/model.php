@@ -24,36 +24,32 @@ class cms_model_registration {
 /* ==================================================================================================== */
 /* ==================================================================================================== */
     public static function getDefaultConfig() {
-
-        $cfg = array (
-                'reg_type' => 'open',
-                'inv_count' => 3,
-                'inv_karma' => 1,
-                'inv_period' => 'WEEK',
-                'default_gid' => 1,
-                'is_on' => 1,
-                'act' => 0,
-                'send' => 0,
-                'offmsg' => 'Регистрация приостановлена по техническим причинам.',
-                'first_auth_redirect' => 'profile',
-                'auth_redirect' => 'profile',
-                'name_mode' => 'nickname',
-                'badnickname' => 'администратор
-                                    админ
-                                    qwert
-                                    qwerty
-                                    123
-                                    admin
-                                    вася пупкин',
-                'ask_icq' => 1,
-                'ask_birthdate' => 1,
-                'ask_city' => 1,
-                'send_greetmsg' => 1,
-                'greetmsg' => '<h2>Привет!</h2><p>Мы очень <span style="color: rgb(51, 153, 102);">рады</span> что ты зарегистрировался!</p>'
-              );
-
-        return $cfg;
-
+        return array (
+            'reg_type' => 'open',
+            'inv_count' => 3,
+            'inv_karma' => 1,
+            'inv_period' => 'WEEK',
+            'default_gid' => 1,
+            'is_on' => 1,
+            'act' => 0,
+            'send' => 0,
+            'offmsg' => 'Регистрация приостановлена по техническим причинам.',
+            'first_auth_redirect' => 'profile',
+            'auth_redirect' => 'profile',
+            'name_mode' => 'nickname',
+            'badnickname' => 'администратор
+                                админ
+                                qwert
+                                qwerty
+                                123
+                                admin
+                                вася пупкин',
+            'ask_icq' => 1,
+            'ask_birthdate' => 1,
+            'ask_city' => 1,
+            'send_greetmsg' => 1,
+            'greetmsg' => '<h2>Привет!</h2><p>Мы очень <span style="color: rgb(51, 153, 102);">рады</span> что ты зарегистрировался!</p>'
+        );
     }
 /* ==================================================================================================== */
 /* ==================================================================================================== */

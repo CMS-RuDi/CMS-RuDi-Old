@@ -42,8 +42,6 @@ class miniCurl {
         }
         
         $this->reInit($cfg);
-        
-        return $this;
     }
     
     public function __destruct() {
@@ -85,6 +83,8 @@ class miniCurl {
         $this->set_option(CURLOPT_RETURNTRANSFER, $this->config['return_transfer']);
         $this->set_option(CURLOPT_CONNECTTIMEOUT, $this->config['connect_timeout']);
         $this->set_option(CURLOPT_AUTOREFERER,    $this->config['auto_referer']);
+        
+        return $this;
     }
     
     private static function getDefaultConfig() {

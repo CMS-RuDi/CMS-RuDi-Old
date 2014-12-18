@@ -12,7 +12,7 @@ ignore_user_abort(true);
 set_time_limit(0);
 
 function genSystemImage($dir) {
-    $dir = rtrim($dir);
+    $dir = rtrim($dir, '/');
     $dir_context = opendir($dir);
     
     while ($next = readdir($dir_context)) {

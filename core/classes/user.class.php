@@ -346,7 +346,7 @@ $this->logout();
                     $opt[] = $k .'='. urlencode($v);
                 }
                 
-                $response = cmsCore::c('curl')->jsonGet('https://api.vk.com/method/users.get?'. implode('&', $opt), true);
+                $response = cmsCore::c('curl')->request('get', 'https://api.vk.com/method/users.get?'. implode('&', $opt))->json();
                 
                 if (!empty($response) && !empty($response['response'][0]['id'])) {
                     $response = $response['response'][0];

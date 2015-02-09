@@ -86,11 +86,7 @@ class cmsgeo {
      * @return array
      */
     private function getData() {
-        $out = cmsCore::c('curl', array(
-            'header' => 0,
-            'connect_timeout' => 2,
-            'user_agent' => 'CMS RuDi'
-        ))->xmlGet($this->url.$this->ip);
+        $out = cmsCore::c('curl')->setConfig(array('connecttimeout' => 2, 'useragent' => 'CMS RuDi'))->request('get', $this->url . $this->ip)->xml();
         
         foreach ($out->ip[0] as $key=>$value) {
             $data[$key] = (string)$value;

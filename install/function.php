@@ -10,7 +10,7 @@ function html_bool_span($value, $condition) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 function check_requirements() {
-    $min_php_version = '5.2.0';
+    $min_php_version = '5.3.0';
     $extensions = array('json', 'mbstring', 'simplexml', 'iconv', 'mysqli');
 
     sort($extensions);

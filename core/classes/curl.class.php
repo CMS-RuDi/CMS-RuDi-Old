@@ -12,111 +12,234 @@
  * Класс обертка для методов CURL
  * 
  * @author DS Soft <support@ds-soft.ru>
- * @version 1.2.4
+ * @version 2.0.0
  */
-class miniCurl {
-    public static $Server = false;
+class class_curl {
+    private $server = false;
+    private $config = array();
+    private $ch = null;
     
-    private $key = '';
-    private $ch=null;
-    
-    private $result_encoding = '';
-    private $current_url = '';
-    public $error = '';
-    public $info = '';
-    public $config = array();
-    public $cookies = array();
-    private $result = '';
-    
-    
-    public $header = false;
-    public $result_headers = array();
+    private $url;
+    private $method = 'get';
+    private $multipart = false;
+    private $ajax = false;
+    private $request_headers = array();
+    private $cookies = array();
+    private $curl_options = array();
+
+    public $response = '';
+    public $response_header_raw = '';
+    public $response_header = array();
+    public $response_encoding = false;
     public $meta_tags = array();
-    public $result_head = '';
-    public $result_body = '';
-    public $postdata;
+    public $code     = false;
+    public $info     = false;
+    public $error    = false;
+    public $errno    = false;
     
     public function __construct($cfg=array()) {
-        if (!function_exists('curl_setopt') || !function_exists('curl_init')) {
-            return self::echoError('Библиотека CURL не установлена');
-        }
-        
-        $this->reInit($cfg);
+        $this->setConfig($cfg);
     }
     
-    public function __destruct() {
-        if ($this->ch) {
-            curl_close($this->ch);
-            $this->ch = null;
-        }
-    }
-    
-    public function reInit($cfg=array()) {
-        if ($this->ch) {
-            curl_close($this->ch);
-            $this->ch = null;
-        }
-        
-        $this->error = '';
-        $this->info = '';
-        $this->cookies = array();
-        $this->result_encoding = '';
-        $this->current_url = '';
-        $this->header = false;
-        $this->result = '';
-        $this->result_headers = array();
-        $this->meta_tags = array();
-        $this->result_head = '';
-        $this->result_body = '';
+    /**
+     * Выставляет настройки
+     * @param array $cfg
+     * @return \clas_curl
+     */
+    public function setConfig($cfg) {
         $this->config = array_merge(self::getDefaultConfig(), $cfg);
-        
-        $this->ch = curl_init();
-        if (!$this->ch) {
-            $this->error = curl_error($this->ch);
-            return;
-        }
-
-        $this->set_option(CURLOPT_USERAGENT,      $this->config['user_agent']);
-        $this->set_option(CURLOPT_FOLLOWLOCATION, $this->config['follow_location']);
-        $this->set_option(CURLOPT_HEADER,         $this->config['header']);
-        $this->set_option(CURLOPT_HTTP_VERSION,   $this->config['http_version']);
-        $this->set_option(CURLOPT_RETURNTRANSFER, $this->config['return_transfer']);
-        $this->set_option(CURLOPT_CONNECTTIMEOUT, $this->config['connect_timeout']);
-        $this->set_option(CURLOPT_AUTOREFERER,    $this->config['auto_referer']);
-        
         return $this;
     }
     
-    private static function getDefaultConfig() {
+    /**
+     * Возвращает массив с дефолтовыми настройками
+     * @return array
+     */
+    public static function getDefaultConfig() {
         return array(
-            'header' => true,
-            'return_transfer' => true,
-            'follow_location' => true,
-            'auto_referer' => true,
-            'connect_timeout' => 60,
-            'user_agent' => 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:25.0) Gecko/20100101 Firefox/25.0',
-            'verify_host' => false,
-            'verify_peer' => false,
-            'meta' => false,
-            'encoding' => false,
+            'server'           => false,
+            'server_key'       => false,
             'default_encoding' => 'utf-8',
-            'proxy' =>'',
-            'proxy_type' => CURLPROXY_HTTP,
-            'proxy_user' => '',
-            'proxy_password' => '',
-            'externalIp' => false,
-            'http_version' => CURL_HTTP_VERSION_1_1
+            'encoding'         => false,
+            'ssl'              => true,
+            'proxy'            => '',
+            'proxy_type'       => CURLPROXY_HTTP,
+            'proxy_user'       => '',
+            'proxy_password'   => '',
+            'interface'        => false,
+            'connecttimeout'   => 30,
+            'timeout'          => 60,
+            'useragent'        => 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:25.0) Gecko/20100101 Firefox/25.0'
         );
     }
     
-    public function set_option($option, $value) {
-        if (!curl_setopt($this->ch, $option, $value)) {
-            $this->error = curl_error($this->ch);
-            return false;
-        }
-        return true;
+    /**
+     * Указываем что нужно выставить ajax заголовок при запросе
+     * @return \clas_curl
+     */
+    public function ajax() {
+        $this->ajax = true;
+        return $this;
     }
     
+    /**
+     * Устанавливает значение куки
+     * @param string $key ключ
+     * @param string $val значение
+     * @return \clas_curl
+     */
+    public function setCookie($key, $val) {
+        $this->cookies[$key] = $val;
+        return $this;
+    }
+    
+    /**
+     * Устанавливает значение кук из массива
+     * @param array $cookies массив с куками
+     * @return \clas_curl
+     */
+    public function setCookies($cookies) {
+        foreach ($cookies as $key => $val) {
+            $this->cookies[$key] = $val;
+        }
+        return $this;
+    }
+    
+    /**
+     * Возвращает массив с куками
+     * @return \clas_curl
+     */
+    public function getCookies() {
+        return $this->cookies;
+    }
+    
+    /**
+     * Удаляет все куки
+     * @return \clas_curl
+     */
+    public function clearCookies() {
+        $this->cookies = array();
+        return $this;
+    }
+
+    /**
+     * Выставляет необходимые опции и выполняет запрос
+     * @param string $method
+     * @param string $url ссылка
+     * @param array $query_data массив параметров
+     * @param array $headers массив хидеров
+     * @param string $file ссылка на файл для отправки методом PUT
+     * @return \clas_curl
+     */
+    public function request($method, $url, $query_data=array(), $headers=array(), $file=false) {
+        $this->clear();
+        
+        $this->url = $url;
+        
+        $this->setRequestMethod($method);
+        $this->setRequestOptions($query_data, $headers);
+        
+        if ($this->method == 'put' && !empty($file) && file_exists($file)) {
+            $this->set_option(CURLOPT_PUT, true);
+
+            $this->multipart = true;
+            
+            $fp = fopen($file, 'r');
+            $this->set_option(CURLOPT_INFILE, $fp)->
+                set_option(CURLOPT_INFILESIZE, filesize($file))->
+                set_option(CURLOPT_UPLOAD, true);
+        }
+        
+        if (!empty($this->config['server']) && $this->multipart === false) {
+            $this->requestFromServer();
+        } else {
+            $this->exec();
+        }
+        
+        if ($this->method == 'put' && $this->multipart === true) {
+            fclose($fp);
+        }
+        
+        $this->reset();
+
+        return $this;
+    }
+    
+    /**
+     * Выставляет необходимые опции для метода запроса
+     * @param string $method
+     */
+    private function setRequestMethod($method) {
+        $this->method = empty($method) ? $this->method : $method;
+        
+        switch ($this->method) {
+            case 'head':
+                $this->set_option(CURLOPT_NOBODY, true);
+                break;
+            case 'get':
+                $this->set_option(CURLOPT_HTTPGET, true);
+                break;
+            case 'post':
+                $this->set_option(CURLOPT_POST, true);
+                break;
+        }
+
+        $this->set_option(CURLOPT_CUSTOMREQUEST, strtoupper($this->method));
+    }
+    
+    /**
+     * Устанавливает опции запроса: постдата, хидеры, куки, прокси, интерфей и др.
+     * @param array $query_data
+     * @param array $headers
+     */
+    private function setRequestOptions($query_data, $headers) {
+        if ($this->ajax === true) {
+            $this->request_headers[] = 'X-Requested-With: XMLHttpRequest';
+        }
+        
+        if (!empty($headers)) {
+            $this->request_headers = array_merge($this->request_headers, $headers);
+        }
+        
+        if ($this->method == 'get' && !empty($query_data)) {
+            $this->url .= strstr($this->url, '?') ? '&' : '?';
+            $this->url .= http_build_query($query_data);
+        } else if (!empty($query_data)) {
+            $this->set_option(CURLOPT_POSTFIELDS, $this->preparePostData($query_data));
+        }
+        
+        $this->set_option(CURLOPT_URL, $this->url)->
+            set_option(CURLOPT_USERAGENT, $this->config['useragent'])->
+            set_option(CURLOPT_HEADER, false)->
+            set_option(CURLOPT_CONNECTTIMEOUT, $this->config['connecttimeout'])->
+            set_option(CURLOPT_TIMEOUT, $this->config['timeout'])->
+            set_option(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1)->
+            set_option(CURLOPT_FOLLOWLOCATION, true)->
+            set_option(CURLOPT_MAXREDIRS, 5)->
+            set_option(CURLOPT_AUTOREFERER, true)->
+            set_option(CURLOPT_RETURNTRANSFER, true)->
+            set_option(CURLINFO_HEADER_OUT, true)->
+            set_option(CURLOPT_HEADERFUNCTION, array($this, 'setResponseHeaders'));
+        
+        if (!empty($this->request_headers)) {
+            $this->set_option(CURLOPT_HTTPHEADER, $this->request_headers);
+        }
+        
+        if (!empty($this->cookies)) {
+            $cookies = array();
+            foreach ($this->cookies as $k => $v) {
+                $cookies[] = $k .'='. $v;
+            }
+            $this->set_option(CURLOPT_COOKIE, implode('; ', $cookies));
+        }
+        
+        $this->setProxy();
+        $this->setInterface();
+    }
+    
+    /**
+     * Выставляет опции прокси
+     */
     private function setProxy() {
         if (!empty($this->config['proxy'])) {
             $this->set_option(CURLOPT_PROXY, $this->config['proxy']);
@@ -127,99 +250,362 @@ class miniCurl {
         }
     }
 
+    /**
+     * Выставляет опции интерфейса
+     * @return boolean
+     */
     private function setInterface() {
-        if (!empty($this->config['interface'])) {
+        if (!empty($this->config['interface']) && empty($this->config['server'])) {
             curl_setopt($this->ch, CURLOPT_INTERFACE, $this->config['interface']);
         }
+    }
+    
+    /**
+     * Подготавливает данные для post запроса
+     * @param array $post_data
+     * @return string|array
+     */
+    private function preparePostData($post_data=false) {
+        if (empty($post_data)) { return ''; }
+        
+        if (!is_array($post_data)) {
+            return $post_data;
+        }
+        
+        foreach ($post_data as $v) {
+            if (substr($v, 0, 1) == '@') {
+                $this->multipart = true;
+                return $post_data;
+            }
+        }
+        
+        return http_build_query($post_data);
+    }
+    
+    /**
+     * Выставляет опции для запроса к ssl url
+     * @param string $url
+     */
+    private function checkSSLurl($url) {
+        if (strtolower(parse_url($url, PHP_URL_SCHEME)) == 'https' && $this->config['ssl'] === true) {
+            $this->set_option(CURLOPT_SSL_VERIFYHOST, 2);
+            $this->set_option(CURLOPT_SSL_VERIFYPEER, true);
+            $this->set_option(CURLOPT_CAINFO, __DIR__ . DIRECTORY_SEPARATOR . 'cacert.pem');
+            $this->set_option(CURLOPT_CAPATH, __DIR__);
+        } else {
+            $this->set_option(CURLOPT_SSL_VERIFYHOST, 1);
+            $this->set_option(CURLOPT_SSL_VERIFYPEER, false);
+        }
+    }
+    
+    /**
+     * Добавляет опцию для курла в массив опций для дальнейшей инициализации 
+     * методом curl_setopt_array
+     * @param mixed $option
+     * @param mixed $value
+     * @return \clas_curl
+     */
+    public function set_option($option, $value) {
+        if (!isset($this->curl_options[$option])) {
+            $this->curl_options[$option] = $value;
+        }
+        return $this;
+    }
+    
+    /**
+     * Выполняет запрос
+     */
+    private function exec() {
+        $this->checkSSLurl($this->url);
+        
+        $this->ch = curl_init();
+        
+        foreach ($this->curl_options as $k => $v) {
+            curl_setopt($this->ch, $k, $v);
+        }
+        
+        $this->response = curl_exec($this->ch);
+        $this->code     = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        $this->info     = curl_getinfo($this->ch);
+        $this->error    = curl_error($this->ch);
+        $this->errno    = curl_errno($this->ch);
+        
+        curl_close($this->ch);
+        
+        $this->processHeaders();
+        $this->processHeaderCharset();
+        
+        if ($this->config['encoding'] === true && $this->response_encoding != $this->config['default_encoding']) {
+            $this->response = iconv($this->response_encoding, $this->config['default_encoding'], $this->response);
+        }
+    }
+    
+    /**
+     * Сохраняет полученный хидер в переменную response_header_raw
+     * @param type $ch
+     * @param string $header
+     * @return integer
+     */
+    private function setResponseHeaders($ch, $header) {
+        $this->response_header_raw .= $header;
+        return strlen($header);
+    }
+    
+    /**
+     * Создает ассоциативный массив из данных хидера
+     */
+    private function processHeaders(){
+        $headers = explode("\r\n", $this->response_header_raw);
+        
+        foreach ($headers as $header) {
+            $header = trim($header);
+            
+            if (strpos($header, ':') !== false) {
+                list($key, $value) = explode(':', $header, 2);
+                
+                $key = strtolower(trim($key));
+                
+                if ($key == 'set-cookie') {
+                    $this->processCookies($value);
+                }
+                
+                $this->response_header[$key][] = trim($value);
+            } else if (!empty($header)) {
+                $this->response_header[0][] = $header;
+            }
+        }
+    }
+    
+    /**
+     * Заносит в массив куки выставленные в хидере
+     * @param string $string
+     */
+    private function processCookies($string) {
+        list($cookie) = explode(';', $string);
+        
+        $cookie = explode('=', $cookie);
+        
+        $cookie[0] = trim($cookie[0]);
+        $cookie[1] = strtolower(trim($cookie[1]));
+        
+        if ($cookie[1] == 'deleted') {
+            unset($this->cookies[$cookie[0]]);
+        } else {
+            $this->cookies[$cookie[0]] = $cookie[1];
+        }
+    }
+    
+    /**
+     * Получаем кодировку полученных данных из хидера
+     */
+    private function processHeaderCharset() {
+        if (preg_match('#charset=(.+?)$#is', $this->info['content_type'], $charset)) {
+            $this->response_encoding = strtolower(trim($charset[1]));
+        } else {
+            $this->processBodyCharset();
+        }
+    }
+    
+    /**
+     * Получаем кодировку полученных данных из мета тега
+     */
+    private function processBodyCharset() {
+        if (preg_match("#<meta\b[^<>]*?\bcontent=['\"]?text/html;\s*charset=([^>\s\"']+)['\"]?#is", $this->response, $charset)) {
+            $this->response_encoding = strtolower(trim($charset[1]));
+        }
+    }
+    
+    private function clear() {
+        $this->method = 'get';
+        $this->response = '';
+        $this->response_header_raw = '';
+        $this->response_header = array();
+        $this->response_encoding = false;
+        $this->meta_tags = array();
+        $this->code = false;
+        $this->info = false;
+        $this->error = false;
+        $this->errno = false;
+    }
+    
+    private function reset() {
+        $this->multipart = false;
+        $this->ajax = false;
+        $this->curl_options = array();
+    }
+    
+    /**
+     * Выполняет запрос с помошью такого же класса установленного на удаленном сервере
+     */
+    private function requestFromServer() {
+        $config = $this->config;
+        unset($config['server']);
+        unset($config['server_key']);
+        
+        $data = base64_encode(
+            json_encode(array(
+                'url'          => $this->url,
+                'curl_options' => $this->curl_options,
+                'config'       => $config,
+                'cookies'      => $this->cookies
+            ))
+        );
+        
+        $signature = md5(
+            $this->config['server_key'] .'-'. $data .'-'. $this->config['server_key']
+        );
+        
+        $inCurl = new self();
+        $inCurl->exec('post', $this->config['server'], array(
+            'requestData' => $data,
+            'signature'   => $signature
+        ));
+        
+        if (!empty($inCurl->response)) {
+            $request = json_decode($inCurl->response, true);
+            
+            $rSignature = $request['signature'];
+
+            $request = json_decode(base64_decode($request['requestData']), true);
+            
+            $signature = md5(
+                $this->config['server_key'] .'-'. $request['requestData'] .'-'. $this->config['server_key']
+            );
+            
+            if ($signature == $rSignature) {
+                foreach ($request as $k => $v) {
+                    $this->{$k} = $v;
+                }
+            } else {
+                $this->error = 'Invalid signature';
+            }
+        } else {
+            $this->error = 'Invalid response';
+        }
+    }
+    
+    /**
+     * Получает данные для запроса, проверяет хеш если хеш совпадает выполняет
+     * запрос и возвращает данные
+     */
+    public function startServer() {
+        if ($this->server !== true) { exit; }
+        
+        $requestData = $_POST['requestData'];
+        $rSignature  = $_POST['signature'];
+        
+        $signature   = md5($this->config['server_key'] .'-'. $requestData .'-'. $this->config['server_key']);
+        
+        if ($rSignature == $signature) {
+            $this->config = array_merge($this->config, $requestData['config']);
+            unset($requestData['config']);
+            
+            foreach ($requestData as $k => $v) {
+                $this->{$k} = $v;
+            }
+            
+            $this->exec();
+            
+            $data = base64_encode(
+                json_encode(array(
+                    'response'            => $this->response,
+                    'response_header_raw' => $this->response_header_raw,
+                    'response_header'     => $this->response_header,
+                    'response_encoding'   => $this->response_encoding,
+                    'code'                => $this->code,
+                    'info'                => $this->info,
+                    'error'               => $this->error,
+                    'errno'               => $this->errno
+                ))
+            );
+
+            $signature = md5(
+                $this->config['server_key'] .'-'. $data .'-'. $this->config['server_key']
+            );
+            
+            echo json_encode(array(
+                'requestData' => $data,
+                'signature'   => $signature
+            ));
+        }
+        
+        exit;
+    }
+    
+    /**
+     * Возвращает массив или объект из json данных полученных в результате запроса
+     * @param boolean $assoc возвращать в виде ассоциативного массива или объекта
+     */
+    public function json($assoc=true) {
+        return json_decode($this->response, $assoc);
+    }
+    
+    /**
+     * Возвращает xml объект из данных результа запроса
+     * @return object
+     */
+    public function xml() {
+        return simplexml_load_string($this->response);
+    }
+    
+    /**
+     * Парсит из тела мета теги и заполняет ими meta_tags
+     */
+    public function meta() {
+        if (!preg_match_all('#<meta(.+?)>#is', $this->response, $matches)) {
+            return false;
+        }
+        
+        foreach ($matches[1] as $val) {
+            preg_match_all('#([a-z0-9\-\_]+)="([^"]+)"#is', trim($val), $match);
+            
+            $name = ''; $item = array();
+            foreach ($match[1] as $k => $v) {
+                if ($v == 'name' || $v == 'property' || $v == 'itemprop') {
+                    $name = $match[2][$k];
+                } else {
+                    $item[$v] = $match[2][$k];
+                }
+            }
+            
+            if (!empty($name)) {
+                if (!isset($this->meta_tags[$name])) {
+                    $this->meta_tags[$name] = array();
+                }
+                $this->meta_tags[$name][] = $item;
+            } else {
+                $this->meta_tags[] = $item;
+            }
+        }
+        
         return true;
     }
     
-    private function https(){
-        $scheme = parse_url($this->current_url,PHP_URL_SCHEME);
-        $scheme = strtolower($scheme);
-        if ($scheme == 'https') {
-            $this->set_option(CURLOPT_SSL_VERIFYHOST, $this->config['verify_host']);
-            $this->set_option(CURLOPT_SSL_VERIFYPEER, $this->config['verify_peer']);
-        }
-    }
-    
-    private static function echoError($msg) {
-        if (class_exists('cmsCore')) {
-            cmsCore::addsessionmessage($msg, 'error');
-        } else {
-            echo $msg;
-        }
-        return false;
-    }
-    
-    private function getPostRawData($post_data=false) {
-        $multipart = false; $raw_data = array();
-        
-        if (!empty($post_data)) {
-            if (is_array($post_data)) {
-                foreach ($post_data as $k => $v) {
-                    if (mb_substr($v, 0, 1) == '@') {
-                        $multipart = true;
-                        break;
-                    }
-                    $raw_data[] = $k .'='. urlencode($v);
-                }
-            } else {
-                return $post_data;
-            }
-        } else {
-            return '';
-        }
-        
-        return $multipart === false ? implode('&', $raw_data) : $post_data;
-    }
-    
-    public function getCurrentUrl() {
-        return $this->current_url;
-    }
-    
-    public function get($url, $header = array(), $type = '') {
-        $this->current_url = $url;
-        
-        if (!$this->current_url) { 
-            return self::echoError('Не указан URL');
-        }
-        
-        $this->header = empty($header) ? '' : $header;
-        $this->set_option(CURLOPT_URL, $this->current_url);
-        $this->set_option(CURLOPT_POST, false);
-        $this->set_option(CURLOPT_HTTPGET, true);
-        
-        $this->https();
-        
-        return $this->exec($type);
-    }
-    
-    public function saveFile($src, $dist, $header = '') {
+    /**
+     * Сохраняет удаленный файл $src в локальный файл $dist
+     * @param string $src
+     * @param string $dist
+     * @param array $header
+     * @return boolean
+     */
+    public function saveFile($src, $dist, $header=array()) {
         $file = fopen($dist, 'w');
-        if (!$file) {
-            self::echoError('Не возможно открыть(создать файл) '. $dist);
-            return false;
-        }
+        if (!$file) { return false; }
         
         $ch = curl_init();
-        if (!$ch) {
-            $this->error = curl_error($ch);
-            return false;
-        }
-        
-        $cfg = self::getDefaultConfig();
-        
-        curl_setopt($ch, CURLOPT_USERAGENT, $cfg['user_agent']);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, $cfg['header']);
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, $cfg['http_version']);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $cfg['connect_timeout']);
-        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        if (!$ch) { return false; }
+
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:25.0) Gecko/20100101 Firefox/25.0');
         curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $src);
         curl_setopt($ch, CURLOPT_FILE, $file);
-        
+
         if (!empty($header)) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         }
@@ -227,374 +613,9 @@ class miniCurl {
         $result = curl_exec($ch);
         
         fclose($file);
-        
-        if ($result === false) {
-            self::echoError('Не удалось получить файл '. $src);
-            
-            $this->error = curl_error($ch);
-            
-            curl_close($ch);
-            
-            return false;
-        }
-        
+
         curl_close($ch);
         
-        return true;
+        return $result;
     }
-
-    public function post($url, $postdata = null, $header = array(), $type = '') {
-        $this->current_url = $url;
-        $this->postdata = $this->getPostRawData($postdata);
-        
-        if (empty($this->current_url)) {
-            return self::echoError('Не указан URL');
-        }
-        
-        $this->header = empty($header) ? '' : $header;;
-        $this->set_option(CURLOPT_URL, $this->current_url);
-        $this->set_option(CURLOPT_POST, true);
-        $this->set_option(CURLOPT_POSTFIELDS, $this->postdata);
-        
-        $this->https();
-        return $this->exec($type);
-    }
-    
-    public function put($url, $file = false, $data = null, $header = ''){
-        $this->current_url = $url;
-        
-        if (!$this->current_url) {
-            return self::echoError('Не указан URL');
-        }
-
-        $this->set_option(CURLOPT_POST, false);
-        $this->set_option(CURLOPT_POSTFIELDS, $data);
-        
-        $this->header = $header;
-        $this->set_option(CURLOPT_URL, $this->current_url);
-        $this->set_option(CURLOPT_PUT, true);
-
-        if (!empty($file) && file_exists($file)) {
-            $fp = fopen($file, 'r');
-
-            $this->set_option(CURLOPT_INFILE, $fp);
-            $this->set_option(CURLOPT_INFILESIZE, filesize($file));
-            $this->set_option(CURLOPT_UPLOAD, true);
-        }
-
-        return $this->exec();
-    }
-    
-    public function delete($url, $header = ''){
-        $this->current_url = $url;
-        
-        if (!$this->current_url) {
-            return self::echoError('Не указан URL');
-        }
-        
-        $this->header = $header;
-        $this->set_option(CURLOPT_URL, $this->current_url);
-        $this->set_option(CURLOPT_CUSTOMREQUEST, 'DELETE');
-        
-        return $this->exec();
-    }
-    
-    private function exec($type) {
-        if (mb_strstr($type, 'ajax')) {
-            if (empty($this->header) || !is_array($this->header)) {
-                $this->header = array();
-            }
-            $this->header[] = 'X-Requested-With: XMLHttpRequest';
-        }
-        
-        if ($this->header) {
-            $this->set_option(CURLOPT_HTTPHEADER, $this->header);
-        }
-        
-        if ($this->cookies) {
-            $cookies = array();
-            foreach ($this->cookies as $k => $v) {
-                $cookies[] = $k .'='. $v;
-            }
-            $this->set_option(CURLOPT_COOKIE, implode('; ', $cookies));
-        }
-        
-        $this->setProxy();
-        $this->setInterface();
-        
-        $this->result = curl_exec($this->ch);
-        
-        if ($this->result === false) {
-            $this->error = curl_error($this->ch);
-            return false;
-        }
-        
-        $this->info = curl_getinfo($this->ch);
-        $this->processHeaders();
-        $this->processBody();
-
-        if (mb_strstr($type, 'json')) {
-            return json_decode(
-                $this->result_body,
-                mb_strstr($type, 'json:array') ? true : false
-            );
-        }
-
-        if (mb_strstr($type, 'xml')) {
-            return simplexml_load_string($this->result_body);
-        }
-        
-        return true;
-    }
-    
-    private function processHeaders(){
-        if ($this->config['header']) {
-            $this->result_headers = array();
-            $this->result_headers[0] = substr($this->result,0,$this->info['header_size']);
-            $headers = explode("\r\n",$this->result_headers[0]);
-            foreach ($headers as $header) {
-                if (strpos($header,":") !== false) {
-                    list($key,$value) = explode(":",$header,2);
-                    $key = trim($key);
-                    $key = strtolower($key);
-                    switch ($key) {
-                        case 'set-cookie':
-                            $this->processCookies($value);
-                            break;
-                        case 'content-type':
-                            if ($this->config['encoding'] === true) $this->processContentType($value);
-                            break;
-                    }
-                    $this->result_headers[$key] = trim($value);
-                }
-            }
-        }
-    }
-    
-    private function processCookies($string) {
-        $cookie	= explode(';',$string);
-        $cookie = explode('=',$cookie[0]);
-        
-        $cookie[0] = trim($cookie[0]);
-        $cookie[1] = trim($cookie[1]);
-        
-        if ($cookie[1] == 'DELETED' || $cookie[1] == 'deleted') {
-            unset($this->cookies[$cookie[0]]);
-        } else {
-            $this->cookies[$cookie[0]] = $cookie[1];
-        }
-    }
-    
-    private function processContentType($string) {
-        $pos = strpos($string,'charset');
-        if ($pos !== false) {
-            $endpos = strpos($string,';',$pos);
-            if ($endpos === false) {
-                $charset = substr($string,$pos);
-            } else {
-                $length = $endpos - $pos;
-                $charset = substr($string,$pos,$length);
-            }
-            list(,$this->result_encoding) = explode('=',$charset,2);
-        }
-        return true;
-    }
-    
-    private function processBody() {
-        $html = array();
-        
-        if ($this->config['header']) {
-            $this->result_body = substr($this->result, $this->info['header_size']);
-        } else {
-            $this->result_body = $this->result;
-        }
-            
-        if ($this->config['meta'] === true && preg_match('#<head[^>]{0,}>(.+?)</head.+?<body[^>]{0,}>(.*)$#is', $this->result_body, $html)) {
-            $this->result_head = $html[1];
-            $this->result_body = $html[2];
-        }
-        
-        if (!$this->result_encoding && $this->config['encoding'] === true) {
-            if (preg_match("#<meta\b[^<>]*?\bcontent=['\"]?text/html;\s*charset=([^>\s\"']+)['\"]?#is", (empty($this->result_head) ? $this->result_body : $this->result_head), $match)) {
-                $this->result_encoding = strtoupper($match[1]);
-            }
-        }
-        
-        if ($this->config['encoding'] !== false) { $this->processEncoding(); }
-        if ($this->config['meta'] === true) { $this->processMetaSearch(); }
-    }
-    
-    private function processEncoding() {
-        if ($this->config['encoding'] !== true) {
-            $this->result_encoding = $this->config['encoding'];
-        }
-        if ($this->result_encoding != $this->default_encoding) {
-            $this->result_body = iconv($this->result_encoding, $this->default_encoding, $this->result_body);
-            if ($this->config['meta'] === true) {
-                $this->result_head = iconv($this->result_encoding, $this->default_encoding, $this->result_head);
-            }
-        }
-        if ($this->config['meta'] === true) {
-            $this->result_body = preg_replace('#\s+#is', ' ', $this->result_body);
-            $this->result_head = preg_replace('#\s+#is', ' ', $this->result_head);
-        }
-    }
-    
-    private function processMetaSearch() {
-        $this->meta_tags = array();
-        if (!empty($this->result_head)) {
-            preg_match_all('#<meta(.+?)>#is', $this->result_head, $matches);
-            foreach ($matches[1] as $val) {
-                preg_match_all('#([a-z0-9\-\_]+)="([^"]+)"#is', trim($val), $match);
-                $name = ''; $item = array();
-                foreach ($match[1] as $k => $v) {
-                    if ($v == 'name' || $v == 'property' || $v == 'itemprop') {
-                        $name = $match[2][$k];
-                    } else {
-                        $item[$v] = $match[2][$k];
-                    }
-                }
-                if (!empty($name)) {
-                    if (!isset($this->meta_tags[$name])) {
-                        $this->meta_tags[$name] = array();
-                    }
-                    $this->meta_tags[$name][] = $item;
-                } else {
-                    $this->meta_tags[] = $item;
-                }
-            }
-        }
-    }
-    
-    public function startServer() {
-        if (!empty($this->key) && $this->key != md_5($_POST['key'])) {
-            header("HTTP/1.0 404 Not Found");
-            header("HTTP/1.1 404 Not Found");
-            header("Status: 404 Not Found");
-            exit;
-        }
-        
-        $request = $_POST['request'];
-        $request = base64_decode($request);
-        $request = json_decode($request, true);
-        
-        $this->reInit($request['config']);
-        $this->cookies = $request['cookies'];
-        
-        switch ($request['type']) {
-            case 'get':
-                    $this->get($request['url'], $request['header']);
-                break;
-            case 'ajaxGet':
-                    $this->ajaxGet($request['url'], $request['header']);
-                break;
-            case 'post':
-                    $this->post($request['url'], $request['postdata'], $request['header']);
-                break;
-            case 'ajaxPost':
-                    $this->ajaxPost($request['url'], $request['postdata'], $request['header']);
-                break;
-            default:
-                    header("HTTP/1.0 404 Not Found");
-                    header("HTTP/1.1 404 Not Found");
-                    header("Status: 404 Not Found");
-                    exit;
-                break;
-        }
-        
-        $data = array(
-            'error' => $this->error,
-            'info' => $this->info,
-            'cookies' => $this->cookies,
-            'result_headers' => $this->result_headers,
-            'meta_tags' => $this->meta_tags,
-            'result_head' => $this->result_head,
-            'result_body' => $this->result_body
-            
-        );
-
-        $data = json_encode($data);
-        $data = base64_encode($data);
-        echo $data;
-    }
-    
-    public function getServer($sUrl, $type, $url, $postdata=false, $header=false) {
-        $data = array(
-            'type' => $type,
-            'url' => $url,
-            'postdata' => $postdata,
-            'header' => $header,
-            'cookies' => $this->cookies,
-            'config' => $this->config
-        );
-        $data = json_encode($data);
-        $data = base64_encode($data);
-        
-        $config = $this->config;
-        $this->config['meta'] = false;
-        $this->config['encoding'] = false;
-
-        $this->post($sUrl, array('request' => $data));
-        $this->config = $config;
-        
-        if (!empty($this->result_body)) {
-            $request = $this->result_body;
-            $request = base64_decode($request);
-            $request = json_decode($request, true);
-
-            $this->error = $request['error'];
-            $this->info = $request['info'];
-            $this->cookies = $request['cookies'];
-            $this->result_headers = $request['result_headers'];
-            $this->meta_tags = $request['meta_tags'];
-            $this->result_head = $request['result_head'];
-            $this->result_body = $request['result_body'];
-        }
-    }
-    
-    //==========================================================================
-    public function ajaxGet($url, $header = array()) {
-        return $this->get($url, $header, 'ajax');
-    }
-    
-    public function jsonGet($url, $assoc=false, $header = array()) {
-        return $this->get($url, $header, 'json'. ($assoc ? ':array' : ''));
-    }
-    
-    public function ajaxJsonGet($url, $assoc=false, $header = array()) {
-        return $this->get($url, $header, 'ajax json'. ($assoc ? ':array' : ''));
-    }
-
-    public function xmlGet($url, $header = array()) {
-        return $this->get($url, $header, 'xml');
-    }
-    
-    public function ajaxXmlGet($url, $header = array()) {
-        return $this->get($url, $header, 'ajax xml');
-    }
-    //==========================================================================
-    public function ajaxPost($url, $postdata = null, $header = array()){
-        return $this->post($url, $postdata, $header, 'ajax');
-    }
-    
-    public function jsonPost($url, $assoc = false, $postdata = null, $header = array()){
-        return $this->post($url, $postdata, $header, 'json'. ($assoc ? ':array' : ''));
-    }
-    
-    public function ajaxJsonPost($url, $assoc = false, $postdata = null, $header = array()) {
-        return $this->post($url, $postdata, $header, 'ajax json'. ($assoc ? ':array' : ''));
-    }
-    
-    public function xmlPost($url, $postdata = null, $header = array()){
-        return $this->post($url, $postdata, $header, 'xml');
-    }
-    
-    public function ajaxXmlPost($url, $postdata, $header = array()) {
-        return $this->post($url, $postdata, $header, 'ajax xml');
-    }
-}
-
-if (miniCurl::$Server === true && !empty($_POST['request'])) {
-    $inCurl = new miniCurl();
-    $inCurl->startServer();
 }

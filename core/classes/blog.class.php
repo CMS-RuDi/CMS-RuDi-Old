@@ -16,11 +16,11 @@ class cmsBlogs {
     public $owner;
     
     private $targets = array(
-        'tags'=>'blogpost',
-        'rating'=>'blogpost',
-        'comments'=>'blog',
-        'actions_post'=>'add_post',
-        'actions_blog'=>'add_blog'
+        'tags'         => 'blogpost',
+        'rating'       => 'blogpost',
+        'comments'     => 'blog',
+        'actions_post' => 'add_post',
+        'actions_blog' => 'add_blog'
     );
 
 // ============================================================================ //

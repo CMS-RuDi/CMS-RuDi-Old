@@ -323,31 +323,58 @@ function cpMenu() {
 }
 
 function cpToolMenu($toolmenu_list, $opt=false, $optname='opt') {
-    if ($toolmenu_list) {
+    $html = '';
+    
+    if (!empty($toolmenu_list)) {
+        $active_menu = false;
+        $active_sub_menu = false;
+        
         $opt = cmsCore::request($optname, 'str', $opt);
         
-        echo '<nav class="navbar navbar-default" role="navigation"><ul class="nav nav-tabs">';
+        $html .= '<nav class="navbar navbar-default" role="navigation"><ul class="nav nav-tabs">';
 
         foreach ($toolmenu_list as $toolmenu) {
-            if (!$toolmenu) {
-                echo '<div class="toolmenuseparator"></div>'; continue;
+            if (empty($toolmenu)) {
+                $html .= '<div class="toolmenuseparator"></div>'; continue;
             }
 
-            $sel = '';
-            if (!empty($opt)) {
+            if ($active_menu === false) {
                 if (mb_strstr($toolmenu['link'], $optname .'='. $opt)) {
-                    $sel = ' class="active"';
-                    unset($opt);
+                    $active_menu = true;
                 }
+            }
+            
+            $sub_menu = '';
+            
+            if (!empty($toolmenu['items'])) {
+                $sub_menu .= '<ul class="dropdown-menu" role="menu">';
+                        
+                foreach ($toolmenu['items'] as $item) {
+                    if ($active_menu === false) {
+                        if (mb_strstr($item['link'], $optname .'='. $opt)) {
+                            $active_menu = $active_sub_menu = true;
+                        }
+                    }
+                    
+                    $sub_menu .= '<li class="'. ($active_sub_menu === true ? 'active' : '') .'"><a href="'. $item['link'] .'" class="uittip" title="'. $item['title'] .'" '. (!empty($item['target']) ? 'target="'. $item['target'] .'"' : '') .'><img src="images/toolmenu/'. $item['icon'] .'" /></a></li>';
+                }
+                
+                $sub_menu .= '</ul>';
             }
             
             $target = isset($toolmenu['target']) ? 'target="'. $toolmenu['target'].'"' : '';
             
-            echo '<li'. $sel .'><a href="'. $toolmenu['link'] .'" class="uittip" title="'. $toolmenu['title'] .'" '. $target .'><img src="images/toolmenu/'. $toolmenu['icon'] .'" /></a></li>';
+            $html .= '<li class="'. ($active_menu === true ? 'active' : '') .''. (!empty($toolmenu['items']) ? ' dropdown' : '') .'"><a href="'. $toolmenu['link'] .'" class="uittip '. (!empty($toolmenu['items']) ? ' dropdown-toggle" data-toggle="dropdown"' : '"') .' title="'. $toolmenu['title'] .'" '. (!empty($toolmenu['target']) ? 'target="'. $toolmenu['target'] .'"' : '') .'><img src="images/toolmenu/'. $toolmenu['icon'] .'" /></a>'. (!empty($toolmenu['items']) ? $sub_menu : '') .'</li>';
+            
+            if ($active_menu === true) {
+                $active_menu = $active_sub_menu = null;
+            }
         }
 
-        echo '</ul></nav>';
+        $html .= '</ul></nav>';
     }
+    
+    echo $html;
 
     return;
 }

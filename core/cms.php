@@ -46,7 +46,7 @@ class cmsCore {
     private static $classes = array();
     private static $classes_name = array(
         'actions'      => 'cmsActions',     'blog'         => 'cmsBlogs',     'config'  => 'cmsConfig',
-        'cron'         => 'cmsCron',        'curl'         => 'miniCurl',     'db'      => 'cmsDatabase',
+        'cron'         => 'cmsCron',        'curl'         => 'class_curl',   'db'      => 'cmsDatabase',
         'form'         => 'cmsForm',        'formgen'      => 'cmsFormGen',   'geo'     => 'cmsgeo',
         'gif_resize'   => 'gifresizer',     'idna_convert' => 'idna_convert', 'images'  => 'rudi_graphics',
         'jevix'        => 'Jevix',          'page'         => 'cmsPage',      'photo'   => 'cmsPhoto',
@@ -2086,9 +2086,7 @@ class cmsCore {
         return in_array(self::c('user')->group_id, $access_list);
     }
 
-    // SECURITY /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
+    // SECURITY ////////////////////////////////////////////////////////////////
     public static function strClear($input, $strip_tags=true) {
         if (is_array($input)) {
             foreach ($input as $key=>$string) {
@@ -2109,7 +2107,6 @@ class cmsCore {
         
         return $string;
     }
-    ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     /**
      * ====== DEPRECATED =========
@@ -2353,13 +2350,13 @@ class cmsCore {
         return self::c('db')->insert(
             'cms_upload_images',
             array(
-                'target_id' => $target_id,
+                'target_id'  => $target_id,
                 'session_id' => session_id(),
-                'fileurl' => $fileurl,
-                'component' => $component,
-                'target' => $target,
-                'user_id' => (empty($user_id) ? self::c('user')->id : $user_id),
-                'pubdate' => date('Y-m-d H:i:s')
+                'fileurl'    => $fileurl,
+                'component'  => $component,
+                'target'     => $target,
+                'user_id'    => (empty($user_id) ? self::c('user')->id : $user_id),
+                'pubdate'    => date('Y-m-d H:i:s')
             )
         );
     }
@@ -2810,7 +2807,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
                 }
             }else{
                 global $_LANG;
-                cmsCore::halt(sprintf($_LANG['MODEL_NOT_FOUND'], $component));
+                self::halt(sprintf($_LANG['MODEL_NOT_FOUND'], $component));
             }
         }
         
@@ -2838,7 +2835,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
                 }
             } else {
                 global $_LANG;
-                cmsCore::halt(sprintf($_LANG['CLASS_NOT_FOUND'], $class));
+                self::halt(sprintf($_LANG['CLASS_NOT_FOUND'], $class));
             }
         } else {
             if ($reInit === true) {

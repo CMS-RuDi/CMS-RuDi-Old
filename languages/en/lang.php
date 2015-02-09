@@ -55,6 +55,7 @@ $_LANG['SEND']                  ='Send';
 $_LANG['ONLY_FOR_REGISTERED_USERS'] ='This page is available only to registered users.';
 $_LANG['TODAY']                 ='today';
 $_LANG['YESTERDAY']             ='yesterday';
+$_LANG['TOMORROW']              = 'tomorrow';
 $_LANG['DATE']                  ='Date';
 $_LANG['CLOSE']    		        ='Close';
 $_LANG['SIZE_B']                = 'b';

@@ -141,7 +141,7 @@ function applet_tickets() {
             
             if ($item['status'] != '3') {
                 //Отправляем сообщение на сервер техподдержки что тикет удален
-                cmsCore::c('curl')->ajaxPost( $server .'?do=ticket_deleted', array( 'ticket_id' => $item['id'], 'ticket_secret_key' => $item['secret_key'], 'host' => cmsCore::c('config')->host ) );
+                cmsCore::c('curl')->ajax()->request('post', $server .'?do=ticket_deleted', array( 'ticket_id' => $item['id'], 'ticket_secret_key' => $item['secret_key'], 'host' => cmsCore::c('config')->host ));
             }
             
             cmsCore::addSessionMessage($_LANG['AD_TICKET_DELETE_SUCCESS'], 'success');
@@ -163,7 +163,7 @@ function applet_tickets() {
             if (empty($server)) { $server = 'http://ds-soft.ru/tickets.api.php'; }
             
             //Отправляем сообщение на сервер техподдержки что тикет закрыт
-            cmsCore::c('curl')->ajaxPost( $server .'?do=ticket_closed', array( 'ticket_id' => $item['id'], 'ticket_secret_key' => $item['secret_key'], 'host' => cmsCore::c('config')->host ) );
+            cmsCore::c('curl')->ajax()->request('post', $server .'?do=ticket_closed', array( 'ticket_id' => $item['id'], 'ticket_secret_key' => $item['secret_key'], 'host' => cmsCore::c('config')->host ));
             
             cmsCore::addSessionMessage($_LANG['AD_TICKET_CLOSE_SUCCESS'], 'success');
         } else {
@@ -276,7 +276,7 @@ function applet_tickets() {
             }
 
             //Отправляем тикет на сервер техподдержки
-            $result = cmsCore::c('curl')->ajaxJsonPost( $server .'?do=add_ticket', true, $ticket );
+            $result = cmsCore::c('curl')->ajax()->request('post', $server .'?do=add_ticket', $ticket)->json();
             
             if (!empty($result['error'])) {
                 cmsCore::clearSessionMessages();
@@ -417,7 +417,7 @@ function applet_tickets() {
         if (empty($server)) { $server = 'http://ds-soft.ru/tickets.api.php'; }
         
         //Отправляем тикет на сервер техподдержки
-        $result = cmsCore::c('curl')->ajaxJsonPost( $server .'?do=add_ticket_msg', true, array( 'msg' => $msg, 'ticket_id' => $item['id'], 'secret_key' => $item['secret_key'], 'host' => cmsCore::c('config')->host ) );
+        $result = cmsCore::c('curl')->ajax()->request('post', $server .'?do=add_ticket_msg', array( 'msg' => $msg, 'ticket_id' => $item['id'], 'secret_key' => $item['secret_key'], 'host' => cmsCore::c('config')->host ))->json();
 
         if (!empty($result['error'])) {
             cmsCore::addSessionMessage($result['error'], 'error');

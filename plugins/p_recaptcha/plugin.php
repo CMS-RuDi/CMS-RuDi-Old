@@ -163,7 +163,7 @@ class p_recaptcha extends cmsPlugin {
         
         if (empty($captcha_code)) { return false; }
         
-        $result = cmsCore::c('curl')->jsonGet('https://www.google.com/recaptcha/api/siteverify?secret='. $this->config['rpc_private_key'] .'&response='. $captcha_code .'&remoteip='. cmsCore::c('user')->ip, true);
+        $result = cmsCore::c('curl')->request('get', 'https://www.google.com/recaptcha/api/siteverify?secret='. $this->config['rpc_private_key'] .'&response='. $captcha_code .'&remoteip='. cmsCore::c('user')->ip)->json();
         
         return $result['success'];
     }

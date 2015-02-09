@@ -305,7 +305,7 @@ if ($do == 'addarticle' || $do == 'editarticle') {
         $dynamic_cost = false;
 
         // Если добавляем статью
-        if ($do=='addarticle') {
+        if ($do == 'addarticle') {
             $pagetitle = $_LANG['ADD_ARTICLE'];
             
             cmsCore::c('page')->setTitle($pagetitle);

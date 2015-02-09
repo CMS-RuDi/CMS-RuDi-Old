@@ -121,7 +121,7 @@ class p_loginza extends cmsPlugin {
         if (!$token) { cmsCore::error404(); }
 
         // получение профиля
-        $profile = $this->request('http://loginza.ru/api/authinfo?token=?token='. $token);
+        $profile = cmsCore::c('curl')->request('get', 'http://loginza.ru/api/authinfo?token=?token='. $token)->json(false);
 
         // проверка на ошибки
         if (!is_object($profile) || !empty($profile->error_message) || !empty($profile->error_type)) {
@@ -236,7 +236,9 @@ class p_loginza extends cmsPlugin {
 
             // если есть аватар, пробуем скачать
             if (!empty($profile->photo) || !empty($advanced['photo'])) {
-                $photo_path = $this->downloadAvatar((!empty($advanced['photo']) ? $advanced['photo'] : $profile->photo));
+                $photo_path = PATH .'/images/users/avatars/'. md5(session_id()) .'.jpg';
+                cmsCore::c('curl')->saveFile((!empty($advanced['photo']) ? $advanced['photo'] : $profile->photo), $photo_path);
+                
                 if ($photo_path) {
                     cmsCore::includeGraphics();
 
@@ -284,65 +286,17 @@ class p_loginza extends cmsPlugin {
         return false;
     }
 
-    private function downloadAvatar($url) {
-        $tempfile = PATH.'/images/users/avatars/'.md5(session_id()).'.jpg';
-
-        if (function_exists('curl_init')) {
-            $curl = curl_init();
-
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_USERAGENT, 'InstantCMS/1.10.4 +'. HOST);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_POST, false);
-            $raw_data = curl_exec($curl);
-            curl_close($curl);
-        } else {
-            $raw_data = file_get_contents($url);
-        }
-
-        if ($f = @fopen($tempfile, 'w')) {
-            @fwrite($f, $raw_data);
-            @fclose($f);
-
-            return $tempfile;
-        } else {
-            return false;
-        }
-    }
-
     private function getUserByIdentity($identity) {
         return cmsCore::c('db')->get_field('cms_users', "openid='". md5($identity) ."'", 'id');
     }
-
-    private function request($url) {
-        if (function_exists('curl_init')) {
-            $curl = curl_init($url);
-
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_HEADER, false);
-            curl_setopt($curl, CURLOPT_USERAGENT, 'InstantCMS/1.10.4 +'. HOST);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-            
-            $raw_data = curl_exec($curl);
-            
-            curl_close($curl);
-        } else {
-            $raw_data = @file_get_contents($url);
-        }
-        
-        return $raw_data ? json_decode($raw_data) : false;
-    }
     
     private function callVk($uid) {
-        $r = $this->request('https://api.vk.com/method/users.get?'.http_build_query(array(
-            'v'=>'5.21',
-            'user_ids'=>$uid,
-            'fields'=>'city,photo_max_orig,status'
-        )));
+        $r = cmsCore::c('curl')->request('get', 'https://api.vk.com/method/users.get', array(
+            'v'        => '5.21',
+            'user_ids' => $uid,
+            'fields'   => 'city,photo_max_orig,status'
+        ))->json(false);
+        
         return $r ? current($r->response) : false;
     }
 }

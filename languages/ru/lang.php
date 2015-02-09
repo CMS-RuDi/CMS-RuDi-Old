@@ -54,6 +54,7 @@ $_LANG['SEND']                      = 'Отправить';
 $_LANG['ONLY_FOR_REGISTERED_USERS'] = 'Страница доступна только для зарегистрированных пользователей.';
 $_LANG['TODAY']                     = 'сегодня';
 $_LANG['YESTERDAY']                 = 'вчера';
+$_LANG['TOMORROW']                  = 'завтра';
 $_LANG['DATE']                      = 'Дата';
 $_LANG['CLOSE']                     = 'Закрыть';
 $_LANG['SIZE_B']                    = 'б';

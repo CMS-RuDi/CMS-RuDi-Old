@@ -75,6 +75,8 @@ class users_sitemap extends cms_rudi_sitemap {
                         'changefreq' => 'daily',
                         'priority' => '0.8'
                     ));
+                    
+                    $item_nums++;
                 }
             } else {
                 $is_end = true;

@@ -337,6 +337,8 @@ class class_curl {
         
         if ($this->config['encoding'] === true && $this->response_encoding != $this->config['default_encoding']) {
             $this->response = iconv($this->response_encoding, $this->config['default_encoding'], $this->response);
+        } else if ($this->config['encoding'] !== false) {
+            $this->response = iconv($this->config['encoding'], $this->config['default_encoding'], $this->response);
         }
     }
     
@@ -564,7 +566,7 @@ class class_curl {
                 if ($v == 'name' || $v == 'property' || $v == 'itemprop') {
                     $name = $match[2][$k];
                 } else {
-                    $item[$v] = $match[2][$k];
+                    $item[$v] = html_entity_decode($match[2][$k], ENT_COMPAT, $this->config['default_encoding']);
                 }
             }
             

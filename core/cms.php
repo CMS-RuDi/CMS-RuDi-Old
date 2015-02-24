@@ -2189,6 +2189,7 @@ class cmsCore {
 
             // Устанавливаем параметры тегов являющиеся обязательными. Без них вырезает тег оставляя содержимое.
             self::c('jevix')->cfgSetTagParamsRequired('img', 'src');
+            self::c('jevix')->cfgSetTagParamsRequired('iframe', 'src');
 
             // Устанавливаем теги которые может содержать тег контейнер
             self::c('jevix')->cfgSetTagChilds('ul',array('li'),false,true);

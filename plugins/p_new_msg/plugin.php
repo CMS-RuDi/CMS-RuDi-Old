@@ -25,14 +25,14 @@ class p_new_msg extends cmsPlugin {
     }
 
     // ==================================================================== //
-    public function execute($event='', $data=array()) {
+    public function execute($event='', $item=array()) {
         parent::execute();
         
         switch ($event) {
-            case 'PRINT_PAGE_HEAD': return $this->animateNewMsg($data);
+            case 'PRINT_PAGE_HEAD': return $this->animateNewMsg($item);
         }
         
-        return $data;
+        return $item;
     }
 
     // ==================================================================== //

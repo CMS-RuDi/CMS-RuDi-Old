@@ -1061,8 +1061,7 @@ class bbcode {
 
         foreach ($elem['val'] as $item) {
             if ('item'==$item['type']) { continue; }
-            $item['str'] = str_replace('&#8217;', "'", $item['str']);
-            $item['str'] = str_replace('’', "'", $item['str']);
+            $item['str'] = str_replace(array('&#8217;', '’'), "'", $item['str']);
         }
 
         $geshi = new GeSHi($item['str'], $lang);
@@ -1077,24 +1076,12 @@ class bbcode {
     }
     // Функция - обработчик тега [video]
     function video_2html($elem) {
-        $str = '<div class="bb_tag_video">';
-        foreach ($elem['val'] as $item) {
-
-            if ('item'==$item['type']) { continue; }
-
-			$my_domen_regexp = str_replace('.', '\.', HOST);
-			$my_domen_regexp = str_replace('/', '\/', $my_domen_regexp);
-
-            $iframe_regexp      = '/<iframe.*?src=(?!"\/\/www\.youtube\.com\/embed\/|"http:\/\/vk\.com\/video_ext\.php\?|"'.$my_domen_regexp.').*?><\/iframe>/iu';
-            $iframe_regexp2     = '/<iframe.*>.+<\/iframe>/iu';
-            $item['str']        = preg_replace($iframe_regexp, '', $item['str']);
-            $item['str']        = preg_replace($iframe_regexp2, '', $item['str']);
-
-            $str .= strip_tags($item['str'], '<iframe><object><param><embed>');
-
+        $str = cmsCore::htmlCleanUp('<div class="bb_tag_video">'. $elem['val'][0]['str'] .'</div>');
+        if (preg_match('#<div class="bb_tag_video">[\s]+</div>#')) {
+            return '';
+        } else {
+            return $str;
         }
-        $str .= '</div>';
-        return cmsCore::htmlCleanUp($str);
     }
     // Функция - обработчик тега [audio]
     function audio_2html($elem) {

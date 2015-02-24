@@ -123,8 +123,9 @@ class board_sitemap extends cms_rudi_sitemap {
                         'priority' => '0.7',
                         'lastmod' => $last_date[0]
                     ));
+                    
+                    $item_nums++;
                 }
-                
             } else {
                 $is_end = true;
             }

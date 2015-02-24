@@ -133,7 +133,7 @@ class content_sitemap extends cms_rudi_sitemap {
         
         // Заносим в карту статьи
         while($is_end === false) {
-            $results = cmsCore::c('db')->query("SELECT id, seolink, pubdate FROM cms_content WHERE published = 1 AND pubdate <= '$today' AND (is_end=0 OR (is_end=1 AND enddate >= '$today')) ORDER BY pubdate ASC LIMIT ". $article_nums .', 1000');
+            $results = cmsCore::c('db')->query("SELECT id, seolink, pubdate FROM cms_content WHERE published = 1 AND pubdate <= '". $today ."' ORDER BY pubdate ASC LIMIT ". $article_nums .', 1000');
             
             if (cmsCore::c('db')->num_rows($results)) {
                 while ($article = cmsCore::c('db')->fetch_assoc($results)) {

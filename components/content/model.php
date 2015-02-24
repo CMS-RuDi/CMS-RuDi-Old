@@ -217,7 +217,7 @@ class cms_model_content {
         $today = date("Y-m-d H:i:s");
 
         if ($only_published) {
-            cmsCore::c('db')->where("con.published = 1 AND con.pubdate <= '$today' AND (con.is_end=0 OR (con.is_end=1 AND con.enddate >= '$today'))");
+            cmsCore::c('db')->where("con.published = 1 AND con.pubdate <= '". $today ."'");
         }
 
         $sql = "SELECT con.*,
@@ -276,8 +276,7 @@ class cms_model_content {
         $today = date('Y-m-d H:i:s');
 
         if ($only_published) {
-            cmsCore::c('db')->where("con.published = 1 AND con.pubdate <= '$today'
-                      AND (con.is_end=0 OR (con.is_end=1 AND con.enddate >= '$today'))");
+            cmsCore::c('db')->where("con.published = 1 AND con.pubdate <= '". $today ."'");
         }
 
         $sql = "SELECT 1

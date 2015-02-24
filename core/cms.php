@@ -12,8 +12,8 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
-define('CMS_RUDI_V', '0.0.9');
-define('CMS_RUDI_V_DATE', '14.12.2014');
+define('CMS_RUDI_V', '0.0.10');
+define('CMS_RUDI_V_DATE', '25.02.2015');
 
 class cmsCore {
     private static   $instance;

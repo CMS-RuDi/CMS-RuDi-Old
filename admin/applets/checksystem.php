@@ -2,7 +2,7 @@
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 /******************************************************************************/
 //                                                                            //
-//                             CMS RuDi v0.0.9                                //
+//                             CMS RuDi v0.0.10                               //
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //

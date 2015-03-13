@@ -219,7 +219,8 @@ class class_curl {
             set_option(CURLOPT_AUTOREFERER, true)->
             set_option(CURLOPT_RETURNTRANSFER, true)->
             set_option(CURLINFO_HEADER_OUT, true)->
-            set_option(CURLOPT_HEADERFUNCTION, array($this, 'setResponseHeaders'));
+            set_option(CURLOPT_HEADERFUNCTION, array($this, 'setResponseHeaders'))->
+            set_option(CURLOPT_ENCODING , 'gzip, deflate');
         
         if (!empty($this->request_headers)) {
             $this->set_option(CURLOPT_HTTPHEADER, $this->request_headers);

@@ -375,29 +375,29 @@ if ($do=='profile'){
         return;
     }
 
-	// Данные о друзьях
-	$usr['friends_total'] = cmsUser::getFriendsCount($usr['id']);
-	$usr['friends']		  = cmsUser::getFriends($usr['id']);
-	// очищать сессию друзей если в своем профиле и количество друзей из базы не совпадает с количеством друзей в сессии
-	if ($myprofile && sizeof($usr['friends']) != $usr['friends_total']) { cmsUser::clearSessionFriends(); }
-	// обрезаем список
-	$usr['friends'] = array_slice($usr['friends'], 0, 6);
-	// выясняем друзья ли мы с текущим пользователем
+    // Данные о друзьях
+    $usr['friends_total'] = cmsUser::getFriendsCount($usr['id']);
+    $usr['friends']		  = cmsUser::getFriends($usr['id']);
+    // очищать сессию друзей если в своем профиле и количество друзей из базы не совпадает с количеством друзей в сессии
+    if ($myprofile && sizeof($usr['friends']) != $usr['friends_total']) { cmsUser::clearSessionFriends(); }
+    // обрезаем список
+    $usr['friends'] = array_slice($usr['friends'], 0, 6);
+    // выясняем друзья ли мы с текущим пользователем
     $usr['isfriend'] = !$myprofile ? cmsUser::isFriend($usr['id']) : false;
 
-	// награды пользователя
+    // награды пользователя
     $usr['awards'] = $model->config['sw_awards'] ? $model->getUserAwards($usr['id']) : false;
 
-	// стена
-	if($model->config['sw_wall']){
-		$inDB->limitPage(1, $model->config['wall_perpage']);
+    // стена
+    if($model->config['sw_wall']){
+        $inDB->limitPage(1, $model->config['wall_perpage']);
         $usr['wall_html'] = cmsUser::getUserWall($usr['id'], 'users', $myprofile, $inUser->is_admin);
-	}
+    }
 
-	// можно ли пользователю изменять карму
+    // можно ли пользователю изменять карму
     $usr['can_change_karma'] = $model->isUserCanChangeKarma($usr['id']) && $inUser->id;
 
-	// Фотоальбомы пользователя
+    // Фотоальбомы пользователя
     if ($model->config['sw_photo']){
         $usr['albums']       = $model->getPhotoAlbums($usr['id'], $usr['isfriend'], !$inCore->isComponentEnable('photos'));
         $usr['albums_total'] = sizeof($usr['albums']);
@@ -407,27 +407,21 @@ if ($do=='profile'){
         }
     }
 
-    $usr['board_count']    = $model->config['sw_board'] ?
-								$inDB->rows_count('cms_board_items', "user_id='{$usr['id']}' AND published=1") : 0;
-    $usr['comments_count'] = $model->config['sw_comm'] ?
-								$inDB->rows_count('cms_comments', "user_id='{$usr['id']}' AND published=1") : 0;
-	$usr['forum_count']    = $model->config['sw_forum'] ?
-								$inDB->rows_count('cms_forum_posts', "user_id = '{$usr['id']}'") : 0;
-	$usr['files_count']    = $model->config['sw_files'] ?
-								$inDB->rows_count('cms_user_files', "user_id = '{$usr['id']}'") : 0;
+    $usr['board_count']    = $model->config['sw_board'] ? $inDB->rows_count('cms_board_items', "user_id='{$usr['id']}' AND published=1") : 0;
+    $usr['comments_count'] = $model->config['sw_comm'] ? $inDB->rows_count('cms_comments', "user_id='{$usr['id']}' AND published=1") : 0;
+	$usr['forum_count']    = $model->config['sw_forum'] ? $inDB->rows_count('cms_forum_posts', "user_id = '{$usr['id']}'") : 0;
+	$usr['files_count']    = $model->config['sw_files'] ? $inDB->rows_count('cms_user_files', "user_id = '{$usr['id']}'") : 0;
 
 	$cfg_reg = $inCore->loadComponentConfig('registration');
-	$usr['invites_count'] = ($inUser->id && $myprofile && $cfg_reg['reg_type'] == 'invite') ?
-								$model->getUserInvitesCount($inUser->id) : 0;
+	$usr['invites_count'] = ($inUser->id && $myprofile && $cfg_reg['reg_type'] == 'invite') ? $model->getUserInvitesCount($inUser->id) : 0;
 
-	$usr['blog'] = $model->config['sw_blogs'] ?
-								$inDB->get_fields('cms_blogs', "user_id = '{$usr['id']}' AND owner = 'user'", 'title, seolink') : false;
+	$usr['blog'] = $model->config['sw_blogs'] ? $inDB->get_fields('cms_blogs', "user_id = '{$usr['id']}' AND owner = 'user'", 'title, seolink') : false;
 
     $usr['form_fields'] = array();
     if (is_array($model->config['privforms'])) {
-            foreach ($model->config['privforms'] as $form_id) {
-                    $usr['form_fields'] = array_merge($usr['form_fields'], cmsForm::getFieldsValues($form_id, $usr['formsdata']));
-            }
+        foreach ($model->config['privforms'] as $form_id) {
+            $usr['form_fields'] = array_merge($usr['form_fields'], cmsForm::getFieldsValues($form_id, $usr['formsdata']));
+        }
     }
         
     if ($usr['city']) {
@@ -447,6 +441,9 @@ if ($do=='profile'){
         assign('cfg_forum', $inCore->loadComponentConfig('forum'))->
         assign('is_admin', $inUser->is_admin)->
         assign('is_auth', $inUser->id)->
+        assign('actions_enabled', $inCore->isComponentEnabled('actions'))->
+        assign('blogs_enabled', $inCore->isComponentEnabled('blogs'))->
+        assign('clubs_enabled', $inCore->isComponentEnabled('clubs'))->
         display();
 }
 

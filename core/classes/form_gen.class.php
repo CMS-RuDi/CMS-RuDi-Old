@@ -87,7 +87,7 @@ class rudi_form_generate {
                     $rtype = 'array_str';
                 }
 
-                $data[$n] = cmsCore::request($this->name_prefix . $n, $rtype, '');
+                $data[$n] = cmsCore::request($this->name_prefix . $n, isset($field['request_type']) ? $field['request_type'] : $rtype, '');
             }
         }
     }

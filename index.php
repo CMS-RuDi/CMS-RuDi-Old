@@ -61,6 +61,12 @@ if (cmsCore::c('config')->siteoff &&
     cmsCore::halt();
 }
 
+// Если включена опция показа сайта только авторизованным и пользователь не
+// авторизован то редиректимся на страницу авторизации
+if ($inCore->component != 'registration' && $inCore->component != cmsCore::c('config')->homecom && $inCore->getUri() && cmsCore::c('config')->only_authorized && !cmsCore::c('user')->id) {
+    cmsCore::redirect('/login');
+}
+
 // Мониторинг пользователей
 cmsCore::c('user')->onlineStats();
 

@@ -1905,6 +1905,10 @@ class cmsCore {
     public function isComponentInstalled($component) {
         return isset($this->components[$component]);
     }
+    
+    public function isComponentEnabled($component) {
+        return empty($this->components[$component]['published']) ? false : true;
+    }
 
     public function isModuleInstalled($module) {
         return (bool)self::c('db')->rows_count('cms_modules', "content='". $module ."' AND user=0", 1);

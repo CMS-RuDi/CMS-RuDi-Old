@@ -172,10 +172,10 @@
             <div id="profiletabs" class="uitabs">
                 <ul id="tabs">
                     <li><a href="#upr_profile"><span><?php echo $_LANG['PROFILE']; ?></span></a></li>
-                    <?php if ($myprofile && $cfg['sw_feed']) { ?>
+                    <?php if ($myprofile && $cfg['sw_feed'] && $actions_enabled) { ?>
                         <li><a href="/actions/my_friends" title="upr_feed"><span><?php echo $_LANG['FEED']; ?></span></a></li>
                     <?php } ?>
-                    <?php if ($cfg['sw_clubs']) { ?>
+                    <?php if ($cfg['sw_clubs'] && $clubs_enabled) { ?>
                         <li><a href="/clubs/by_user_<?php echo $usr['id']; ?>" title="upr_clubs"><span><?php echo $_LANG['CLUBS']; ?></span></a></li>
                     <?php } ?>
                     <?php if ($cfg['sw_awards']) { ?>
@@ -271,7 +271,7 @@
                                 <?php } ?>
                             </div>
                             <div id="usr_links">
-                                <?php if ($cfg['sw_blogs']) { ?>
+                                <?php if ($cfg['sw_blogs'] && $blogs_enabled) { ?>
                                     <?php if ($usr['blog']) { ?>
                                         <div id="usr_blog"><a href="/blogs/<?php echo $usr['blog']['seolink']; ?>" title="{$usr.blog.title|escape:'html'}"><?php echo $_LANG['BLOG']; ?></a></div>
                                     <?php } else if ($myprofile) { ?>
@@ -387,11 +387,11 @@
                     </div>
                 </div>
 
-                <?php if ($myprofile && $cfg['sw_feed']) { ?>
+                <?php if ($myprofile && $cfg['sw_feed'] && $actions_enabled) { ?>
                     <div id="upr_feed"></div>
                 <?php } ?>
 
-                <?php if ($cfg['sw_clubs']) { ?>
+                <?php if ($cfg['sw_clubs'] && $clubs_enabled) { ?>
                     <div id="upr_clubs"></div>
                 <?php } ?>
 

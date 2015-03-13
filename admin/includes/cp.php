@@ -356,7 +356,9 @@ function cpToolMenu($toolmenu_list, $opt=false, $optname='opt') {
                         }
                     }
                     
-                    $sub_menu .= '<li class="'. ($active_sub_menu === true ? 'active' : '') .'"><a href="'. $item['link'] .'" class="uittip" title="'. $item['title'] .'" '. (!empty($item['target']) ? 'target="'. $item['target'] .'"' : '') .'><img src="images/toolmenu/'. $item['icon'] .'" /></a></li>';
+                    $sub_menu .= '<li class="'. ($active_sub_menu === true ? 'active' : '') .'"><a href="'. $item['link'] .'" class="uittip" title="'. htmlspecialchars($item['title']) .'" '. (!empty($item['target']) ? 'target="'. $item['target'] .'"' : '') .'><img src="images/toolmenu/'. $item['icon'] .'" /> '. $item['title'] .'</a></li>';
+
+                    $active_sub_menu = false;
                 }
                 
                 $sub_menu .= '</ul>';
@@ -364,7 +366,7 @@ function cpToolMenu($toolmenu_list, $opt=false, $optname='opt') {
             
             $target = isset($toolmenu['target']) ? 'target="'. $toolmenu['target'].'"' : '';
             
-            $html .= '<li class="'. ($active_menu === true ? 'active' : '') .''. (!empty($toolmenu['items']) ? ' dropdown' : '') .'"><a href="'. $toolmenu['link'] .'" class="uittip '. (!empty($toolmenu['items']) ? ' dropdown-toggle" data-toggle="dropdown"' : '"') .' title="'. $toolmenu['title'] .'" '. (!empty($toolmenu['target']) ? 'target="'. $toolmenu['target'] .'"' : '') .'><img src="images/toolmenu/'. $toolmenu['icon'] .'" /></a>'. (!empty($toolmenu['items']) ? $sub_menu : '') .'</li>';
+            $html .= '<li class="'. ($active_menu === true ? 'active' : '') .''. (!empty($toolmenu['items']) ? ' dropdown' : '') .'"><a href="'. $toolmenu['link'] .'" class="uittip '. (!empty($toolmenu['items']) ? ' dropdown-toggle" data-toggle="dropdown"' : '"') .' title="'. htmlspecialchars($toolmenu['title']) .'" '. (!empty($toolmenu['target']) ? 'target="'. $toolmenu['target'] .'"' : '') .'><img src="images/toolmenu/'. $toolmenu['icon'] .'" /></a>'. (!empty($toolmenu['items']) ? $sub_menu : '') .'</li>';
             
             if ($active_menu === true) {
                 $active_menu = $active_sub_menu = null;

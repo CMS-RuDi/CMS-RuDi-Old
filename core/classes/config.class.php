@@ -59,6 +59,7 @@ class cmsConfig {
             'hometitle'          => '',
             'homecom'            => '',
             'siteoff'            => 0,
+            'only_authorized'    => 0,
             'debug'              => 0,
             'offtext'            => '',
             'keywords'           => '',

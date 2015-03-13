@@ -1,7 +1,6 @@
 {add_js file='includes/jquery/tabs/jquery.ui.min.js'}
 {add_css file='includes/jquery/tabs/tabs.css'}
 
-
 <script type="text/javascript">
     $(function() {
         $(".uitabs").tabs();
@@ -11,7 +10,7 @@
 <div id="usertitle">
     <div id="user_ratings">
         <div class="karma" title="{$LANG.KARMA}">
-        	<div class="{if $usr.karma >= 0}value-positive{else}value-negative{/if}" id="u_karma_cont">
+            <div class="{if $usr.karma >= 0}value-positive{else}value-negative{/if}" id="u_karma_cont">
                 <table cellpadding="2" cellspacing="0"><tr>
                     <td class="sign_link" style="color:green">
                     {if $usr.can_change_karma}
@@ -53,17 +52,16 @@
 </div>
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:14px">
-	<tr>
-		<td width="200" valign="top">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">
-				<tr>
-					<td align="center" valign="middle">
+    <tr>
+        <td width="200" valign="top">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center" valign="middle">
                         <div class="usr_avatar">
                             <img alt="{$usr.nickname|escape:'html'}" class="usr_img" src="{$usr.avatar}" />
                         </div>
-
-						{if $is_auth}
-							<div id="usermenu" style="">
+                        {if $is_auth}
+                            <div id="usermenu" style="">
                             <div class="usr_profile_menu">
 							<table cellpadding="0" cellspacing="6" ><tr>
 
@@ -170,15 +168,15 @@
 			</table>
 	    </td>
     	<td valign="top" style="padding-left:10px">
-			<div id="profiletabs" class="uitabs">
-				<ul id="tabs">
-					<li><a href="#upr_profile"><span>{$LANG.PROFILE}</span></a></li>
-					{if $myprofile && $cfg.sw_feed}
-						<li><a href="/actions/my_friends" title="upr_feed"><span>{$LANG.FEED}</span></a></li>
-					{/if}
-					{if $cfg.sw_clubs}
-						<li><a href="/clubs/by_user_{$usr.id}" title="upr_clubs"><span>{$LANG.CLUBS}</span></a></li>
-					{/if}
+            <div id="profiletabs" class="uitabs">
+                <ul id="tabs">
+                    <li><a href="#upr_profile"><span>{$LANG.PROFILE}</span></a></li>
+                    {if $myprofile && $cfg.sw_feed && $actions_enabled}
+                        <li><a href="/actions/my_friends" title="upr_feed"><span>{$LANG.FEED}</span></a></li>
+                    {/if}
+                    {if $cfg.sw_clubs && $clubs_enabled}
+                        <li><a href="/clubs/by_user_{$usr.id}" title="upr_clubs"><span>{$LANG.CLUBS}</span></a></li>
+                    {/if}
                     {if $cfg.sw_awards}
                         <li><a href="#upr_awards"><span>{$LANG.AWARDS}</span></a></li>
                     {/if}
@@ -273,7 +271,7 @@
                                 {/if}
                             </div>
                             <div id="usr_links">
-                                {if $cfg.sw_blogs}
+                                {if $cfg.sw_blogs && $blogs_enabled}
                                     {if $usr.blog}
                                         <div id="usr_blog"><a href="/blogs/{$usr.blog.seolink}" title="{$usr.blog.title|escape:'html'}">{$LANG.BLOG}</a></div>
                                     {elseif $myprofile}
@@ -389,13 +387,13 @@
 					</div>
 				</div>
 
-				{if $myprofile && $cfg.sw_feed}
+				{if $myprofile && $cfg.sw_feed && $actions_enabled}
 					<div id="upr_feed">
 
 					</div>
 				{/if}
 
-				{if $cfg.sw_clubs}
+				{if $cfg.sw_clubs && $clubs_enabled}
 					<div id="upr_clubs">
 
 					</div>

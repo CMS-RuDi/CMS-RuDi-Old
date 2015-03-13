@@ -48,6 +48,10 @@ if (!$inUser->update()) { cmsCore::halt(); }
 
 if ($inConf->siteoff && !$inUser->is_admin){ cmsCore::halt(); }
 
+if ($inCore->component != 'registration' && cmsCore::c('config')->only_authorized && !cmsCore::c('user')->id) {
+     cmsCore::halt();
+}
+
 global $_LANG;
 
 $inPage->setRequestIsAjax();

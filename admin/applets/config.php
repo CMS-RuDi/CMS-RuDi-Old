@@ -42,6 +42,7 @@ function applet_config() {
         $newCFG['com_without_name_in_url'] = cmsCore::request('com_without_name_in_url', 'str', '');
 
         $newCFG['siteoff']            = cmsCore::request('siteoff', 'int', 0);
+        $newCFG['only_authorized']    = cmsCore::request('only_authorized', 'int', 0);
         $newCFG['debug']              = cmsCore::request('debug', 'int', 0);
         $newCFG['offtext']            = htmlspecialchars(cmsCore::request('offtext', 'str', ''), ENT_QUOTES);
         $newCFG['keywords']           = cmsCore::request('keywords', 'str', '');
@@ -219,6 +220,20 @@ function applet_config() {
                         </label>
                         <div style="clear:both;"></div>
                         <div class="help-block"><?php echo $_LANG['AD_ONLY_ADMINS']; ?></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SITE_ONLY_AUTHORIZED']; ?></label>
+                    <div class="col-sm-7 btn-group" data-toggle="buttons">
+                        <label class="btn btn-default <?php if ($config['only_authorized']) { echo 'active'; } ?>">
+                            <input type="radio" name="only_authorized" <?php if ($config['only_authorized']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
+                        </label>
+                        <label class="btn btn-default <?php if (!$config['only_authorized']) { echo 'active'; } ?>">
+                            <input type="radio" name="only_authorized" <?php if (!$config['only_authorized']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
+                        </label>
+                        <div style="clear:both;"></div>
+                        <div class="help-block"><?php echo $_LANG['AD_SITE_ONLY_AUTHORIZED_INFO']; ?></div>
                     </div>
                 </div>
 

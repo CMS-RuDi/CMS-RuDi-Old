@@ -1568,7 +1568,6 @@ class cmsCore {
      * @return int
      */
     public function menuId() {
-
         //если menu_id был определен ранее, то вернем и выйдем
         if (isset($this->menu_id)) { return $this->menu_id; }
 
@@ -1580,6 +1579,7 @@ class cmsCore {
 
         $uri      = '/'. $uri;
         $real_uri = '/'. $this->real_uri;
+        $full_uri = self::c('config')->host . $uri;
 
         //флаг, показывающий было совпадение URI и ссылки пунта меню
         //полным или частичным
@@ -1601,9 +1601,6 @@ class cmsCore {
 
             if (!$item['link']) { continue; }
 
-			// uri с учетом имени хоста
-			$full_uri = HOST . $uri;
-
             //полное совпадение ссылки и адреса?
             if (in_array($item['link'], array(urldecode($uri), urldecode($full_uri), urldecode($real_uri)))){
                 $menuid = $item['id'];
@@ -1616,7 +1613,6 @@ class cmsCore {
             $real_uri_first_part = mb_substr(urldecode($real_uri), 0, mb_strlen($item['link']));
             if (in_array($item['link'], array($uri_first_part, $real_uri_first_part))){
                 $menuid = $item['id'];
-                break;
             }
 
         }
@@ -1625,7 +1621,6 @@ class cmsCore {
         $this->is_menu_id_strict = $is_strict;
 
         return $menuid;
-
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

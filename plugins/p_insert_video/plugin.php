@@ -10,8 +10,6 @@
 
 class p_insert_video extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_insert_video',
             'title'       => 'Прикрепление к статьям Видео материалов',
@@ -29,6 +27,8 @@ class p_insert_video extends cmsPlugin {
             'AFTER_COMPONENT_CONTENT', 'ADD_ARTICLE_SUCCESS', 'GET_ARTICLE',
             'DELETE_ARTICLE', 'ADMIN_CONTENT_TABS'
         );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -58,8 +58,6 @@ class p_insert_video extends cmsPlugin {
     }
 
     public function execute($event='', $item=array()) {
-        parent::execute();
-
         switch ($event) {
             case 'GET_ARTICLE':
                 $item = $this->eventGetArticle($item);

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_search($module_id, $cfg) {
+function mod_search($mod, $cfg) {
     cmsCore::loadModel('search');
     cmsCore::loadLanguage('components/search');
     $model = cms_model_search::initModel();

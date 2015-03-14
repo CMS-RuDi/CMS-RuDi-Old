@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_actions($module_id, $cfg) {
+function mod_actions($mod, $cfg) {
     global $_LANG;
     
     if (!isset($cfg['action_types'])) {

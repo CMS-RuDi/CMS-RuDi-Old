@@ -13,8 +13,6 @@
 
 class p_usertab extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-
         // Информация о плагине
         $this->info = array(
             'plugin'      => 'p_usertab',
@@ -31,30 +29,8 @@ class p_usertab extends cmsPlugin {
 
         // События, которые будут отлавливаться плагином
         $this->events = array( 'USER_PROFILE' );
-    }
-
-    /**
-     * Процедура установки плагина
-     * @return bool
-     */
-    public function install() {
-        return parent::install();
-    }
-
-    /**
-     * Процедура обновления плагина
-     * @return bool
-     */
-    public function upgrade() {
-        return parent::upgrade();
-    }
-    
-    /**
-     * Процедура удаления плагина
-     * @return bool
-     */
-    public function uninstall() {
-        return parent::uninstall();
+        
+        parent::__construct();
     }
 
     /**

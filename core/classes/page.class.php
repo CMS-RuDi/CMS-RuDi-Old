@@ -733,7 +733,7 @@ class cmsPage {
                     $inCore->cacheModuleConfig($mod['id'], $cfg);
 
                     ob_start();
-                        $callback = call_user_func($mod['content'], $mod['id'], $cfg);
+                        $callback = call_user_func($mod['content'], $mod, $cfg);
                     $mod['body'] = ob_get_clean();
 
                     if ($mod['cache']) {

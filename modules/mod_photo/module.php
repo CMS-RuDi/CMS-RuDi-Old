@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_photo($module_id, $cfg) {
+function mod_photo($mod, $cfg) {
     $cfg = array_merge(array(
         'user_photos' => 0,
         'is_full'     => 1,

@@ -13,8 +13,6 @@
 
 class p_demo_route extends cmsPlugin {
     public function __construct(){
-        parent::__construct();
-
         // Информация о плагине
         $this->info = array(
             'plugin' => 'p_demo_route',
@@ -29,6 +27,8 @@ class p_demo_route extends cmsPlugin {
             'GET_ROUTE_USERS',
             'GET_USERS_ACTION_GET_DEMO'
         );
+        
+        parent::__construct();
     }
 
     /**
@@ -62,8 +62,6 @@ class p_demo_route extends cmsPlugin {
      * @return mixed
      */
     public function execute($event='', $data=array()) {
-        parent::execute();
-
         switch ($event) {
             case 'GET_ROUTE_USERS': $data = $this->eventGetRoutes($data); break;
             case 'GET_USERS_ACTION_GET_DEMO': $data = $this->eventGetAction(); break;

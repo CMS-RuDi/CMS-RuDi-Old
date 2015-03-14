@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_latest_faq($module_id, $cfg) {
+function mod_latest_faq($mod, $cfg) {
     $cfg = array_merge(array(
         'newscount' => 2,
         'cat_id'    => 0,

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_cart($module_id, $cfg) {
+function mod_cart($mod, $cfg) {
     cmsCore::includeFile('components/catalog/includes/shopcore.php');
 
     $sid   = session_id();

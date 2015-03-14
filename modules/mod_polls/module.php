@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_polls($module_id, $cfg) {
+function mod_polls($mod, $cfg) {
     if ($cfg['poll_id'] > 0) {
         $poll = cmsCore::m('polls')->getPoll($cfg['poll_id']);
     } else {
@@ -23,7 +23,7 @@ function mod_polls($module_id, $cfg) {
     cmsPage::initTemplate('modules', $cfg['tpl'])->
         assign('poll', $poll)->
         assign('is_voted', cmsCore::m('polls')->isUserVoted($poll['id']))->
-        assign('module_id', $module_id)->
+        assign('module_id', $mod['id'])->
         assign('cfg', $cfg)->
         display();
 

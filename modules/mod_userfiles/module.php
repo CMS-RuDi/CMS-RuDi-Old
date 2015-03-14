@@ -26,7 +26,7 @@ function fetchFiles($sql) {
     return $files;
 }
 
-function mod_userfiles($module_id, $cfg) {
+function mod_userfiles($mod, $cfg) {
     $cfg = array_merge(array(
         'sw_stats'    => 1,
         'sw_latest'   => 1,

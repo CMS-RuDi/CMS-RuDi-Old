@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_rss($module_id, $cfg) {
+function mod_rss($mod, $cfg) {
     cmsCore::includeFile('includes/rss/lastRSS.php');
 
     $rss = new lastRSS;

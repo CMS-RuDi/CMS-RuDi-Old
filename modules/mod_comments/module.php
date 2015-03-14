@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_comments($module_id, $cfg) {
+function mod_comments($mod, $cfg) {
     $cfg = array_merge(array(
         'showrss' => 1,
         'minrate' => 0,

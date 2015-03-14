@@ -13,8 +13,6 @@
 
 class p_hidetext extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_hidetext',
             'title'       => 'Скрытый текст',
@@ -29,6 +27,8 @@ class p_hidetext extends cmsPlugin {
             'GET_FORUM_POST', 'GET_FORUM_POSTS', 'GET_FORUM_POSTS_MODULE',
             'GET_WALL_POSTS'
         );
+        
+        parent::__construct();
     }
 
     /**
@@ -38,8 +38,6 @@ class p_hidetext extends cmsPlugin {
      * @return mixed
      */
     public function execute($event='', $item=array()) {
-        parent::execute();
-
         switch ($event) {
             case 'GET_POST': $item = $this->eventGetPost($item); break;
             case 'GET_POSTS': $item = $this->eventGetPosts($item); break;

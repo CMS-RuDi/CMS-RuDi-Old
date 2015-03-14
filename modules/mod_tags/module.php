@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_tags($module_id, $cfg) {
+function mod_tags($mod, $cfg) {
     if (empty($cfg['targets'])) { return false; }
 
     $tl = "'". implode("','", $cfg['targets']) ."'";

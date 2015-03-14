@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_latest($module_id, $cfg) {
+function mod_latest($mod, $cfg) {
     $cfg = array_merge(array(
         'showrss'  => 1,
         'subs'     => 1,
@@ -45,12 +45,12 @@ function mod_latest($module_id, $cfg) {
     $content_list = cmsCore::m('content')->getArticlesList();
     if (!$content_list) { return false; }
 
-    $pagebar = $cfg['is_pag'] ? cmsPage::getPagebar($total, $cfg['page'], $cfg['newscount'], 'javascript:conPage(%page%, '. $module_id .')') : '';
+    $pagebar = $cfg['is_pag'] ? cmsPage::getPagebar($total, $cfg['page'], $cfg['newscount'], 'javascript:conPage(%page%, '. $mod['id'] .')') : '';
 
     cmsPage::initTemplate('modules', $cfg['tpl'])->
         assign('articles', $content_list)->
         assign('pagebar_module', $pagebar)->
-        assign('module_id', $module_id)->
+        assign('module_id', $mod['id'])->
         assign('cfg', $cfg)->
         display();
 

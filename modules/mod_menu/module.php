@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_menu($module_id, $cfg) {
+function mod_menu($mod, $cfg) {
     $inCore      = cmsCore::getInstance();
     $menuid      = $inCore->menuId();
     $full_menu   = $inCore->getMenuStruct();

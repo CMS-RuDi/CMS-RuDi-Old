@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_lastreg($module_id, $cfg) {
+function mod_lastreg($mod, $cfg) {
     cmsCore::c('db')->orderBy('regdate', 'DESC');
     cmsCore::c('db')->limitPage(1, $cfg['newscount']);
 

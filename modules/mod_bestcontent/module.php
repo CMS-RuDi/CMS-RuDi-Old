@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_bestcontent($module_id, $cfg) {
+function mod_bestcontent($mod, $cfg) {
     $cfg = array_merge(
         array(
             'shownum' => 5,

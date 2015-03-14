@@ -27,8 +27,6 @@ class p_ckeditor extends cmsPlugin {
 
 
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_ckeditor',
             'title'       => 'CKEditor 4.4.5',
@@ -49,6 +47,8 @@ class p_ckeditor extends cmsPlugin {
             'INSERT_BBCODE_EDITOR',
             'GET_ARTICLE'
         );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -76,8 +76,6 @@ class p_ckeditor extends cmsPlugin {
     }
 
     public function execute($event='', $item=array()) {
-        parent::execute();
-
         switch ($event) {
             case 'INSERT_WYSIWYG':
                     return $this->insertEditor($item);

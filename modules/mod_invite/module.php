@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_invite($module_id, $cfg) {
+function mod_invite($mod, $cfg) {
     global $_LANG;
 
     $errors      = false;

@@ -10,8 +10,6 @@
 
 class p_captcha extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_captcha',
             'title'       => 'Captcha.ru',
@@ -25,11 +23,11 @@ class p_captcha extends cmsPlugin {
             'INSERT_CAPTCHA',
             'CHECK_CAPTCHA'
         );
+        
+        parent::__construct();
     }
 
     public function execute($event='', $item=array()) {
-        parent::execute();
-        
         if ($event == 'INSERT_CAPTCHA') { return $this->insert_captcha(); }
         if ($event == 'CHECK_CAPTCHA') { return $this->check_captcha(); }
         

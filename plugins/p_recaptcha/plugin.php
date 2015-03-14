@@ -10,8 +10,6 @@
 
 class p_recaptcha extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_recaptcha',
             'title'       => 'reCaptcha',
@@ -30,6 +28,8 @@ class p_recaptcha extends cmsPlugin {
         );
         
         $this->events = array( 'INSERT_CAPTCHA', 'CHECK_CAPTCHA' );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -133,8 +133,6 @@ class p_recaptcha extends cmsPlugin {
     }
 
     public function execute($event='', $item=array()) {
-        parent::execute();
-        
         if (!empty($this->config['rpc_public_key']) && !empty($this->config['rpc_private_key'])) {
             if ($event == 'INSERT_CAPTCHA') { return $this->insert_captcha(); }
             if ($event == 'CHECK_CAPTCHA') { return $this->check_captcha(); }

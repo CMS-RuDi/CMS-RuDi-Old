@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_auth($module_id, $cfg) {
+function mod_auth($mod, $cfg) {
     if (cmsCore::c('user')->id) { return false; }
 
     cmsUser::sessionPut('auth_back_url', cmsCore::getBackURL());

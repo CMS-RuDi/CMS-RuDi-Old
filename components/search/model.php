@@ -41,7 +41,7 @@ class cms_model_search {
         $this->look   = cmsCore::request('look', 'str', 'allwords');
         $this->page   = cmsCore::request('page', 'int', 1);
         $this->from_pubdate = cmsCore::request('from_pubdate', 'str', '');
-        $this->order_by_date = cmsCore::request('order_by_date', array(0, 1), 0);
+        $this->order_by_date = $this->query ? cmsCore::request('order_by_date', 'int', 0) : 1;
         $this->from_component = self::getComponentsArrayForSearch();
         $this->config = $this->inCore->loadComponentConfig('search');
         cmsCore::loadLib('tags');

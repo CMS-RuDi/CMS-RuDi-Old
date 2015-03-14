@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_template($module_id, $cfg){
+function mod_template($mod, $cfg){
     cmsPage::initTemplate('modules', $cfg['tpl'])->
         assign('current_template', (isset($_SESSION['template']) ? $_SESSION['template'] : ''))->
         assign('templates', cmsCore::getDirsList('/templates'))->

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_user_image($module_id, $cfg) {
+function mod_user_image($mod, $cfg) {
     $sql = "SELECT u.id uid, u.nickname author, u.login as login, p.imageurl, p.title, p.id, pr.gender gender
             FROM cms_user_photos p
             LEFT JOIN cms_users u ON u.id = p.user_id

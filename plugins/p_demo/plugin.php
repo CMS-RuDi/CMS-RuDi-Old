@@ -13,8 +13,6 @@
 
 class p_demo extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-
         // Информация о плагине
         $this->info = array(
             'plugin'      => 'p_demo',
@@ -35,6 +33,8 @@ class p_demo extends cmsPlugin {
         $this->events = array(
             'GET_ARTICLE'
         );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -88,8 +88,6 @@ class p_demo extends cmsPlugin {
      * @return mixed
      */
     public function execute($event='', $item=array()) {
-        parent::execute();
-
         switch ($event) {
             case 'GET_ARTICLE': $item = $this->eventGetArticle($item); break;
         }

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_arhive($module_id, $cfg) {
+function mod_arhive($mod, $cfg) {
     cmsCore::m('arhive')->whereThisAndNestedCats(cmsCore::getArrVal($cfg, 'cat_id', 0));
 
     if (cmsCore::m('arhive')->year != 'all') {

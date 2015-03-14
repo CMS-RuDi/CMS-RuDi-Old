@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_respect($module_id, $cfg) {
+function mod_respect($mod, $cfg) {
     $cfg = array_merge(array(
         'view_aw'     => 0,
         'limit'       => 5,

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_user_rating($module_id, $cfg) {
+function mod_user_rating($mod, $cfg) {
     $cfg = array_merge(array(
         'count' => 20,
         'view_type' => 'rating'

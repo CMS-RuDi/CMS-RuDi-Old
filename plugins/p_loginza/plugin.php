@@ -13,8 +13,6 @@
 
 class p_loginza extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-
         // Информация о плагине
         $this->info = array(
             'plugin'      => 'p_loginza',
@@ -35,6 +33,8 @@ class p_loginza extends cmsPlugin {
             'LOGINZA_BUTTON',
             'LOGINZA_AUTH'
         );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -87,8 +87,6 @@ class p_loginza extends cmsPlugin {
      * @return mixed
      */
     public function execute($event='', $item=array()) {
-        parent::execute();
-        
         if (cmsCore::m('registration')->config['reg_type'] == 'invite') {
             return true;
         }

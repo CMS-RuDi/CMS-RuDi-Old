@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_category($module_id, $cfg) {
+function mod_category($mod, $cfg) {
     $cfg = array_merge(
         array(
             'category_id'  => 0,

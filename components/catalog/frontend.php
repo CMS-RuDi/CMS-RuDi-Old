@@ -465,8 +465,6 @@ function catalog(){
         $result = $inDB->query($sql);
         $itemscount = $inDB->num_rows($result);
 
-        if (!$itemscount){ cmsCore::error404(); }
-
         //can user add items here?
         $is_cat_access = $model->checkCategoryAccess($cat['id'], $cat['is_public'], $inUser->group_id);
         $is_can_add = $is_cat_access || $inUser->is_admin;

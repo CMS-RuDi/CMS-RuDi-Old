@@ -21,4 +21,4 @@ $cfg = $inCore->loadModuleConfig($module_id);
 
 cmsCore::includeFile('modules/mod_polls/module.php');
 
-mod_polls($module_id, $cfg);
+mod_polls(array('id' => $module_id), $cfg);

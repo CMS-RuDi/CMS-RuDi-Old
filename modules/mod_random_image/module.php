@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_random_image($module_id, $cfg) {
+function mod_random_image($mod, $cfg) {
     $catsql = '';
 
     if ($cfg['album_id'] != 0) {

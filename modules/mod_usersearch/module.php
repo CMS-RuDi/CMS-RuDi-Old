@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_usersearch($module_id, $cfg) {
+function mod_usersearch($mod, $cfg) {
     cmsCore::loadLanguage('components/users');
 
     cmsPage::initTemplate('modules', $cfg['tpl'])->

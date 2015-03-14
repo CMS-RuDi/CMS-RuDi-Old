@@ -13,8 +13,6 @@
 
 class p_morecontent extends cmsPlugin {
     public function __construct(){
-        parent::__construct();
-        
         // Информация о плагине
         $this->info = array(
             'plugin' => 'p_morecontent',
@@ -32,6 +30,8 @@ class p_morecontent extends cmsPlugin {
         
         // События, которые будут отлавливаться плагином
         $this->events = array( 'GET_ARTICLE' );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -57,7 +57,6 @@ class p_morecontent extends cmsPlugin {
      * @return html
      */
     public function execute($event='', $item=array()) {
-        parent::execute();
         switch ($event) {
             case 'GET_ARTICLE': $item = $this->eventGetArticle($item); break;
         }

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_user_stats($module_id, $cfg) {
+function mod_user_stats($mod, $cfg) {
     cmsCore::loadLanguage('components/users');
 
     global $_LANG;

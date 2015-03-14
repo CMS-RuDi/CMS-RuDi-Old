@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_clubs($module_id, $cfg) {
+function mod_clubs($mod, $cfg) {
     $cfg = array_merge(array(
         'count'      => 5,
         'type'       => 'id',

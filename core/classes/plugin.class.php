@@ -24,6 +24,7 @@ class cmsPlugin {
         $this->inCore = cmsCore::getInstance();
         $this->inDB   = cmsCore::c('db');
         $this->inPage = cmsCore::c('page');
+        $this->config = array_merge($this->config, $this->inCore->loadPluginConfig(get_called_class()));
     }
 
     public function __clone() {}
@@ -67,9 +68,7 @@ class cmsPlugin {
      * @return mixed в зависимости от события возвращает измененые данные или html
      * код
      */
-    public function execute($event='', $item=array()) {
-        $this->config = $this->inCore->loadPluginConfig( $this->info['plugin'] );
-    }
+    public function execute($event='', $item=array()) {}
 
     /**
      * Сохраняет настройки плагина

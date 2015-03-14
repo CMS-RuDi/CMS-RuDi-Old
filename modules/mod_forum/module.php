@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_forum($module_id, $cfg) {
+function mod_forum($mod, $cfg) {
     $cfg = array_merge(array(
         'shownum' => 4,
         'cat_id' => 0,

@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_blogs($module_id, $cfg) {
+function mod_blogs($mod, $cfg) {
     $cfg = array_merge(
         array(
             'sort'    => 'pubdate',

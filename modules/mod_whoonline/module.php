@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_whoonline($module_id, $cfg) {
+function mod_whoonline($mod, $cfg) {
     $cfg = array_merge(array(
         'color_admin'  => '#FF0000',
         'color_editor' => '#009900'

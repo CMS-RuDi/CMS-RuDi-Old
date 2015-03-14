@@ -10,8 +10,6 @@
 
 class p_content_imgs extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_content_imgs',
             'title'       => 'Прикрепленные к статьям фотографии',
@@ -28,6 +26,8 @@ class p_content_imgs extends cmsPlugin {
             'GET_ARTICLE',
             'GET_SLIDER_OPTS'
         );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -48,8 +48,6 @@ class p_content_imgs extends cmsPlugin {
     }
 
     public function execute($event='', $item=array()) {
-        parent::execute();
-        
         if (empty($this->config['PCI_SLIDER'])) {
             $this->config['slider'] = 'jCarousel__1';
         }

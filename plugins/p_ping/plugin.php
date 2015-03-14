@@ -13,8 +13,6 @@
 
 class p_ping extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-
         // Информация о плагине
         $this->info = array(
             'plugin'      => 'p_ping',
@@ -36,6 +34,8 @@ class p_ping extends cmsPlugin {
         $this->events = array(
             'ADD_POST_DONE', 'ADD_ARTICLE_DONE', 'ADD_BOARD_DONE'
         );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -54,8 +54,6 @@ class p_ping extends cmsPlugin {
      * @return mixed
      */
     public function execute($event='', $item=array()) {
-        parent::execute();
-
         switch ($event) {
             case 'ADD_POST_DONE':
                 $pageURL = HOST . $item['seolink'];

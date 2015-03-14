@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_user_friend($module_id, $cfg) {
+function mod_user_friend($mod, $cfg) {
     if (!cmsCore::c('user')->id) {
         return false;
     }

@@ -13,8 +13,6 @@
 
 class p_auto_forum extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_auto_forum',
             'title'       => 'Автофорум',
@@ -36,6 +34,8 @@ class p_auto_forum extends cmsPlugin {
             'ADD_ARTICLE_DONE',
             'UPDATE_ARTICLE'
         );
+        
+        parent::__construct();
     }
     
     public function getConfigFields() {
@@ -70,8 +70,6 @@ class p_auto_forum extends cmsPlugin {
     }
 
     public function execute($event='', $article=array()) {
-        parent::execute();
-
         switch ($event) {
             case 'DELETE_ARTICLE':   $this->deleteForum($article); break;
             case 'GET_ARTICLE':      $article = $this->getForumLink($article); break;

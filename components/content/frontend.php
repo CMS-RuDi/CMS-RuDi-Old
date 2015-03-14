@@ -27,6 +27,8 @@ function content() {
     $do = $inCore->do;
 
     $seolink = cmsCore::strClear(urldecode(cmsCore::request('seolink', 'html', '')));
+    if (is_numeric($seolink)) { cmsCore::error404(); }
+    
     $page    = cmsCore::request('page', 'int', 1);
 
 ///////////////////////////////////// VIEW CATEGORY ////////////////////////////////////////////////////////////////////////////////

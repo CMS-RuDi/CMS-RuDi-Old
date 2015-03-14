@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_latestboard($module_id, $cfg) {
+function mod_latestboard($mod, $cfg) {
     $cfg = array_merge(array(
         'shownum' => 5,
         'onlyvip' => 0,

@@ -26,4 +26,4 @@ $cfg['page'] = cmsCore::request('page', 'int', 1);
 
 cmsCore::includeFile('modules/mod_latest/module.php');
 
-mod_latest($module_id, $cfg);
+mod_latest(array('id' => $module_id), $cfg);

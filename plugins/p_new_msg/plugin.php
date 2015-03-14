@@ -11,8 +11,6 @@
 
 class p_new_msg extends cmsPlugin {
     public function __construct() {
-        parent::__construct();
-        
         $this->info = array(
             'plugin'      => 'p_new_msg',
             'title'       => 'Анимация при новом сообщении',
@@ -22,12 +20,12 @@ class p_new_msg extends cmsPlugin {
         );
         
         $this->events[] = 'PRINT_PAGE_HEAD';
+        
+        parent::__construct();
     }
 
     // ==================================================================== //
     public function execute($event='', $item=array()) {
-        parent::execute();
-        
         switch ($event) {
             case 'PRINT_PAGE_HEAD': return $this->animateNewMsg($item);
         }

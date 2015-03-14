@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_uc($module_id, $cfg) {
+function mod_uc($mod, $cfg) {
     $cfg = array_merge(array(
         'cat_id' => 0,
         'subs'   => 1,

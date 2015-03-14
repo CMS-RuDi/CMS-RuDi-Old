@@ -11,7 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-function mod_uc_random($module_id, $cfg) {
+function mod_uc_random($mod, $cfg) {
     if ($cfg['cat_id']>0) {
         if (!$cfg['subs']) {
             //select from category

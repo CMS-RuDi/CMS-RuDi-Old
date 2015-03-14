@@ -11,8 +11,6 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
-
 function search() {
     $inCore = cmsCore::getInstance();
     $inPage = cmsPage::getInstance();
@@ -78,18 +76,18 @@ function search() {
         }
 
         cmsPage::initTemplate('components', 'com_search_text')->
-        assign('query', $model->query)->
-        assign('look', $model->look)->
-        assign('order_by_date', $model->order_by_date)->
-        assign('from_pubdate', $model->from_pubdate)->
-        assign('results', $results)->
-        assign('total', $total)->
-        assign('enable_components', $model->getEnableComponentsWithSupportSearch())->
-        assign('from_component', $model->from_component)->
-        assign('external_link', str_replace('%q%', urlencode($model->query), $_LANG['FIND_EXTERNAL_URL']))->
-        assign('host', HOST)->
-        assign('pagebar', cmsPage::getPagebar($total, $model->page, $model->config['perpage'], 'javascript:paginator(%page%)'))->
-        display();
+            assign('query', $model->query)->
+            assign('look', $model->look)->
+            assign('order_by_date', $model->order_by_date)->
+            assign('from_pubdate', $model->from_pubdate)->
+            assign('results', $results)->
+            assign('total', $total)->
+            assign('enable_components', $model->getEnableComponentsWithSupportSearch())->
+            assign('from_component', $model->from_component)->
+            assign('external_link', str_replace('%q%', urlencode($model->query), $_LANG['FIND_EXTERNAL_URL']))->
+            assign('host', HOST)->
+            assign('pagebar', cmsPage::getPagebar($total, $model->page, $model->config['perpage'], 'javascript:paginator(%page%)'))->
+            display();
     }
 
 /* ==================================================================================================== */

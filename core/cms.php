@@ -778,15 +778,19 @@ class cmsCore {
      * то URI парсится и переменные, содержащиеся в нем, забиваются в массив $_REQUEST.
      * @return boolean
      */
-    private function parseComponentRoute(){
+    private function parseComponentRoute() {
         //если uri нет, все равно возвращаем истину - для опции "компонент на главной"
         if (!$this->uri) { return true; }
 
         // если uri совпадает с названием компонента, возвращаем истину
-        if($this->uri == $this->component) { return true; }
+        if ($this->uri == $this->component) {
+            return true;
+        }
 
         //подключаем список маршрутов компонента
-        if(!self::includeFile('components/'. $this->component .'/router.php')){ return false; }
+        if (!self::includeFile('components/'. $this->component .'/router.php')) {
+            return false;
+        }
 
         $routes = call_user_func('routes_'. $this->component);
         $routes = self::callEvent('GET_ROUTE_'. strtoupper($this->component), $routes);
@@ -795,49 +799,44 @@ class cmsCore {
         $is_found = false;
         
         //перебираем все маршруты
-        if($routes){
-            foreach($routes as $route){
-
+        if ($routes) {
+            foreach ($routes as $route) {
                 //сравниваем шаблон маршрута с текущим URI
-                preg_match($route['_uri'], $this->uri, $matches);
+                $patt = (strpos($route['_uri'], '/^') === false && strpos($route['_uri'], '/^'. $this->component) === false) ? '/^'. $this->component .'\/'. $route['_uri'] : $route['_uri'];
+                preg_match($patt, $this-> uri, $matches); 
 
                 //Если найдено совпадение
-                if ($matches){
-
+                if ($matches) {
                     //удаляем шаблон из параметров маршрута, чтобы не мешал при переборе
                     unset($route['_uri']);
 
                     //перебираем параметры маршрута в виде ключ=>значение
-                    foreach($route as $key=>$value){
-                        if (is_integer($key)){
+                    foreach ($route as $key => $value) {
+                        if (is_int($key)) {
                             //Если ключ - целое число, то значением является сегмент URI
-                            $_REQUEST[$value] = $matches[$key];
+                            $_REQUEST[$value] = isset($matches[$key]) ? $matches[$key] : null;
                         } else {
                             //иначе, значение берется из маршрута
                             $_REQUEST[$key]   = $value;
                         }
                     }
+                    
                     // совпадение есть
                     $is_found = true;
                     //раз найдено совпадение, прерываем цикл
                     break;
-
                 }
-
             }
         }
 
-        // Если в маршруте нет совпадений
-        if(!$is_found) { return false; }
-
-        return true;
+        return $is_found;
     }
 
     /**
      * Узнаем действие компонента
      */
-    private function detectAction(){
-        $do = preg_replace('/[^a-z_]/iu', '', self::request('do', 'str', 'view'));
+    private function detectAction() {
+        $do = preg_replace('/[^a-z0-9_-]/i', '', self::request('do', 'str', 'view'));
         $this->do = $do ? $do : 'view';
 
         return true;
@@ -917,7 +916,9 @@ class cmsCore {
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     public static function error404(){
-        ob_end_clean();
+        if (ob_get_contents()) {
+            ob_end_clean();
+        }
         
         if (!empty(self::c('config')->iframe_session_id)){
             return self::redirect(self::c('config')->host .'/');
@@ -2755,8 +2756,10 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
      * @param boolean $is_header Выставлять хидер application/json или нет
      * @param boolean $unescaped_unicode Не кодировать многобайтные символы Unicode (по умолчанию они кодируются как \uXXXX)
      */
-    public static function jsonOutput($data = array(), $is_header = true, $unescaped_unicode = false){
-        ob_end_clean();
+    public static function jsonOutput ($data = array(), $is_header = true, $unescaped_unicode = false) {
+        if (ob_get_contents()) {
+            ob_end_clean();
+        }
         
         if ($is_header) {
             header('Content-type: application/json; charset=utf-8');

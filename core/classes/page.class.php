@@ -509,7 +509,7 @@ class cmsPage {
      * Печатает глубиномер
      * @param string $separator
      */
-    public function printPathway($separator='&rarr;'){
+    public function printPathway($separator='&rarr;') {
         $inCore = cmsCore::getInstance();
 
         //Проверяем, на главной мы или нет

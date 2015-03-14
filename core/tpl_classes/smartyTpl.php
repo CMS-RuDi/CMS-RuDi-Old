@@ -83,16 +83,8 @@ class cmsRuDiSmarty extends Smarty {
     public function __construct(array $options = array()) {
         parent::__construct($options);
         
-        $this->registerPlugin('function', 'wysiwyg', 'cmsSmartyWysiwyg');
-        $this->registerPlugin('function', 'profile_url', 'cmsSmartyProfileURL');
-        $this->registerPlugin('function', 'component', 'cmsSmartyCurrentComponent');
-        $this->registerPlugin('function', 'template', 'cmsSmartyCurrentTemplate');
-        $this->registerPlugin('function', 'add_js', 'cmsSmartyAddJS');
-        $this->registerPlugin('function', 'add_css', 'cmsSmartyAddCSS');
-        $this->registerPlugin('function', 'comments', 'cmsSmartyComments');
-        $this->registerPlugin('function', 'callEvent', 'cmsSmartyCallEvent');
-        
         $this->assign('is_ajax', cmsCore::isAjax());
+        $this->assign('is_auth', cmsCore::c('user')->id);
         
         $this->compile_dir = PATH .'/cache';
     }
@@ -104,64 +96,4 @@ class cmsRuDiSmarty extends Smarty {
     public function fetch($template = null, $cache_id = null, $compile_id = null, $parent = null, $display = false, $merge_tpl_vars = true, $no_output_filter = false) {
         return parent::fetch($this->rudi_tpl_file, $cache_id, $compile_id, $parent, $display, $merge_tpl_vars, $no_output_filter);
     }
-}
-
-/**
- * Вспомогательные функции
- */
-function cmsSmartyComments($params, $smarty){
-    if (empty($params['target']) || empty($params['target_id'])) {
-        return false;
-    }
-
-    cmsCore::includeComments();
-
-    comments($params['target'], $params['target_id'], cmsCore::getArrVal($params, 'labels', array()));
-
-    return;
-}
-
-function cmsSmartyAddJS($params, $smarty){
-    if (empty($params['file'])) { return false; }
-
-    cmsPage::getInstance()->addHeadJS($params['file']);
-}
-
-function cmsSmartyAddCSS($params, $smarty){
-    if (empty($params['file'])) { return false; }
-
-    cmsPage::getInstance()->addHeadCSS($params['file']);
-}
-
-function cmsSmartyWysiwyg($params, $smarty){
-    if (empty($params['name'])) { return false; }
-    
-    ob_start();
-        cmsCore::insertEditor(
-            $params['name'],
-            cmsCore::getArrVal($params, 'value', ''),
-            cmsCore::getArrVal($params, 'height', 350),
-            cmsCore::getArrVal($params, 'width', '100%')
-        );
-    return ob_get_clean();
-}
-
-function cmsSmartyProfileURL($params, $smarty){
-    if (empty($params['login'])) { return false; }
-    
-    return cmsUser::getProfileURL($params['login']);
-}
-
-function cmsSmartyCurrentComponent($params, $smarty){
-    return cmsCore::getInstance()->component;
-}
-
-function cmsSmartyCurrentTemplate($params, $smarty){
-    return cmsCore::c('config')->template;
-}
-
-function cmsSmartyCallEvent($params, $smarty){
-    if (empty($params['event'])) { return false; }
-    
-    return cmsCore::callEvent($params['event'], cmsCore::getArrVal($params, 'item', ''));
 }

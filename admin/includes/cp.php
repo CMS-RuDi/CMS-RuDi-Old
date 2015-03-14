@@ -675,16 +675,29 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                         foreach($_fields as $key => $value) {
                             if (isset($_fields[$key]['link'])) {
                                 $link = str_replace('%id%', $item['id'], $_fields[$key]['link']);
-                                $data = $item[$_fields[$key]['field']];
-
-                                if (isset($_fields[$key]['maxlen'])) {
-                                    if (mb_strlen($data)>$_fields[$key]['maxlen']) {
-                                        $data = mb_substr($data, 0, $_fields[$key]['maxlen']).'...';
+                                if (isset($_fields[$key]['prc'])) {
+                                    // функция обработки под названием $_fields[$key]['prc']
+                                    // какие параметры передать функции - один ключ или произвольный массив ключей
+                                    if (is_array($_fields[$key]['field'])) {
+                                        foreach ($_fields[$key]['field'] as $func_field) {
+                                            $in_func_array[$func_field] = $item[$func_field];
+                                        }
+                                        
+                                        $data = call_user_func($_fields[$key]['prc'], $in_func_array);
+                                    } else {
+                                        $data = call_user_func($_fields[$key]['prc'], $item[$_fields[$key]['field']]);
+                                    }
+                                } else {
+                                    $data = $item[$_fields[$key]['field']];
+                                    if (isset($_fields[$key]['maxlen'])) {
+                                        if (mb_strlen($data) > $_fields[$key]['maxlen']) {
+                                            $data = mb_substr($data, 0, $_fields[$key]['maxlen']).'...';
+                                        }
                                     }
                                 }
 
                                 //nested sets otstup
-                                if (isset($item['NSLevel']) && $_fields[$key]['field']=='title') {
+                                if (isset($item['NSLevel']) && ($_fields[$key]['field']=='title' || (is_array($_fields[$key]['field']) && in_array('title', $_fields[$key]['field'])))) {
                                     $otstup = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($item['NSLevel']-1));
                                     if ($item['NSLevel']-1 > 0) { $otstup .=  ' &raquo; '; }
                                 } else { $otstup = ''; }
@@ -749,7 +762,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                                         }
 
                                         //nested sets otstup
-                                        if (isset($item['NSLevel']) && $_fields[$key]['field']=='title') {
+                                        if (isset($item['NSLevel']) && ($_fields[$key]['field'] == 'title' || (is_array($_fields[$key]['field']) && in_array('title', $_fields[$key]['field'])))) {
                                             $otstup = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($item['NSLevel']-1));
                                             if ($item['NSLevel']-1 > 0) { $otstup .=  ' &raquo; '; }
                                         } else { $otstup = ''; }

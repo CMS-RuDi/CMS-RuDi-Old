@@ -172,7 +172,20 @@ function applet_modules() {
         
         $fields = array(
             array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
-            array( 'title' => $_LANG['AD_TITLE'], 'field' => 'title', 'width' => '', 'filter' => '15', 'link' => '?view=modules&do=edit&id=%id%' ),
+            array(
+                'title' => $_LANG['AD_TITLE'],
+                'field' => array('title','titles'), 'width'=>'',
+                'link'  => '?view=modules&do=edit&id=%id%',
+                'prc'   => function ($i) {
+                    $i['titles'] = cmsCore::yamlToArray($i['titles']);
+                    // переопределяем название пункта меню в зависимости от языка
+                    if (!empty($i['titles'][cmsConfig::getConfig('lang')])) {
+                        $i['title'] = $i['titles'][cmsConfig::getConfig('lang')];
+                    }
+                    
+                    return $i['title'];
+                }
+            ),
             array( 'title' => $_LANG['TITLE'], 'field' => 'name', 'width' => '220', 'filter' => '15' ),
             array( 'title' => $_LANG['AD_VERSION'], 'field' => 'version', 'width' => '70' ),
             array( 'title' => $_LANG['AD_AUTHOR'], 'field' => 'author', 'width' => '110' ),
@@ -275,6 +288,7 @@ function applet_modules() {
         $module = array(
             'name'       => cmsCore::request('name', 'str', ''),
             'title'      => cmsCore::request('title', 'str', ''),
+            'titles'     => cmsCore::arrayToYaml(cmsCore::request('titles', 'array_str', array())),
             'position'   => cmsCore::request('position', 'str', ''),
             'showtitle'  => cmsCore::request('showtitle', 'int', 0),
             'published'  => cmsCore::request('published', 'int', 0),
@@ -352,6 +366,7 @@ function applet_modules() {
 
         $name           = cmsCore::request('name', 'str', '');
         $title          = cmsCore::request('title', 'str', '');
+        $titles         = cmsCore::arrayToYaml(cmsCore::request('titles', 'array_str', array()));
         $position       = cmsCore::request('position', 'str', '');
         $showtitle      = cmsCore::request('showtitle', 'int', 0);
         $content    	= cmsCore::c('db')->escape_string(cmsCore::request('content', 'html', ''));
@@ -373,8 +388,8 @@ function applet_modules() {
         $is_strict_bind_hidden = cmsCore::request('is_strict_bind_hidden', 'int', 0);
 
         if ($operate == 'user') { //USER MODULE
-            $sql = "INSERT INTO cms_modules (position, name, title, is_external, content, ordering, showtitle, published, user, original, css_prefix, access_list, template, is_strict_bind, is_strict_bind_hidden)
-                            VALUES ('". $position ."', '". $name ."', '". $title ."', 0, '". $content ."', '". $maxorder ."', '". $showtitle ."', '". $published ."', 1, 1, '". $css_prefix ."', '". $access_list ."', '". $template ."', '". $is_strict_bind ."', '". $is_strict_bind_hidden ."')";
+            $sql = "INSERT INTO cms_modules (position, name, title, titles, is_external, content, ordering, showtitle, published, user, original, css_prefix, access_list, template, is_strict_bind, is_strict_bind_hidden)
+                            VALUES ('". $position ."', '". $name ."', '". $title ."', '". $titles ."', 0, '". $content ."', '". $maxorder ."', '". $showtitle ."', '". $published ."', 1, 1, '". $css_prefix ."', '". $access_list ."', '". $template ."', '". $is_strict_bind ."', '". $is_strict_bind_hidden ."')";
             cmsCore::c('db')->query($sql) ;
         }
 
@@ -386,11 +401,12 @@ function applet_modules() {
             $original    = cmsCore::c('db')->escape_string(cmsCore::c('db')->fetch_assoc($result));
             $is_original = cmsCore::request('del_orig', 'int', 0) ? 1 : 0;
 
-            $sql = "INSERT INTO cms_modules (position, name, title, is_external, content, ordering, showtitle, published, original, user, config, css_prefix, template, access_list, is_strict_bind, is_strict_bind_hidden, cache, cachetime, cacheint, version)
+            $sql = "INSERT INTO cms_modules (position, name, title, titles, is_external, content, ordering, showtitle, published, original, user, config, css_prefix, template, access_list, is_strict_bind, is_strict_bind_hidden, cache, cachetime, cacheint, version)
                         VALUES (
                             '". $position ."',
                             '". $original['name'] ."',
                             '". $title ."',
+                            '". $titles ."',
                             '". $original['is_external'] ."',
                             '". $original['content'] ."',
                             '". $maxorder ."',
@@ -446,6 +462,8 @@ function applet_modules() {
     }
 
     if ($do == 'add' || $do == 'edit') {
+        $langs = cmsCore::getDirsList('/languages');
+        
         if ($do == 'add') {
             cpAddPathway($_LANG['AD_MODULE_ADD']);
             echo '<h3>'. $_LANG['AD_MODULE_ADD'].'</h3>';
@@ -472,6 +490,7 @@ function applet_modules() {
             if (!$mod){ cmsCore::error404(); }
             
             $mod['hidden_menu_ids'] = cmsCore::yamlToArray($mod['hidden_menu_ids']);
+            $mod['titles'] = cmsCore::yamlToArray($mod['titles']);
 
             $sql = "SELECT id FROM cms_modules_bind WHERE module_id = $id AND menu_id = 0 AND tpl = '". cmsConfig::getConfig('template') ."' LIMIT 1";
             $result = cmsCore::c('db')->query($sql) ;
@@ -508,6 +527,17 @@ function applet_modules() {
                             <input type="text" id="title" class="form-control" style="width:100%" name="title" value="<?php echo htmlspecialchars($mod['title']);?>" />
                             <div class="help-block"><?php echo $_LANG['AD_VIEW_IN_SITE']; ?></div>
                         </div>
+                        
+                        <?php if (count($langs) > 1) { ?>
+                            <label><?php echo $_LANG['AD_LANG_TITLES']; ?></label>
+                            <?php foreach ($langs as $lang) { ?>
+                                <div>
+                                    <strong><?php echo $lang; ?>:</strong>
+                                    <input name="titles[<?php echo $lang; ?>]" type="text" style="width:97%" value="<?php echo htmlspecialchars($mod['titles'][$lang]); ?>" placeholder="<?php echo $_LANG['AD_HINT_DEFAULT']; ?>" />
+                                </div>
+                            <?php } ?>
+                            <div class="help-block"><?php echo $_LANG['AD_LANG_TITLES_HINT']; ?></div>
+                        <?php } ?> 
                         
                         <div class="form-group">
                             <label><?php echo $_LANG['AD_MODULE_NAME']; ?></label>
@@ -668,7 +698,14 @@ function applet_modules() {
                                             $item['position'] = $bind_pos[$item['id']];
                                         }
                                     }
-                                    $item['title'] = str_replace($_LANG['AD_ROOT_PAGES'], $_LANG['AD_MAIN'] , $item['title']);
+                                    
+                                    $item['titles'] = cmsCore::yamlToArray($item['titles']);
+                                    // переопределяем название пункта меню в зависимости от языка
+                                    if (!empty($item['titles'][cmsCore::c('config')->lang])) {
+                                        $item['title'] = $item['titles'][cmsCore::c('config')->lang];
+                                    }
+                                    
+                                    $item['title'] = str_replace($_LANG['AD_ROOT_PAGES'], $_LANG['AD_MAIN'], $item['title']);
                                     $menu_items[] = $item;
                                 }
                             }

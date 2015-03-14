@@ -1649,7 +1649,12 @@ class cmsCore {
         if (!self::c('db')->num_rows($result)){ return; }
 
         while ($item = self::c('db')->fetch_assoc($result)){
-            $item['menu'] = self::yamlToArray($item['menu']);
+            $item['menu']   = self::yamlToArray($item['menu']);
+            $item['titles'] = self::yamlToArray($item['titles']);
+            // переопределяем название пункта меню в зависимости от языка
+            if (!empty($item['titles'][self::c('config')->lang])) {
+                $item['title'] = $item['titles'][self::c('config')->lang];
+            }
             $this->menu_struct[$item['id']] = $item;
         }
 

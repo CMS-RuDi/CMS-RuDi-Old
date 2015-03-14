@@ -89,7 +89,7 @@
                 {else}
                     <td valign="top"><strong>{$field.title}:</strong></td>
                     <td>
-                        {wysiwyg name="fdata[$id]" value=$field.value height=300 width='98%' toolbar='Basic'}
+                        {wysiwyg name="fdata[$id]" value=$field.value height=300 width='98%'}
                     </td>
                 {/if}
             </tr>

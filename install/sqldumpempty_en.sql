@@ -774,6 +774,7 @@ DROP TABLE IF EXISTS `#__menu`;
 CREATE TABLE `#__menu` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `menu` tinytext NOT NULL,
+  `titles` tinytext NOT NULL,
   `title` varchar(200) NOT NULL,
   `css_class` varchar(15) NOT NULL DEFAULT '',
   `link` varchar(200) NOT NULL,
@@ -818,6 +819,7 @@ CREATE TABLE `#__modules` (
   `position` varchar(20) NOT NULL,
   `name` varchar(200) NOT NULL,
   `title` varchar(200) NOT NULL,
+  `titles` tinytext NOT NULL,
   `is_external` tinyint(1) NOT NULL,
   `content` text NOT NULL,
   `ordering` int(11) NOT NULL default '1',

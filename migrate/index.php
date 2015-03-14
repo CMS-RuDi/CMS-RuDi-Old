@@ -20,7 +20,7 @@
 
     define('PATH', $_SERVER['DOCUMENT_ROOT']);
 
-    include(PATH.'/core/cms.php');
+    include(PATH .'/core/cms.php');
     
     if (file_exists(PATH .'/includes/config.inc.php')) {
         cmsCore::c('config');
@@ -64,9 +64,11 @@
             
             array( 'table' => 'cms_menu', 'name' => 'is_lax',    'type' => 'tinyint(1)',  'default' => "'0'" ),
             array( 'table' => 'cms_menu', 'name' => 'css_class', 'type' => 'VARCHAR(15)', 'default' => "''" ),
+            array( 'table' => 'cms_menu', 'name' => 'titles',    'type' => 'TINYTEXT ',   'default' => "''" ),
             
             array( 'table' => 'cms_modules', 'name' => 'hidden_menu_ids',       'type' => 'VARCHAR(300)', 'default' => "''" ),
             array( 'table' => 'cms_modules', 'name' => 'is_strict_bind_hidden', 'type' => 'tinyint(1)',   'default' => "0" ),
+            array( 'table' => 'cms_modules', 'name' => 'titles',                'type' => 'TINYTEXT ',    'default' => "''" ),
             
             array( 'table' => 'cms_search', 'name' => 'imageurl', 'type' => 'VARCHAR(150)', 'default' => "''" ),
             
@@ -210,7 +212,7 @@
     ));
     
     $version_prev = 'CMS RuDi 0.0.x или Instant CMS v1.10.3+';
-    $version_next = 'CMS RuDi 0.0.10';
+    $version_next = 'CMS RuDi 0.1.0';
 
 // ========================================================================== //
 // ========================================================================== //

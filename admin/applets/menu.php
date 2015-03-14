@@ -117,7 +117,21 @@ function applet_menu() {
 
         $fields = array(
             array( 'title' => 'Lt', 'field' => 'NSLeft', 'width' => '40' ),
-            array( 'title' => $_LANG['TITLE'], 'field' => 'title', 'width' => '', 'link' => '?view=menu&do=edit&id=%id%' ),
+            array(
+                'title' => $_LANG['TITLE'],
+                'field' => array('title', 'titles'), 'width'=>'',
+                'link'  => '?view=menu&do=edit&id=%id%',
+                'prc'   => function ($i) {
+                    $i['titles'] = cmsCore::yamlToArray($i['titles']);
+                    
+                    // переопределяем название пункта меню в зависимости от языка
+                    if (!empty($i['titles'][cmsConfig::getConfig('lang')])) {
+                        $i['title'] = $i['titles'][cmsConfig::getConfig('lang')];
+                    }
+                    
+                    return $i['title'];
+                }
+            ),
             array( 'title' => $_LANG['SHOW'], 'field' => 'published', 'width' => '80' ),
             array( 'title' => $_LANG['AD_ORDER'], 'field' => 'ordering', 'width' => '100' ),
             array( 'title' => $_LANG['AD_LINK'], 'field' => array('linktype', 'linkid', 'link'), 'width' => '240', 'prc' => 'cpMenutypeById' ),
@@ -190,6 +204,7 @@ function applet_menu() {
         if(!$id){ cmsCore::redirectBack(); }
 
         $title     = cmsCore::request('title', 'str', '');
+        $titles    = cmsCore::arrayToYaml(cmsCore::request('titles', 'array_str', array()));
         $menu      = cmsCore::arrayToYaml(cmsCore::request('menu', 'array_str', ''));
         $linktype  = cmsCore::request('mode', 'str', '');
         $linkid    = cmsCore::request($linktype, 'str', '');
@@ -216,6 +231,7 @@ function applet_menu() {
 
         $sql = "UPDATE cms_menu
                 SET title='". $title ."',
+                    titles='". $titles ."',
                     css_class='". $css_class ."',
                     menu='". $menu ."',
                     link='". $link ."',
@@ -245,6 +261,7 @@ function applet_menu() {
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $title     = cmsCore::request('title', 'str', '');
+        $titles    = cmsCore::arrayToYaml(cmsCore::request('titles', 'array_str', array()));
         $menu      = cmsCore::arrayToYaml(cmsCore::request('menu', 'array_str', ''));
         $linktype  = cmsCore::request('mode', 'str', '');
         $linkid    = cmsCore::request($linktype, 'str', '');
@@ -268,6 +285,7 @@ function applet_menu() {
         $sql = "UPDATE cms_menu
                         SET menu='". $menu ."',
                                 title='". $title ."',
+                                titles='". $titles ."',
                                 css_class='". $css_class ."',
                                 link='". $link ."',
                                 linktype='". $linktype ."',
@@ -449,8 +467,10 @@ function applet_menu() {
 
     if ($do == 'add' || $do == 'edit') {
         $menu_list = cpGetList('menu');
-
-        if ($do=='add') {
+        
+        $langs = cmsCore::getDirsList('/languages');
+        
+        if ($do == 'add') {
             cpAddPathway($_LANG['AD_MENU_POINT_ADD']);
             $mod['menu'] = array('mainmenu');
         } else {
@@ -478,8 +498,9 @@ function applet_menu() {
 
             $mod = cmsCore::c('db')->get_fields('cms_menu', "id = '$item_id'", '*');
             if (!$mod) { cmsCore::error404(); }
-            
-            $mod['menu'] = cmsCore::yamlToArray($mod['menu']);
+
+            $mod['menu']   = cmsCore::yamlToArray($mod['menu']);
+            $mod['titles'] = cmsCore::yamlToArray($mod['titles']);
 
             cpAddPathway($_LANG['AD_MENU_POINT_EDIT'].$ostatok.' "'.$mod['title'].'"');
 
@@ -499,6 +520,19 @@ function applet_menu() {
                             <input type="text" id="title" class="form-control" style="width:100%" name="title" value="<?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'title', ''));?>" />
                             <div class="help-block"><?php echo $_LANG['AD_VIEW_IN_SITE']; ?></div>
                         </div>
+                        
+                        <?php if (count($langs) > 1) { ?>
+                        <div class="form-group">
+                            <label><?php echo $_LANG['AD_LANG_TITLES']; ?></label>
+                            <?php foreach ($langs as $lang) { ?>
+                                <div>
+                                    <strong><?php echo $lang; ?>:</strong>
+                                    <input name="titles[<?php echo $lang; ?>]" type="text" style="width:97%" value="<?php echo htmlspecialchars(cmsCore::getArrVal($mod['titles'], $lang, '')); ?>" placeholder="<?php echo $_LANG['AD_HINT_DEFAULT']; ?>" />
+                                </div>
+                            <?php } ?>
+                            <div class="help-block"><?php echo $_LANG['AD_LANG_TITLES_HINT']; ?></div>
+                        </div>
+                        <?php } ?>
                             
                         <div class="form-group">
                             <label><?php echo $_LANG['AD_PARENT_POINT']; ?></label>

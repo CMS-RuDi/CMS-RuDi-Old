@@ -594,17 +594,22 @@ class cmsPage {
      * @param array $data массив значений, доступных в шаблоне
      * @return <type>
      */
-    public static function includeTemplateFile($file, $data=array()){
+    public static function includeTemplateFile($file, $data=array()) {
+        $inCore = cmsCore::getInstance();
+        $inUser = cmsCore::c('user');
+        $inPage = cmsCore::c('page');
+        $inDB   = cmsCore::c('db');
+        
         extract($data);
         global $_LANG;
 
-        if (file_exists(TEMPLATE_DIR.$file)){
-            include(TEMPLATE_DIR.$file);
+        if (file_exists(cmsCore::c('config')->template_dir . $file)){
+            include(cmsCore::c('config')->template_dir . $file);
             return true;
         }
 
-        if (file_exists(DEFAULT_TEMPLATE_DIR.$file)){
-            include(DEFAULT_TEMPLATE_DIR.$file);
+        if (file_exists(cmsCore::c('config')->default_template_dir . $file)){
+            include(cmsCore::c('config')->default_template_dir . $file);
             return true;
         }
 
@@ -709,6 +714,12 @@ class cmsPage {
 
         // html код модуля
         $html = '';
+        
+        $mod['titles'] = cmsCore::yamlToArray($mod['titles']);
+        // переопределяем название в зависимости от языка
+        if (!empty($mod['titles'][cmsCore::c('config')->lang])) {
+            $mod['title'] = $mod['titles'][cmsCore::c('config')->lang];
+        } 
 
         // для php модулей загружаем файл локализации
         if (!$mod['user']){ cmsCore::loadLanguage('modules/'.$mod['content']); }

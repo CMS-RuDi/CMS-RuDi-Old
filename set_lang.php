@@ -11,32 +11,30 @@
 //                                                                            //
 /******************************************************************************/
 
-    header('Content-Type: text/html; charset=utf-8');
-    Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+header('Content-Type: text/html; charset=utf-8');
+Error_Reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
-    session_start();
+session_start();
 
-	define('PATH', dirname(__FILE__));
-	define("VALID_CMS", 1);
+define('PATH', dirname(__FILE__));
+define('VALID_CMS', 1);
 
-	include(PATH.'/core/cms.php');
+include(PATH .'/core/cms.php');
 
-    cmsCore::getInstance();
+cmsCore::getInstance();
 
-    if(!cmsConfig::getConfig('is_change_lang')){
-        cmsCore::halt();
-    }
+if (!cmsCore::c('config')->is_change_lang) {
+    cmsCore::error404();
+}
 
-    $set_lang = cmsCore::request('lang', 'str', 'ru');
+$set_lang = cmsCore::request('lang', 'str', 'ru');
 
-    $langs = cmsCore::getDirsList('/languages');
+$langs = cmsCore::getDirsList('/languages');
 
-    if(!in_array($set_lang, $langs)){
-        cmsCore::halt();
-    }
+if (!in_array($set_lang, $langs)) {
+    cmsCore::error404();
+}
 
-    $_SESSION['lang'] = $set_lang;
+$_SESSION['lang'] = $set_lang;
 
-    cmsCore::redirectBack();
-
-?>
+cmsCore::redirectBack();

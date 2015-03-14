@@ -16,6 +16,7 @@ $_LANG['PATH_HOME']                 = 'Главная';
 $_LANG['DEBUG_TIME_GEN_PAGE']       = 'Время генерации страницы:';
 $_LANG['DEBUG_QUERY_DB']            = 'Запросы к базе:';
 $_LANG['DEBUG_SEC']                 = 'с.';
+$_LANG['TRACE_STACK']               = 'Последние вызовы';
 $_LANG['DEBUG_MEMORY']              = 'Потребление памяти:';
 $_LANG['ACCESS_DENIED']             = 'Доступ запрещен';
 $_LANG['YOU_HAVENT_ACCESS']         = 'Вы не имеете доступа к этой странице.';

@@ -17,6 +17,7 @@ $_LANG['PATH_HOME']             ='Home';
 $_LANG['DEBUG_TIME_GEN_PAGE']   ='Page generation time:';
 $_LANG['DEBUG_QUERY_DB']        ='Database queries:';
 $_LANG['DEBUG_SEC']             ='sec.';
+$_LANG['TRACE_STACK']           ='Recent calls';
 $_LANG['DEBUG_MEMORY']          ='Memory consumption:';
 $_LANG['ACCESS_DENIED']         ='Access denied';
 $_LANG['YOU_HAVENT_ACCESS']     ='You do not have access to this page.';

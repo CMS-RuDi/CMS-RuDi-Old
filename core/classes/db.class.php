@@ -15,7 +15,7 @@ class cmsDatabase {
     private static $instance;
 
     public $q_count = 0;
-    public $q_dump  = '';
+    public $q_dump  = array();
 
     public $join     = '';
     public $select   = '';
@@ -177,13 +177,23 @@ class cmsDatabase {
 
         if (cmsCore::c('config')->debug) {
             $this->q_count += 1;
-            $this->q_dump .= '<pre>'. number_format(microtime(true)-$time,6) ."\n". $sql .'</pre><hr/>';
+            
+            $trace = debug_backtrace();
+            
+            if ((isset($trace[1]['file']) || isset($trace[0]['file'])) && isset($trace[1]['function'])) {
+                $src = (isset($trace[1]['file']) ? $trace[1]['file'] : $trace[0]['file']) .' => '. $trace[1]['function'] .'()';
+                $src = str_replace(PATH, '', $src);
+            } else {
+                $src = '';
+            }
+            
+            $this->q_dump[] = array('time' => microtime(true) - $time, 'sql' => $sql, 'src' => $src);
         }
 
         if (cmsCore::c('config')->debug && !$ignore_errors) {
             $error = $this->error();
             if ($error) {
-                die('<div style="border:solid 1px gray;padding:12px">DATABASE ERROR: <pre>'. $sql .'</pre>'. $error .'</div>');
+                die('<h3>DATABASE ERROR:</h3><pre>'. $sql .'</pre><p>'. $error .'</p>');
             }
         }
 

@@ -69,7 +69,7 @@
                                    <span class="left_border"><a href="javascript:" onclick="editComment('<?php echo $comment['id']; ?>', '<?php echo cmsUser::getCsrfToken(); ?>')" class="ajaxlink"><?php echo $_LANG['EDIT']; ?></a></span>
                                 <?php } ?>
                             <?php } ?>
-                            <?php if ($is_admin || ($comment['is_my'] && $user_can_delete) || $user_can_moderate) { ?>
+                            <?php if ($is_admin || ($comment['is_my'] && $user_can_delete) || $user_can_moderate || $target_author_can_delete) { ?>
                                 <span class="left_border"><a href="javascript:" onclick="deleteComment(<?php echo $comment['id']; ?>, '<?php echo cmsUser::getCsrfToken(); ?>'<?php if ($comments[$next]['level'] > $comment['level']) { ?>, 1<?php } ?>);return false;" class="ajaxlink"><?php if ($comments[$next]['level'] > $comment['level']) { ?><?php echo $_LANG['DELETE_BRANCH']; ?><?php } else { ?><?php echo $_LANG['DELETE']; ?><?php } ?></a></span>
                             <?php } ?>
                         <?php } ?>

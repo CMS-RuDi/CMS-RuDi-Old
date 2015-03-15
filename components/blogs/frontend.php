@@ -798,9 +798,9 @@ function blogs() {
             assign('navigation', cmsCore::c('blog')->getPostNavigation($post['id'], $blog['id'], cmsCore::m('blogs'), $blog['seolink']))->
             display();
 
-        if($inCore->isComponentInstalled('comments') && $post['comments']){
+        if ($inCore->isComponentEnable('comments') && $post['comments']) {
             cmsCore::includeComments();
-            comments('blog', $post['id']);
+            comments('blog', $post['id'], array(), $is_author);
         }
     }
 

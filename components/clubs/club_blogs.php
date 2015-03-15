@@ -287,9 +287,9 @@ if($bdo=='post'){
             assign('navigation', $inBlog->getPostNavigation($post['id'], $blog['id'], $model, $club['id']))->
             display();
 
-    if($inCore->isComponentInstalled('comments') && $post['comments']){
+    if ($inCore->isComponentEnable('comments') && $post['comments']) {
         cmsCore::includeComments();
-        comments($inBlog->getTarget('comments'), $post['id']);
+        comments($inBlog->getTarget('comments'), $post['id'], array(), $is_author);
     }
 
 }

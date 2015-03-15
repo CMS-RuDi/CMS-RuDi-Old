@@ -257,9 +257,9 @@ if ($do == 'read') {
         display();
 
     // Комментарии статьи
-    if ($article['published'] && $article['comments'] && $inCore->isComponentInstalled('comments')) {
+    if ($article['published'] && $article['comments'] && $inCore->isComponentEnable('comments')) {
         cmsCore::includeComments();
-        comments('article', $article['id']);
+        comments('article', $article['id'], array(), $is_author);
     }
 }
 ///////////////////////////////////// ADD ARTICLE //////////////////////////////////////////////////////////////////////////////////

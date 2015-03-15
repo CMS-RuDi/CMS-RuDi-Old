@@ -3,15 +3,7 @@
 </div>
 
 <div class="cm_ajax_list">
-{if $cfg.cmm_ajax}
-    <script type="text/javascript">
-        var anc = '';
-        if (window.location.hash) {
-            var anc = window.location.hash;
-        }
-        loadComments('{$target}', {$target_id}, anc);
-    </script>
-{else}
+{if !$cfg.cmm_ajax}
     {$html}
 {/if}
 </div>
@@ -41,3 +33,16 @@
     {/if}
 </div>
 <div id="cm_addentry0"></div>
+
+<script type="text/javascript">
+    var target_author_can_delete = {$target_author_can_delete};
+    {if $cfg.cmm_ajax}
+        var anc = '';
+        if (window.location.hash) {
+            anc = window.location.hash;
+        }
+        $(function() {
+            loadComments('{$target}', {$target_id}, anc);
+        });
+    {/if}
+</script>

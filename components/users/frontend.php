@@ -441,9 +441,9 @@ if ($do=='profile'){
         assign('cfg_forum', $inCore->loadComponentConfig('forum'))->
         assign('is_admin', $inUser->is_admin)->
         assign('is_auth', $inUser->id)->
-        assign('actions_enabled', $inCore->isComponentEnabled('actions'))->
-        assign('blogs_enabled', $inCore->isComponentEnabled('blogs'))->
-        assign('clubs_enabled', $inCore->isComponentEnabled('clubs'))->
+        assign('actions_enabled', $inCore->isComponentEnable('actions'))->
+        assign('blogs_enabled', $inCore->isComponentEnable('blogs'))->
+        assign('clubs_enabled', $inCore->isComponentEnable('clubs'))->
         display();
 }
 

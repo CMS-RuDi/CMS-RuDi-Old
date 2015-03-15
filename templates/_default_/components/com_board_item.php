@@ -82,5 +82,5 @@
 <?php
 if ($cfg['comments']) {
     cmsCore::includeComments();
-    comments('boarditem', $item['id']);
+    comments('boarditem', $item['id'], array(), ($item.user_id == $user_id));
 }

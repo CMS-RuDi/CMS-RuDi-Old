@@ -496,10 +496,10 @@ if ($pdo=='viewphoto'){
             assign('tagbar', ($is_allow ? cmsTagBar('userphoto', $photo['id']) : ''))->
             display();
 
-	if($inCore->isComponentInstalled('comments') && $is_allow){
-        cmsCore::includeComments();
-        comments('userphoto', $photo['id']);
-    }
+	if ($inCore->isComponentEnable('comments') && $is_allow){
+            cmsCore::includeComments();
+            comments('userphoto', $photo['id'], array(), $myprofile);
+        }
 
 }
 //============================================================================//

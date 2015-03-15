@@ -69,7 +69,7 @@
                                    <span class="left_border"><a href="javascript:" onclick="editComment('{$comment.id}', '{csrf_token}')" class="ajaxlink">{$LANG.EDIT}</a></span>
                                 {/if}
                             {/if}
-                            {if $is_admin || ($comment.is_my && $user_can_delete) || $user_can_moderate}
+                            {if $is_admin || ($comment.is_my && $user_can_delete) || $user_can_moderate || $target_author_can_delete}
                                 <span class="left_border"><a href="javascript:" onclick="deleteComment({$comment.id}, '{csrf_token}'{if $comments[$next].level > $comment.level}, 1{/if});return false;" class="ajaxlink">{if $comments[$next].level > $comment.level}{$LANG.DELETE_BRANCH}{else}{$LANG.DELETE}{/if}</a></span>
                             {/if}
                         {/if}

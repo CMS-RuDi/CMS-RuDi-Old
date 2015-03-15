@@ -1735,7 +1735,8 @@ INSERT INTO `#__user_groups_access` (`id`, `access_type`, `access_name`, `hide_f
 (12, 'board/moderate', 'Модерация доски объявлений', 1),
 (13, 'comments/add_published', 'Добавлять комментарии без модерации', 0),
 (14, 'forum/add_post', 'Отвечать в темах на форуме', 1),
-(15, 'forum/add_thread', 'Создавать новые темы на форуме', 1);
+(15, 'forum/add_thread', 'Создавать новые темы на форуме', 1),
+(16, 'comments/target_author_delete', 'Удаление неугодных комментариев к своим публикациям', 1);
 
 DROP TABLE IF EXISTS `#__user_invites`;
 CREATE TABLE `#__user_invites` (

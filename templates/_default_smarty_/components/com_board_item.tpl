@@ -80,5 +80,6 @@
 </div>
 
 {if $cfg.comments}
-    {comments target='boarditem' target_id=$item.id}
+    {$can_delete = ($item.user_id == $user_id)}
+    {comments target='boarditem' target_id=$item.id can_delete=$can_delete}
 {/if}

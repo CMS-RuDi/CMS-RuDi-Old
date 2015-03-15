@@ -140,10 +140,10 @@ if ($do=='view'){
             display();
 
 	// если есть фотограйии в альбоме и включены комментарии в альбоме, то показываем их
-	if($album['is_comments'] && $photos && $inCore->isComponentInstalled('comments')){
-          cmsCore::includeComments();
-          comments('palbum', $album['id']);
-     }
+        if ($album['is_comments'] && $photos && $inCore->isComponentEnable('comments')){
+            cmsCore::includeComments();
+            comments('palbum', $album['id'], array(), $is_author);
+        }
 
 }
 /////////////////////////////// VIEW PHOTO ///////////////////////////////////////////////////////////////////////////////////////////

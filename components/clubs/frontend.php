@@ -928,9 +928,9 @@ if ($do=='view_photo'){
             display();
 
 	//если есть, выводим комментарии
-	if($photo['comments'] && $inCore->isComponentInstalled('comments')){
-		cmsCore::includeComments();
-		comments('club_photo', $photo['id']);
+	if ($photo['comments'] && $inCore->isComponentEnable('comments')) {
+            cmsCore::includeComments();
+            comments('club_photo', $photo['id'], array(), $is_author);
 	}
 
 }

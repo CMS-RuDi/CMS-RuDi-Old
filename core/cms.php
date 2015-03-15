@@ -360,13 +360,7 @@ class cmsCore {
      * @return bool
      */
     public function isComponentEnable($component){
-        $enable = false;
-
-        if (isset($this->components[$component])) {
-            $enable = (bool)$this->components[$component]['published'];
-        }
-
-        return $enable;
+        return empty($this->components[$component]['published']) ? false : true;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1905,10 +1899,6 @@ class cmsCore {
      */
     public function isComponentInstalled($component) {
         return isset($this->components[$component]);
-    }
-    
-    public function isComponentEnabled($component) {
-        return empty($this->components[$component]['published']) ? false : true;
     }
 
     public function isModuleInstalled($module) {

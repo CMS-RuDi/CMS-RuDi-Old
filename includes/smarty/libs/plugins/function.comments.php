@@ -16,7 +16,7 @@ function smarty_function_comments($params, &$smarty) {
     
     cmsCore::includeComments();
     
-    comments($params['target'], $params['target_id'], (is_array($params['labels']) ? $params['labels'] : array()));
+    comments($params['target'], $params['target_id'], (is_array($params['labels']) ? $params['labels'] : array()), (isset($params['can_delete']) ? $params['can_delete'] : false));
     
     return;
 }

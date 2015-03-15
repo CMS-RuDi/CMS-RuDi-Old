@@ -726,9 +726,9 @@ function catalog(){
                 assign('ratingForm', (isset($ratingForm) ? $ratingForm : ''))->
                 display('com_catalog_item.tpl');
 
-        if($item['is_comments'] && $inCore->isComponentInstalled('comments')){
+        if ($item['is_comments'] && $inCore->isComponentEnable('comments')) {
             cmsCore::includeComments();
-            comments('catalog', $item['id']);
+            comments('catalog', $item['id'], array(), ($inUser->id == $item['user_id']));
         }
 
         return true;

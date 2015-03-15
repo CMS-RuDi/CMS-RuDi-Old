@@ -52,11 +52,12 @@ class cms_model_comments {
     }
 
     public function initAccess() {
-        $this->is_can_delete    = cmsUser::isUserCan('comments/delete');
-        $this->is_can_moderate  = cmsUser::isUserCan('comments/moderate');
-        $this->is_can_bbcode    = cmsUser::isUserCan('comments/bbcode');
-        $this->is_can_add       = cmsUser::isUserCan('comments/add');
-        $this->is_add_published = cmsUser::isUserCan('comments/add_published');
+        $this->is_can_delete        = cmsUser::isUserCan('comments/delete');
+        $this->is_can_moderate      = cmsUser::isUserCan('comments/moderate');
+        $this->is_can_bbcode        = cmsUser::isUserCan('comments/bbcode');
+        $this->is_can_add           = cmsUser::isUserCan('comments/add');
+        $this->is_add_published     = cmsUser::isUserCan('comments/add_published');
+        $this->target_author_delete = cmsUser::isUserCan('comments/target_author_delete');
     }
 
     public function addComment($item) {

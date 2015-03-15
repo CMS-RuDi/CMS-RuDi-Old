@@ -119,7 +119,7 @@ function loadComments(target, target_id, anchor){
     $.ajax({
 			type: "POST",
 			url: "/components/comments/comments.php",
-			data: "target="+target+"&target_id="+target_id,
+			data: "target="+target+"&target_id="+target_id+"&target_author_can_delete="+target_author_can_delete,
 			success: function(data){
 				$('div.cm_ajax_list').html(data);
                 $('td.loading').html('');

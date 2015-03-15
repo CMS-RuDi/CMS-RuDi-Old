@@ -3,16 +3,8 @@
 </div>
 
 <div class="cm_ajax_list">
-<?php if ($cfg['cmm_ajax']) { ?>
-    <script type="text/javascript">
-        var anc = '';
-        if (window.location.hash){
-            var anc = window.location.hash;
-        }
-        loadComments('<?php echo $target; ?>', <?php echo $target_id; ?>, anc);
-    </script>
-<?php } else { ?>
-	<?php echo $html; ?>
+<?php if (!$cfg['cmm_ajax']) { ?>
+    <?php echo $html; ?>
 <?php } ?>
 </div>
 
@@ -41,3 +33,16 @@
     <?php } ?>
 </div>
 <div id="cm_addentry0"></div>
+
+<script type="text/javascript">
+    var target_author_can_delete = <?php echo $target_author_can_delete; ?>;
+    <?php if ($cfg['cmm_ajax']) { ?>
+        var anc = '';
+        if (window.location.hash) {
+            anc = window.location.hash;
+        }
+        $(function() {
+            loadComments('<?php echo $target; ?>', <?php echo $target_id; ?>, anc);
+        });
+    <?php } ?>
+</script>

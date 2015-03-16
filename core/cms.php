@@ -280,23 +280,21 @@ class cmsCore {
      * @return mixed
      */
     public static function callEvent($event, $item) {
-        $inCore = self::getInstance();
-        
         //получаем все активные плагины, привязанные к указанному событию
-        $plugins = $inCore->getEventPlugins($event);
+        $plugins = self::getInstance()->getEventPlugins($event);
 
         //если активных плагинов нет, возвращаем элемент $item без изменений
         if (!$plugins) { return $item; }
 
         //перебираем плагины и вызываем каждый из них, передавая элемент $item
-        foreach($plugins as $plugin_name) {
-            $plugin = $inCore->loadPlugin($plugin_name);
+        foreach ($plugins as $plugin_name) {
+            $plugin = self::loadPlugin($plugin_name);
 
             if ($plugin !== false) {
                 $item = $plugin->execute($event, $item);
                 
                 if (isset($plugin->info['plugin_type'])) {
-                    if (in_array($plugin->info['plugin_type'], $inCore->single_run_plugins)) {
+                    if (in_array($plugin->info['plugin_type'], self::$single_run_plugins)) {
                         return $item;
                     }
                 }

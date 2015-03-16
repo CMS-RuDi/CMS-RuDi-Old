@@ -11,8 +11,6 @@
 //                                                                            //
 /******************************************************************************/
 
-if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
-
 class cms_model_clubs {
     private $club_members_ids;
     public $club_total_members = 1;

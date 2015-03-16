@@ -30,7 +30,8 @@ class cmsCore {
     public           $component;
     public           $do;
     public           $components;
-    public           $plugins;
+    public           $plugins = array();
+    public           $plugin_events = array();
     protected static $filters;
     protected        $url_without_com_name = false;
     private static   $is_ajax = false;
@@ -96,7 +97,7 @@ class cmsCore {
         $this->component = $this->detectComponent();
 
         //загрузим все события плагинов в память
-        $this->plugins = $this->getAllPlugins();
+        $this->loadPluginsData();
 
         // массив текущего пункта меню
         $this->menu_item = $this->getMenuItem($this->menuId());
@@ -256,18 +257,19 @@ class cmsCore {
     /**
      * Задает полный список зарегистрированных
      * событий в соответствии с включенными плагинами
-     * @return array
+     * @return object
      */
-    public function getAllPlugins() {
-        // если уже получали, возвращаемся
-        if ($this->plugins && is_array($this->plugins)) { return $this->plugins; }
-
-        // Получаем список плагинов
-        $this->plugins = self::c('db')->get_table('cms_plugins p, cms_event_hooks e', 'p.published = 1 AND e.plugin_id = p.id', 'p.id, p.plugin, p.config, e.event');
+    private function loadPluginsData() {
+        $result = self::c('db')->query("SELECT p.id, p.plugin, p.config, e.event FROM cms_event_hooks e LEFT JOIN cms_plugins p ON e.plugin_id = p.id WHERE p.published = 1");
         
-        if (!$this->plugins){ $this->plugins = array(); }
-
-        return $this->plugins;
+        if (self::c('db')->num_rows($result)) {
+            while ($plugin = self::c('db')->fetch_assoc($result)) {
+                $this->plugins[$plugin['plugin']]        = $plugin;
+                $this->plugin_events[$plugin['event']][] = $plugin['plugin']; 
+            }
+        }
+        
+        return $this;
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -277,29 +279,30 @@ class cmsCore {
      * @param mixed $item
      * @return mixed
      */
-    public static function callEvent($event, $item){
+    public static function callEvent($event, $item) {
+        $inCore = self::getInstance();
+        
         //получаем все активные плагины, привязанные к указанному событию
-        $plugins = self::getInstance()->getEventPlugins($event);
+        $plugins = $inCore->getEventPlugins($event);
 
         //если активных плагинов нет, возвращаем элемент $item без изменений
         if (!$plugins) { return $item; }
 
         //перебираем плагины и вызываем каждый из них, передавая элемент $item
         foreach($plugins as $plugin_name) {
+            $plugin = $inCore->loadPlugin($plugin_name);
 
-            $plugin = self::getInstance()->loadPlugin($plugin_name);
-
-            if ($plugin!==false){
+            if ($plugin !== false) {
                 $item = $plugin->execute($event, $item);
-                self::getInstance()->unloadPlugin($plugin);
-
-                if (isset($plugin->info['type'])) {
-                    if (in_array($plugin->info['type'], self::$single_run_plugins)) {
+                
+                if (isset($plugin->info['plugin_type'])) {
+                    if (in_array($plugin->info['plugin_type'], $inCore->single_run_plugins)) {
                         return $item;
                     }
                 }
+                
+                unset($plugin);
             }
-
         }
 
         //возращаем $item обратно
@@ -314,17 +317,7 @@ class cmsCore {
      * @return array
      */
     public function getEventPlugins($event) {
-        $plugins_list = array();
-        
-        if (is_array($this->plugins)) {
-            foreach ($this->plugins as $plugin){
-                if($plugin['event'] == $event){
-                    $plugins_list[] = $plugin['plugin'];
-                }
-            }
-        }
-
-        return $plugins_list;
+        return !empty($this->plugin_events[$event]) ? $this->plugin_events[$event] : array();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -334,20 +327,21 @@ class cmsCore {
      * @return array
      */
     public function getAllComponents() {
-        // если уже получали, возвращаемся
-        if ($this->components && is_array($this->components)) {
+        if (is_array($this->components)) {
             return $this->components;
         }
-
-        // Получаем список компонентов
-        $results = self::c('db')->query("SELECT * FROM cms_components WHERE 1=1 ORDER BY title ASC");
-        if (!self::c('db')->num_rows($results)) { die('kernel panic'); }
         
         $this->components = array();
-        
-        while ($component = self::c('db')->fetch_assoc($results)) {
-            $this->components[$component['link']] = $component;
+
+        $result = self::c('db')->query("SELECT id, title, link, config, internal, published, version, system FROM cms_components ORDER BY title");
+
+        if (self::c('db')->num_rows($result)) {
+            while($c = self::c('db')->fetch_assoc($result)){
+                $this->components[$c['link']] = $c;
+            }
         }
+        
+        if (empty($this->components)) { die('kernel panic'); }
 
         return $this->components;
     }
@@ -390,16 +384,15 @@ class cmsCore {
      * @return float
      */
     public function loadPluginConfig($plugin_name){
-        $config = array();
-
-        foreach ($this->plugins as $plugin) {
-            if ($plugin['plugin'] == $plugin_name) {
-                $config = self::yamlToArray($plugin['config']);
-                break;
-            }
+        if (empty($this->plugins[$plugin_name]['config'])) {
+            return array();
         }
-
-        return $config;
+        
+        if (!is_array($this->plugins[$plugin_name]['config'])) {
+            $this->plugins[$plugin_name]['config'] = self::yamlToArray($this->plugins[$plugin_name]['config']);
+        }
+        
+        return $this->plugins[$plugin_name]['config'];
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -441,18 +434,6 @@ class cmsCore {
             } 
         }
         return false;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    /**
-     * Уничтожает объект плагина
-     * @param cmsPlugin $plugin_obj
-     * @return true
-     */
-    public static function unloadPlugin($plugin_obj) {
-        unset($plugin_obj);
-        return true;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -905,7 +886,11 @@ class cmsCore {
      * @return str
      */
     public function getComponentTitle() {
-        return $this->components[$this->component]['title'];
+        $component_title = '';
+        if (isset($this->components[$this->component])) {
+            $component_title = $this->components[$this->component]['title'];
+        }
+        return $component_title;
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -2872,7 +2857,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
 
                 $plugins_list[] = $p;
 
-                self::unloadPlugin($plugin);
+                unset($plugin);
             }
 
         }

@@ -17,3 +17,4 @@ CMS RuDi v0.1.0 (10.08.2015)
 Частично внесены изменения http://trac.instantcms.ru/changeset/1487 от mike_zaytcev (12/16/14 01:06:31);
 Внесены изменения http://trac.instantcms.ru/changeset/1488 от fuze (12/19/14 23:23:07);
 Внесены изменения http://trac.instantcms.ru/changeset/1489 от fuze (12/20/14 02:27:26);
+Внесены изменения http://trac.instantcms.ru/changeset/1491 от fuze (12/22/14 23:48:54);

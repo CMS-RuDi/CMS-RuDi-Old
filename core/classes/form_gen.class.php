@@ -36,7 +36,6 @@ class rudi_form_generate {
     private $values = array();
     private $name_prefix = '';
 
-
     public function requestForm($fields, $name_prefix='') {
         $data = array();
         $this->name_prefix = empty($name_prefix) ? '' : $name_prefix .'_';
@@ -179,9 +178,9 @@ class rudi_form_generate {
         if (empty($field['fields'])) { return false; }
         
         $data = array(
-            'type' => $field['type'],
+            'type'   => $field['type'],
             'before' => '<fieldset id="'. $this->fields['fieldset']['class'] .'_'. ($this->fields['fieldset']['count']++) .'" class="'. $this->fields['fieldset']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .'>',
-            'after' => '</fieldset>',
+            'after'  => '</fieldset>',
             'fields' => array()
         );
         
@@ -356,7 +355,7 @@ class rudi_form_generate {
             'type' => $field['type'],
             'title' => $field['title'],
             'description' => cmsCore::getArrVal($field, 'description', ''),
-            'html' => '<div class="btn-group" data-toggle="buttons" style="vertical-align:top;"><label class="btn btn-default'. ($val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" checked="checked" value="1"'. ($val ? ' checked="checked"' : '') .' /> '. $_LANG['YES'] .'</label> <label class="btn btn-default'. (!$val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" value="0"'. (!$val ? ' checked="checked"' : '') .' /> '. $_LANG['NO'] .' </label></div>'
+            'html' => '<div class="btn-group" data-toggle="buttons" style="vertical-align:top;"><label class="btn btn-default'. ($val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" value="1"'. ($val ? ' checked="checked"' : '') .' /> '. $_LANG['YES'] .'</label> <label class="btn btn-default'. (!$val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" value="0"'. (!$val ? ' checked="checked"' : '') .' /> '. $_LANG['NO'] .' </label></div>'
         );
     }
     

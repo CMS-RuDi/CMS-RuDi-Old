@@ -41,6 +41,8 @@ class cmsPage {
         $this->page_keys = $this->site_cfg->keywords;
         $this->page_desc = $this->site_cfg->metadesc;
         $this->setTplInfo();
+        global $_LANG;
+        $this->addPathway($_LANG['PATH_HOME'], '/');
     }
 
     private function __clone() {}
@@ -603,12 +605,12 @@ class cmsPage {
         extract($data);
         global $_LANG;
 
-        if (file_exists(cmsCore::c('config')->template_dir . $file)){
+        if (file_exists(cmsCore::c('config')->template_dir . $file)) {
             include(cmsCore::c('config')->template_dir . $file);
             return true;
         }
 
-        if (file_exists(cmsCore::c('config')->default_template_dir . $file)){
+        if (file_exists(cmsCore::c('config')->default_template_dir . $file)) {
             include(cmsCore::c('config')->default_template_dir . $file);
             return true;
         }
@@ -623,11 +625,22 @@ class cmsPage {
     public static function showSplash(){
         if (self::includeTemplateFile('splash/splash.php')){
             cmsCore::setCookie('splash', md5('splash'), time()+60*60*24*30);
-            $_SESSION['splash'] = 1;
             return true;
         }
 
         return false;
+    }
+    
+    /**
+     * Проверяет, нужно ли показывать сплеш-страницу (приветствие)
+     * @return bool
+     */
+    public static function isSplash() {
+        if (cmsCore::c('config')->splash) {
+            return !cmsCore::getCookie('splash');
+        } else {
+            return false;
+        }
     }
     
     /**

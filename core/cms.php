@@ -61,6 +61,12 @@ class cmsCore {
         if (!defined('HOST')) {
             define('HOST', self::c('config')->host); //Оставлен для совместимости с компонентами Instant CMS
         }
+        
+        //проверяем был ли переопределен шаблон через сессию
+        if (isset($_SESSION['template'])) { self::c('config')->template = $_SESSION['template']; }
+
+        self::c('config')->template_dir = PATH .'/templates/'. self::c('config')->template .'/';
+        self::c('config')->default_template_dir = PATH .'/templates/_default_/';
 
         if ($install_mode) { return; }
         
@@ -98,12 +104,6 @@ class cmsCore {
         // проверяем шаблон пункта меню
         $menu_template = $this->menuTemplate();
         if ($menu_template) { self::c('config')->template = $menu_template; }
-        
-        //проверяем был ли переопределен шаблон через сессию
-        if (isset($_SESSION['template'])) { self::c('config')->template = $_SESSION['template']; }
-
-        self::c('config')->template_dir = PATH .'/templates/'. self::c('config')->template .'/';
-        self::c('config')->default_template_dir = PATH .'/templates/_default_/';
 
         define('TEMPLATE', self::c('config')->template); //Оставлен для совместимости с компонентами Instant CMS
         define('TEMPLATE_DIR', self::c('config')->template_dir); //Оставлен для совместимости с компонентами Instant CMS
@@ -942,18 +942,6 @@ class cmsCore {
         $ns = new CCelkoNastedSet();
         $ns->TableName  = $table;
         return $ns;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    /**
-     * Проверяет, нужно ли показывать сплеш-страницу (приветствие)
-     * @return bool
-     */
-    public static function isSplash(){
-        if (self::c('config')->splash){
-            return !(self::getCookie('splash') || isset($_SESSION['splash']));
-        } else { return false; }
     }
 
     ////////////////////////////////////////////////////////////////////////////

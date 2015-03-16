@@ -244,7 +244,8 @@ if ($pdo=='submitphotos'){
 			));
         }
 
-        if(!$is_edit){
+        if (!$is_edit) {
+            cmsUser::checkAwards($inUser->id);
             cmsCore::redirect("/users/{$usr['login']}/photos/private{$album_id}.html");
         } else {
             cmsCore::redirect("/users/{$usr['id']}/photo{$photo_id}.html");

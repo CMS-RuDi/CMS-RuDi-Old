@@ -79,13 +79,8 @@ cmsCore::c('page')->addPathway($_LANG['PATH_HOME'], '/');
 if ($inCore->checkMenuAccess()) { $inCore->proceedBody(); }
 
 //Проверяем нужно ли показать входную страницу (splash)
-if ($inCore->isSplash()) {
-    //Показываем входную страницу
-    if (!cmsCore::c('page')->showSplash()) {
-        //Если шаблон входной страницы не был найден,
-        //показываем обычный шаблон сайта
-        cmsCore::c('page')->showTemplate();
-    }
+if (cmsPage::isSplash()) {
+    cmsPage::showSplash();
 } else {
     //показываем шаблон сайта
     cmsCore::c('page')->showTemplate();

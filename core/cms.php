@@ -8,7 +8,7 @@
 //                                                                            //
 //                        LICENSED BY GNU/GPL v2                              //
 /******************************************************************************/
-
+ini_set('display_errors', 'on');
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 define('CMS_RUDI', 1);
@@ -775,8 +775,7 @@ class cmsCore {
         if ($routes) {
             foreach ($routes as $route) {
                 //сравниваем шаблон маршрута с текущим URI
-                $patt = (strpos($route['_uri'], '/^') === false && strpos($route['_uri'], '/^'. $this->component) === false) ? '/^'. $this->component .'\/'. $route['_uri'] : $route['_uri'];
-                preg_match($patt, $this-> uri, $matches); 
+                preg_match($route['_uri'], $this-> uri, $matches); 
 
                 //Если найдено совпадение
                 if ($matches) {

@@ -12,11 +12,9 @@
 /******************************************************************************/
 
 function geo($do=null) {
-    $model  = new cms_model_geo();
-
     // Определяем местоположение пользователя
     cmsCore::c('user')->loadUserGeo();
-
+    
     $do = isset($do) ? $do : cmsCore::getInstance()->do;
 
     $field_id = cmsCore::request('field_id', 'int', 0);
@@ -26,7 +24,7 @@ function geo($do=null) {
     if ($do == 'view'){
         if (!cmsCore::isAjax()) { cmsCore::error404(); }
 
-        $countries = $model->getCountries();
+        $countries = cmsCore::m('geo')->getCountries();
         $regions   = array();
         $cities    = array();
 
@@ -45,15 +43,15 @@ function geo($do=null) {
 
         if ($city_id){
 
-            $city_parents = $model->getCityParents($city_id);
+            $city_parents = cmsCore::m('geo')->getCityParents($city_id);
 
             if($city_parents){
 
                 $region_id  = $city_parents['region_id'];
                 $country_id = $city_parents['country_id'];
 
-                $regions = $model->getRegions($country_id);
-                $cities  = $model->getCities($region_id);
+                $regions = cmsCore::m('geo')->getRegions($country_id);
+                $cities  = cmsCore::m('geo')->getCities($region_id);
 
                 $city_id = $city_parents['id'];
 
@@ -88,10 +86,10 @@ function geo($do=null) {
 
         switch ( $type ){
 
-            case 'regions': $items = $model->getRegions( $parent_id );
+            case 'regions': $items = cmsCore::m('geo')->getRegions( $parent_id );
                             break;
 
-            case 'cities':  $items = $model->getCities( $parent_id );
+            case 'cities':  $items = cmsCore::m('geo')->getCities( $parent_id );
                             break;
 
             default: $items = array();

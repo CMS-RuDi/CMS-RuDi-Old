@@ -955,19 +955,19 @@ class cmsPage {
                 
                 $options = array_merge(
                     array(
-                        'url' => '/core/ajax/imginsert.php',
-                        'del_url' => '/core/ajax/imgdelete.php',
-                        'extensions' => 'jpg,gif,png',
+                        'url'           => '/core/ajax/imginsert.php',
+                        'del_url'       => '/core/ajax/imgdelete.php',
+                        'extensions'    => 'jpg,gif,png',
                         'max_file_size' => '10',
                         
-                        'type' => 'images',
-                        'component' => 'content',
-                        'target' => '',
-                        'target_id' => '0',
+                        'type'         => 'images',
+                        'component'    => 'content',
+                        'target'       => '',
+                        'target_id'    => '0',
                         'insertEditor' => false,
-                        'editorName' => 'content',
-                        'title' => true,
-                        'description' => true
+                        'editorName'   => 'content',
+                        'title'        => true,
+                        'description'  => true
                     ),
                     $options
                 );

@@ -21,51 +21,54 @@ if (!cmsCore::c('user')->id) { cmsCore::halt(); }
 // Получаем компонент, с которого идет загрузка
 $component = cmsCore::request('component', 'str', '');
 
-// Проверяем установлен ли он
-if (!$inCore->isComponentInstalled($component)) { cmsCore::halt(); }
-
-// Загружаем конфигурацию компонента
-$cfg = $inCore->loadComponentConfig($component);
-
-/* Будет удален в скором времени */
-if (!isset($cfg['imgs_big_w']) && isset($cfg['img_w'])) {
-    $cfg['imgs_big_w'] = $cfg['img_w'];
-}
-if (!isset($cfg['imgs_big_h']) && isset($cfg['img_h'])) {
-    $cfg['imgs_big_h'] = $cfg['img_h'];
-}
-/* ============================= */
-
-$cfg = array_merge(
-    array(
-        'img_max' => 50,
-        'img_on' => 1,
-        'img_w' => 900, // Будет удалено в скором времени
-        'img_h' => 900, // Будет удалено в скором времени
-        'imgs_big_w' => 900,
-        'imgs_big_h' => 900,
-        'imgs_medium_w' => 600,
-        'imgs_medium_h' => 600,
-        'imgs_small_w' => 150,
-        'imgs_small_h' => 150,
-        'resize_type' => 'auto',
-        'mresize_type' => 'auto',
-        'sresize_type' => 'auto',
-        'imgs_quality' => 80,
-        'watermark' => 1,
-        'watermark_only_big' => false
-    ),
-    $cfg
-);
-
-// проверяем не выключен ли он
-if (!$cfg['component_enabled']) { cmsCore::halt(); }
-
 // id места назначения
 $target_id = cmsCore::request('target_id', 'int', 0);
 
 // место назначения в компоненте
 $target = cmsCore::request('target', 'str', '');
+
+// Проверяем установлен и включен ли компонент
+if (!$inCore->isComponentEnable($component)) { cmsCore::halt(); }
+
+// Загружаем конфигурацию компонента
+$com_cfg = $inCore->loadComponentConfig($component);
+
+/* Будет удален в скором времени */
+if (!isset($com_cfg['imgs_big_w']) && isset($com_cfg['img_w'])) {
+    $com_cfg['imgs_big_w'] = $com_cfg['img_w'];
+}
+if (!isset($com_cfg['imgs_big_h']) && isset($com_cfg['img_h'])) {
+    $com_cfg['imgs_big_h'] = $com_cfg['img_h'];
+}
+/* ============================= */
+
+// Настройки по умолчанию
+$cfg = array(
+    'img_max'       => 50,
+    'img_on'        => 1,
+    'img_w'         => 900, // Будет удалено в скором времени
+    'img_h'         => 900, // Будет удалено в скором времени
+    'imgs_big_w'    => 900,
+    'imgs_big_h'    => 900,
+    'imgs_medium_w' => 600,
+    'imgs_medium_h' => 600,
+    'imgs_small_w'  => 150,
+    'imgs_small_h'  => 150,
+    'resize_type'   => 'auto',
+    'mresize_type'  => 'auto',
+    'sresize_type'  => 'auto',
+    'imgs_quality'  => 80,
+    'watermark'     => 1,
+    'watermark_only_big' => false
+);
+
+foreach ($default_cfg as $k => $v) {
+    if (!empty($target) && isset($com_cfg[$target .'_'. $k])) {
+        $cfg[$k] = $com_cfg[$target .'_'. $k];
+    } else if (isset($com_cfg[$target .'_'. $k])) {
+        $cfg[$k] = $com_cfg[$k];
+    }
+}
 
 // Разрешена ли загрузка
 if (!$cfg['img_on']) {

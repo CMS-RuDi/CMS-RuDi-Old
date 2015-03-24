@@ -53,6 +53,9 @@ class cmsConfig {
      */
     public static function getDefaultConfig() {
         $d_cfg = array(
+            'cache'              => 1,
+            'cache_time'         => 1800,
+            'cache_type'         => 'file',
             'sitename'           => '',
             'title_and_sitename' => 1,
             'title_and_page'     => 1,

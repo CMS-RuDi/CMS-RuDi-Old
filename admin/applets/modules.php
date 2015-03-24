@@ -788,13 +788,12 @@ function applet_modules() {
                             <div style="margin-top:15px">
                                 <?php
                                     if ($do == 'edit') {
-                                        if ($inCore->isCached('module', $mod['id'], cmsCore::getArrVal($mod, 'cachetime', 1), cmsCore::getArrVal($mod, 'cacheint', 'MINUTES'))) {
-                                            $t = 'module'. $mod['id'];
-                                            $cfile = PATH .'/cache/'. md5($t) .'.html';
-                                            if (file_exists($cfile)) {
-                                                $kb = round(filesize($cfile)/1024, 2);
-                                                echo '<a href="index.php?view=cache&do=delcache&target=module&id='. $mod['id'] .'">'. $_LANG['AD_MODULE_CACHE_DELETE'] .'</a> ('. $kb . $_LANG['SIZE_KB'] .')';
-                                            }
+                                        $cache = cmsCore::c('cache')->get('modules', $mod['id'], $mod['content'], array(cmsCore::getArrVal($mod, 'cachetime', 1), cmsCore::getArrVal($mod, 'cacheint', 'MINUTES')));
+                                        
+                                        if (!empty($cache)){
+                                            $kb = round(mb_strlen($cache)/1024, 2);
+                                            unset($cache);
+                                            echo '<a href="index.php?view=cache&component=modules&target='. $mod['content'] .'&target_id='. $mod['id'] .'">'. $_LANG['AD_MODULE_CACHE_DELETE'] .'</a> ('. $kb . $_LANG['SIZE_KB'] .')';
                                         } else {
                                             echo '<span style="color:gray">'. $_LANG['AD_NO_CACHE'] .'</span>';
                                         }

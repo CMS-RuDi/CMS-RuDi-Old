@@ -741,12 +741,13 @@ class cmsPage {
         if (!$mod['is_external']){
             $mod['body'] = cmsCore::processFilters($mod['content']);
         }else{ // Отдельный модуль
-            if (cmsCore::includeFile('modules/'.$mod['content'].'/module.php')){
+            if (cmsCore::includeFile('modules/'. $mod['content'] .'/module.php')) {
                 // Если есть кеш, берем тело модуля из него
-                if ($mod['cache'] && cmsCore::isCached('module', $mod['id'], $mod['cachetime'], $mod['cacheint'])) {
-                    $mod['body'] = cmsCore::getCache('module', $mod['id']);
-                    $callback = true;
-                } else {
+                if ($mod['cache']) {
+                    $mod['body'] = cmsCore::c('cache')->get('modules', $mod['id'], $mod['content'], array($mod['cachetime'], $mod['cacheint']));
+                }
+                
+                if (empty($mod['body'])) {
                     $cfg = cmsCore::yamlToArray($mod['config']);
                     
                     // переходный костыль для указания шаблона
@@ -761,8 +762,10 @@ class cmsPage {
                     $mod['body'] = ob_get_clean();
 
                     if ($mod['cache']) {
-                        cmsCore::saveCache('module', $mod['id'], $mod['body']);
+                        cmsCore::c('cache')->set($mod['body'], 'modules', $mod['id'], $mod['content']);
                     }
+                } else {
+                    $callback = true;
                 }
             }
         }

@@ -51,7 +51,8 @@ class cmsCore {
         'form'         => 'cmsForm',        'formgen'      => 'cmsFormGen',   'geo'     => 'cmsgeo',
         'gif_resize'   => 'gifresizer',     'idna_convert' => 'idna_convert', 'images'  => 'rudi_graphics',
         'jevix'        => 'Jevix',          'page'         => 'cmsPage',      'photo'   => 'cmsPhoto',
-        'upload_photo' => 'cmsUploadPhoto', 'user'         => 'cmsUser',      'form_gen'=> 'rudi_form_generate'
+        'upload_photo' => 'cmsUploadPhoto', 'user'         => 'cmsUser',      'form_gen'=> 'rudi_form_generate',
+        'cache'        => 'rudiCache'
     );
 
     protected function __construct($install_mode = false) {

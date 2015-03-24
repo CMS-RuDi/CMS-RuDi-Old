@@ -14,11 +14,13 @@
 if (!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
 function applet_cache() {
+    $component = cmsCore::request('component', 'str', '');
     $target    = cmsCore::request('target', 'str', '');
-    $target_id = cmsCore::request('id', 'int', 0);
+    $target_id = cmsCore::request('target_id', 'str', '');
 
-    if (!$target || !$target_id) { cmsCore::error404(); }
+    if (empty($component) || empty($target_id)) { cmsCore::error404(); }
     
-    cmsCore::deleteCache($target, $target_id);
+    cmsCore::c('cache')->remove($component, $target_id, $target);
+
     cmsCore::redirectBack();
 }

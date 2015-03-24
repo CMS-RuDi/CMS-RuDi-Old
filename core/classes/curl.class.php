@@ -46,7 +46,7 @@ class class_curl {
      * @param array $cfg
      * @return \clas_curl
      */
-    public function setConfig($cfg) {
+    public function setConfig($cfg=array()) {
         $this->config = array_merge(self::getDefaultConfig(), $cfg);
         return $this;
     }
@@ -193,6 +193,8 @@ class class_curl {
      * @param array $headers
      */
     private function setRequestOptions($query_data, $headers) {
+        $this->request_headers = array();
+        
         if ($this->ajax === true) {
             $this->request_headers[] = 'X-Requested-With: XMLHttpRequest';
         }

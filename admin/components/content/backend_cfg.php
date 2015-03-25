@@ -17,6 +17,16 @@ $com_cfg = array(
                         'title' => $_LANG['AD_GENERATE_CYRYLLIC_URL']
                     ),
                     array(
+                        'type' => 'select',
+                        'name' => 'seolink',
+                        'title' => $_LANG['AD_GENERATE_SEOLINK'],
+                        'options' => array(
+                            array( 'title' => $_LANG['AD_GENERATE_SEOLINK_OPT_ROOT'], 'value' => 'root' ),
+                            array( 'title' => $_LANG['AD_GENERATE_SEOLINK_OPT_MAIN_CAT'], 'value' => 'main_cat' ),
+                            array( 'title' => $_LANG['AD_GENERATE_SEOLINK_OPT_CAT'], 'value' => 'cat' ),
+                        )
+                    ),
+                    array(
                         'type' => 'btn_yes_no',
                         'name' => 'readdesc',
                         'title' => $_LANG['AD_OUTPUT_ANNOUNCEMENTS']

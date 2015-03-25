@@ -607,7 +607,7 @@ class cmsCore {
         if (!$request_uri) { return; }
 
         // игнорируемые для детекта url
-        if (preg_match('/^(admin|install|migrate|index)(.*)/ui', $request_uri)) {
+        if (preg_match('/^(admin|install|migrate|index)(\/|\?)(.*)/ui', $request_uri)) {
             return;
         }
 
@@ -935,25 +935,23 @@ class cmsCore {
      * @return string
      */
     public static function getKeywords($text){
-
         self::includeFile('includes/keywords.inc.php');
 
-        $params['content'] = $text; //page content
+        $params['content']         = $text; //page content
         $params['min_word_length'] = 5;  //minimum length of single words
-        $params['min_word_occur'] = 2;  //minimum occur of single words
+        $params['min_word_occur']  = 2;  //minimum occur of single words
 
-        $params['min_2words_length'] = 5;  //minimum length of words for 2 word phrases
+        $params['min_2words_length']        = 5;  //minimum length of words for 2 word phrases
         $params['min_2words_phrase_length'] = 10; //minimum length of 2 word phrases
-        $params['min_2words_phrase_occur'] = 2; //minimum occur of 2 words phrase
+        $params['min_2words_phrase_occur']  = 2; //minimum occur of 2 words phrase
 
-        $params['min_3words_length'] = 5;  //minimum length of words for 3 word phrases
+        $params['min_3words_length']        = 5;  //minimum length of words for 3 word phrases
         $params['min_3words_phrase_length'] = 10; //minimum length of 3 word phrases
-        $params['min_3words_phrase_occur'] = 2; //minimum occur of 3 words phrase
+        $params['min_3words_phrase_occur']  = 2; //minimum occur of 3 words phrase
 
         $keyword = new autokeyword($params, "UTF-8");
 
         return $keyword->get_keywords();
-
     }
 
     // REQUESTS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1538,7 +1536,7 @@ class cmsCore {
         if (isset($this->menu_id)) { return $this->menu_id; }
 
         if ($this->url_without_com_name) {
-            $uri = mb_substr($this->uri, mb_strlen(cmsConfig::getConfig('com_without_name_in_url').'/'));
+            $uri = mb_substr($this->uri, mb_strlen(cmsConfig::getConfig('com_without_name_in_url') .'/'));
         } else {
             $uri = $this->uri;
         }
@@ -1561,26 +1559,37 @@ class cmsCore {
 
         //перевернем массив меню чтобы перебирать от последнего пункта к первому
         $menu = array_reverse($this->menu_struct);
+        
+        $a = explode('/', trim(urldecode($uri), '/'));
+        $b = explode('/', trim(urldecode($real_uri), '/'));
+        $c = explode('/', trim(urldecode($full_uri), '/'));
 
         //перебираем меню в поисках текущего пункта
-        foreach($menu as $item){
-
+        $lastk = 0;
+        
+        foreach ($menu as $item) {
             if (!$item['link']) { continue; }
-
-            //полное совпадение ссылки и адреса?
-            if (in_array($item['link'], array(urldecode($uri), urldecode($full_uri), urldecode($real_uri)))){
-                $menuid = $item['id'];
-                $is_strict = true; //полное совпадение
-                break;
+            
+            $l = explode('/', trim($item['link'], '/'));
+            $brk = false;
+            
+            foreach ($l as $k => $v) {
+                if ($a[$k] != $v && $b[$k] != $v && $c[$k] != $v) {
+                    $brk = true; break;
+                }
             }
-
-            //частичное совпадение ссылки и адреса (по началу строки)?
-            $uri_first_part = mb_substr(urldecode($uri), 0, mb_strlen($item['link']));
-            $real_uri_first_part = mb_substr(urldecode($real_uri), 0, mb_strlen($item['link']));
-            if (in_array($item['link'], array($uri_first_part, $real_uri_first_part))){
-                $menuid = $item['id'];
+            
+            if ($brk === false) {
+                if ($k >= $lastk) {
+                    $menuid = $item['id'];
+                    $lastk = $k;
+                }
+                
+                if (count($a)-1 == $k || count($b)-1 == $k || count($c)-1 == $k) {
+                    $is_strict = true;
+                    break;
+                }
             }
-
         }
 
         $this->menu_id           = $menuid;

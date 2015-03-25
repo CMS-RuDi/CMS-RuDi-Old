@@ -522,7 +522,7 @@ class cmsDatabase {
     public function getNsCategoryPath($table, $left_key, $right_key, $fields='*', $differ='', $only_nested = false) {
         $nested_sql = $only_nested ? '' : '=';
 
-        $path = $this->get_table($table, "NSLeft < ". $nested_sql ." ". $left_key ." AND NSRight > ". $nested_sql ." ". $right_key ." AND parent_id > 0 AND NSDiffer = '". $differ ."' ORDER BY NSLeft", $fields);
+        $path = $this->get_table($table, "NSLeft <". $nested_sql ." ". $left_key ." AND NSRight >". $nested_sql ." ". $right_key ." AND parent_id > 0 AND NSDiffer = '". $differ ."' ORDER BY NSLeft", $fields);
 
         return $path;
     }
@@ -541,7 +541,7 @@ class cmsDatabase {
         $this->query("UPDATE ". $table ." SET seolink='". $cat_seolink ."' WHERE id = '". $cat['id'] ."'");
 
         // Получаем вложенные категории для нее
-        $path_list = $this->get_table($table, "NSLeft > ". $cat['NSLeft'] ." AND NSRight < ". $cat['NSRight'] ." AND parent_id > 0 ORDER BY NSLeft");
+        $path_list = $this->get_table($table, "NSLeft >". $cat['NSLeft'] ." AND NSRight <". $cat['NSRight'] ." AND parent_id > 0 ORDER BY NSLeft");
 
         if ($path_list) {
             foreach($path_list as $pcat) {

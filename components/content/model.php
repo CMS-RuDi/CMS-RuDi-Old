@@ -498,7 +498,7 @@ class cms_model_content {
         }
 
         // получаем значение порядка последней статьи
-        $last_ordering = (int)cmsCore::c('db')->get_field('cms_content', "category_id = ". $article['category_id'] ."' ORDER BY ordering DESC", 'ordering');
+        $last_ordering = (int)cmsCore::c('db')->get_field('cms_content', "category_id = '". $article['category_id'] ."' ORDER BY ordering DESC", 'ordering');
         $article['ordering'] = $last_ordering+1;
 
         $article['id'] = cmsCore::c('db')->insert('cms_content', $article);

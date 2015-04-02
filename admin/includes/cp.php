@@ -288,6 +288,11 @@ function cpMenu() {
                         </a>
                     </li>
                     <li>
+                        <a class="fa fa-columns" href="index.php?view=templates">
+                            <?php echo $_LANG['AD_TEMPLATES_SETTING']; ?>
+                        </a>
+                    </li>
+                    <li>
                         <a class="fa fa-sitemap" href="index.php?view=repairnested">
                             <?php echo $_LANG['AD_CHECKING_TREES']; ?>
                         </a>

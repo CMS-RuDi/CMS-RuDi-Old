@@ -1034,11 +1034,9 @@ class cmsCore {
      * @return array
      */
     public static function getArrayFromRequest($types) {
-
         $items = array();
 
         foreach ($types as $field => $type_list) {
-
             $items[$field] = self::request($type_list[0], $type_list[1], $type_list[2]);
             // если передана функция обработки (ее название), обрабатываем
             // полная поддержка анонимных функций невозможна из-за поддержки php 5.2.x
@@ -1055,11 +1053,9 @@ class cmsCore {
                 }
 
             }
-
         }
 
         return $items;
-
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -2903,12 +2899,14 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
     }
     
     //Возвращает ностройки шаблона
-    public static function getTplCfg() {
-        if (self::includeFile('templates/'. self::c('config')->template .'/config.php')) {
+    public static function getTplCfg($template=false) {
+        $template = empty($template) ? self::c('config')->template : $template;
+        
+        if (self::includeFile('templates/'. $template .'/config.php')) {
             $cfg = array();
             
-            if (file_exists(PATH .'/cache/tpl_cfg/'. self::c('config')->template .'.cfg')) {
-                $str = file_get_contents(PATH .'/cache/tpl_cfg/'. self::c('config')->template .'.cfg');
+            if (file_exists(PATH .'/cache/tpl_cfg/'. $template .'.cfg')) {
+                $str = file_get_contents(PATH .'/cache/tpl_cfg/'. $template .'.cfg');
                 if (!empty($str)) {
                     $cfg = unserialize($str);
                 }
@@ -2925,8 +2923,9 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
     }
     
     //Сохраняет настройки шаблона в файл
-    public static function saveTplCfg($cfg) {
-        file_put_contents(PATH .'/cache/tpl_cfg/'. self::c('config')->template .'.cfg', serialize($cfg));
+    public static function saveTplCfg($cfg, $template=false) {
+        $template = empty($template) ? self::c('config')->template : $template;
+        file_put_contents(PATH .'/cache/tpl_cfg/'. $template .'.cfg', serialize($cfg));
     }
     
     public static function getTimeZones($offsets=false) {

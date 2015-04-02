@@ -19,7 +19,7 @@ class rudiCache {
             $cache_class = 'file';
         }
         
-        if ($cache_class == 'memcached' && !class_exists('Memcache')) {
+        if ($cache_class == 'memcached' && !class_exists('Memcached')) {
             $cache_class = 'file';
         }
         
@@ -52,7 +52,7 @@ class rudiCache {
      * @param string $target
      * @return boolean
      */
-    public function set($data, $component, $target_id, $target) {
+    public function set($data, $component, $target_id, $target='') {
         return $this->cache_class->set($data, $component, $target_id, $target);
     }
     
@@ -110,6 +110,8 @@ class rudiCache_file {
             $time = filemtime($filename);
             if (time()-$time <= $cachetime) {
                 return unserialize(file_get_contents($filename));
+            } else {
+                $this->remove($component, $target_id, $target);
             }
         }
         
@@ -158,7 +160,7 @@ class rudiCache_memcached {
     
     public function __construct() {
         $this->memcached = new Memcached();
-        $this->memcached->addServer('localhost', 11211);
+        $this->memcached->addServer(cmsCore::c('config')->memcached_host, cmsCore::c('config')->memcached_port);
     }
     
     public function set($data, $component, $target_id, $target='') {

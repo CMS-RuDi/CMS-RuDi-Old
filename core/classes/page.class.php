@@ -23,6 +23,8 @@ class cmsPage {
     public $page_img   = '';
     public $page_body  = '';
 
+    private $js  = array();
+    private $css = array();
     private $page_lang = array();
     private $pathway   = array();
     private $is_ajax   = false;
@@ -36,11 +38,16 @@ class cmsPage {
     private static $instance;
 
     private function __construct() {
-        $this->site_cfg  = cmsConfig::getInstance();
+        $this->site_cfg  = cmsCore::c('config');
+        
         $this->title     = $this->homeTitle();
         $this->page_keys = $this->site_cfg->keywords;
         $this->page_desc = $this->site_cfg->metadesc;
-        $this->setTplInfo();
+        
+        $this->getTplInfo();
+        
+        $this->combineJsCssPrepare();
+        
         global $_LANG;
         $this->addPathway($_LANG['PATH_HOME'], '/');
     }
@@ -59,9 +66,11 @@ class cmsPage {
      * для этого ищет в корне шаблона файл system.php
      * а в нем определенный массив с параметрами шаблона
      */
-    private function setTplInfo() {
-        if (!isset($this->tpl_info[cmsCore::c('config')->template])) {
-            $info_file = cmsCore::c('config')->template_dir .'system.php';
+    public function getTplInfo($tpl=false) {
+        $tpl = empty($tpl) ? cmsCore::c('config')->template : $tpl;
+        
+        if (!isset($this->tpl_info[$tpl])) {
+            $info_file = PATH .'/templates/'. $tpl .'/system.php';
         
             if (file_exists($info_file)) {
                 include $info_file;
@@ -71,7 +80,41 @@ class cmsPage {
                 $info = $this->default_tpl_info;
             }
 
-            $this->tpl_info[cmsCore::c('config')->template] = $info;
+            $this->tpl_info[$tpl] = $info;
+        }
+        
+        return $this->tpl_info[$tpl];
+    }
+    
+    private function combineJsCssPrepare() {
+        if (!defined('VALID_CMS_ADMIN')) {
+            if ($this->site_cfg->combine_js_enable) {
+                $this->js = explode("\n", $this->site_cfg->combine_js);
+                foreach ($this->js as $k => $src) {
+                    $src = $this->checkLink(trim($src));
+                    if (mb_substr($src, 0, 1) != '/') {
+                        unset($this->js[$k]);
+                    } else if (!file_exists(PATH . $src)) {
+                        unset($this->js[$k]);
+                    } else {
+                        $this->js[$k] = $src;
+                    }
+                }
+            }
+
+            if ($this->site_cfg->combine_css_enable) {
+                $this->css = explode("\n", $this->site_cfg->combine_css);
+                foreach ($this->css as $k => $src) {
+                    $src = $this->checkLink(trim($src));
+                    if (mb_substr($src, 0, 1) != '/') {
+                        unset($this->css[$k]);
+                    } else if (!file_exists(PATH . $src)) {
+                        unset($this->css[$k]);
+                    } else {
+                        $this->css[$k] = $src;
+                    }
+                }
+            }
         }
     }
 
@@ -164,8 +207,10 @@ class cmsPage {
             mb_substr($src, 0, 7) != 'http://' &&
             mb_substr($src, 0, 8) != 'https://' &&
             mb_substr($src, 0, 2) != '//'
-        ){
+        ) {
             $src = '/'. $src;
+        } else if (mb_substr($src, 0, 2) == '//') {
+            $src = 'http:'. $src;
         }
         return $src;
     }
@@ -178,6 +223,10 @@ class cmsPage {
      */
     public function addHeadJS($src, $prepend=false) {
         $src = $this->checkLink($src);
+        
+        if (in_array($src, $this->js)) {
+            return $this;
+        }
 
         if (!in_array($src, $this->page_js)) {
             if ($prepend) {
@@ -203,6 +252,10 @@ class cmsPage {
      */
     public function addHeadCSS($src, $prepend=false) {
         $src = $this->checkLink($src);
+        
+        if (in_array($src, $this->css)) {
+            return $this;
+        }
 
         if (!in_array($src, $this->page_css)) {
             if ($prepend) {
@@ -425,28 +478,46 @@ class cmsPage {
      * Печатает теги <script>
      * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
      */
-    public function printHeadJS($indent='') {
+    public function printHeadJS($indent=4) {
         $indent_str = str_repeat(' ', $indent);
         
         $this->page_js = cmsCore::callEvent('PRINT_PAGE_JS', $this->page_js);
         
-        if (cmsCore::c('config')->collect_js == 1) {
-            $data = '';
-            foreach ($this->page_js as $key => $value) {
-                if (mb_substr($value, 0, 1) != '/' || mb_substr($value, 0, 2) == '//') { continue; }
-                
-                if (file_exists(PATH . $value)) {
-                    $data .= "\n\n". file_get_contents(PATH . $value);
-                    unset($this->page_js[$key]);
+        if (!empty($this->js)) {
+            $key = md5(implode('.', $this->js));
+            
+            $cachetime = cmsCore::c('cache')->get('class_page', $key, 'js', 24*3600);
+            
+            $update = false;
+            
+            if (empty($cachetime) || !file_exists(PATH .'/upload/'. $key .'.js')) {
+                $update = true;
+            }
+            
+            if ($update === false && (time()-$cachetime['time']) > 3600) {
+                $filetimes = array();
+                foreach ($this->js as $k => $src) {
+                    $filetimes[md5($src)] = filemtime(PATH . $src);
+                    if ($filetimes[md5($src)] != cmsCore::getArrVal($cachetime, md5($src))) {
+                        $update = true;
+                    }
                 }
+                $filetimes['time'] = time();
+                cmsCore::c('cache')->set($filetimes, 'class_page', $key, 'js');
+            }
+
+            if ($update === true) {
+                $data = '';
+                foreach ($this->js as $src) {
+                    $data .= "\n\n". '/* '. $src .' */'. "\n" . file_get_contents(PATH . $src);
+                }
+
+                file_put_contents(PATH .'/upload/'. $key .'.js', trim($data));
+
+                unset($data);
             }
             
-            if (!empty($data)) {
-                file_put_contents(PATH .'/upload/system.js', $data);
-                $this->addHeadJS('upload/system.js', true);
-            }
-            
-            unset($data);
+            $this->addHeadJS('upload/'. $key .'.js', true);
         }
         
         foreach ($this->page_js as $value) {
@@ -458,28 +529,46 @@ class cmsPage {
      * Печатает теги <style>
      * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
      */
-    public function printHeadCSS($indent='') {
+    public function printHeadCSS($indent=4) {
         $indent_str = str_repeat(' ', $indent);
         
         $this->page_css = cmsCore::callEvent('PRINT_PAGE_CSS', $this->page_css);
         
-        if (cmsCore::c('config')->collect_css == 1) {
-            $data = '';
-            foreach ($this->page_css as $key => $value) {
-                if (mb_substr($value, 0, 1) != '/' || mb_substr($value, 0, 2) == '//') { continue; }
-                
-                if (file_exists(PATH . $value)) {
-                    $data .= "\n\n". file_get_contents(PATH . $value);
-                    unset($this->page_css[$key]);
+        if (!empty($this->css)) {
+            $key = md5(implode('.', $this->css));
+            
+            $cachetime = cmsCore::c('cache')->get('class_page', $key, 'css', 24*3600);
+            
+            $update = false;
+            
+            if (empty($cachetime) || !file_exists(PATH .'/upload/'. $key .'.css')) {
+                $update = true;
+            }
+            
+            if ($update === false && (time()-$cachetime['time']) > 3600) {
+                $filetimes = array();
+                foreach ($this->css as $k => $src) {
+                    $filetimes[md5($src)] = filemtime(PATH . $src);
+                    if ($filetimes[md5($src)] != cmsCore::getArrVal($cachetime, md5($src))) {
+                        $update = true;
+                    }
                 }
+                $filetimes['time'] = time();
+                cmsCore::c('cache')->set($filetimes, 'class_page', $key, 'css');
+            }
+
+            if ($update === true) {
+                $data = '';
+                foreach ($this->css as $src) {
+                    $data .= "\n\n". '/* '. $src .' */'. "\n" . preg_replace('#[\s]+#is', ' ', file_get_contents(PATH . $src));
+                }
+
+                file_put_contents(PATH .'/upload/'. $key .'.css', trim($data));
+
+                unset($data);
             }
             
-            if (!empty($data)) {
-                file_put_contents(PATH .'/upload/system.css', $data);
-                $this->addHeadCSS('upload/system.css', true);
-            }
-            
-            unset($data);
+            $this->addHeadJS('upload/'. $key .'.css', true);
         }
         
         foreach ($this->page_css as $value){
@@ -743,11 +832,11 @@ class cmsPage {
         }else{ // Отдельный модуль
             if (cmsCore::includeFile('modules/'. $mod['content'] .'/module.php')) {
                 // Если есть кеш, берем тело модуля из него
-                if ($mod['cache']) {
+                if ($mod['cache'] && $this->site_cfg->cache && empty($mod['cache_enable'])) {
                     $mod['body'] = cmsCore::c('cache')->get('modules', $mod['id'], $mod['content'], array($mod['cachetime'], $mod['cacheint']));
                 }
                 
-                if (empty($mod['body'])) {
+                if (empty($mod['body']) || !empty($mod['cache_enable'])) {
                     $cfg = cmsCore::yamlToArray($mod['config']);
                     
                     // переходный костыль для указания шаблона
@@ -761,7 +850,7 @@ class cmsPage {
                         $callback = call_user_func($mod['content'], $mod, $cfg);
                     $mod['body'] = ob_get_clean();
 
-                    if ($mod['cache']) {
+                    if ($mod['cache'] && $this->site_cfg->cache && empty($mod['cache_enable'])) {
                         cmsCore::c('cache')->set($mod['body'], 'modules', $mod['id'], $mod['content']);
                     }
                 } else {

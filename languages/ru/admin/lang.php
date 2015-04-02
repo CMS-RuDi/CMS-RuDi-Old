@@ -87,6 +87,7 @@ $_LANG['AD_LANG_TITLES_HINT']     = 'введите заголовок для к
 $_LANG['AD_HINT_DEFAULT']         = 'Не указан - используется по умолчанию';
 $_LANG['AD_SHARE']                = 'Общий доступ';
 $_LANG['AD_SITE_SETTING']         = 'Настройки сайта';
+$_LANG['AD_TEMPLATES_SETTING']    = 'Настройки шаблонов';
 $_LANG['AD_CLEAR_SYS_CACHE']      = 'Очистка системного кеша';
 $_LANG['AD_PAGE_TITLE']           = 'Заголовок страницы';
 $_LANG['AD_FROM_COMMA']           = 'Через запятую, 10-15 слов.';

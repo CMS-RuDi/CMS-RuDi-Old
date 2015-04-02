@@ -21,7 +21,7 @@ define('PATH', $_SERVER['DOCUMENT_ROOT']);
 include(PATH .'/core/cms.php');
 cmsCore::getInstance();
 
-$template = preg_replace ('/[^a-zA-Z_\-]/i', '', cmsCore::request('template', 'str', ''));
+$template = preg_replace ('/[^a-zA-Z_\-0-9]/i', '', cmsCore::request('template', 'str', ''));
 
 if ($template) {
     $_SESSION['template'] = $template;

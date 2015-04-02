@@ -14,6 +14,8 @@
 $_LANG['AD_CONFIG_SITE_ERROR']         = 'File /includes/config/config.inc.json is not writable';
 $_LANG['AD_SITE']                      = 'Site';
 $_LANG['AD_DESIGN']                    = 'Design';
+$_LANG['AD_CACHE']                     = 'Cache';
+$_LANG['AD_CACHE_INFO']                = 'Enabling disabling this option does not affect the Association of js and css files. But it affects everything else, including caching modules.';
 $_LANG['AD_TIME']                      = 'Time';
 $_LANG['AD_DB']                        = 'Database';
 $_LANG['AD_POST']                      = 'Mail';
@@ -97,8 +99,14 @@ $_LANG['AD_IFRAME_APP_PUBLIC_KEY']     = 'Public key';
 $_LANG['AD_IFRAME_APP_PRIVATE_KEY']    = 'Private key';
 
 $_LANG['AD_COM_WITHOUT_NAME_IN_URL']   = 'Default component';
-$_LANG['AD_COLLECT_CSS']               = 'Collect all of the CSS files in one';
-$_LANG['AD_COLLECT_CSS_INFO']          = 'Attention. Before you enable this option, make sure that links to images in css files are from the root of the site, and do not have the kind of "../images/xxx.jpg"';
-$_LANG['AD_COLLECT_JS']                = 'Collect all of the JS files in one';
-$_LANG['AD_COLLECT_JS_INFO']           = 'Attention. Before you enable this option, make sure that links to images and other files in the js files are on the root of the site, and do not have the kind of "../images/xxx.jpg"';
+$_LANG['AD_COLLECT_CSS']               = 'Combine CSS files into one';
+$_LANG['AD_COLLECT_CSS_INFO']          = 'A list of CSS files for each on a new line, links from the root without a forward slash "/".<br/> Attention. Make sure that references to symbols in the file are from the root of the site, and do not have the form "../images/xxx.jpg"';
+$_LANG['AD_COLLECT_JS']                = 'Combine JS files into one';
+$_LANG['AD_COLLECT_JS_INFO']           = 'A list of JS files for each on a new line, links from the root without a forward slash "/".<br/> Attention. Make sure that references to symbols in the file are from the root of the site, and do not have the form "../images/xxx.jpg"';
 $_LANG['AD_PAGEBAR_MAX_LINKS']         = 'The maximum number of links in the PageBar';
+$_LANG['AD_CACHE_TYPE']                = 'Cache type';
+$_LANG['AD_CACHE_TYPE_INFO']           = 'Currently supported file cache and Memcached. If the list is not displayed Memcached it on your server is not installed, or installed but not installed module for php.';
+$_LANG['AD_MEMCACHED_HOST']            = 'HOST Memcached';
+$_LANG['AD_MEMCACHED_HOST_INFO']       = 'In this parameter you can also specify other transports like unix:///path/to/memcached.sock i.e. use UNIX sockets, in this case, the port must be set to 0';
+$_LANG['AD_MEMCACHED_PORT']            = 'PORT Memcached';
+$_LANG['AD_MEMCACHED_PORT_INFO']       = 'The port on which Memcached is listening for connections. Set this parameter to 0 if you intend to use sockets';

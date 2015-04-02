@@ -652,7 +652,7 @@ function applet_modules() {
                     <ul id="tabs">
                         <li><a href="#upr_publish"><span><?php echo $_LANG['AD_TAB_PUBLISH']; ?></span></a></li>
                         
-                        <?php if (($mod['is_external'] && $do == 'edit') || $do == 'add') { ?>
+                        <?php if ((($mod['is_external'] && $do == 'edit') || $do == 'add') && cmsCore::c('config')->cache) { ?>
                         <li><a href="#upr_cache"><span><?php echo $_LANG['AD_MODULE_CACHE']; ?></span></a></li>
                         <?php } ?>
                         
@@ -758,7 +758,7 @@ function applet_modules() {
                         </div>
                     </div>
                     
-                    <?php if (($mod['is_external'] && $do == 'edit') || $do == 'add') { ?>
+                    <?php if ((($mod['is_external'] && $do == 'edit') || $do == 'add') && cmsCore::c('config')->cache) { ?>
                     <div id="upr_cache">
                         <div class="form-group">
                             <label><?php echo $_LANG['AD_DO_MODULE_CACHE']; ?></label>

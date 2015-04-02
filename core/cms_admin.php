@@ -542,20 +542,26 @@ class cmsAdmin extends cmsCore {
      * @return bool
      */
     public function removeModule($module_id) {
-        if(is_array($module_id)){
+        if (is_array($module_id)) {
             foreach ($module_id as $id) {
                 $this->removeModule((int)$id);
             }
+            
+            return true;
         }
 
         $module = $this->getModuleById($module_id);
-        if ($this->loadModuleInstaller($module)){
-            if(function_exists('remove_module_'.$module)){
-            	call_user_func('remove_module_'.$module);
+        if ($this->loadModuleInstaller($module)) {
+            if (function_exists('remove_module_'. $module)) {
+            	call_user_func('remove_module_'. $module);
             }
         }
 
-        return self::c('db')->delete('cms_modules', "id = '{$module_id}'", 1);
+        if (self::c('db')->delete('cms_modules', "id = '". $module_id ."'", 1)) {
+            self::c('db')->delete('cms_modules_bind', "module_id='". $module_id ."'");
+        }
+        
+        return false;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

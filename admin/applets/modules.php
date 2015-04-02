@@ -152,9 +152,6 @@ function applet_modules() {
         cmsCore::redirectBack();
     }
 
-//============================================================================//
-//============================================================================//
-
     if ($do == 'list') {
         $toolmenu = array(
             array( 'icon' => 'new.gif', 'title' => $_LANG['AD_MODULE_ADD'], 'link' => '?view=modules&do=add' ),
@@ -245,9 +242,6 @@ function applet_modules() {
         }
     }
 
-//============================================================================//
-//============================================================================//
-
     if ($do == 'show') {
         if (!isset($_REQUEST['item'])) {
             if ($id >= 0) { cmsCore::c('db')->setFlag('cms_modules', $id, 'published', '1'); }
@@ -270,7 +264,7 @@ function applet_modules() {
     }
 
     if ($do == 'delete') {
-        if (!isset($_REQUEST['item'])) {
+        if (!cmsCore::inRequest('item')) {
             $inCore->removeModule($id);
         } else {
             $inCore->removeModule(cmsCore::request('item', 'array_int', array()));
@@ -320,9 +314,9 @@ function applet_modules() {
                 'cms_modules_bind',
                 array(
                     'module_id' => $id,
-                    'menu_id' => 0,
-                    'position' => $module['position'],
-                    'tpl' => cmsCore::c('config')->template
+                    'menu_id'   => 0,
+                    'position'  => $module['position'],
+                    'tpl'       => cmsCore::c('config')->template
                 )
             );
             
@@ -340,9 +334,9 @@ function applet_modules() {
                         'cms_modules_bind',
                         array(
                             'module_id' => $id,
-                            'menu_id' => $value,
-                            'position' => $showpos[$value],
-                            'tpl' => cmsCore::c('config')->template
+                            'menu_id'   => $value,
+                            'position'  => $showpos[$value],
+                            'tpl'       => cmsCore::c('config')->template
                         )
                     );
                 }
@@ -356,7 +350,6 @@ function applet_modules() {
         } else {
             cmsCore::redirect('index.php?view=modules&do=edit');
         }
-
     }
 
     if ($do == 'submit') {
@@ -466,11 +459,11 @@ function applet_modules() {
         
         if ($do == 'add') {
             cpAddPathway($_LANG['AD_MODULE_ADD']);
-            echo '<h3>'. $_LANG['AD_MODULE_ADD'].'</h3>';
+            echo '<h3>'. $_LANG['AD_MODULE_ADD'] .'</h3>';
             $show_all = false;
         } else {
-            if (isset($_REQUEST['multiple'])) {
-                if (isset($_REQUEST['item'])) {
+            if (cmsCore::inRequest('multiple')) {
+                if (cmsCore::inRequest('item')) {
                     $_SESSION['editlist'] = cmsCore::request('item', 'array_int', array());
                 } else {
                     cmsCore::addSessionMessage($_LANG['AD_NO_SELECT_OBJECTS'], 'error');
@@ -481,38 +474,47 @@ function applet_modules() {
             $ostatok = '';
 
             if (isset($_SESSION['editlist'])) {
-               $item_id = array_shift($_SESSION['editlist']);
-               if (sizeof($_SESSION['editlist'])==0) { unset($_SESSION['editlist']); } else
-               { $ostatok = '('.$_LANG['AD_NEXT_IN'].sizeof($_SESSION['editlist']).')'; }
-            } else { $item_id = cmsCore::request('id', 'int', 0); }
+                $item_id = array_shift($_SESSION['editlist']);
+                if (count($_SESSION['editlist'])==0) {
+                   unset($_SESSION['editlist']);
+                } else {
+                    $ostatok = '('. $_LANG['AD_NEXT_IN'] . count($_SESSION['editlist']) .')';
+                }
+            } else {
+                $item_id = cmsCore::request('id', 'int', 0);
+            }
 
-            $mod = cmsCore::c('db')->get_fields('cms_modules', "id = '$item_id'", '*');
-            if (!$mod){ cmsCore::error404(); }
+            $mod = cmsCore::c('db')->get_fields('cms_modules', "id = '". $item_id ."'", '*');
+            if (!$mod) { cmsCore::error404(); }
             
             $mod['hidden_menu_ids'] = cmsCore::yamlToArray($mod['hidden_menu_ids']);
             $mod['titles'] = cmsCore::yamlToArray($mod['titles']);
+            
+            $show_all = false;
+            
+            $default_position = cmsCore::c('db')->get_field('cms_modules_bind', "module_id='". $mod['id'] ."' AND menu_id=0 AND tpl='". cmsCore::c('config')->template ."'", 'position');
+            
+            if (!empty($default_position)) {
+                $show_all = true;
+                $mod['position'] = $default_position;
+            }
 
-            $sql = "SELECT id FROM cms_modules_bind WHERE module_id = $id AND menu_id = 0 AND tpl = '". cmsConfig::getConfig('template') ."' LIMIT 1";
-            $result = cmsCore::c('db')->query($sql) ;
-            if (cmsCore::c('db')->num_rows($result)) { $show_all = true; } else { $show_all = false; }
-
-            echo '<h3>'.$_LANG['AD_EDIT_MODULE'].$ostatok.'</h3>';
+            echo '<h3>'. $_LANG['AD_EDIT_MODULE'] . $ostatok .'</h3>';
             cpAddPathway($mod['name']);
         }
 
-        $toolmenu[] = array('icon'=>'save.gif', 'title'=>$_LANG['SAVE'], 'link'=>'javascript:document.addform.submit();');
-        $toolmenu[] = array('icon'=>'cancel.gif', 'title'=>$_LANG['CANCEL'], 'link'=>'javascript:history.go(-1);');
+        $toolmenu[] = array( 'icon' => 'save.gif',   'title' => $_LANG['SAVE'],   'link' => 'javascript:document.addform.submit();' );
+        $toolmenu[] = array( 'icon' => 'cancel.gif', 'title' => $_LANG['CANCEL'], 'link' => 'javascript:history.go(-1);' );
 
-        if (@$mod['is_external']) {
-            $php_file = 'modules/'.$mod['content'].'/backend.php';
-            $xml_file = 'modules/'.$mod['content'].'/backend.xml';
-            if (file_exists($php_file) || file_exists($xml_file)){
-                $toolmenu[] = array('icon'=>'config.gif', 'title'=>$_LANG['CONFIG_MODULE'], 'link'=>'?view=modules&do=config&id='.$mod['id']);
+        if (cmsCore::getArrVal($mod, 'is_external')) {
+            $php_file = 'modules/'. $mod['content'] .'/backend.php';
+            $xml_file = 'modules/'. $mod['content'] .'/backend.xml';
+            if (file_exists($php_file) || file_exists($xml_file)) {
+                $toolmenu[] = array( 'icon' => 'config.gif', 'title' => $_LANG['CONFIG_MODULE'], 'link' => '?view=modules&do=config&id='. $mod['id'] );
             }
         }
 
         cpToolMenu($toolmenu);
-
 ?>
     <form id="addform" name="addform" method="post" action="index.php">
         <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />

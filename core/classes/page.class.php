@@ -739,7 +739,7 @@ class cmsPage {
     private function loadModulesForMenuItem() {
         if (isset($this->modules)) { return true; }
 
-        $modules = array();
+        $this->modules = array();
 
         $inCore = cmsCore::getInstance();
 
@@ -761,7 +761,6 @@ class cmsPage {
         $result = cmsCore::c('db')->query($sql);
 
         if (!cmsCore::c('db')->num_rows($result)) {
-            $this->modules = $modules;
             return true;
         }
 
@@ -783,10 +782,8 @@ class cmsPage {
             if (!$m) { continue; }
 
             // список модулей на позицию
-            $modules[$mod['mb_position']][] = $m;
+            $this->modules[$mod['mb_position']][] = $m;
         }
-
-        $this->modules = $modules;
 
         return true;
     }

@@ -110,3 +110,7 @@ $_LANG['AD_MEMCACHED_HOST']            = 'HOST Memcached';
 $_LANG['AD_MEMCACHED_HOST_INFO']       = 'In this parameter you can also specify other transports like unix:///path/to/memcached.sock i.e. use UNIX sockets, in this case, the port must be set to 0';
 $_LANG['AD_MEMCACHED_PORT']            = 'PORT Memcached';
 $_LANG['AD_MEMCACHED_PORT_INFO']       = 'The port on which Memcached is listening for connections. Set this parameter to 0 if you intend to use sockets';
+$_LANG['AD_SCHEME_TYPE']               = 'Protocol';
+$_LANG['AD_SCHEME_ANY']                = 'Any';
+$_LANG['AD_SCHEME_http']               = 'Only HTTP';
+$_LANG['AD_SCHEME_https']              = 'Only HTTPS';

@@ -33,6 +33,7 @@ function applet_config() {
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
         $newCFG = cmsCore::getArrayFromRequest(array(
+            'scheme'                  => array('scheme', array('http', 'https'), ''),
             'sitename'                => array('sitename', 'str', ''),
             'title_and_sitename'      => array('title_and_sitename', 'int', 0),
             'title_and_page'          => array('title_and_page', 'int', 0),
@@ -122,6 +123,17 @@ function applet_config() {
         
         <div id="basic">
             <div style="width:750px;">
+                <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SCHEME_TYPE']; ?></label>
+                    <div class="col-sm-7">
+                        <select id="scheme" class="form-control" name="scheme">
+                            <option value=""><?php echo $_LANG['AD_SCHEME_ANY']; ?></option>
+                            <option value="http" <?php if ($config['scheme'] == 'http') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_SCHEME_http']; ?></option>
+                            <option value="https" <?php if ($config['scheme'] == 'https') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_SCHEME_https']; ?></option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label class="col-sm-5 control-label"><?php echo $_LANG['AD_TIME_ARREA']; ?></label>
                     <div class="col-sm-7">
@@ -406,9 +418,9 @@ function applet_config() {
                     <label class="col-sm-5 control-label"><?php echo $_LANG['AD_CACHE_TYPE']; ?></label>
                     <div class="col-sm-7 btn-group" data-toggle="buttons">
                         <select class="form-control" name="cache_type" onchange="if ($(this).val() == 'memcached'){$('.memcached').show();}else{$('.memcached').hide();}">
-                            <option value="file">File</option>
+                            <option value="file" <?php if ($config['cache_type'] == 'file') { echo 'selected="selected"'; } ?>>File</option>
                             <?php if (class_exists('Memcached')) { ?>
-                                <option value="memcached">Memcached</option>
+                                <option value="memcached" <?php if ($config['cache_type'] == 'memcached') { echo 'selected="selected"'; } ?>>Memcached</option>
                             <?php } ?>
                         </select>
                         <div class="help-block">
@@ -417,7 +429,7 @@ function applet_config() {
                     </div>
                 </div>
                 
-                <div class="form-group memcached" <?php if ($config['cache'] != 'memcached'){ ?>style="display:none;"<?php } ?>>
+                <div class="form-group memcached" <?php if ($config['cache_type'] != 'memcached'){ ?>style="display:none;"<?php } ?>>
                     <label class="col-sm-5 control-label"><?php echo $_LANG['AD_MEMCACHED_HOST']; ?></label>
                     <div class="col-sm-7 btn-group" data-toggle="buttons">
                         <input type="text" class="form-control" name="memcached_host" value="<?php echo $config['memcached_host']; ?>" />
@@ -427,7 +439,7 @@ function applet_config() {
                     </div>
                 </div>
                 
-                <div class="form-group memcached" <?php if ($config['cache'] != 'memcached'){ ?>style="display:none;"<?php } ?>>
+                <div class="form-group memcached" <?php if ($config['cache_type'] != 'memcached'){ ?>style="display:none;"<?php } ?>>
                     <label class="col-sm-5 control-label"><?php echo $_LANG['AD_MEMCACHED_PORT']; ?></label>
                     <div class="col-sm-7 btn-group" data-toggle="buttons">
                         <input type="number" class="form-control" name="memcached_port" value="<?php echo $config['memcached_port']; ?>" />

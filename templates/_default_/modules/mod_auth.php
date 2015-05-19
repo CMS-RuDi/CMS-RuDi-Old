@@ -17,7 +17,7 @@
                     <table border="0" cellspacing="0" cellpadding="3">
                     <tr>
                         <td width="20">
-                            <input name="remember" type="checkbox" id="remember" value="1" checked="checked"  style="margin-right:0px"/> 
+                            <input name="remember" type="checkbox" id="remember" value="1" checked="checked"  style="margin-right:0px"/>
                         </td>
                         <td>
                             <label for="remember"> <?php echo $_LANG['AUTH_REMEMBER']; ?></label>

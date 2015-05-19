@@ -154,7 +154,7 @@ class rudi_form_generate {
                 }
                 
                 if (!empty($dat)) {
-                    $data['before'] .= '<li><a href="#'. $this->fields['tabs']['class'] .'_'. $this->fields['tabs']['count'] .'_'. $id .'">'. $tab['title'] .'</a></li>';
+                    $data['before'] .= '<li><a href="#'. $this->fields['tabs']['class'] .'_'. $this->fields['tabs']['count'] .'_'. $id .'">'. $this->getTD($tab, 'title', 'tab', $id) .'</a></li>';
                     
                     $data['fields'][$id]['before'] = '<div id="'. $this->fields['tabs']['class'] .'_'. $this->fields['tabs']['count'] .'_'. $id .'">';
                     $data['fields'][$id]['after'] = '</div>';
@@ -185,7 +185,7 @@ class rudi_form_generate {
         );
         
         if (!empty($field['title'])) {
-            $data['before'] .= "\n" .'<legend>'. $field['title'] .'</legend>';
+            $data['before'] .= "\n" .'<legend>'. $this->getTD($field, 'title', 'fieldset', $this->fields['fieldset']['count']-1) .'</legend>';
         }
         
         foreach ($field['fields'] as $f) {
@@ -212,9 +212,9 @@ class rudi_form_generate {
         if (empty($field['name'])) { return false; }
         
         return array(
-            'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'type'  => $field['type'],
+            'title' => $this->getTD($field, 'title', 'text', $field['name']),
+            'description' => $this->getTD($field, 'description', 'text', $field['name']),
             'html' => '<input type="text" id="'. $this->fields['text']['class'] .'_'. $this->fields['text']['count'] .'" class="form-control '. $this->fields['text']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'" />'
         );
     }
@@ -229,8 +229,8 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => $this->getTD($field, 'title', 'number', $field['name']),
+            'description' => $this->getTD($field, 'description', 'number', $field['name']),
             'html' => '<input type="number" id="'. $this->fields['number']['class'] .'_'. $this->fields['number']['count'] .'" class="form-control '. $this->fields['number']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'" />'
         );
     }
@@ -245,8 +245,8 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => $this->getTD($field, 'title', 'textarea', $field['name']),
+            'description' => $this->getTD($field, 'description', 'textarea', $field['name']),
             'html' => '<textarea id="'. $this->fields['textarea']['class'] .'_'. $this->fields['textarea']['count'] .'" class="form-control '. $this->fields['textarea']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'">'. $this->getValue($field) .'</textarea>');
     }
     
@@ -263,17 +263,23 @@ class rudi_form_generate {
         $selected = $this->getValue($field);
         if (!is_array($selected)) { $selected = array($selected); }
         
+        $optgroup_c = $option_c = 0;
+        
         foreach ($field['options'] as $option) {
             if (isset($option['optgroup'])) {
-                $html .= '    <optgroup label="'. htmlspecialchars($option['title']) .'"'. $this->getOtherAttributes($option) .'>'. "\n";
+                $html .= '    <optgroup label="'. htmlspecialchars($this->getTD($option, 'title', 'select_optgroup_'. $field['name'], $optgroup_c)) .'"'. $this->getOtherAttributes($option) .'>'. "\n";
                 
                 foreach ($option['options'] as $opt) {
-                    $html .= '        <option value="'. htmlspecialchars($opt['value']) .'"'. (in_array($opt['value'],$selected) || isset($opt['selected']) ? ' selected="selected"' : '') .''. $this->getOtherAttributes($opt) .'>'. $opt['title'] .'</option>'. "\n";
+                    $html .= '        <option value="'. htmlspecialchars($opt['value']) .'"'. (in_array($opt['value'],$selected) || isset($opt['selected']) ? ' selected="selected"' : '') .''. $this->getOtherAttributes($opt) .'>'. $this->getTD($opt, 'title', 'select_option_'. $field['name'], $option_c) .'</option>'. "\n";
+                    $option_c++;
                 }
                 
                 $html .= '    </optgroup>'. "\n";
+                
+                $optgroup_c++;
             } else {
-                $html .= '    <option value="'. htmlspecialchars($option['value']) .'"'. (in_array($option['value'],$selected) || isset($option['selected']) ? ' selected="selected"' : '') .''. $this->getOtherAttributes($option) .'>'. $option['title'] .'</option>'. "\n";
+                $html .= '    <option value="'. htmlspecialchars($option['value']) .'"'. (in_array($option['value'],$selected) || isset($option['selected']) ? ' selected="selected"' : '') .''. $this->getOtherAttributes($option) .'>'. $this->getTD($option, 'title', 'select_option_'. $field['name'], $option_c) .'</option>'. "\n";
+                $option_c++;
             }
         }
         
@@ -281,8 +287,8 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => $this->getTD($field, 'title', 'select', $field['name']),
+            'description' => $this->getTD($field, 'description', 'select', $field['name']),
             'html' => $html
         );
     }
@@ -297,8 +303,8 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => '<label for="'. $this->fields['checkbox']['class'] .'_'. $this->fields['checkbox']['count'] .'">'. $field['title'] .'</label>',
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => '<label for="'. $this->fields['checkbox']['class'] .'_'. $this->fields['checkbox']['count'] .'">'. $this->getTD($field, 'title', 'checkbox', $field['name']) .'</label>',
+            'description' => $this->getTD($field, 'description', 'checkbox', $field['name']),
             'html' => '<input type="checkbox" id="'. $this->fields['checkbox']['class'] .'_'. $this->fields['checkbox']['count'] .'" class="'. $this->fields['checkbox']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($field)) .'"'. ($this->getValue($field, true) || isset($field['checked']) ? 'checked="checked"' : '') .' />'
         );
     }
@@ -313,13 +319,15 @@ class rudi_form_generate {
         
         $data = array(
             'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => $this->getTD($field, 'title', 'radio', $field['name']),
+            'description' => $this->getTD($field, 'description', 'radio', $field['name']),
             'options' => array(),
             'html' => ''
         );
         
         $count = $this->fields['radio']['count'];
+        
+        $option_c = 0;
         
         foreach ($field['options'] as $option) {
             $checked = '';
@@ -329,11 +337,12 @@ class rudi_form_generate {
             
             $data['options'][] = array(
                 'id' => $this->fields['radio']['class'] .'_'. $count,
-                'title' => $option['title'],
+                'title' => $this->getTD($option, 'title', 'radio_option_'. $field['name'], $option_c),
                 'html' => '<input type="radio" id="'. $this->fields['radio']['class'] .'_'. $count .'" class="'. $this->fields['radio']['class'] .' '. cmsCore::getArrVal($option, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($option, 'style', false)) .''. $this->getOtherAttributes($option) .' name="'. $this->name_prefix . $field['name'] .'" value="'. htmlspecialchars($this->getValue($option)) .'"'. $checked .' />'
             );
             
             $count++;
+            $option_c++;
         }
         
         return $data;
@@ -353,8 +362,8 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => $this->getTD($field, 'title', 'btn_yes_no', $field['name']),
+            'description' => $this->getTD($field, 'description', 'btn_yes_no', $field['name']),
             'html' => '<div class="btn-group" data-toggle="buttons" style="vertical-align:top;"><label class="btn btn-default'. ($val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" value="1"'. ($val ? ' checked="checked"' : '') .' /> '. $_LANG['YES'] .'</label> <label class="btn btn-default'. (!$val ? ' active' : '') .'"><input type="radio" name="'. $this->name_prefix . $field['name'] .'" value="0"'. (!$val ? ' checked="checked"' : '') .' /> '. $_LANG['NO'] .' </label></div>'
         );
     }
@@ -369,7 +378,7 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => $field['title'],
+            'title' => $this->getTD($field, 'title', 'img_size', $field['name']),
             'html' => '<table width="100%"><tr><td><input type="number" class="form-control" name="'. $this->name_prefix . $field['nameX'] .'" value="'. (float)$this->getValue($field, false, 'nameX', 'valueX') .'" /></td><td><span style="padding:5px;">x</span></td><td><input type="number" class="form-control" name="'. $this->name_prefix . $field['nameY'] .'" value="'. (float)$this->getValue($field, false, 'nameY', 'valueY') .'" /></td></tr></table>'
         );
     }
@@ -409,8 +418,8 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => $this->getTD($field, 'title', 'ns_list', $field['name']),
+            'description' => $this->getTD($field, 'description', 'ns_list', $field['name']),
             'html' => $html
         );
     }
@@ -454,8 +463,8 @@ class rudi_form_generate {
         
         return array(
             'type' => $field['type'],
-            'title' => $field['title'],
-            'description' => cmsCore::getArrVal($field, 'description', ''),
+            'title' => $this->getTD($field, 'title', 'dir_list', $field['name']),
+            'description' => $this->getTD($field, 'description', 'dir_list', $field['name']),
             'html' => $html
         );
     }
@@ -549,5 +558,28 @@ class rudi_form_generate {
         }
         
         return $return_isset ? false : cmsCore::getArrVal($field, $value, '');
+    }
+    
+    /**
+     * Возвращает название или описание поля
+     * @global array $_LANG
+     * @param array $var
+     * @param string $key
+     * @param string $type
+     * @param string $name
+     * @return string
+     */
+    private function getTD($var, $key, $type, $name) {
+        global $_LANG;
+        
+        if (!empty($var[$key])) {
+            return $var[$key];
+        } else if ((!empty($_LANG[mb_strtoupper($type .'_'. $name)]) && $key == 'title') || (!empty($_LANG[mb_strtoupper($type .'_'. $name .'_desc')]) && $key == 'description')) {
+            return $key == 'title' ? $_LANG[mb_strtoupper($type .'_'. $name)] : $_LANG[mb_strtoupper($type .'_'. $name .'_desc')];
+        } else if (!is_numeric($name) && $key != 'description') {
+            return mb_strtoupper($name);
+        } else if ($key != 'description') {
+            return mb_strtoupper($type .'_'. $name);
+        }
     }
 }

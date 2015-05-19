@@ -143,6 +143,10 @@ class cmsCore {
             $scheme = 'http';
         }
         
+        if (!empty(self::c('config')->scheme) && self::c('config')->scheme != $scheme) {
+            self::redirect( self::c('config')->scheme .'://'. self::getHost() .'/'. ltrim($_SERVER['REQUEST_URI'], '/'), 301 );
+        }
+        
         return $scheme;
     }
 

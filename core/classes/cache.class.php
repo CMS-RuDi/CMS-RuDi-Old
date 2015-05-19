@@ -38,10 +38,7 @@ class rudiCache {
      * @return mixed
      */
     public function get($component, $target_id, $target='', $cachetime=false) {
-        if (is_array($cachetime)) {
-            $cachetime = $this->getCacheTime($cachetime[0], $cachetime[1]);
-        }
-        return $this->cache_class->get($component, $target_id, $target, $cachetime);
+        return $this->cache_class->get($component, $target_id, $target, $this->getCacheTime($cachetime));
     }
     
     /**
@@ -52,8 +49,8 @@ class rudiCache {
      * @param string $target
      * @return boolean
      */
-    public function set($data, $component, $target_id, $target='') {
-        return $this->cache_class->set($data, $component, $target_id, $target);
+    public function set($data, $component, $target_id, $target='', $cachetime=false) {
+        return $this->cache_class->set($data, $component, $target_id, $target, $this->getCacheTime($cachetime));
     }
     
     /**
@@ -73,43 +70,50 @@ class rudiCache {
      * @param string $target
      * @return boolean
      */
-    public function clear($component=false, $target=false) {
-        return $this->cache_class->clear($component, $target);
+    public function clear($component=false, $target=false, $only_old=false) {
+        return $this->cache_class->clear($component, $target, $only_old);
     }
     
-    private function getCacheTime($cachetime, $cacheint) {
-        switch ($cacheint) {
-            case 'MINUTE':
-                return $cachetime*60;
-            case 'HOUR':
-                return $cachetime*3600;
-            case 'DAY':
-                return $cachetime*3600*24;
-            case 'MONTH':
-                return $cachetime*3600*24*30;
-            default :
-                return 1800;
+    private function getCacheTime($cachetime) {
+        $cachetime = $cachetime ? $cachetime : cmsCore::c('config')->cache_time;
+        
+        if (is_array($cachetime)) {
+            switch ($cachetime[1]) {
+                case 'MINUTE':
+                    $cachetime = $cachetime[0]*60;
+                case 'HOUR':
+                    $cachetime = $cachetime[0]*3600;
+                case 'DAY':
+                    $cachetime = $cachetime[0]*3600*24;
+                case 'MONTH':
+                    $cachetime = $cachetime[0]*3600*24*30;
+                default :
+                    $cachetime = 1800;
+            }
         }
+        
+        return $cachetime;
     }
 }
 
 class rudiCache_file {
-    public function set($data, $component, $target_id, $target='') {
+    public function set($data, $component, $target_id, $target='', $cachetime=false) {
         if (!file_exists(PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : ''))) {
             mkdir(PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : ''), 0777, true);
         }
         
-        file_put_contents(PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : '') . md5($target_id) .'.cache', serialize($data));
+        file_put_contents(PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : '') . md5($target_id) .'.cache', serialize(array('data' => $data, 'time' => $cachetime)));
     }
     
     public function get($component, $target_id, $target='', $cachetime=false) {
         $filename = PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : '') . md5($target_id) .'.cache';
         
         if (file_exists($filename)) {
-            $cachetime = empty($cachetime) ? cmsCore::c('config')->cache_time : $cachetime;
             $time = filemtime($filename);
+            
             if (time()-$time <= $cachetime) {
-                return unserialize(file_get_contents($filename));
+                $data = unserialize(file_get_contents($filename));
+                return $data['data'];
             } else {
                 $this->remove($component, $target_id, $target);
             }
@@ -128,12 +132,12 @@ class rudiCache_file {
         return true;
     }
     
-    public function clear($component=false, $target=false) {
+    public function clear($component=false, $target=false, $only_old=false) {
         $dir = PATH .'/cache/'. (!empty($component) ? $component .'/'. (!empty($target) ? $target .'/' : '') : '');
-        return $this->clearDir($dir);
+        return $this->clearDir($dir, $only_old);
     }
     
-    private function clearDir($dir) {
+    private function clearDir($dir, $only_old) {
         $handle = opendir($dir);
         
         while (false !== ($file = readdir($handle))) {
@@ -141,10 +145,21 @@ class rudiCache_file {
                 $path = $dir .'/'. $file;
                 
                 if (is_dir($path)) {
-                    $this->clearDir($path);
-                    rmdir($path);
+                    $this->clearDir($path, $only_old);
+                    if ($only_old === false) {
+                        rmdir($path);
+                    }
                 } else {
-                    unlink($path);
+                    if ($only_old === false) {
+                        unlink($path);
+                    } else {
+                        $data = unserialize(file_get_contents($path));
+                        $time = filemtime($path);
+                        
+                        if (time()-$time > $data['time']) {
+                            unlink($path);
+                        }
+                    }
                 }
             }
         }
@@ -163,25 +178,23 @@ class rudiCache_memcached {
         $this->memcached->addServer(cmsCore::c('config')->memcached_host, cmsCore::c('config')->memcached_port);
     }
     
-    public function set($data, $component, $target_id, $target='') {
+    public function set($data, $component, $target_id, $target, $cachetime) {
         $key = cmsCore::strToURL(cmsCore::c('config')->host) .'_'. $component .'_'. (!empty($target) ? $target .'_' : '') . md5($target_id);
         
         if ($this->memcached->get($key) !== false) {
-            $this->memcached->replace($key, array('data' => $data, 'time' => time()), cmsCore::c('config')->cache_time);
+            $this->memcached->replace($key, $data, $cachetime);
         } else {
-            $this->memcached->set($key, array('data' => $data, 'time' => time()), cmsCore::c('config')->cache_time);
+            $this->memcached->set($key, $data, $cachetime);
         }
     }
     
-    public function get($component, $target_id, $target='', $cachetime=false) {
+    public function get($component, $target_id, $target, $cachetime) {
         $key = cmsCore::strToURL(cmsCore::c('config')->host) .'_'. $component .'_'. (!empty($target) ? $target .'_' : '') . md5($target_id);
+        
         $data = $this->memcached->get($key);
         
         if ($data !== false) {
-            $cachetime = empty($cachetime) ? cmsCore::c('config')->cache_time : $cachetime;
-            if (time()-$data['time'] <= $cachetime) {
-                return $data['data'];
-            }
+            return $data;
         }
         
         return false;
@@ -189,10 +202,13 @@ class rudiCache_memcached {
     
     public function remove($component, $target_id, $target='') {
         $key = cmsCore::strToURL(cmsCore::c('config')->host) .'_'. $component .'_'. (!empty($target) ? $target .'_' : '') . md5($target_id);
+        
         return $this->memcached->delete($key);
     }
     
-    public function clear($component=false, $target=false) {
+    public function clear($component=false, $target=false, $only_old=false) {
+        if ($only_old) { return true; }
+        
         $prefix = cmsCore::strToURL(cmsCore::c('config')->host) .'_'. $component .'_'. (!empty($target) ? $target .'_' : '');
         $prefix_length = strlen($prefix);
         

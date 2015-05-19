@@ -191,7 +191,8 @@ class cmsPage {
      */
     public function addHead($tag) {
         if (!in_array($tag, $this->page_head)) {
-            if ($this->is_ajax) { echo $tag; } else { $this->page_head[] = $tag; }
+            $this->page_head[] = $tag;
+            if ($this->is_ajax) { echo $tag; }
         }
         return $this;
     }
@@ -568,7 +569,7 @@ class cmsPage {
                 unset($data);
             }
             
-            $this->addHeadJS('upload/'. $key .'.css', true);
+            $this->addHeadCSS('upload/'. $key .'.css', true);
         }
         
         foreach ($this->page_css as $value){

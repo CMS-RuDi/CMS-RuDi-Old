@@ -57,3 +57,15 @@ CMS RuDi v0.1.0 (10.08.2015)
 [-] В настройках сайта в админке удалена вкладка "Дизайн" ее содержимое перенесено
     во вкладку "Сайт";
 [=] При удалении модуля не удалялись позиции модуля из таблицы cms_modules_bind;
+[+] В класс rudi_form_generate добавлена поддержка передачи названий и описаний
+    полей в массиве $_LANG а не только опциями title и description. Теперь поиск
+    названия и описания идет так:
+    1. При наличии возвращаются значения опций title и description;
+    2. При наличии возвращаются значения $_LANG[TYPE_NAME] и $_LANG[TYPE_NAME_DESC];
+    3. Для названия возвращается NAME.
+    Для опций полей select и radio для ключа используются еще и префиксы option,
+    optgroup и номер опции по счету начиная с нуля:
+    $_LANG[SELECT_OPTGROUP_NAME_0]...$_LANG[SELECT_OPTGROUP_NAME_3]...$_LANG[SELECT_OPTGROUP_NAME_N]
+    $_LANG[SELECT_OPTION_NAME_0]...$_LANG[SELECT_OPTION_NAME_3]...$_LANG[SELECT_OPTION_NAME_N]
+    $_LANG[RADIO_OPTION_NAME_0]...$_LANG[RADIO_OPTION_NAME_3]...$_LANG[RADIO_OPTION_NAME_N]
+[+] Добавлена настройка протокола: любой, только HTTP, только HTTPS;

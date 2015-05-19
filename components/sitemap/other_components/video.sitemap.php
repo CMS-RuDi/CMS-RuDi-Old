@@ -286,7 +286,7 @@ class video_sitemap extends cms_rudi_sitemap {
         $this->closeFile();
     }
 
-    protected function deleteAllFiles() {
+    protected function deleteAllFiles($match='') {
         parent::deleteAllFiles();
         parent::deleteAllFiles($this->config['component'] .'_g_[0-9]+');
     }

@@ -84,6 +84,8 @@ class blogs_sitemap extends cms_rudi_sitemap {
 
             $blogs = cmsCore::c('blog')->getBlogs(cmsCore::m('blogs'));
 
+            cmsCore::c('db')->resetConditions();
+            
             if (empty($blogs)) { return false; }
 
             $items = array();

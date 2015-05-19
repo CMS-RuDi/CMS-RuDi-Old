@@ -32,7 +32,7 @@ class content_sitemap extends cms_rudi_sitemap {
                 'target_id' => $cat['id'],
                 'target' => '',
                 'title' => $cat['title'],
-                'link' => '/'. $cat['seolink']
+                'link' => '/'. (cmsCore::c('config')->com_without_name_in_url != 'content' ? 'content/' : '') . $cat['seolink']
             );
         }
         
@@ -56,7 +56,7 @@ class content_sitemap extends cms_rudi_sitemap {
             'target_id' => $cat['id'],
             'target' => '',
             'title' => $cat['title'],
-            'link' => '/'. $cat['seolink']
+            'link' => '/'. (cmsCore::c('config')->com_without_name_in_url != 'content' ? 'content/' : '') . $cat['seolink']
         );
     }
 
@@ -77,7 +77,7 @@ class content_sitemap extends cms_rudi_sitemap {
             $items[] = array(
                 'id' => $item['id'],
                 'title' => $item['title'],
-                'link' => '/'. $item['seolink'] .'.html'
+                'link' => '/'. (cmsCore::c('config')->com_without_name_in_url != 'content' ? 'content/' : '') . $item['seolink'] .'.html'
             );
         }
         
@@ -121,7 +121,7 @@ class content_sitemap extends cms_rudi_sitemap {
                 $last_date = explode(' ', !empty($last_date) ? $last_date : $cat['pubdate']);
 
                 $this->writeMapItem(array(
-                    'loc' => cmsCore::c('config')->host .'/'. $cat['seolink'],
+                    'loc' => cmsCore::c('config')->host .'/'. (cmsCore::c('config')->com_without_name_in_url != 'content' ? 'content/' : '') . $cat['seolink'],
                     'changefreq' => 'daily',
                     'priority' => '0.8',
                     'lastmod' => $last_date[0]
@@ -141,7 +141,7 @@ class content_sitemap extends cms_rudi_sitemap {
                         $last_date = explode(' ', $article['pubdate']);
 
                         $this->writeMapItem(array(
-                            'loc' => cmsCore::c('config')->host .'/'. $article['seolink'] .'.html',
+                            'loc' => cmsCore::c('config')->host .'/'. (cmsCore::c('config')->com_without_name_in_url != 'content' ? 'content/' : '') . $article['seolink'] .'.html',
                             'changefreq' => 'weekly',
                             'priority' => '0.7',
                             'lastmod' => $last_date[0]

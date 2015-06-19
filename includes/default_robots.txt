@@ -1,0 +1,12 @@
+User-Agent: *
+Allow: /
+Disallow: /g/
+Disallow: /go/
+Disallow: /rss
+Disallow: /video/channel
+Disallow: /comments
+Disallow: /components
+Disallow: /gobanner
+Crawl-delay: 2
+Host: %domen%
+Sitemap: %host%/sitemap.xml

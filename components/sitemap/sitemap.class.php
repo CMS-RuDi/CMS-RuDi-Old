@@ -17,7 +17,9 @@ abstract class cms_rudi_sitemap {
     protected $open_file = null; // Ссылка на открытый файл
     protected $page = 1; // Номер текущего файла
     
-    public function __construct() {}
+    public function __construct() {
+        cmsCore::c('db')->resetConditions();
+    }
 
     /**
      * Должен возвращать массив дополнительных настроек компонента

@@ -757,3 +757,7 @@ div.filter {
 .alert{
     word-break: break-all;
 }
+
+.dropdown:hover > .dropdown-menu { 
+    display: block; 
+}

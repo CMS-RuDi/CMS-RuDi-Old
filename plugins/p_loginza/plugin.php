@@ -95,12 +95,12 @@ class p_loginza extends cmsPlugin {
     private function showLoginzaButton() {
         global $_LANG;
         
-        $token_url  = urlencode('http://' . $_SERVER['HTTP_HOST'] . '/plugins/p_loginza/auth.php');
+        $token_url  = urlencode(HOST . '/plugins/p_loginza/auth.php');
 
-        $html  = '<div class="lf_title">'.$_LANG['PL_LOGIN_LOGINZA'].'</div><p style="margin:15px 0">'.$_LANG['PL_LOGIN_LOGINZA_INFO'].'</p><p><script src="http://loginza.ru/js/widget.js" type="text/javascript"></script>
-                 <a href="http://loginza.ru/api/widget?token_url='.$token_url.'&providers_set='.$this->config['PL_PROVIDERS'].'&lang='.$this->config['PL_LANG'].'" class="loginza">
-                     <img src="http://loginza.ru/img/sign_in_button_gray.gif" alt="'.$_LANG['PL_LOGIN_LOGINZA_DO'].'"/>
-                 </a></p>';
+        $html  = '<div class="lf_title">'. $_LANG['PL_LOGIN_LOGINZA'] .'</div><p style="margin:15px 0">'. $_LANG['PL_LOGIN_LOGINZA_INFO'] .'</p><p><script src="https://loginza.ru/js/widget.js" type="text/javascript"></script>
+                <a href="https://loginza.ru/api/widget?token_url='. $token_url .'&providers_set='. $this->config['PL_PROVIDERS'] .'&lang='. $this->config['PL_LANG'] .'" class="loginza">
+                    <img src="https://loginza.ru/img/sign_in_button_gray.gif" alt="'.$_LANG['PL_LOGIN_LOGINZA_DO'].'"/>
+                </a></p>';
 
         echo $html;
 
@@ -112,8 +112,13 @@ class p_loginza extends cmsPlugin {
         if (!$token) { cmsCore::error404(); }
 
         // получение профиля
-        $profile = cmsCore::c('curl')->request('get', 'http://loginza.ru/api/authinfo?token=?token='. $token)->json(false);
-
+        $profile = cmsCore::c('curl')->request('get', 'https://loginza.ru/api/authinfo?token=?token='. $token)->json();
+        
+        ob_start();
+        print_r($profile);
+        nl2br(ob_get_clean());
+        exit;
+        
         // проверка на ошибки
         if (!is_object($profile) || !empty($profile->error_message) || !empty($profile->error_type)) {
             cmsCore::error404();

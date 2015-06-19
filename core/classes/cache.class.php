@@ -97,7 +97,7 @@ class rudiCache {
 }
 
 class rudiCache_file {
-    public function set($data, $component, $target_id, $target='', $cachetime=false) {
+    public function set($data, $component, $target_id, $target, $cachetime) {
         if (!file_exists(PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : ''))) {
             mkdir(PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : ''), 0777, true);
         }
@@ -105,7 +105,7 @@ class rudiCache_file {
         file_put_contents(PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : '') . md5($target_id) .'.cache', serialize(array('data' => $data, 'time' => $cachetime)));
     }
     
-    public function get($component, $target_id, $target='', $cachetime=false) {
+    public function get($component, $target_id, $target, $cachetime) {
         $filename = PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : '') . md5($target_id) .'.cache';
         
         if (file_exists($filename)) {
@@ -122,7 +122,7 @@ class rudiCache_file {
         return false;
     }
     
-    public function remove($component, $target_id, $target='') {
+    public function remove($component, $target_id, $target) {
         $filename = PATH .'/cache/'. $component .'/'. (!empty($target) ? $target .'/' : '') . md5($target_id) .'.cache';
         
         if (file_exists($filename)) {

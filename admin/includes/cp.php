@@ -293,6 +293,11 @@ function cpMenu() {
                         </a>
                     </li>
                     <li>
+                        <a class="fa fa-edit" href="index.php?view=robots">
+                            robots.txt
+                        </a>
+                    </li>
+                    <li>
                         <a class="fa fa-sitemap" href="index.php?view=repairnested">
                             <?php echo $_LANG['AD_CHECKING_TREES']; ?>
                         </a>

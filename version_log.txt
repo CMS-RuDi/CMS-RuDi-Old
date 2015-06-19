@@ -69,3 +69,4 @@ CMS RuDi v0.1.0 (10.08.2015)
     $_LANG[SELECT_OPTION_NAME_0]...$_LANG[SELECT_OPTION_NAME_3]...$_LANG[SELECT_OPTION_NAME_N]
     $_LANG[RADIO_OPTION_NAME_0]...$_LANG[RADIO_OPTION_NAME_3]...$_LANG[RADIO_OPTION_NAME_N]
 [+] Добавлена настройка протокола: любой, только HTTP, только HTTPS;
+[+] В админку добавлен раздел для редактирование содержимого файла robots.txt;

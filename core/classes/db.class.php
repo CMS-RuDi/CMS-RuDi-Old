@@ -33,6 +33,7 @@ class cmsDatabase {
 
     protected function __construct() {
         $this->db_link = self::initConnection();
+        $this->setTimeZone();
         $this->db_prefix = cmsCore::c('config')->db_prefix .'_';
     }
     
@@ -57,6 +58,7 @@ class cmsDatabase {
                 mysqli_close($db->db_link);
             }
             $db->db_link = self::initConnection();
+            $db->setTimeZone();
         }
         return true;
     }
@@ -74,15 +76,24 @@ class cmsDatabase {
 
         mysqli_set_charset($db_link, 'utf8');
         
-        $now = new DateTime(null, new DateTimeZone(cmsCore::c('config')->timezone));
-        $offset = $now->getOffset();
-        $offsetHours = floor(abs($offset)/3600); 
-        $offsetMinutes = floor((abs($offset) - $offsetHours * 3600) / 60); 
-        $offsetString = ($offset < 0 ? '-' : '+') . ($offsetHours < 10 ? '0' : '') . $offsetHours . ':' . ($offsetMinutes < 10 ? '0' : '') . $offsetMinutes;
-        
-        mysqli_query($db_link, "SET LOCAL time_zone='". $offsetString ."'");
-
         return $db_link;
+    }
+    
+    /**
+     * Выставляет временную зону для БД
+     * @param string $tz
+     */
+    public function setTimeZone($tz=false) {
+        $now = new DateTime(null, new DateTimeZone($tz ? $tz : cmsCore::c('config')->timezone));
+        
+        $offset        = $now->getOffset();
+        
+        $offsetHours   = floor(abs($offset)/3600); 
+        $offsetMinutes = floor((abs($offset) - $offsetHours * 3600) / 60); 
+        
+        $offsetString  = ($offset < 0 ? '-' : '+') . ($offsetHours < 10 ? '0' : '') . $offsetHours . ':' . ($offsetMinutes < 10 ? '0' : '') . $offsetMinutes;
+        
+        mysqli_query($this->db_link, "SET LOCAL time_zone='". $offsetString ."'");
     }
 
     /**

@@ -23,7 +23,7 @@ function applet_config() {
     
     if (!cmsUser::isAdminCan('admin/config', $adminAccess)) { cpAccessDenied(); }
     
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_SITE_SETTING']);
+    cmsCore::c('page')->setTitle($_LANG['AD_SITE_SETTING']);
 
     cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
 
@@ -158,6 +158,7 @@ function applet_config() {
                         <?php
                             $templates = cmsCore::getDirsList('/templates');
                             foreach ($templates as $template) {
+                                if ($template == 'admin') { continue; }
                                 echo '<option value="'. $template .'" '. ($config['template'] == $template ? 'selected="selected"' : '') .'>'. $template .'</option>';
                             }
 

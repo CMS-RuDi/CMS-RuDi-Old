@@ -8,7 +8,7 @@ function applet_robots() {
     
     if (!cmsUser::isAdminCan('admin/robots', $adminAccess)) { cpAccessDenied(); }
     
-    cmsCore::c('page')->setAdminTitle($_LANG['ROBOTS_TITLE']);
+    cmsCore::c('page')->setTitle($_LANG['ROBOTS_TITLE']);
 
     cpAddPathway($_LANG['ROBOTS_TITLE']);
 

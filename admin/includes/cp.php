@@ -13,333 +13,374 @@
 
 defined('VALID_CMS_ADMIN') or die();
 
-function cpAccessDenied(){
+function cpAccessDenied() {
     cmsCore::redirect('/admin/index.php?view=noaccess');
 }
 
-function cpWarning($text){
+function cpWarning($text) {
     global $_LANG;
-    return '<div id="warning"><span>'.$_LANG['ATTENTION'].': </span>'.$text.'</div>';
+    return '<div id="warning"><span>'. $_LANG['ATTENTION'] .': </span>'. $text .'</div>';
 }
 
-function cpWritable($file){ //relative path with starting "/"
-    if (is_writable(PATH.$file)){
+function cpWritable($file) { //relative path with starting "/"
+    if (is_writable(PATH . $file)) {
         return true;
     } else {
-        return @chmod(PATH.$file, 0777);
+        return @chmod(PATH . $file, 0777);
     }
 }
 
-function cpCheckWritable($file, $type='file'){
+function cpCheckWritable($file, $type='file') {
     global $_LANG;
-	if (!cpWritable($file)){
-		if ($type=='file'){
-			echo cpWarning(sprintf($_LANG['FILE_NOT_WRITABLE'], $file));
-		} else {
-			echo cpWarning(sprintf($_LANG['DIR_NOT_WRITABLE'], $file));
-		}
-	}
+    if (!cpWritable($file)) {
+        if ($type == 'file') {
+            echo cpWarning(sprintf($_LANG['FILE_NOT_WRITABLE'], $file));
+        } else {
+            echo cpWarning(sprintf($_LANG['DIR_NOT_WRITABLE'], $file));
+        }
+    }
 }
 
 /////////////////////////// PAGE GENERATION ////////////////////////////////////////////////////////////////
-function cpHead() {
-    /* Костыль скоро будет удален */
-    if (!empty($GLOBALS['cp_page_title'])) {
-        cmsCore::c('page')->setAdminTitle($GLOBALS['cp_page_title']);
-    }
-    foreach($GLOBALS['cp_page_head'] as $key=>$value) {
-        cmsCore::c('page')->addHead($value);
-        unset ($GLOBALS['cp_page_head'][$key]);
-    }
-    /******************************/
-    
-    cmsCore::c('page')->printAdminHead();
-
-    return;
-}
-
-function cpMenu() {
+function cpMenu($type='main') {
     global $_LANG;
     global $adminAccess;
+    
+    $items = array();
 
-    $inCore = cmsCore::getInstance();
+    if ($type == 'main') {
+        $inCore = cmsCore::getInstance();
 
-    ob_start(); ?>
+        if (cmsUser::isAdminCan('admin/menu', $adminAccess)) {
+            $items['admin/menu'] = array(
+                'class'    => 'fa-list admin_menu',
+                'title'    => $_LANG['AD_MENU'],
+                'dropdown' => true,
+                'items'    => array(
+                    'AD_MENU_POINT_ADD' => array(
+                        'class' => 'fa-plus-circle admin_menu_mpa',
+                        'link'  => 'index.php?view=menu&do=add',
+                        'title' => $_LANG['AD_MENU_POINT_ADD']
+                    ),
+                    'AD_MENU_ADD' => array(
+                        'class' => 'fa-plus-circle admin_menu_ma',
+                        'link'  => 'index.php?view=menu&do=addmenu',
+                        'title' => $_LANG['AD_MENU_ADD']
+                    ),
+                    'AD_SHOW_ALL' => array(
+                        'class' => 'fa-ellipsis-h admin_menu_sa',
+                        'link'  => 'index.php?view=menu',
+                        'title' => $_LANG['AD_SHOW_ALL']
+                    ),
+                )
+            );
+        }
 
-    <nav class="navbar navbar-default navbar-collapse" role="navigation" style="margin-bottom:0;">
-        <ul class="nav navbar-nav">
-            <?php if (cmsUser::isAdminCan('admin/menu', $adminAccess)) { ?>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=menu">
-                    <i class="fa fa-list"></i>
-                    <?php echo $_LANG['AD_MENU']; ?>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <a class="fa fa-plus-circle" href="index.php?view=menu&do=add">
-                            <?php echo $_LANG['AD_MENU_POINT_ADD']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-plus-circle" href="index.php?view=menu&do=addmenu">
-                            <?php echo $_LANG['AD_MENU_ADD']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-ellipsis-h" href="index.php?view=menu">
-                            <?php echo $_LANG['AD_SHOW_ALL']; ?>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <?php } ?>
+        if (cmsUser::isAdminCan('admin/modules', $adminAccess)) {
+            $items['admin/modules'] = array(
+                'class'    => 'fa-th admin_modules',
+                'title'    => $_LANG['AD_MODULES'],
+                'dropdown' => true,
+                'items'    => array(
+                    'AD_MODULES_SETUP' => array(
+                        'class' => 'fa-cube admin_modules_ms',
+                        'link'  => 'index.php?view=install&do=module',
+                        'title' => $_LANG['AD_MODULES_SETUP']
+                    ),
+                    'AD_MODULE_ADD' => array(
+                        'class' => 'fa-plus-circle admin_modules_ma',
+                        'link'  => 'index.php?view=modules&do=add',
+                        'title' => $_LANG['AD_MODULE_ADD']
+                    ),
+                    'AD_SHOW_ALL' => array(
+                        'class' => 'fa-plus-circle admin_modules_sa',
+                        'link'  => 'index.php?view=modules',
+                        'title' => $_LANG['AD_SHOW_ALL']
+                    )
+                )
+            );
+        }
 
-            <?php if (cmsUser::isAdminCan('admin/modules', $adminAccess)) { ?>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=modules">
-                    <i class="fa fa-th"></i>
-                    <?php echo $_LANG['AD_MODULES']; ?>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <a class="fa fa-cube" href="index.php?view=install&do=module">
-                            <?php echo $_LANG['AD_MODULES_SETUP']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-plus-circle" href="index.php?view=modules&do=add">
-                            <?php echo $_LANG['AD_MODULE_ADD']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-ellipsis-h" href="index.php?view=modules">
-                            <?php echo $_LANG['AD_SHOW_ALL']; ?>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <?php } ?>
+        if (cmsUser::isAdminCan('admin/content', $adminAccess)) {
+            $items['admin/content'] = array(
+                'class'    => 'fa-folder-open admin_content',
+                'title'    => $_LANG['AD_ARTICLE_SITE'],
+                'dropdown' => true,
+                'items'    => array(
+                    'AD_ARTICLES' => array(
+                        'class' => 'fa-file-text admin_content_a',
+                        'link'  => 'index.php?view=tree',
+                        'title' => $_LANG['AD_ARTICLES']
+                    ),
+                    'AD_ARTICLES_ARCHIVE' => array(
+                        'class' => 'fa-archive admin_content_aa',
+                        'link'  => 'index.php?view=arhive',
+                        'title' => $_LANG['AD_ARTICLES_ARCHIVE']
+                    ),
+                    'AD_CREATE_SECTION' => array(
+                        'class' => 'fa-plus-circle admin_content_cs',
+                        'link'  => 'index.php?view=cats&do=add',
+                        'title' => $_LANG['AD_CREATE_SECTION']
+                    ),
+                    'AD_CREATE_ARTICLE' => array(
+                        'class' => 'fa-plus-circle admin_content_ca',
+                        'link'  => 'index.php?view=content&do=add',
+                        'title' => $_LANG['AD_CREATE_ARTICLE']
+                    )
+                )
+            );
+        }
 
-            <?php if (cmsUser::isAdminCan('admin/content', $adminAccess)) { ?>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=tree">
-                    <i class="fa fa-folder-open"></i>
-                    <?php echo $_LANG['AD_ARTICLE_SITE']; ?>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <a class="fa fa-file-text" href="index.php?view=tree">
-                            <?php echo $_LANG['AD_ARTICLES']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-archive" href="index.php?view=arhive">
-                            <?php echo $_LANG['AD_ARTICLES_ARCHIVE']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-plus-circle" href="index.php?view=cats&do=add">
-                            <?php echo $_LANG['AD_CREATE_SECTION']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-plus-circle" href="index.php?view=content&do=add">
-                            <?php echo $_LANG['AD_CREATE_ARTICLE']; ?>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <?php } ?>
+        if (cmsUser::isAdminCan('admin/components', $adminAccess)) {
+            $items['admin/components'] = array(
+                'class'    => 'fa-cubes admin_components',
+                'title'    => $_LANG['AD_COMPONENTS'],
+                'dropdown' => true,
+                'items'    => array(
+                    'AD_INSTALL_COMPONENTS' => array(
+                        'class' => 'fa-cube admin_components_ic',
+                        'link'  => 'index.php?view=install&do=component',
+                        'title' => $_LANG['AD_INSTALL_COMPONENTS']
+                    )
+                )
+            );
 
-            <?php if (cmsUser::isAdminCan('admin/components', $adminAccess)) { ?>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=components">
-                    <i class="fa fa-cubes"></i>
-                    <?php echo $_LANG['AD_COMPONENTS']; ?>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <a class="fa fa-cube" href="index.php?view=install&do=component">
-                            <?php echo $_LANG['AD_INSTALL_COMPONENTS']; ?>
-                        </a>
-                    </li>
-                <?php
-                    $components   = $inCore->getAllComponents();
-                    $showed_count = 0;
-                    $total_count  = count($components);
+            $components   = $inCore->getAllComponents();
+            $showed_count = 0;
+            $total_count  = count($components);
 
-                    if ($total_count) {
-                        foreach ($components as $com) {
-                            if ($com['published'] && (file_exists('components/'. $com['link'] .'/backend.php')) && cmsUser::isAdminCan('admin/com_'. $com['link'], $adminAccess)) { ?>
-
-                                <li>
-                                    <a class="fa" href="index.php?view=components&do=config&link=<?php echo $com['link']; ?>">
-                                        <img src="/admin/images/components/<?php echo $com['link']; ?>.png" class="com_icon" />
-                                        <?php echo $com['title']; ?>
-                                    </a>
-                                </li>
-
-                <?php
-                                $showed_count++;
-                            }
-                        }
+            if ($total_count) {
+                foreach ($components as $com) {
+                    if ($com['published'] && (file_exists('components/'. $com['link'] .'/backend.php')) && cmsUser::isAdminCan('admin/com_'. $com['link'], $adminAccess)) {
+                        cmsCore::loadLanguage('components/'. $com['link']);
+                        $items['admin/components']['items'][$com['link']] = array(
+                            'class' => 'admin_components_'. $com['link'],
+                            'icon'  => '/admin/images/components/'. $com['link'] .'.png',
+                            'link'  => 'index.php?view=components&do=config&link='. $com['link'],
+                            'title' => isset($_LANG['COM_TITLE_'. mb_strtoupper($com['link'])]) ? $_LANG['COM_TITLE_'. mb_strtoupper($com['link'])] : $com['title']
+                        );
                     }
+                }
+            }
 
-                    if ($total_count != $showed_count && cmsCore::c('user')->id == 1) {
-                ?>
-                        <li>
-                            <a class="fa fa-ellipsis-h" href="index.php?view=components">
-                                <?php echo $_LANG['AD_SHOW_ALL']; ?>
-                            </a>
-                        </li>
-                <?php
-                    }
-                ?>
-                </ul>
-            </li>
-            <?php } ?>
+            if ($total_count != $showed_count && cmsCore::c('user')->id == 1) {
+                $items['admin/components']['items']['AD_SHOW_ALL'] = array(
+                    'class' => 'fa-ellipsis-h admin_components_sa',
+                    'link'  => 'index.php?view=components',
+                    'title' => $_LANG['AD_SHOW_ALL']
+                );
+            }
+        }
 
-            <?php if (cmsUser::isAdminCan('admin/plugins', $adminAccess)) { ?>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-puzzle-piece"></i>
-                    <?php echo $_LANG['AD_ADDITIONS']; ?>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <a class="fa fa-cube" href="index.php?view=install&do=plugin">
-                            <?php echo $_LANG['AD_INSTALL_PLUGINS']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-puzzle-piece" href="index.php?view=plugins">
-                            <?php echo $_LANG['AD_PLUGINS']; ?>
-                        </a>
-                    </li>
-                    <?php if (cmsUser::isAdminCan('admin/filters', $adminAccess)) { ?>
-                        <li>
-                            <a class="fa fa-filter" href="index.php?view=filters">
-                                <?php echo $_LANG['AD_FILTERS']; ?>
-                            </a>
-                        </li>
-                    <?php } ?>
-                </ul>
-            </li>
-            <?php } ?>
+        if (cmsUser::isAdminCan('admin/plugins', $adminAccess)) {
+            $items['admin/plugins'] = array(
+                'class'    => 'fa-puzzle-piece admin_plugins',
+                'title'    => $_LANG['AD_ADDITIONS'],
+                'dropdown' => true,
+                'items'    => array(
+                    'AD_INSTALL_PLUGINS' => array(
+                        'class' => 'fa-cube admin_plugins_ip',
+                        'link'  => 'index.php?view=install&do=plugin',
+                        'title' => $_LANG['AD_INSTALL_PLUGINS']
+                    ),
+                    'AD_PLUGINS' => array(
+                        'class' => 'fa-puzzle-piece admin_plugins_p',
+                        'link'  => 'index.php?view=plugins',
+                        'title' => $_LANG['AD_PLUGINS']
+                    )
+                )
+            );
 
-            <?php if (cmsUser::isAdminCan('admin/users', $adminAccess)) { ?>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=users">
-                    <i class="fa fa-users"></i>
-                    <?php echo $_LANG['AD_USERS']; ?>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <a class="fa fa-user" href="index.php?view=users">
-                            <?php echo $_LANG['AD_USERS']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-ban" href="index.php?view=userbanlist">
-                            <?php echo $_LANG['AD_BANLIST']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-users" href="index.php?view=usergroups">
-                            <?php echo $_LANG['AD_USERS_GROUP']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-plus-circle" href="index.php?view=users&do=add">
-                            <?php echo $_LANG['AD_USER_ADD']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-plus-circle" href="index.php?view=usergroups&do=add">
-                            <?php echo $_LANG['AD_CREATE_GROUP']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-cogs" href="index.php?view=components&do=config&link=users">
-                            <?php echo $_LANG['AD_PROFILE_SETTINGS']; ?>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <?php } ?>
+            if (cmsUser::isAdminCan('admin/filters', $adminAccess)) {
+                $items['admin/plugins']['items']['AD_FILTERS'] = array(
+                    'class' => 'fa-puzzle-piece admin_plugins_f',
+                    'link'  => 'index.php?view=filters',
+                    'title' => $_LANG['AD_FILTERS']
+                );
+            }
+        }
 
-            <?php if (cmsUser::isAdminCan('admin/config', $adminAccess)) { ?>
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="index.php?view=config">
-                    <i class="fa fa-cogs"></i>
-                    <?php echo $_LANG['AD_SETTINGS']; ?>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>
-                        <a class="fa fa-cogs" href="index.php?view=config">
-                            <?php echo $_LANG['AD_SITE_SETTING']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-columns" href="index.php?view=templates">
-                            <?php echo $_LANG['AD_TEMPLATES_SETTING']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-edit" href="index.php?view=robots">
-                            robots.txt
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-sitemap" href="index.php?view=repairnested">
-                            <?php echo $_LANG['AD_CHECKING_TREES']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-clock-o" href="index.php?view=cron">
-                            <?php echo $_LANG['AD_CRON_MISSION']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-info-circle" href="index.php?view=phpinfo">
-                            <?php echo $_LANG['AD_PHP_INFO']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-pie-chart" href="index.php?view=checksystem">
-                            <?php echo $_LANG['AD_CHECK_SYSTEM']; ?>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="fa fa-trash-o" href="index.php?view=clearcache">
-                            <?php echo $_LANG['AD_CLEAR_SYS_CACHE']; ?>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <?php } ?>
-        </ul>
-    </nav>
-    <?php echo ob_get_clean();
+        if (cmsUser::isAdminCan('admin/users', $adminAccess)) {
+            $items['admin/users'] = array(
+                'class'    => 'fa-users admin_users',
+                'title'    => $_LANG['AD_USERS'],
+                'dropdown' => true,
+                'items'    => array(
+                    'AD_USERS' => array(
+                        'class' => 'fa-user admin_users_u',
+                        'link'  => 'index.php?view=users',
+                        'title' => $_LANG['AD_USERS']
+                    ),
+                    'AD_BANLIST' => array(
+                        'class' => 'fa-ban admin_users_b',
+                        'link'  => 'index.php?view=userbanlist',
+                        'title' => $_LANG['AD_BANLIST']
+                    ),
+                    'AD_USERS_GROUP' => array(
+                        'class' => 'fa-users admin_users_ug',
+                        'link'  => 'index.php?view=usergroups',
+                        'title' => $_LANG['AD_USERS_GROUP']
+                    ),
+                    'AD_USER_ADD' => array(
+                        'class' => 'fa-plus-circle admin_users_ua',
+                        'link'  => 'index.php?view=users&do=add',
+                        'title' => $_LANG['AD_USER_ADD']
+                    ),
+                    'AD_CREATE_GROUP' => array(
+                        'class' => 'fa-plus-circle admin_users_cg',
+                        'link'  => 'index.php?view=usergroups&do=add',
+                        'title' => $_LANG['AD_CREATE_GROUP']
+                    ),
+                    'AD_PROFILE_SETTINGS' => array(
+                        'class' => 'fa-cogs admin_users_ps',
+                        'link'  => 'index.php?view=components&do=config&link=users',
+                        'title' => $_LANG['AD_PROFILE_SETTINGS']
+                    )
+                )
+            );
+        }
 
-    return;
+        if (cmsUser::isAdminCan('admin/config', $adminAccess)) {
+        $items['admin/config'] = array(
+            'class'    => 'fa-cogs admin_config',
+            'title'    => $_LANG['AD_SETTINGS'],
+            'dropdown' => true,
+            'items'    => array(
+                'AD_SITE_SETTING' => array(
+                    'class' => 'fa-cogs admin_config_ss',
+                    'link'  => 'index.php?view=config',
+                    'title' => $_LANG['AD_SITE_SETTING']
+                ),
+                'AD_TEMPLATES_SETTING' => array(
+                    'class' => 'fa-columns admin_config_ts',
+                    'link'  => 'index.php?view=templates',
+                    'title' => $_LANG['AD_TEMPLATES_SETTING']
+                ),
+                'AD_ROBOTS_TXT' => array(
+                    'class' => 'fa-edit admin_config_rt',
+                    'link'  => 'index.php?view=robots',
+                    'title' => robots.txt
+                ),
+                'AD_CHECKING_TREES' => array(
+                    'class' => 'fa-sitemap admin_config_ct',
+                    'link'  => 'index.php?view=repairnested',
+                    'title' => $_LANG['AD_CHECKING_TREES']
+                ),
+                'AD_CRON_MISSION' => array(
+                    'class' => 'fa-clock-o admin_config_cm',
+                    'link'  => 'index.php?view=cron',
+                    'title' => $_LANG['AD_CRON_MISSION']
+                ),
+                'AD_PHP_INFO' => array(
+                    'class' => 'fa-info-circle admin_config_pi',
+                    'link'  => 'index.php?view=phpinfo',
+                    'title' => $_LANG['AD_PHP_INFO']
+                ),
+                'AD_CHECK_SYSTEM' => array(
+                    'class' => 'fa-pie-chart admin_config_cs',
+                    'link'  => 'index.php?view=checksystem',
+                    'title' => $_LANG['AD_CHECK_SYSTEM']
+                ),
+                'AD_CLEAR_SYS_CACHE' => array(
+                    'class' => 'fa-trash-o admin_config_csc',
+                    'link'  => 'index.php?view=clearcache',
+                    'title' => $_LANG['AD_CLEAR_SYS_CACHE']
+                )
+            )
+        );
+    }
+    }
+    
+    if ($type == 'user') {
+        $items['admin/help'] = array(
+            'class'    => 'fa-question-circle admin_help',
+            'title'    => $_LANG['AD_HELP'],
+            'dropdown' => true,
+            'items'    => array(
+                'AD_DOCS' => array(
+                    'class' => 'fa-question admin_help_d',
+                    'link'  => 'http://cmsrudi.ru/docs',
+                    'target' => '_blank',
+                    'title' => $_LANG['AD_DOCS']
+                ),
+                'AD_TICKETS' => array(
+                    'class' => 'fa-ticket admin_help_t',
+                    'link'  => '/admin/index.php?view=tickets',
+                    'title' => $_LANG['AD_TICKETS']
+                )
+            )
+        );
+        
+        $items['AD_OPEN_SITE'] = array(
+            'class' => 'fa-external-link admin_open_site',
+            'link'  => '/',
+            'target' => '_blank',
+            'title' => $_LANG['AD_OPEN_SITE']
+        );
+        
+        $items['admin/user_menu'] = array(
+            'class'    => 'fa-user admin_user_menu',
+            'title'    => cmsCore::c('db')->get_field('cms_users', 'id='. cmsCore::c('user')->id, 'nickname'),
+            'dropdown' => true,
+            'items'    => array(
+                'ip' => array(
+                    'class' => 'fa-info-circle admin_user_menu_ip',
+                    'link'  => 'javascript:void(return false);',
+                    'title' => 'IP '. cmsCore::c('user')->ip
+                ),
+                'TEMPLATE_MY_PROFILE' => array(
+                    'class' => 'fa-user admin_user_menu_tmp',
+                    'link'  => cmsUser::getProfileURL(cmsCore::c('user')->login),
+                    'title' => $_LANG['TEMPLATE_MY_PROFILE']
+                )
+            )
+        );
+        
+        $new_messages = cmsCore::c('user')->getNewMsg();
+        if ($new_messages['total']) {
+            $items['admin/user_menu']['items']['AD_NEW_MSG'] = array(
+                'class' => 'fa-envelope-o admin_user_menu_nm',
+                'link'  => '/users/'. cmsCore::c('user')->id .'/messages.html',
+                'title' => $_LANG['AD_NEW_MSG'] .' ('. $new_messages['total'] .')'
+            );
+        }
+        
+        $items['admin/exit']['items']['AD_EXIT'] = array(
+            'class' => 'fa-power-off admin_exit',
+            'link'  => '/logout',
+            'title' => $_LANG['AD_EXIT']
+        );
+    }
+    
+    cmsCore::c('page')->initTemplate('special', 'menu')->
+        assign('items', $items)->
+        display();
 }
 
 function cpToolMenu($toolmenu_list, $opt=false, $optname='opt') {
-    $html = '';
-    
     if (!empty($toolmenu_list)) {
         $active_menu = false;
         $active_sub_menu = false;
         
         $opt = cmsCore::request($optname, 'str', $opt);
+        
+        foreach ($toolmenu_list as $key => $toolmenu) {
+            if ($active_menu === false) {
+                if (mb_strstr($toolmenu['link'], $optname .'='. $opt)) {
+                    $active_menu = true;
+                }
+            }
+            
+            if (!empty($toolmenu['items'])) {
+                foreach ($toolmenu['items'] as $k => $item) {
+                    if ($active_menu === false) {
+                        if (mb_strstr($item['link'], $optname .'='. $opt)) {
+                            $active_menu = $active_sub_menu = true;
+                        }
+                    }
+                }
+            }
+        }
         
         $html .= '<nav class="navbar navbar-default" role="navigation"><ul class="nav nav-tabs">';
 
@@ -386,7 +427,7 @@ function cpToolMenu($toolmenu_list, $opt=false, $optname='opt') {
         $html .= '</ul></nav>';
     }
     
-    echo $html;
+    
 
     return;
 }
@@ -394,19 +435,19 @@ function cpToolMenu($toolmenu_list, $opt=false, $optname='opt') {
 function cpProceedBody(){
     ob_start();
     
-    $file = $GLOBALS['applet'] .'.php';
+    $file = cmsAdmin::getApplet() .'.php';
 
-    if (!file_exists(PATH .'/admin/applets/'. $file)){
+    if (!file_exists(PATH .'/admin/applets/'. $file)) {
         cmsCore::error404();
     }
 
-    cmsCore::loadLanguage('admin/applets/applet_'. $GLOBALS['applet']);
+    cmsCore::loadLanguage('admin/applets/applet_'. cmsAdmin::getApplet());
     
     include('applets/'. $file);
 
-    call_user_func('applet_'. $GLOBALS['applet']);
+    call_user_func('applet_'. cmsAdmin::getApplet());
 
-    $GLOBALS['cp_page_body'] = ob_get_clean();
+    cmsCore::c('page')->page_body = ob_get_clean();
 }
 
 function cpBody(){
@@ -415,62 +456,33 @@ function cpBody(){
 }
 
 //////////////////////////////////////////////// PATHWAY ///////////////////////////////////////////////////////
-function cpPathway() {
-    $n = count($GLOBALS['cp_pathway']);
+function cpAddPathway($title, $link){
+    return cmsCore::c('page')->addPathway($title, $link);
+}
 
-    if ($n > 1) { 
-        echo '<ol class="breadcrumb">';
-            foreach($GLOBALS['cp_pathway'] as $k => $path) {
-                echo '<li'. ($k == $n ? ' class="active"' : '') .'><a href="'. $path['link'] .'">'. $path['title'] .'</a></li>';
+function cpModulePositions($template) {
+    $pos = array();
+
+    $posfile = PATH .'/templates/'. $template .'/positions.txt';
+
+    if (file_exists($posfile)) {
+        $file = fopen($posfile, 'r');
+        while (!feof($file)) {
+            $str = fgets($file);
+            $str = str_replace("\n", '', $str);
+            $str = str_replace("\r", '', $str);
+            if (!mb_strstr($str, '#') && mb_strlen($str)>1) {
+                $pos[] = $str;
             }
-        echo '</ol>';
+        }
+        fclose($file);
+        return $pos;
+    } else {
+        return false;
     }
 }
 
-function cpAddPathway($title, $link){
-	$already = false;
-    if (empty($link)) { $link = htmlspecialchars($_SERVER['REQUEST_URI']); }
-
-	foreach($GLOBALS['cp_pathway'] as $key => $val){
-	 if ($GLOBALS['cp_pathway'][$key]['title'] == $title || $GLOBALS['cp_pathway'][$key]['link'] == $link){
-	 	$already = true;
-	 }
-	}
-
-	if(!$already){
-		$next = sizeof($GLOBALS['cp_pathway']);
-		$GLOBALS['cp_pathway'][$next]['title'] = $title;
-		$GLOBALS['cp_pathway'][$next]['link'] = $link;
-	}
-
-	return true;
-}
-
-function cpModulePositions($template){
-
-	$pos = array();
-
-	$posfile = PATH.'/templates/'.$template.'/positions.txt';
-
-	if(file_exists($posfile)){
-		$file = fopen($posfile, 'r');
-		while(!feof($file)){
-			$str = fgets($file);
-			$str = str_replace("\n", '', $str);
-			$str = str_replace("\r", '', $str);
-			if (!mb_strstr($str, '#') && mb_strlen($str)>1){
-				$pos[] = $str;
-			}
-		}
-		fclose($file);
-		return $pos;
-	} else {
-		return false;
-	}
-
-}
-
-function cpAddParam($query, $param, $value){
+function cpAddParam($query, $param, $value) {
     if (is_array($param)) {
         if (is_array($value)) {
             if (count($value) != count($param)) {
@@ -655,7 +667,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
 
     if (cmsCore::c('db')->num_rows($result)) {
         //DRAW LIST TABLE
-        echo '<form name="selform" action="index.php?view='.$GLOBALS['applet'].'&do=saveorder" method="post">';
+        echo '<form name="selform" action="index.php?view='.cmsAdmin::getApplet().'&do=saveorder" method="post">';
             echo '<table class="table table-striped tablesorter">';
                 //TABLE HEADING
                 echo '<thead>'."\n";
@@ -783,7 +795,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                                     if (isset($_fields[$key]['do'])) { $do = 'do=config&id='.(int)$_REQUEST['id'].'&'.$_fields[$key]['do']; } else { $do = 'do'; }
                                     if (isset($_fields[$key]['do_suffix'])) { $dos = $_fields[$key]['do_suffix']; $ids = 'item_id'; } else { $dos = ''; $ids = 'id'; }
                                     echo '<td class="'.$row_class.'" valign="middle">
-                                            <a title="'.$_LANG['AD_DOWN'].'" href="?view='.$GLOBALS['applet'].'&'.$do.'=move_down&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/down.gif" border="0"/></a>';
+                                            <a title="'.$_LANG['AD_DOWN'].'" href="?view='.cmsAdmin::getApplet().'&'.$do.'=move_down&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/down.gif" border="0"/></a>';
                                     if ($table != 'cms_menu' && $table != 'cms_category'){
                                         echo '<input class="lt_input" type="text" size="4" name="ordering[]" value="'.$item['ordering'].'" />';
                                         echo '<input name="ids[]" type="hidden" value="'.$item['id'].'" />';
@@ -791,7 +803,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                                         echo '<input class="lt_input" type="text" size="4" name="ordering[]" value="'.$item['ordering'].'" disabled/>';
                                     }
 
-                                    echo '<a title="'.$_LANG['AD_UP'].'" href="?view='.$GLOBALS['applet'].'&'.$do.'=move_up&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/top.gif" border="0"/></a>'.
+                                    echo '<a title="'.$_LANG['AD_UP'].'" href="?view='.cmsAdmin::getApplet().'&'.$do.'=move_up&co='.$item[$_fields[$key]['field']].'&'.$ids.'='.$item['id'].'"><img src="images/actions/top.gif" border="0"/></a>'.
                                                         '</td>'. "\n";
                                 }
                             }
@@ -834,7 +846,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
         echo '<style>tr#lt_row2{ background:#eeeeee !important; } tr#lt_row1:hover td,tr#lt_row2:hover{ background:#cccccc !important; }</style>';
         echo '<script type="text/javascript">trClickChecked();</script>';
 
-        $link = '?view='. $GLOBALS['applet'];
+        $link = '?view='. cmsAdmin::getApplet();
         
         if ($sort) {
             $link .= '&sort='.$sort;

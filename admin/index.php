@@ -1,13 +1,10 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.5                               //
-//                        http://www.instantcms.ru/                           //
-//                                                                            //
-//                   written by InstantCMS Team, 2007-2014                    //
-//                produced by InstantSoft, (www.instantsoft.ru)               //
-//                                                                            //
-//                        LICENSED BY GNU/GPL v2                              //
+//                             CMS RuDi v0.0.10                               //
+//                            http://cmsrudi.ru/                              //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
+//                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
 
@@ -31,7 +28,9 @@ cmsCore::loadClass('page');
 cmsCore::loadClass('user');
 cmsCore::loadClass('actions');
 
-if (!cmsCore::c('user')->update()) { cmsCore::error404(); }
+if (!cmsCore::c('user')->update()) {
+    cmsCore::error404();
+}
 
 // проверяем доступ по Ip
 if (!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
@@ -40,9 +39,8 @@ cmsCore::loadLanguage('admin/lang');
 global $_LANG;
 
 //-------CHECK AUTHENTICATION--------------------------------------//
-if (!cmsCore::c('user')->is_admin) {
-    include PATH .'/admin/login.php';
-    cmsCore::halt();
+if (!cmsCore::c('user')->is_admin && cmsAdmin::getApplet() != 'login') {
+    cmsCore::redirect('/admin/index.php?view=login');
 }
 
 //--------LOAD ACCESS OPTIONS LIST---------------------------------//
@@ -52,25 +50,11 @@ $adminAccess = cmsUser::getAdminAccess();
 //------------------------------------------------------------------//
 
 cmsCore::c('user')->onlineStats();
-
-$GLOBALS['applet'] = cmsCore::request('view', 'str', 'main');
-if (!preg_match('/^[a-z0-9]+$/i', $GLOBALS['applet'])) { cmsCore::error404(); }
-
-cmsCore::c('page')->setAdminTitle();
-cmsCore::c('page')->addHeadJS('admin/js/common.js');
-cmsCore::c('page')->addHeadJS('includes/jquery/jquery.js');
+cmsCore::c('page')->setTitle();
 
 $GLOBALS['cp_page_title'] = '';
 $GLOBALS['cp_page_head']  = array();
-$GLOBALS['cp_page_body']  = '';
-
-$GLOBALS['cp_pathway'] = array(
-    array(
-        'title' => $_LANG['PATH_HOME'],
-        'link' => '/admin/'
-    )
-);
 
 cpProceedBody();
 
-include(PATH .'/admin/template.php');
+cmsCore::c('page')->showTemplate();

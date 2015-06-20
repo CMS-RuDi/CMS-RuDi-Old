@@ -23,7 +23,7 @@ function applet_tree() {
     
     if (!cmsUser::isAdminCan('admin/content', $adminAccess)) { cpAccessDenied(); }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES']);
+    cmsCore::c('page')->setTitle($_LANG['AD_ARTICLES']);
     cpAddPathway($_LANG['AD_ARTICLES'], 'index.php?view=tree');
 
     cmsCore::c('page')->addHeadJS('admin/js/content.js');

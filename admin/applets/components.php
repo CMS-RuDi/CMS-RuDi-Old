@@ -36,7 +36,7 @@ function applet_components() {
     
     if (!cmsUser::isAdminCan('admin/components', $adminAccess)) { cpAccessDenied(); }
     
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_COMPONENTS']);
+    cmsCore::c('page')->setTitle($_LANG['AD_COMPONENTS']);
     cpAddPathway($_LANG['AD_COMPONENTS'], 'index.php?view=components');
     
     $do = cmsCore::request('do', 'str', 'list');

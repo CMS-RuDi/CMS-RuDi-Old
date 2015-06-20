@@ -1,18 +1,12 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.5                               //
-//                        http://www.instantcms.ru/                           //
-//                                                                            //
-//                   written by InstantCMS Team, 2007-2014                    //
-//                produced by InstantSoft, (www.instantsoft.ru)               //
-//                                                                            //
-//                        LICENSED BY GNU/GPL v2                              //
+//                             CMS RuDi v0.0.10                               //
+//                            http://cmsrudi.ru/                              //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
+//                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
-if(!defined('VALID_CMS_ADMIN')) { die(); }
-
-header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html> 
 <html>

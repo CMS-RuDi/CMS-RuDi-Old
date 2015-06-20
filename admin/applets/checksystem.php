@@ -61,7 +61,7 @@ function applet_checksystem() {
     
     if (!cmsUser::isAdminCan('admin/checksystem', $adminAccess)) { cpAccessDenied(); }
     
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_CHECK_SYSTEM']);
+    cmsCore::c('page')->setTitle($_LANG['AD_CHECK_SYSTEM']);
 
     cpAddPathway($_LANG['AD_CHECK_SYSTEM'], 'index.php?view=checksystem');
 

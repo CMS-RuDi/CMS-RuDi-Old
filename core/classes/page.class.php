@@ -23,6 +23,7 @@ class cmsPage {
     public $page_img   = '';
     public $page_body  = '';
 
+    private $adminka = false;
     private $js  = array();
     private $css = array();
     private $page_lang = array();
@@ -31,13 +32,18 @@ class cmsPage {
 
     private $modules;
     private $tpl_info = array(
-        '_default_' => array( 'author' => 'InstantCMS Team', 'renderer' => 'phpTpl', 'ext' => 'php' )
+        '_default_' => array( 'author' => 'CMS RuDi Team', 'renderer' => 'phpTpl', 'ext' => 'php' ),
+        'admin/_default_' => array( 'author' => 'CMS RuDi Team', 'renderer' => 'phpTpl', 'ext' => 'php' )
     );
-    private $default_tpl_info = array( 'author' => 'InstantCMS Team', 'renderer' => 'smartyTpl', 'ext' => 'tpl' );
+    private $default_tpl_info = array( 'author' => 'CMS RuDi Team', 'renderer' => 'smartyTpl', 'ext' => 'tpl' );
 
     private static $instance;
 
     private function __construct() {
+        if (defined('VALID_CMS_ADMIN')) {
+            $this->adminka = true;
+        }
+        
         $this->site_cfg  = cmsCore::c('config');
         
         $this->title     = $this->homeTitle();
@@ -49,7 +55,7 @@ class cmsPage {
         $this->combineJsCssPrepare();
         
         global $_LANG;
-        $this->addPathway($_LANG['PATH_HOME'], '/');
+        $this->addPathway($_LANG['PATH_HOME'], '/'. ($this->adminka ? 'admin/' : ''));
     }
 
     private function __clone() {}
@@ -67,7 +73,9 @@ class cmsPage {
      * а в нем определенный массив с параметрами шаблона
      */
     public function getTplInfo($tpl=false) {
-        $tpl = empty($tpl) ? cmsCore::c('config')->template : $tpl;
+        if (empty($tpl)) {
+            $tpl = $this->adminka ? cmsCore::c('config')->admin_template : cmsCore::c('config')->template;
+        }
         
         if (!isset($this->tpl_info[$tpl])) {
             $info_file = PATH .'/templates/'. $tpl .'/system.php';
@@ -87,7 +95,7 @@ class cmsPage {
     }
     
     private function combineJsCssPrepare() {
-        if (!defined('VALID_CMS_ADMIN')) {
+        if (!$this->adminka) {
             if ($this->site_cfg->combine_js_enable) {
                 $this->js = explode("\n", $this->site_cfg->combine_js);
                 foreach ($this->js as $k => $src) {
@@ -123,7 +131,7 @@ class cmsPage {
      * @return array
      */
     public function getCurrentTplInfo() {
-        return $this->tpl_info[cmsCore::c('config')->template];
+        return $this->tpl_info[$this->adminka ? cmsCore::c('config')->admin_template : cmsCore::c('config')->template];
     }
 
     /**
@@ -134,21 +142,21 @@ class cmsPage {
         $thisObj = self::getInstance();
 
         // чтобы не перезаписать
-        $tpl_info = $thisObj->tpl_info[cmsCore::c('config')->template];
+        $tpl_info = $thisObj->tpl_info[$thisObj->adminka ? cmsCore::c('config')->admin_template : cmsCore::c('config')->template];
 
         // имя файла без расширения (для совместимости)
         $file_name = pathinfo($tpl_file, PATHINFO_FILENAME);
         
         // есть ли файл в текущем шаблоне
-        $is_exists_tpl_file = file_exists(cmsCore::c('config')->template_dir . $tpl_folder .'/'. $file_name .'.'. $tpl_info['ext']);
+        $is_exists_tpl_file = file_exists(($thisObj->adminka ? cmsCore::c('config')->admin_template_dir : cmsCore::c('config')->template_dir) . $tpl_folder .'/'. $file_name .'.'. $tpl_info['ext']);
 
         // если нет, считаем что файл лежит в дефолтном, используем оригинальное имя с расширением
         // если есть формируем полное имя файла с учетом параметров шаблона
         if (!$is_exists_tpl_file) {
             $tpl_info = $thisObj->tpl_info['_default_'];
-            $tpl_folder = cmsCore::c('config')->default_template_dir . $tpl_folder;
+            $tpl_folder = ($thisObj->adminka ? cmsCore::c('config')->admin_default_template_dir : cmsCore::c('config')->default_template_dir) . $tpl_folder;
         } else {
-            $tpl_folder = cmsCore::c('config')->template_dir . $tpl_folder;
+            $tpl_folder = ($thisObj->adminka ? cmsCore::c('config')->admin_template_dir : cmsCore::c('config')->template_dir) . $tpl_folder;
         }
         $tpl_file = $file_name .'.'. $tpl_info['ext'];
 
@@ -314,12 +322,12 @@ class cmsPage {
     }
     
     /**
-     * Устанавливает заголовок страницы в админке
+     * Устанавливает заголовок страницы
      * @param string
      * @return $this
      */
-    public function setAdminTitle($title='') {
-        if (defined('VALID_CMS_ADMIN')) {
+    public function setTitle($title) {
+        if ($this->adminka) {
             global $_LANG;
             
             $title = strip_tags($title);
@@ -329,21 +337,13 @@ class cmsPage {
             if (!empty($title)) {
                 $this->title = $title .' - '. $this->title ;
             }
-        }
-        return $this;
-    }
-    
-    /**
-     * Устанавливает заголовок страницы
-     * @param string
-     * @return $this
-     */
-    public function setTitle($title) {
-        if (cmsCore::getInstance()->menuId() == 1 || empty($title)) {
-            return $this;
-        }
+        } else {
+            if (cmsCore::getInstance()->menuId() == 1 || empty($title)) {
+                return $this;
+            }
 
-        $this->title = strip_tags($title) . ($this->site_cfg->title_and_sitename ? ' — '. $this->site_cfg->sitename : '');
+            $this->title = strip_tags($title) . ($this->site_cfg->title_and_sitename ? ' — '. $this->site_cfg->sitename : '');
+        }
 
         return $this;
     }
@@ -389,35 +389,43 @@ class cmsPage {
     /**
      * Печатает головную область страницы в админке
      */
-    public function printAdminHead() {
-        if (defined('VALID_CMS_ADMIN')) {
-            self::displayLangJS(array('AD_NO_SELECT_OBJECTS','AD_SWITCH_EDITOR','CANCEL','CONTINUE','CLOSE','ATTENTION'));
-            
-            // Заголовок страницы
-            echo '<title>', htmlspecialchars($this->title), '</title>',"\n";
-
-            // Ключевые слова
-            echo '<meta name="keywords" content="', htmlspecialchars($this->site_cfg->keywords), '" />',"\n";
-
-            // Описание
-            echo '<meta name="description" content="',htmlspecialchars($this->site_cfg->metadesc),'" />',"\n";
-
-            // CSS
-            $this->page_css = cmsCore::callEvent('PRINT_ADMIN_PAGE_CSS', $this->page_css);
-            foreach ($this->page_css as $value) {
-                echo '<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n";
-            }
-
-            // JS
-            $this->page_js = cmsCore::callEvent('PRINT_ADMIN_PAGE_JS', $this->page_js);
-            foreach ($this->page_js as $value) {
-                echo '<script type="text/javascript" src="'. $value .'"></script>',"\n";
-            }
-
-            // Оставшиеся теги
-            $this->page_head = cmsCore::callEvent('PRINT_ADMIN_PAGE_HEAD', $this->page_head);
-            foreach($this->page_head as $value) { echo $value,"\n"; }
+    private function printAdminHead() {
+        /* Костыль скоро будет удален */
+        if (!empty($GLOBALS['cp_page_title'])) {
+            cmsCore::c('page')->setTitle($GLOBALS['cp_page_title']);
         }
+        foreach($GLOBALS['cp_page_head'] as $key=>$value) {
+            cmsCore::c('page')->addHead($value);
+            unset ($GLOBALS['cp_page_head'][$key]);
+        }
+        /******************************/
+        
+        self::displayLangJS(array('AD_NO_SELECT_OBJECTS','AD_SWITCH_EDITOR','CANCEL','CONTINUE','CLOSE','ATTENTION'));
+
+        // Заголовок страницы
+        echo '<title>', htmlspecialchars($this->title), '</title>',"\n";
+
+        // Ключевые слова
+        echo '<meta name="keywords" content="', htmlspecialchars($this->site_cfg->keywords), '" />',"\n";
+
+        // Описание
+        echo '<meta name="description" content="',htmlspecialchars($this->site_cfg->metadesc),'" />',"\n";
+
+        // CSS
+        $this->page_css = cmsCore::callEvent('PRINT_ADMIN_PAGE_CSS', $this->page_css);
+        foreach ($this->page_css as $value) {
+            echo '<link href="'. $value .'" rel="stylesheet" type="text/css" />',"\n";
+        }
+
+        // JS
+        $this->page_js = cmsCore::callEvent('PRINT_ADMIN_PAGE_JS', $this->page_js);
+        foreach ($this->page_js as $value) {
+            echo '<script type="text/javascript" src="'. $value .'"></script>',"\n";
+        }
+
+        // Оставшиеся теги
+        $this->page_head = cmsCore::callEvent('PRINT_ADMIN_PAGE_HEAD', $this->page_head);
+        foreach($this->page_head as $value) { echo $value,"\n"; }
     }
     
     /**
@@ -426,6 +434,10 @@ class cmsPage {
      * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
      */
     public function printHead($full_print=true, $indent=4) {
+        if ($this->adminka) {
+            return $this->printAdminHead();
+        }
+        
         $indent_str = str_repeat(' ', $indent);
         
         $this->addHeadJsLang(array('SEND','CONTINUE','CLOSE','SAVE','CANCEL','ATTENTION','CONFIRM','LOADING','ERROR', 'ADD','SELECT_CITY','SELECT'));
@@ -580,19 +592,23 @@ class cmsPage {
     /**
      * Выводит тело страницы (результат работы компонента)
      */
-    public function printBody(){
-        if (cmsConfig::getConfig('slight')){
-            $searchquery = cmsUser::sessionGet('searchquery');
-            if ($searchquery && cmsCore::getInstance()->component != 'search'){
-                $this->page_body = preg_replace('/('.preg_quote($searchquery).')/iu',
-                    '<strong class="search_match">$1</strong>',
-                    $this->page_body
-                );
-                cmsUser::sessionDel('searchquery');
+    public function printBody() {
+        if (!$this->adminka) {
+            if (cmsConfig::getConfig('slight')) {
+                $searchquery = cmsUser::sessionGet('searchquery');
+                if ($searchquery && cmsCore::getInstance()->component != 'search'){
+                    $this->page_body = preg_replace('/('.preg_quote($searchquery).')/iu',
+                        '<strong class="search_match">$1</strong>',
+                        $this->page_body
+                    );
+                    cmsUser::sessionDel('searchquery');
+                }
             }
-        }
 
-        $this->page_body = cmsCore::callEvent('PRINT_PAGE_BODY', $this->page_body);
+            $this->page_body = cmsCore::callEvent('PRINT_PAGE_BODY', $this->page_body);
+        } else {
+            $this->page_body = cmsCore::callEvent('PRINT_ADMIN_PAGE_BODY', $this->page_body);
+        }
 
         echo $this->page_body;
     }
@@ -643,10 +659,12 @@ class cmsPage {
         }
 
         //Если такого звена еще нет, добавляем его
-        if(!$already){
-            // проверяем нет ли на ссылку пункта меню, если есть, меняем заголовок
-            $title = ($menu_title = cmsCore::getInstance()->getLinkInMenu($link)) ? cmsUser::stringReplaceUserProperties($menu_title, true) : $title;
-            $this->pathway[] = array('title'=>$title, 'link'=>$link);
+        if (!$already) {
+            if (!$this->adminka) {
+                // проверяем нет ли на ссылку пункта меню, если есть, меняем заголовок
+                $title = ($menu_title = cmsCore::getInstance()->getLinkInMenu($link)) ? cmsUser::stringReplaceUserProperties($menu_title, true) : $title;
+            }
+            $this->pathway[] = array('title' => $title, 'link' => $link);
         }
 
         return $this;
@@ -671,12 +689,21 @@ class cmsPage {
 
         global $_LANG;
 
-        if (file_exists(TEMPLATE_DIR. 'template.php')) {
-            require(TEMPLATE_DIR. 'template.php');
-            return;
+        if ($this->adminka) {
+            if (file_exists(cmsCore::c('config')->admin_template_dir .'template.php')) {
+                require(cmsCore::c('config')->admin_template_dir .'template.php');
+                return;
+            }
+            
+            cmsCore::halt($_LANG['TEMPLATE'] .' "'. cmsCore::c('config')->admin_template .'" '. $_LANG['NOT_FOUND']);
+        } else {
+            if (file_exists(cmsCore::c('config')->template_dir .'template.php')) {
+                require(cmsCore::c('config')->template_dir .'template.php');
+                return;
+            }
+            
+            cmsCore::halt($_LANG['TEMPLATE'].' "'. cmsCore::c('config')->template .'" '.$_LANG['NOT_FOUND']);
         }
-
-        cmsCore::halt($_LANG['TEMPLATE'].' "'.TEMPLATE.'" '.$_LANG['NOT_FOUND']);
     }
     
     /**
@@ -695,14 +722,26 @@ class cmsPage {
         extract($data);
         global $_LANG;
 
-        if (file_exists(cmsCore::c('config')->template_dir . $file)) {
-            include(cmsCore::c('config')->template_dir . $file);
-            return true;
-        }
+        if (defined('VALID_CMS_ADMIN')) {
+            if (file_exists(cmsCore::c('config')->admin_template_dir . $file)) {
+                include(cmsCore::c('config')->admin_template_dir . $file);
+                return true;
+            }
 
-        if (file_exists(cmsCore::c('config')->default_template_dir . $file)) {
-            include(cmsCore::c('config')->default_template_dir . $file);
-            return true;
+            if (file_exists(cmsCore::c('config')->admin_default_template_dir . $file)) {
+                include(cmsCore::c('config')->admin_default_template_dir . $file);
+                return true;
+            }
+        } else {
+            if (file_exists(cmsCore::c('config')->template_dir . $file)) {
+                include(cmsCore::c('config')->template_dir . $file);
+                return true;
+            }
+
+            if (file_exists(cmsCore::c('config')->default_template_dir . $file)) {
+                include(cmsCore::c('config')->default_template_dir . $file);
+                return true;
+            }
         }
 
         return false;

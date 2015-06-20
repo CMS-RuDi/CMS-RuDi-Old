@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <?php
 /******************************************************************************/
 //                                                                            //
@@ -31,12 +30,16 @@ cmsCore::c('page')->addHeadJS('admin/js/hltable.js');
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap.min.css');
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap-theme.min.css');
 cmsCore::c('page')->addHeadJS('includes/bootstrap/js/bootstrap.min.js');
+
+cmsCore::c('page')->prependHeadJS('admin/js/common.js');
+cmsCore::c('page')->prependHeadJS('includes/jquery/jquery.js');
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         
-        <?php cpHead(); ?>
+        <?php $this->printHead(); ?>
         
         <style type="text/css">
             .hoverRow { color:#FF3300; background-color:#CFFFFF;}
@@ -57,71 +60,20 @@ cmsCore::c('page')->addHeadJS('includes/bootstrap/js/bootstrap.min.js');
                                 </a>
                             </li>
                         </ul>
+                        
                         <ul class="nav navbar-nav navbar-right">
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                    <i class="fa fa-question-circle"></i>
-                                    <?php echo $_LANG['AD_HELP']; ?>
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a class="fa fa-question" href="http://cmsrudi.ru/docs" target="_blank">
-                                            <?php echo $_LANG['AD_DOCS']; ?>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="fa fa-ticket" href="/admin/index.php?view=tickets" >
-                                            <?php echo $_LANG['AD_TICKETS']; ?>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a class="fa fa-external-link" href="/" target="_blank">
-                                    <?php echo $_LANG['AD_OPEN_SITE']; ?>
-                                </a>
-                            </li>
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                    <i class="fa fa-user"></i>
-                                    <?php echo cmsCore::c('db')->get_field('cms_users', 'id='.cmsCore::c('user')->id, 'nickname'); ?>
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="#" onclick="return false;">
-                                            <i class="fa fa-info-circle"></i>
-                                            IP: <?php echo cmsCore::c('user')->ip; ?>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="<?php echo cmsUser::getProfileURL(cmsCore::c('user')->login); ?>" target="_blank" title="<?php echo $_LANG['AD_GO_PROFILE']; ?>">
-                                            <i class="fa fa-user"></i>
-                                            <?php echo $_LANG['TEMPLATE_MY_PROFILE']; ?>
-                                        </a>
-                                        <?php
-                                            $new_messages = cmsCore::c('user')->getNewMsg();
-                                            if ($new_messages['total']) {
-                                                echo '<a href="/users/'. cmsCore::c('user')->id .'/messages.html" class="fa fa-envelope-o">'. $_LANG['AD_NEW_MSG'] .' ('. $new_messages['total'] .')</a>';
-                                            }
-                                        ?>
-                                    </li>
-                                    <li>
-                                        <a class="fa fa-power-off" href="/logout">
-                                            <?php echo $_LANG['AD_EXIT']; ?>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                            <?php cpMenu('user'); ?>
                         </ul>
                     </nav>
                 </div>
                 
-                <?php
-                    cpMenu();
-                    cpPathway();
-                ?>
+                <nav class="navbar navbar-default navbar-collapse" role="navigation" style="margin-bottom:0;">
+                    <ul class="nav navbar-nav">
+                        <?php cpMenu('main'); ?>
+                    </ul>
+                </nav>
+                
+                <?php $this->printPathway(); ?>
                 
                 <?php $messages = cmsCore::getSessionMessages(true);
                 if ($messages) { ?>
@@ -139,7 +91,7 @@ cmsCore::c('page')->addHeadJS('includes/bootstrap/js/bootstrap.min.js');
                 <?php } ?>
                 
                 <div id="body" style="padding:0px 10px 10px 10px;">
-                    <?php cpBody(); ?>
+                    <?php $this->printBody(); ?>
                 </div>
             </div>
             

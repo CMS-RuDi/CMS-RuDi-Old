@@ -177,7 +177,7 @@ function applet_repairnested() {
         }
     }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_CHECKING_TREES']);
+    cmsCore::c('page')->setTitle($_LANG['AD_CHECKING_TREES']);
 
     cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
     cpAddPathway($_LANG['AD_CHECKING_TREES'], 'index.php?view=repairnested');

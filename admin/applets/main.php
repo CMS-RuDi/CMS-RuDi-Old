@@ -24,7 +24,7 @@ function applet_main() {
     
     global $_LANG;
     
-    cmsCore::c('page')->setAdminTitle($_LANG['PATH_HOME']);
+    cmsCore::c('page')->setTitle($_LANG['PATH_HOME']);
 ?>
 
 <table class="table-condensed" width="100%">

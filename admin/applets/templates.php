@@ -17,7 +17,7 @@ function applet_templates() {
     
     $do = cmsCore::request('do', array('config', 'save_config'), 'main');
     
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_TEMPLATES_SETTING']);
+    cmsCore::c('page')->setTitle($_LANG['AD_TEMPLATES_SETTING']);
     cpAddPathway($_LANG['AD_TEMPLATES_SETTING'], 'index.php?view=templates');
     
     if ($do == 'main') {
@@ -30,6 +30,7 @@ function applet_templates() {
         echo '<th width="200">'. $_LANG['AD_TEMPLATE_EXT'] .'</th><th width="100"></th><th width="100"></th>';
         echo '</tr></thead><tbody>';
         foreach ($templates as $template) {
+            if ($template == 'admin') { continue; }
             $tpl_info = cmsCore::c('page')->getTplInfo($template);
             
             echo '<tr>';

@@ -25,7 +25,7 @@ function applet_modules() {
     global $adminAccess;
     if (!cmsUser::isAdminCan('admin/modules', $adminAccess)) { cpAccessDenied(); }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_MODULES']);
+    cmsCore::c('page')->setTitle($_LANG['AD_MODULES']);
     cpAddPathway($_LANG['AD_MODULES'], 'index.php?view=modules');
     cmsCore::c('page')->addHeadJS('admin/js/modules.js');
 

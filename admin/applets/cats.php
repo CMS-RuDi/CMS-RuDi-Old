@@ -42,7 +42,7 @@ function applet_cats() {
 
     global $_LANG;
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES']);
+    cmsCore::c('page')->setTitle($_LANG['AD_ARTICLES']);
     cpAddPathway($_LANG['AD_ARTICLES'], 'index.php?view=tree');
 
     $do = cmsCore::request('do', 'str', 'add');

@@ -22,7 +22,7 @@ function applet_cron() {
     
     if (!cmsUser::isAdminCan('admin/config', $adminAccess)) { cpAccessDenied(); }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_CRON_MISSION']);
+    cmsCore::c('page')->setTitle($_LANG['AD_CRON_MISSION']);
     cpAddPathway($_LANG['AD_SITE_SETTING'], 'index.php?view=config');
     cpAddPathway($_LANG['AD_CRON_MISSION'], 'index.php?view=cron');
 

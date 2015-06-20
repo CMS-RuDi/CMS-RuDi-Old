@@ -21,7 +21,7 @@ function applet_userbanlist() {
     
     if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_BANLIST']);
+    cmsCore::c('page')->setTitle($_LANG['AD_BANLIST']);
     cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
     cpAddPathway($_LANG['AD_BANLIST'], 'index.php?view=userbanlist');
 

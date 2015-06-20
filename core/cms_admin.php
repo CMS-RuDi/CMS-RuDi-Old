@@ -14,12 +14,29 @@
 if(!defined('VALID_CMS')) { die('ACCESS DENIED'); }
 
 class cmsAdmin extends cmsCore {
-
+    private static $applet;
+    
     protected function __construct($install_mode=false) {
         parent::__construct($install_mode);
+        
+        if (self::inRequest('default_template')) {
+            self::c('config')->admin_template = 'admin/_default_';
+        }
+        
+        self::c('config')->admin_template_dir = PATH .'/templates/'. self::c('config')->admin_template .'/';
+        self::c('config')->admin_default_template_dir = PATH .'/templates/admin/_default_/';
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static function getApplet() {
+        if (empty(self::$applet)) {
+            self::$applet = self::request('view', 'str', 'main');
+            if (!preg_match('/^[a-z0-9_]+$/i', self::$applet)) {
+                self::error404();
+            }
+        }
+        return self::$applet;
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Устанавливает плагин и делает его привязку к событиям

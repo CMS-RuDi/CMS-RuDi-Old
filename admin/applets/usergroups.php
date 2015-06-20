@@ -23,7 +23,7 @@ function applet_usergroups() {
     global $adminAccess;
     if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_USERS_GROUP']);
+    cmsCore::c('page')->setTitle($_LANG['AD_USERS_GROUP']);
     cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
     cpAddPathway($_LANG['AD_USERS_GROUP'], 'index.php?view=usergroups');
 

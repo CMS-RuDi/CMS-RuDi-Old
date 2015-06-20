@@ -18,7 +18,7 @@ function applet_plugins() {
     
     $inCore = cmsCore::getInstance();
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_PLUGINS']);
+    cmsCore::c('page')->setTitle($_LANG['AD_PLUGINS']);
     cpAddPathway($_LANG['AD_PLUGINS'], 'index.php?view=plugins');
     
     global $adminAccess;
@@ -132,7 +132,7 @@ function applet_plugins() {
         
         $plugin_cfg_fields = $plugin->getConfigFields();
 
-        cmsCore::c('page')->setAdminTitle($plugin->info['title']);
+        cmsCore::c('page')->setTitle($plugin->info['title']);
         cpAddPathway($plugin->info['title'], 'index.php?view=plugins&do=config&id='. $id);
 
         echo '<fieldset style="width:610px;"><legend>'. $plugin->info['title'] .'</legend>';

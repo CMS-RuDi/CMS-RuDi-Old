@@ -75,6 +75,7 @@ class cmsConfig {
             'sitemail'           => '',
             'sitemail_name'      => '',
             'wmark'              => 'watermark.png',
+            'admin_template'     => 'admin/_default_',
             'template'           => '_default_',
             'combine_js_enable'  => 0,
             'combine_js'         => '',

@@ -55,7 +55,7 @@ function applet_users() {
     global $adminAccess;
     if (!cmsUser::isAdminCan('admin/users', $adminAccess)) { cpAccessDenied(); }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_USERS']);
+    cmsCore::c('page')->setTitle($_LANG['AD_USERS']);
     cpAddPathway($_LANG['AD_USERS'], 'index.php?view=users');
 
     $do = cmsCore::request('do', 'str', 'list');

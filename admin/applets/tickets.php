@@ -96,7 +96,7 @@ function applet_tickets() {
 
     cpToolMenu($toolmenu, 'list', 'do');
     
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_TICKETS']);
+    cmsCore::c('page')->setTitle($_LANG['AD_TICKETS']);
     cpAddPathway($_LANG['AD_TICKETS'], 'index.php?view=tickets');
     
     if ($do == 'list') {

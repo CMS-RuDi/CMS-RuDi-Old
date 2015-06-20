@@ -18,7 +18,7 @@ function applet_arhive() {
     
     global $_LANG;
     
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_ARTICLES_ARCHIVE']);
+    cmsCore::c('page')->setTitle($_LANG['AD_ARTICLES_ARCHIVE']);
     
     $cfg = $inCore->loadComponentConfig('content');
     $cfg_arhive = $inCore->loadComponentConfig('arhive');

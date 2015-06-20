@@ -96,7 +96,7 @@ function applet_menu() {
 
     if (!cmsUser::isAdminCan('admin/menu', $adminAccess)) { cpAccessDenied(); }
 
-    cmsCore::c('page')->setAdminTitle($_LANG['AD_MENU']);
+    cmsCore::c('page')->setTitle($_LANG['AD_MENU']);
     cpAddPathway($_LANG['AD_MENU'], 'index.php?view=menu');
 
     $do = cmsCore::request('do', 'str', 'list');
@@ -346,7 +346,7 @@ function applet_menu() {
     }
 
     if ($do == 'addmenu') {
-        cmsCore::c('page')->setAdminTitle($_LANG['AD_MENU_ADD']);
+        cmsCore::c('page')->setTitle($_LANG['AD_MENU_ADD']);
         cpAddPathway($_LANG['AD_MENU_ADD']);
 
         $menu_list = cpGetList('menu');
@@ -672,6 +672,7 @@ function applet_menu() {
                                 <?php
                                 $templates = cmsCore::getDirsList('/templates');
                                 foreach ($templates as $template) {
+                                    if ($template == 'admin') { continue; }
                                     echo '<option value="'. $template .'" '.(cmsCore::getArrVal($mod, 'template') ? 'selected="selected"': '').'>'.$template.'</option>';
                                 }
                                 ?>

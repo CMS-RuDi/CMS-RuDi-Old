@@ -5,6 +5,7 @@
 //                            http://cmsrudi.ru/                              //
 //              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
 //                  Данный код защищен авторскими правами                     //
+//                          LICENSED BY GNU/GPL v2                            //
 //                                                                            //
 /******************************************************************************/
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }

@@ -725,6 +725,15 @@ div.filter {
     margin-left: 10px;
 }
 
+.filterform input, .filterform select {
+    margin-right: 10px;
+    margin-left: 5px;
+}
+
+form.selform table.tablesorter tr:hover{
+    background:#cccccc !important;
+}
+
 .main_menu_icon{
     width: 14px;
     height: 14px;

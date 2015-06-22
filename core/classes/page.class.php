@@ -620,15 +620,21 @@ class cmsPage {
     public function printPathway($separator='&rarr;') {
         $inCore = cmsCore::getInstance();
 
-        //Проверяем, на главной мы или нет
-        if (($inCore->menuId()==1 && !$this->site_cfg->index_pw) || !$this->site_cfg->show_pw) { return false; }
+        if (!$this->adminka) {
+            //Проверяем, на главной мы или нет
+            if (($inCore->menuId() == 1 && !$this->site_cfg->index_pw) || !$this->site_cfg->show_pw) {
+                return false;
+            }
+        }
 
         $count = count($this->pathway);
 
-        if (!$this->site_cfg->last_item_pw){
-            unset($this->pathway[$count-1]); $count --;
-        } elseif ($this->site_cfg->last_item_pw == 2) {
-            $this->pathway[$count-1]['is_last'] = true;
+        if (!$this->adminka) {
+            if (!$this->site_cfg->last_item_pw) {
+                unset($this->pathway[$count-1]); $count --;
+            } else if ($this->site_cfg->last_item_pw == 2) {
+                $this->pathway[$count-1]['is_last'] = true;
+            }
         }
 
         if ($this->pathway){

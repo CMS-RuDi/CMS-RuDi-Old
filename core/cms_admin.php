@@ -707,19 +707,19 @@ class cmsAdmin extends cmsCore {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static function getModuleTemplates() {
-        $tpl_dir = is_dir(TEMPLATE_DIR.'modules') ? TEMPLATE_DIR.'modules' : PATH.'/templates/_default_/modules';
+        $tpl_dir = is_dir(TEMPLATE_DIR . 'modules') ? TEMPLATE_DIR . 'modules' : PATH .'/templates/_default_/modules';
         $pdir    = opendir($tpl_dir);
 
         $templates  = array();
 
         while ($nextfile = readdir($pdir)){
             if (
-                    ($nextfile != '.')  &&
-                    ($nextfile != '..') &&
-                    !is_dir($tpl_dir.'/'.$nextfile) &&
-                    ($nextfile!='.svn') &&
-                    (mb_substr($nextfile, 0, 6)=='module')
-               ) {
+                ($nextfile != '.')  &&
+                ($nextfile != '..') &&
+                !is_dir($tpl_dir.'/'.$nextfile) &&
+                ($nextfile!='.svn') &&
+                (mb_substr($nextfile, 0, 6)=='module')
+           ) {
                 $templates[$nextfile] = $nextfile;
             }
         }

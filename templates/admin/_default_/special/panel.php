@@ -10,7 +10,7 @@
                         <select id="ins" style="width:99%" class="form-control" name="ins" onChange="showIns()">
                             <option value="frm" selected="selected"><?php echo $_LANG['AD_FORM']; ?></option>
                             <option value="include"><?php echo $_LANG['FILE']; ?></option>
-                            <option value="filelink"><?php echo $_LANG['AD_LINK_DOWNLOAD_FILE']; ?></option>';
+                            <option value="filelink"><?php echo $_LANG['AD_LINK_DOWNLOAD_FILE']; ?></option>
                             <?php if ($bannersInstalled) { ?>
                                 <option value="banpos"><?php echo $_LANG['AD_BANNER_POSITION']; ?></option>
                             <?php } ?>
@@ -54,7 +54,7 @@
                     <td width="100">
                         <input type="button" class="btn btn-default" style="width:100px" value="<?php echo $_LANG['AD_INSERT']; ?>" onClick="insertTag(document.addform.ins.options[document.addform.ins.selectedIndex].value)" />
                     </td>
-                </tr>';
+                </tr>
                 <?php if ($bannersInstalled) { ?>
                 <tr id="banpos">
                     <td width="120">

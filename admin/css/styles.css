@@ -267,7 +267,7 @@ table {
     margin-left:2px;
     margin-bottom:8px;
 }
-#menutype {
+.menutype {
     padding-left:16px;
     background:url(../images/icons/site.png) no-repeat;
 }

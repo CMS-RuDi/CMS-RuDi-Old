@@ -3,7 +3,7 @@
 define('PATH', $_SERVER['DOCUMENT_ROOT']);
 include(PATH.'/core/ajax/ajax_core.php');
 
-if (!$inUser->is_admin) { cmsCore::halt(); }
+if (!$inUser->is_admin) { cmsCore::halt($_LANG['ACCESS_DENIED']); }
 
 cmsCore::c('actions')->showTargets(true);
 

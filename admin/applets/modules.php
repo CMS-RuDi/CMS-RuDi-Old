@@ -52,8 +52,6 @@ function applet_modules() {
         cpAddPathway($module_title, '?view=modules&do=edit&id='. $id);
         cpAddPathway($_LANG['AD_SETTINGS']);
 
-        echo '<h3>'. $module_title .'</h3>';
-        
         $toolmenu = array(
             array( 'icon' => 'save.gif', 'title' => $_LANG['SAVE'], 'link' => 'javascript:submitModuleConfig();' ),
             array( 'icon' => 'cancel.gif', 'title' => $_LANG['CANCEL'], 'link' => 'index.php?view=modules' ),
@@ -61,40 +59,20 @@ function applet_modules() {
         );
 
         cpToolMenu($toolmenu);
-?>
-        <form action="index.php?view=modules&do=save_auto_config&id=<?php echo $id; ?>" method="post" name="optform" target="_self" id="optform">
-            <div class="panel panel-default" style="width:650px;">
-                <div class="panel-body">
-<?php
+        
+        $tpl = cmsCore::c('page')->initTemplate('applets', 'modules_config')->
+            assign('module_title', $module_title)->
+            assign('id', $id);
+        
         if (file_exists($xml_file)) {
             cmsCore::loadClass('formgen');
             $formGen = new cmsFormGen($xml_file, $cfg);
-            echo $formGen->getHTML();
+            $tpl->assign('formGenHtml', $formGen->getHTML());
         } else {
-?>
-                    <div class="form-group">
-                        <label class="col-sm-5 control-label"><?php echo $_LANG['AD_MODULE_TEMPLATE']; ?></label>
-                        <div class="col-sm-7">
-                            <input type="text" class="form-control" value="<?php echo $cfg['tpl']; ?>" />
-                        </div>
-                    </div>
-<?php
+            $tpl->assign('cfg', $cfg);
         }
-?>
-                </div>
-                <div class="panel-footer">
-                    <input type="submit" name="save" class="btn btn-primary" value="<?php echo $_LANG['SAVE']; ?>" />
-                </div>
-            </div>
-        <script type="text/javascript">
-            function submitModuleConfig(){
-                $('#optform').submit();
-            }
-        </script>
-        </form>
-<?php
-
-        return;
+        
+        $tpl->display();
     }
 
     if ($do == 'save_auto_config') {
@@ -455,8 +433,6 @@ function applet_modules() {
     }
 
     if ($do == 'add' || $do == 'edit') {
-        $langs = cmsCore::getDirsList('/languages');
-        
         if ($do == 'add') {
             cpAddPathway($_LANG['AD_MODULE_ADD']);
             echo '<h3>'. $_LANG['AD_MODULE_ADD'] .'</h3>';
@@ -515,357 +491,63 @@ function applet_modules() {
         }
 
         cpToolMenu($toolmenu);
-?>
-    <form id="addform" name="addform" method="post" action="index.php">
-        <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
-        <input type="hidden" name="view" value="modules" />
+        
+        $bind     = array();
+        $bind_pos = array();
+        $cache = 0;
+        
+        if ($do == 'edit') {
+            $bind_sql = "SELECT * FROM cms_modules_bind WHERE module_id = ". $mod['id'] ." AND tpl = '". cmsCore::c('config')->template ."'";
+            
+            $bind_res = cmsCore::c('db')->query($bind_sql);
+            
+            while ($r = cmsCore::c('db')->fetch_assoc($bind_res)) {
+                $bind[] = $r['menu_id'];
+                $bind_pos[$r['menu_id']] = $r['position'];
+            }
+            
+            $cache = cmsCore::c('cache')->get('modules', $mod['id'], $mod['content'], array(cmsCore::getArrVal($mod, 'cachetime', 1), cmsCore::getArrVal($mod, 'cacheint', 'MINUTES')));
+        }
+        
+        $menu_sql = "SELECT * FROM cms_menu ORDER BY NSLeft, ordering";
+        $menu_res = cmsCore::c('db')->query($menu_sql) ;
 
-        <table class="table">
-            <tr><td>
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_MODULE_TITLE']; ?> (<input type="checkbox" class="uittip" title="<?php echo $_LANG['AD_VIEW_TITLE'];?>" name="showtitle" <?php if ($mod['showtitle'] || $do == 'add') { echo 'checked="checked"'; } ?> value="1" />)</label>
-                            <input type="text" id="title" class="form-control" style="width:100%" name="title" value="<?php echo htmlspecialchars($mod['title']);?>" />
-                            <div class="help-block"><?php echo $_LANG['AD_VIEW_IN_SITE']; ?></div>
-                        </div>
-                        
-                        <?php if (count($langs) > 1) { ?>
-                            <label><?php echo $_LANG['AD_LANG_TITLES']; ?></label>
-                            <?php foreach ($langs as $lang) { ?>
-                                <div>
-                                    <strong><?php echo $lang; ?>:</strong>
-                                    <input name="titles[<?php echo $lang; ?>]" type="text" style="width:97%" value="<?php echo htmlspecialchars($mod['titles'][$lang]); ?>" placeholder="<?php echo $_LANG['AD_HINT_DEFAULT']; ?>" />
-                                </div>
-                            <?php } ?>
-                            <div class="help-block"><?php echo $_LANG['AD_LANG_TITLES_HINT']; ?></div>
-                        <?php } ?> 
-                        
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_MODULE_NAME']; ?></label>
-                            <?php if (!isset($mod['user']) || @$mod['user'] == 1) { ?>
-                                <input type="text" id="name" class="form-control" style="width:99%" name="name" value="<?php echo htmlspecialchars($mod['name']);?>" />
-                            <?php } else { ?>
-                                <input type="text" id="name" class="form-control" style="width:99%" name="" value="<?php echo @$mod['name'];?>" disabled="disabled" />
-                                <input type="hidden" name="name" value="<?php echo htmlspecialchars($mod['name']);?>" />
-                            <?php } ?>
-                            <div class="help-block"><?php echo $_LANG['AD_SHOW_ADMIN']; ?></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_PREFIX_CSS']; ?></label>
-                            <input type="text" id="css_prefix" class="form-control" style="width:154px" name="css_prefix" value="<?php echo @$mod['css_prefix'];?>" />
-                        </div>
-                        
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_DEFOLT_VIEW']; ?></label>
-                            <?php
-                                $pos = cpModulePositions(cmsConfig::getConfig('template'));
-                            ?>
-                            
-                            <select id="position" class="form-control" style="width:100%" name="position">
-                                <?php
-                                    if ($pos){
-                                        foreach($pos as $key=>$position) {
-                                            if (@$mod['position']==$position) {
-                                                echo '<option value="'.$position.'" selected>'.$position.'</option>';
-                                            } else {
-                                                echo '<option value="'.$position.'">'.$position.'</option>';
-                                            }
-                                        }
-                                    }
-                                ?>
-                            </select>
-                            
-                            <div class="help-block">
-                                <?php echo $_LANG['AD_POSITION_MUST_BE']; ?>
-                                <?php if (file_exists(PATH .'/templates/'. cmsCore::c('config')->template .'/positions.jpg')) { ?>
-                                    <a href="#myModal" role="button" class="btn btn-sm btn-default" data-toggle="modal"><?php echo $_LANG['AD_SEE_VISUALLY']; ?></a>
-                                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                                    <h4 class="modal-title" id="myModalLabel"><?php echo $_LANG['AD_TPL_POS']; ?></h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <img src="/templates/<?php echo cmsCore::c('config')->template; ?>/positions.jpg" alt="<?php echo $_LANG['AD_TPL_POS']; ?>" style="width:100%;height:auto;" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php } ?>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_MODULE_TEMPLATE']; ?></label>
-                            <?php
-                                $tpls = cmsAdmin::getModuleTemplates();
-                            ?>
-                            <select id="template" class="form-control" style="width:100%" name="template">
-                                <?php
-                                    foreach ($tpls as $tpl) {
-                                        $selected = ($mod['template'] == $tpl || (!$mod['template'] && $tpl == 'module' )) ? 'selected="selected"' : '';
-                                        echo '<option value="'. $tpl .'" '. $selected .'>'. $tpl .'</option>';
-                                    }
-                                ?>
-                            </select>
-                            <div class="help-block"><?php echo $_LANG['AD_FOLDER_MODULES'];?></div>
-                        </div>
-                        
-                        <?php if ($do == 'add') { ?>
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_MODULE_TYPE']; ?></label>
-                            <select id="operate" class="form-control" style="width:100%" name="operate" onchange="checkDiv()" >
-                                <option value="user" selected="selected"><?php echo $_LANG['AD_MODULE_TYPE_NEW'];?></option>
-                                <option value="clone"><?php echo $_LANG['AD_MODULE_TYPE_COPY'];?></option>
-                            </select>
-                        </div>
-                        <?php } ?>
-                        
-                        <?php if (!isset($mod['user']) || $mod['user'] == 1 || $do == 'add') { ?>
-                        <div id="user_div" class="form-group">
-                            <label><?php echo $_LANG['AD_MODULE_CONTENT']; ?></label>
-                            <div><?php insertPanel(); ?></div>
-                            <div><?php $inCore->insertEditor('content', $mod['content'], '250', '100%'); ?></div>
-                        </div>
-                        <?php } ?>
-                        
-                        <div id="clone_div" class="form-group" style="display:none;">
-                            <label><?php echo $_LANG['AD_MODULE_COPY']; ?></label>
-                            <select id="clone_id" class="form-control" style="width:100%" name="clone_id">
-                                <?php
-                                    echo $inCore->getListItems('cms_modules');
-                                ?>
-                            </select>
-                            <label>
-                                <input type="checkbox" name="del_orig" value="1" />
-                                <?php echo $_LANG['AD_ORIGINAL_MODULE_DELETE'];?>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </td>
+        $menu_items = array();
 
-            <!-- боковая ячейка -->
-            <td width="400" valign="top">
-                <div class="uitabs">
-                    <ul id="tabs">
-                        <li><a href="#upr_publish"><span><?php echo $_LANG['AD_TAB_PUBLISH']; ?></span></a></li>
-                        
-                        <?php if ((($mod['is_external'] && $do == 'edit') || $do == 'add') && cmsCore::c('config')->cache) { ?>
-                        <li><a href="#upr_cache"><span><?php echo $_LANG['AD_MODULE_CACHE']; ?></span></a></li>
-                        <?php } ?>
-                        
-                        <li><a href="#upr_access"><span><?php echo $_LANG['AD_TAB_ACCESS']; ?></span></a></li>
-                    </ul>
-                    
-                    <div id="upr_publish">
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="published" id="published" value="1" <?php if ($mod['published'] || $do=='add') { echo 'checked="checked"'; } ?> />
-                                <?php echo $_LANG['AD_MODULE_PUBLIC'];?>
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <input name="show_all" id="show_all" type="checkbox" value="1"  onclick="checkGroupList()" <?php if ($show_all) { echo 'checked="checked"'; } ?> />
-                                <?php echo $_LANG['AD_VIEW_ALL_PAGES'];?>
-                            </label>
-                        </div>
-                        
-                        <?php
-                            if ($do == 'edit') {
-                                $bind_sql = "SELECT * FROM cms_modules_bind WHERE module_id = ". $mod['id'] ." AND tpl = '". cmsConfig::getConfig('template') ."'";
-                                $bind_res = cmsCore::c('db')->query($bind_sql);
-                                $bind     = array();
-                                $bind_pos = array();
-                                while ($r = cmsCore::c('db')->fetch_assoc($bind_res)) {
-                                    $bind[] = $r['menu_id'];
-                                    $bind_pos[$r['menu_id']] = $r['position'];
-                                }
-                            }
-
-                            $menu_sql = "SELECT * FROM cms_menu ORDER BY NSLeft, ordering";
-                            $menu_res = cmsCore::c('db')->query($menu_sql) ;
-
-                            $menu_items = array();
-
-                            if (cmsCore::c('db')->num_rows($menu_res)) {
-                                while ($item = cmsCore::c('db')->fetch_assoc($menu_res)) {
-                                    if ($do == 'edit') {
-                                        if (in_array($item['id'], $bind)) {
-                                            $item['selected'] = true;
-                                            $item['position'] = $bind_pos[$item['id']];
-                                        }
-                                    }
-                                    
-                                    $item['titles'] = cmsCore::yamlToArray($item['titles']);
-                                    // переопределяем название пункта меню в зависимости от языка
-                                    if (!empty($item['titles'][cmsCore::c('config')->lang])) {
-                                        $item['title'] = $item['titles'][cmsCore::c('config')->lang];
-                                    }
-                                    
-                                    $item['title'] = str_replace($_LANG['AD_ROOT_PAGES'], $_LANG['AD_MAIN'], $item['title']);
-                                    $menu_items[] = $item;
-                                }
-                            }
-                        ?>
-                        
-                        <div id="grp" class="form-group">
-                            <label>
-                                <span class="show_list"><?php echo $_LANG['AD_WHERE_MODULE_VIEW'];?></span>
-                                <span class="hide_list"><?php echo $_LANG['AD_WHERE_MODULE_NOT_VIEW'];?></span>
-                            </label>
-                            <div style="height:400px;overflow: auto;border: solid 1px #999; padding:5px 10px; background: #FFF;">
-                                <table class="table">
-                                    <tr>
-                                        <td colspan="2" height="25"><strong><?php echo $_LANG['AD_MENU'];?></strong></td>
-                                        <td class="show_list" align="center" width="50"><strong><?php echo $_LANG['AD_POSITION'];?></strong></td>
-                                    </tr>
-                                    <?php foreach($menu_items as $i) { ?>
-                                    <tr class="show_list">
-                                        <td width="20" height="25">
-                                            <input type="checkbox" name="showin[]" id="mid<?php echo $i['id']; ?>" value="<?php echo $i['id']; ?>" <?php if ($i['selected']){ ?>checked="checked"<?php } ?> onclick="$('#p<?php echo $i['id']; ?>').toggle()"/>
-                                        </td>
-                                        <td style="padding-left:<?php echo ($i['NSLevel'])*6-6; ?>px"><label for="mid<?php echo $i['id']; ?>"><?php echo $i['title']; ?></label></td>
-                                        <td align="center">
-                                            <select id="p<?php echo $i['id']; ?>" name="showpos[<?php echo $i['id']; ?>]" style="<?php if (!$i['selected']) { ?>display:none<?php } ?>">
-                                                <?php foreach($pos as $position){ ?>
-                                                    <option value="<?php echo $position; ?>" <?php if ($i['position']==$position){ ?>selected="selected"<?php } ?>><?php echo $position; ?></option>
-                                                <?php } ?>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <?php } ?>
-                                    <?php foreach($menu_items as $it) { ?>
-                                    <tr class="hide_list">
-                                        <td width="20" height="25">
-                                            <input type="checkbox" name="hidden_menu_ids[]" id="hmid<?php echo $it['id']; ?>" value="<?php echo $it['id']; ?>" <?php if (in_array($it['id'], $mod['hidden_menu_ids'])){ ?>checked="checked"<?php } ?> />
-                                        </td>
-                                        <td style="padding-left:<?php echo ($it['NSLevel'])*6-6; ?>px"><label for="hmid<?php echo $it['id']; ?>"><?php echo $it['title']; ?></label></td>
-                                    </tr>
-                                    <?php } ?>
-                                </table>
-                            </div>
-                            <label class="show_list">
-                                <input type="checkbox" name="is_strict_bind" id="is_strict_bind" value="1" <?php if ($mod['is_strict_bind']) { echo 'checked="checked"'; } ?> />
-                                <?php echo $_LANG['AD_DONT_VIEW']; ?>
-                            </label>
-                            <label class="hide_list">
-                                <input type="checkbox" name="is_strict_bind_hidden" id="is_strict_bind_hidden" value="1" <?php if ($mod['is_strict_bind_hidden']) { echo 'checked="checked"'; } ?> />
-                                <?php echo $_LANG['AD_EXCEPT_NESTED']; ?>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <?php if ((($mod['is_external'] && $do == 'edit') || $do == 'add') && cmsCore::c('config')->cache) { ?>
-                    <div id="upr_cache">
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_DO_MODULE_CACHE']; ?></label>
-                            <select id="cache" class="form-control" style="width:100%" name="cache">
-                                <option value="0" <?php if (!cmsCore::getArrVal($mod, 'cache')) { echo 'selected="selected"'; } ?>><?php echo $_LANG['NO']; ?></option>
-                                <option value="1" <?php if (cmsCore::getArrVal($mod, 'cache')) { echo 'selected="selected"'; } ?>><?php echo $_LANG['YES']; ?></option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_MODULE_CACHE_PERIOD']; ?></label>
-                            <table class="table">
-                                <tr>
-                                    <td valign="top"  width="100">
-                                        <input id="int_1" class="form-control" style="width:99%" name="cachetime" type="text" value="<?php echo cmsCore::getArrVal($mod, 'cachetime', 0); ?>"/>
-                                    </td>
-                                    <td valign="top" style="padding-left:5px">
-                                        <select id="int_2" class="form-control" style="width:100%" name="cacheint">
-                                            <option value="MINUTE"  <?php if(mb_strstr(cmsCore::getArrVal($mod, 'cacheint', 'MINUTES'), 'MINUTE')) { echo 'selected="selected"'; } ?>><?php echo cmsCore::spellCount(cmsCore::getArrVal($mod, 'cachetime', 0), $_LANG['MINUTE1'], $_LANG['MINUTE2'], $_LANG['MINUTE10'], false); ?></option>
-                                            <option value="HOUR"  <?php if(mb_strstr(cmsCore::getArrVal($mod, 'cacheint', 'MINUTES'), 'HOUR')) { echo 'selected="selected"'; } ?>><?php echo cmsCore::spellCount(cmsCore::getArrVal($mod, 'cachetime', 0), $_LANG['HOUR1'], $_LANG['HOUR2'], $_LANG['HOUR10'], false); ?></option>
-                                            <option value="DAY" <?php if(mb_strstr(cmsCore::getArrVal($mod, 'cacheint', 'MINUTES'), 'DAY')) { echo 'selected="selected"'; } ?>><?php echo cmsCore::spellCount(cmsCore::getArrVal($mod, 'cachetime', 0), $_LANG['DAY1'], $_LANG['DAY2'], $_LANG['DAY10'], false); ?></option>
-                                            <option value="MONTH" <?php if(mb_strstr(cmsCore::getArrVal($mod, 'cacheint', 'MINUTES'), 'MONTH')) { echo 'selected="selected"'; } ?>><?php echo cmsCore::spellCount(cmsCore::getArrVal($mod, 'cachetime', 0), $_LANG['MONTH1'], $_LANG['MONTH2'], $_LANG['MONTH10'], false); ?></option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </table>
-                            <div style="margin-top:15px">
-                                <?php
-                                    if ($do == 'edit') {
-                                        $cache = cmsCore::c('cache')->get('modules', $mod['id'], $mod['content'], array(cmsCore::getArrVal($mod, 'cachetime', 1), cmsCore::getArrVal($mod, 'cacheint', 'MINUTES')));
-                                        
-                                        if (!empty($cache)){
-                                            $kb = round(mb_strlen($cache)/1024, 2);
-                                            unset($cache);
-                                            echo '<a href="index.php?view=cache&component=modules&target='. $mod['content'] .'&target_id='. $mod['id'] .'">'. $_LANG['AD_MODULE_CACHE_DELETE'] .'</a> ('. $kb . $_LANG['SIZE_KB'] .')';
-                                        } else {
-                                            echo '<span style="color:gray">'. $_LANG['AD_NO_CACHE'] .'</span>';
-                                        }
-                                    }
-                                ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?php } ?>
-                    
-                    <div id="upr_access">
-                        <div class="form-group">
-                            <?php
-                                $groups = cmsUser::getGroups();
-                                $style  = 'disabled="disabled"';
-                                $public = 'checked="checked"';
-
-                                if ($do == 'edit') {
-                                    if ($mod['access_list']) {
-                                        $public = '';
-                                        $style  = '';
-                                        $access_list = $inCore->yamlToArray($mod['access_list']);
-                                    }
-                                }
-                            ?>
-                            <label>
-                                <input name="is_public" type="checkbox" id="is_public" onclick="checkAccesList()" value="1" <?php echo $public; ?> />
-                                <?php echo $_LANG['AD_SHARE']; ?>
-                            </label>
-                            <div class="help-block"><?php echo $_LANG['AD_IF_CHECKED']; ?></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_GROUPS_VIEW']; ?></label>
-                            <?php
-                                echo '<select style="width: 99%" name="allow_group[]" id="allow_group" size="6" multiple="multiple" '.$style.'>';
-
-                                if ($groups) {
-                                    foreach($groups as $group) {
-                                        echo '<option value="'.$group['id'].'"';
-                                        if ($do == 'edit' && $mod['access_list']) {
-                                            if (in_array($group['id'], $access_list)) {
-                                                echo 'selected="selected"';
-                                            }
-                                        }
-
-                                        echo '>';
-                                        echo $group['title'].'</option>';
-                                    }
-                                }
-
-                                echo '</select>';
-                            ?>
-                            <div class="help-block"><?php echo $_LANG['AD_SELECT_MULTIPLE_CTRL']; ?></div>
-                        </div>
-                    </div>
-                </div>
-            </td></tr>
-        </table>
-        <p>
-            <input type="submit" id="add_mod" class="btn btn-primary" name="add_mod" value="<?php echo $_LANG['SAVE']; ?>" />
-            <input type="button" id="back" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.history.back();" />
-            <input type="hidden" id="do" name="do" <?php if ($do == 'add') { echo 'value="submit"'; } else { echo 'value="update"'; } ?> />
-            <?php
+        if (cmsCore::c('db')->num_rows($menu_res)) {
+            while ($item = cmsCore::c('db')->fetch_assoc($menu_res)) {
                 if ($do == 'edit') {
-                    echo '<input name="id" type="hidden" value="'. $mod['id'] .'" />';
+                    if (in_array($item['id'], $bind)) {
+                        $item['selected'] = true;
+                        $item['position'] = $bind_pos[$item['id']];
+                    }
                 }
-            ?>
-        </p>
-    </form>
-<?php
+
+                $item['titles'] = cmsCore::yamlToArray($item['titles']);
+                // переопределяем название пункта меню в зависимости от языка
+                if (!empty($item['titles'][cmsCore::c('config')->lang])) {
+                    $item['title'] = $item['titles'][cmsCore::c('config')->lang];
+                }
+
+                $item['title'] = str_replace($_LANG['AD_ROOT_PAGES'], $_LANG['AD_MAIN'], $item['title']);
+                $menu_items[] = $item;
+            }
+        }
+        
+        
+        cmsCore::c('page')->initTemplate('applets', 'modules_add')->
+            assign('do', $do)->
+            assign('langs', cmsCore::getDirsList('/languages'))->
+            assign('pos', cpModulePositions(cmsCore::c('config')->template))->
+            assign('positions_img_exist', file_exists(PATH .'/templates/'. cmsCore::c('config')->template .'/positions.jpg'))->
+            assign('tpls', cmsAdmin::getModuleTemplates())->
+            assign('modules_opt', $inCore->getListItems('cms_modules'))->
+            assign('show_all', $show_all)->
+            assign('groups', cmsUser::getGroups())->
+            assign('kb_cache', !empty($cache) ? round(mb_strlen($cache)/1024, 2) : false)->
+            assign('menu_items', $menu_items)->
+            assign('access_list', !empty($mod['access_list']) ? $inCore->yamlToArray($mod['access_list']) : array())->
+            assign('mod', $mod)->
+            display();
    }
 }

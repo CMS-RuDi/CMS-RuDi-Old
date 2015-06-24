@@ -39,9 +39,6 @@ function applet_tree() {
 
     $do = cmsCore::request('do', 'str', 'tree');
 
-//============================================================================//
-//============================================================================//
-
     if ($do == 'tree') {
         $toolmenu = array(
             array( 'icon' => 'config.gif', 'title' => $_LANG['AD_SETUP_CATEGORY'], 'link' => '?view=components&do=config&link=content' ),
@@ -62,10 +59,6 @@ function applet_tree() {
         $page        = cmsCore::request('page', 'int', 1);
         $perpage     = 20;
 
-        $hide_cats   = cmsCore::request('hide_cats', 'int', 0);
-
-        $cats        = cmsCore::m('content')->getCatsTree();
-
         if ($category_id) {
             cmsCore::m('content')->whereCatIs($category_id);
         }
@@ -79,19 +72,25 @@ function applet_tree() {
         }
 
         cmsCore::c('db')->orderBy($orderby, $orderto);
-
         cmsCore::c('db')->limitPage($page, $perpage);
 
         $total = cmsCore::m('content')->getArticlesCount(false);
-
-        $items = cmsCore::m('content')->getArticlesList(false);
-
-        $pages = ceil($total / $perpage);
-
-
-        $tpl_file   = 'admin/content.php';
-        $tpl_dir    = file_exists(TEMPLATE_DIR . $tpl_file) ? TEMPLATE_DIR : DEFAULT_TEMPLATE_DIR;
-
-        include($tpl_dir . $tpl_file);
+        
+        cmsCore::c('page')->initTemplate('applets', 'tree')->
+            assign('hide_cats', cmsCore::request('hide_cats', 'int', 0))->
+            assign('only_hidden', $only_hidden)->
+            assign('base_uri', $base_uri)->
+            assign('category_id', $category_id)->
+            assign('cats', cmsCore::m('content')->getCatsTree())->
+            assign('orderto', $orderto)->
+            assign('orderby', $orderby)->
+            assign('title_part', $title_part)->
+            assign('category_opt', $inCore->getListItemsNS('cms_category', $category_id))->
+            assign('page', $page)->
+            assign('total', $total)->
+            assign('perpage', $perpage)->
+            assign('pages', ceil($total / $perpage))->
+            assign('items', cmsCore::m('content')->getArticlesList(false))->
+            display();
     }
 }

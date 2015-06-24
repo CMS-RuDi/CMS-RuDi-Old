@@ -676,7 +676,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                     }
                 } else {
                     if ($_fields[$key]['field'] != 'ordering') {
-                        if ($_fields[$key]['field'] == 'published') {
+                        if ($_fields[$key]['field'] == 'published' || isset($_fields[$key]['published'])) {
                             $it['type'] = 'published';
 
                             if (isset($_fields[$key]['do'])) {
@@ -693,7 +693,7 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                                 $ids = 'id';
                             }
 
-                            if ($item['published']) {
+                            if ($item[$_fields[$key]['field']]) {
                                 $qs = cpAddParam($_SERVER['QUERY_STRING'], $do, 'hide'.$dos);
                                 $qs = cpAddParam($qs, $ids, $item['id']);
                                 $qs2 = cpAddParam($_SERVER['QUERY_STRING'], $do, 'show'.$dos);
@@ -790,7 +790,10 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
                         $link   = $action['link'];
 
                         foreach($item as $f=>$v) {
-                            $link = str_replace('%'.$f.'%', $v, $link);
+                            $link  = str_replace('%'.$f.'%', $v, $link);
+                            if (isset($action['confirm'])) {
+                                $action['confirm'] = str_replace('%'.$f.'%', $v, $action['confirm']);
+                            }
                         }
 
                         $acts = array(
@@ -1027,7 +1030,7 @@ function insertPanel() {
 
     $inCore = cmsCore::getInstance();
     
-    if ($bannersInstalled) {
+    if ($inCore->isComponentInstalled('banners')) {
         $inCore->loadModel('banners');
     }
     

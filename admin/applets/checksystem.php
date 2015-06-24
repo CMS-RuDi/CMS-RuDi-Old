@@ -83,74 +83,19 @@ function applet_checksystem() {
             $data = unserialize(file_get_contents(PATH .'/cache/last_check_result.serialize'));
         }
         
-        echo '<p>'. $_LANG['AD_TIME_LAST_CHECK'] .' <b>'. (isset($data['date']) ? $data['date'] : $_LANG['AD_NEVER']) .'</b>, '. $_LANG['AD_IMG'] .': <b>'. (isset($data['img']) ? $data['img'] : '') .'</b></p>';
-        
-        if (!empty($data)) {
-            echo '<div class="uitabs"><ul id="tabs"><li><a href="#tab1"><span>'. $_LANG['AD_MODIFY_FILES'] .'</span></a></li><li><a href="#tab2"><span>'. $_LANG['AD_NEW_FILES'] .'</span></a></li><li><a href="#tab3"><span>'. $_LANG['AD_DELETED_FILES'] .'</span></a></li></ul>';
-            
-                echo '<div id="tab1">';
-                    if (!empty($data['modified_files'])) {
-                        foreach ($data['modified_files'] as $path) {
-                            echo '<div>'. $path .'</div>';
-                        }
-                    } else {
-                        echo '<p>'. $_LANG['AD_MODIFY_FILES_NOT_FOUND'] .'</p>';
-                    }
-                echo '</div>';
-
-                echo '<div id="tab2">';
-                    if (!empty($data['new_files'])) {
-                        foreach ($data['new_files'] as $path) {
-                            echo '<div>'. $path .'</div>';
-                        }
-                    } else {
-                        echo '<p>'. $_LANG['AD_NEW_FILES_NOT_FOUND'] .'</p>';
-                    }
-                echo '</div>';
-                
-                echo '<div id="tab3">';
-                    if (!empty($data['old_files'])) {
-                        foreach ($data['old_files'] as $path) {
-                            echo '<div>'. $path .'</div>';
-                        }
-                    } else {
-                        echo '<p>'. $_LANG['AD_DELETED_FILES_NOT_FOUND'] .'</p>';
-                    }
-                echo '</div>';
-            
-            echo '</div>';
-        } else {
-            echo '<p>'. $_LANG['AD_LAST_CHECK_RESULT_NOT_FOUND'] .'</p>';
-        }
+        cmsCore::c('page')->initTemplate('applets', 'checksystem_last_check')->
+            assign('data', $data)->
+            display();
     }
     
     if ($do == 'start') {
         cpAddPathway($_LANG['AD_START_NEW_CHECK']);
         
         $imageFiles = getSystemImageFiles();
-?>
-<form class="form-horizontal" role="form" action="/admin/index.php?view=checksystem&do=start_scan" method="post" name="CFGform" target="_self" style="margin-bottom:30px">
-    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
-    
-    <div style="width:750px;">
-        <div class="form-group">
-            <label class="col-sm-5 control-label"><?php echo $_LANG['AD_SELECT_IMG']; ?></label>
-            <div class="col-sm-7">
-                <select id="image" class="form-control" name="image">
-                    <?php foreach ($imageFiles as $if) { ?>
-                        <option value="<?php echo $if; ?>"><?php echo $if; ?></option>
-                    <?php } ?>
-                </select>
-            </div>
-        </div>
         
-        <div>
-            <input type="submit" class="btn btn-primary" name="save" value="<?php echo $_LANG['AD_START']; ?>" />
-            <input type="button" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.history.back();" />
-        </div>
-    </div>
-</form>
-<?php
+        cmsCore::c('page')->initTemplate('applets', 'checksystem')->
+            assign('imageFiles', $imageFiles)->
+            display();
     }
     
     if ($do == 'start_scan') {

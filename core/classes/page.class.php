@@ -635,6 +635,8 @@ class cmsPage {
             } else if ($this->site_cfg->last_item_pw == 2) {
                 $this->pathway[$count-1]['is_last'] = true;
             }
+        } else {
+            if ($count == 1) { return; }
         }
 
         if ($this->pathway){

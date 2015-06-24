@@ -13,127 +13,98 @@
 
 if(!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
-function pluginsList($new_plugins, $action_name, $action) {
+function pluginsList($new_plugins, $action) {
     $inCore = cmsCore::getInstance();
     global $_LANG;
-
-    echo '<table class="table table-striped">'
-            . '<thead>'
-                . '<tr>'
-                    . '<th>#</th>'
-                    . '<th>'. $_LANG['AD_PLUGIN'] .'</th>'
-                    . '<th width="150">'. $_LANG['AD_VERSION'] .'</th>'
-                    . '<th width="150">'. $_LANG['AD_AUTHOR'] .'</th>'
-                    . '<th width="250">'. $_LANG['AD_FOLDER'] .'</th>'
-                    . '<th width="100"></th>'
-                . '</tr>'
-            . '</thead><tbody>';
     
-    $k = 0;
+    $items = array();
     
     foreach ($new_plugins as $plugin) {
         $plugin_obj = $inCore->loadPlugin($plugin);
 
-        if ($action == 'install_plugin') { $version = $plugin_obj->info['version']; }
-        if ($action == 'upgrade_plugin') { $version = $inCore->getPluginVersion($plugin) . ' &rarr; '. $plugin_obj->info['version']; }
-        
-        echo '<tr>';
-                echo '<td>'. ++$k .'</td>';
-                echo '<td><strong>'. $plugin_obj->info['title'] .'</strong><div class="help-block">'. $plugin_obj->info['description'] .'</div></td>';
-                echo '<td>'. $version .'</td>';
-                echo '<td>'. $plugin_obj->info['author'] .'</td>';
-                echo '<td>/plugins/'. $plugin_obj->info['plugin'] .'</td>';
-                echo '<td><a href="index.php?view=install&do='. $action .'&id='. $plugin .'" class="btn btn-primary">'. $action_name .'</a></td>';
-        echo '</tr>';
+        if ($action == 'install_plugin') {
+            $version = $plugin_obj->info['version'];
+        }
+
+        if ($action == 'upgrade_plugin') {
+            $version = $inCore->getPluginVersion($plugin) . ' &rarr; '. $plugin_obj->info['version'];
+        }
+
+        $items[] = array(
+            'version'     => $version,
+            'title'       => $plugin_obj->info['title'],
+            'description' => $plugin_obj->info['description'],
+            'author'      => $plugin_obj->info['author'],
+            'folder'      => '/plugins/'. $plugin_obj->info['plugin'],
+            'link'        => $plugin_obj->info['plugin']
+        );
     }
     
-    echo '</tbody></table>';
-
-    return;
+    return $items;
 }
 
-function componentsList($new_components, $action_name, $action) {
+function componentsList($new_components, $action) {
     $inCore = cmsCore::getInstance();
     global $_LANG;
-
-    echo '<table class="table table-striped">'
-            . '<thead>'
-                . '<tr>'
-                    . '<th>#</th>'
-                    . '<th>'. $_LANG['AD_COMPONENT'] .'</th>'
-                    . '<th width="150">'. $_LANG['AD_VERSION'] .'</th>'
-                    . '<th width="150">'. $_LANG['AD_AUTHOR'] .'</th>'
-                    . '<th width="250">'. $_LANG['AD_FOLDER'] .'</th>'
-                    . '<th width="100"></th>'
-                . '</tr>'
-            . '</thead><tbody>';
     
-    $k = 0;
+    $items = array();
     
     foreach ($new_components as $component) {
         if ($inCore->loadComponentInstaller($component)) {
-
             $_component = call_user_func('info_component_'. $component);
 
-            if ($action == 'install_component') { $version = $_component['version']; }
-            if ($action == 'upgrade_component') { $version = $inCore->getComponentVersion($component) . ' &rarr; '. $_component['version']; }
+            if ($action == 'install_component') {
+                $version = $_component['version'];
+            }
             
-            echo '<tr>';
-                echo '<td>'. ++$k .'</td>';
-                echo '<td><strong>'. $_component['title'] .'</strong><div class="help-block">'. $_component['description'] .'</div></td>';
-                echo '<td>'. $version .'</td>';
-                echo '<td>'. $_component['author'] .'</td>';
-                echo '<td>/components/'. $_component['link'] .'</td>';
-                echo '<td><a href="index.php?view=install&do='. $action .'&id='. $component .'" class="btn btn-primary">'. $action_name .'</a></td>';
-            echo '</tr>';
+            if ($action == 'upgrade_component') {
+                $version = $inCore->getComponentVersion($component) . ' &rarr; '. $_component['version'];
+            }
+            
+            $items[] = array(
+                'version'     => $version,
+                'title'       => $_component['title'],
+                'description' => $_component['description'],
+                'author'      => $_component['author'],
+                'folder'      => '/components/'. $_component['link'],
+                'link'        => $_component['link']
+            );
         }
     }
     
-    echo '</tbody></table>';
-
-    return;
+    return $items;
 }
 
-function modulesList($new_modules, $action_name, $action) {
+function modulesList($new_modules, $action) {
     $inCore = cmsCore::getInstance();
     global $_LANG;
-
-    echo '<table class="table table-striped">'
-            . '<thead>'
-                . '<tr>'
-                    . '<th>#</th>'
-                    . '<th>'. $_LANG['AD_MODULE'] .'</th>'
-                    . '<th width="150">'. $_LANG['AD_VERSION'] .'</th>'
-                    . '<th width="150">'. $_LANG['AD_AUTHOR'] .'</th>'
-                    . '<th width="250">'. $_LANG['AD_FOLDER'] .'</th>'
-                    . '<th width="100"></th>'
-                . '</tr>'
-            . '</thead><tbody>';
     
-    $k = 0;
+    $items = array();
     
     foreach ($new_modules as $module) {
         if ($inCore->loadModuleInstaller($module)) {
-
             $_module = call_user_func('info_module_'. $module);
 
-            if ($action == 'install_module') { $version = $_module['version']; }
-            if ($action == 'upgrade_module') { $version = $inCore->getModuleVersion($module) . ' &rarr; '. $_module['version']; }
-
-            echo '<tr>';
-                echo '<td>'. ++$k .'</td>';
-                echo '<td><strong>'. $_module['title'] .'</strong><div class="help-block">'. $_module['description'] .'</div></td>';
-                echo '<td>'. $version .'</td>';
-                echo '<td>'. $_module['author'] .'</td>';
-                echo '<td>/modules/'. $_module['link'] .'</td>';
-                echo '<td><a href="index.php?view=install&do='. $action .'&id='. $module .'" class="btn btn-primary">'. $action_name .'</a></td>';
-            echo '</tr>';
+            if ($action == 'install_module') {
+                $version = $_module['version'];
+            }
+            
+            if ($action == 'upgrade_module') {
+                $version = $inCore->getModuleVersion($module) . ' &rarr; '. $_module['version'];
+            }
+            
+            $items[] = array(
+                'version'     => $version,
+                'title'       => $_module['title'],
+                'description' => $_module['description'],
+                'author'      => $_module['author'],
+                'folder'      => '/modules/'. $_module['link'],
+                'link'        => $_module['link']
+            );
         }
     }
     
-    echo '</tbody></table>';
-
-    return;
+    return $items;
 }
 
 function applet_install() {
@@ -155,29 +126,23 @@ function applet_install() {
 
         $new_modules = $inCore->getNewModules();
         $upd_modules = $inCore->getUpdatedModules();
-
-        echo '<h3>'. $_LANG['AD_SETUP_MODULES'] .'</h3>';
-
-        if (!$new_modules && !$upd_modules) {
-            echo '<p>'. $_LANG['AD_NO_SEARCH_MODULES'] .'</p>';
-            echo '<p>'. $_LANG['AD_IF_WANT_SETUP_MODULES'] .'</p>';
-            echo '<p><a class="btn btn-default" href="javascript:window.history.go(-1);">'. $_LANG['BACK'] .'</a></p>';
-            return;
-        }
-
+        
+        $tpl = cmsCore::c('page')->initTemplate('applets', 'install')->
+            assign('title', $_LANG['AD_SETUP_MODULES'])->
+            assign('addon_type', $_LANG['AD_MODULE'])->
+            assign('text1', $_LANG['AD_NO_SEARCH_MODULES'])->
+            assign('text2', $_LANG['AD_IF_WANT_SETUP_MODULES'])->
+            assign('text3', $new_modules ? $_LANG['AD_SEARCH_MODULES'] : $_LANG['AD_MODULES_UPDATE'])->
+            assign('action_name', $new_modules ? $_LANG['AD_SETUP'] : $_LANG['AD_UPDATE'])->
+            assign('action', $new_modules ? 'install_module' : 'upgrade_module');
+        
         if ($new_modules) {
-            echo '<div class="panel panel-default"><div class="panel-heading">'. $_LANG['AD_SEARCH_MODULES'] .'</div><div class="panel-body">';
-                modulesList($new_modules, $_LANG['AD_SETUP'], 'install_module');
-            echo '</div></div>';
+            $tpl->assign('items', modulesList($new_modules, 'install_module'));
+        } else if ($upd_modules) {
+            $tpl->assign('items', modulesList($upd_modules, 'upgrade_module'));
         }
-
-        if ($upd_modules) {
-            echo '<div class="panel panel-default"><div class="panel-heading">'. $_LANG['AD_MODULES_UPDATE'] .'</div><div class="panel-body">';
-                modulesList($upd_modules, $_LANG['AD_UPDATE'], 'upgrade_module');
-            echo '</div></div>';
-        }
-
-        echo '<p><a class="btn btn-default" href="javascript:window.history.go(-1);">'. $_LANG['BACK'] .'</a></p>';
+        
+        $tpl->display();
     }
     
     //--------------------------- Установка модуля -----------------------------
@@ -251,30 +216,23 @@ function applet_install() {
 
         $new_components = $inCore->getNewComponents();
         $upd_components = $inCore->getUpdatedComponents();
-
-        echo '<h3>'. $_LANG['AD_SETUP_COMPONENTS'] .'</h3>';
-
-        if (!$new_components && !$upd_components) {
-            echo '<p>'. $_LANG['AD_NO_SEARCH_COMPONENTS'] .'</p>';
-            echo '<p>'. $_LANG['AD_IF_WANT_SETUP_COMPONENTS'] .'</p>';
-            echo '<p><a href="javascript:window.history.go(-1);" class="btn btn-default">'. $_LANG['BACK'] .'</a></p>';
-            return;
-        }
-
+        
+        $tpl = cmsCore::c('page')->initTemplate('applets', 'install')->
+            assign('title', $_LANG['AD_SETUP_COMPONENTS'])->
+            assign('addon_type', $_LANG['AD_COMPONENT'])->
+            assign('text1', $_LANG['AD_NO_SEARCH_COMPONENTS'])->
+            assign('text2', $_LANG['AD_IF_WANT_SETUP_COMPONENTS'])->
+            assign('text3', $new_components ? $_LANG['AD_COMPONENTS_SETUP'] : $_LANG['AD_COMPONENTS_UPDATE'])->
+            assign('action_name', $new_components ? $_LANG['AD_SETUP'] : $_LANG['AD_UPDATE'])->
+            assign('action', $new_components ? 'install_component' : 'upgrade_component');
+        
         if ($new_components) {
-            echo '<div class="panel panel-default"><div class="panel-heading">'. $_LANG['AD_COMPONENTS_SETUP'] .'</div><div class="panel-body">';
-                componentsList($new_components, $_LANG['AD_SETUP'], 'install_component');
-            echo '</div></div>';
+            $tpl->assign('items', componentsList($new_components, 'install_component'));
+        } else if ($upd_components) {
+            $tpl->assign('items', componentsList($upd_components, 'upgrade_component'));
         }
-
-        if ($upd_components) {
-            echo '<div class="panel panel-default"><div class="panel-heading">'. $_LANG['AD_COMPONENTS_UPDATE'] .'</div><div class="panel-body">';
-                componentsList($upd_components, $_LANG['AD_UPDATE'], 'upgrade_component');
-            echo '</div></div>';
-
-        }
-
-        echo '<p><a href="javascript:window.history.go(-1);" class="btn btn-default">'. $_LANG['BACK'] .'</a></p>';
+        
+        $tpl->display();
     }
 
     //------------------------- Установка компонента ---------------------------
@@ -390,29 +348,23 @@ function applet_install() {
 
         $new_plugins = $inCore->getNewPlugins();
         $upd_plugins = $inCore->getUpdatedPlugins();
-
-        echo '<h3>'. $_LANG['AD_SETUP_PLUGINS'] .'</h3>';
-
-        if (!$new_plugins && !$upd_plugins) {
-            echo '<p>'. $_LANG['AD_NO_SEARCH_PLUGINS'] .'</p>';
-            echo '<p>'. $_LANG['AD_IF_WANT_SETUP_PLUGINS'] .'</p>';
-            echo '<p><a href="javascript:window.history.go(-1);" class="btn btn-default">'. $_LANG['BACK'] .'</a></p>';
-            return;
-        }
-
+        
+        $tpl = cmsCore::c('page')->initTemplate('applets', 'install')->
+            assign('title', $_LANG['AD_SETUP_PLUGINS'])->
+            assign('addon_type', $_LANG['AD_PLUGIN'])->
+            assign('text1', $_LANG['AD_NO_SEARCH_PLUGINS'])->
+            assign('text2', $_LANG['AD_IF_WANT_SETUP_PLUGINS'])->
+            assign('text3', $new_plugins ? $_LANG['AD_PLUGINS_SETUP'] : $_LANG['AD_PLUGINS_UPDATE'])->
+            assign('action_name', $new_plugins ? $_LANG['AD_SETUP'] : $_LANG['AD_UPDATE'])->
+            assign('action', $new_plugins ? 'install_plugin' : 'upgrade_plugin');
+        
         if ($new_plugins) {
-            echo '<div class="panel panel-default"><div class="panel-heading">'. $_LANG['AD_PLUGINS_SETUP'] .'</div><div class="panel-body">';
-                pluginsList($new_plugins, $_LANG['AD_SETUP'], 'install_plugin');
-            echo '</div></div>';
+            $tpl->assign('items', pluginsList($new_plugins, 'install_plugin'));
+        } else if ($upd_plugins) {
+            $tpl->assign('items', pluginsList($upd_plugins, 'upgrade_plugin'));
         }
-
-        if ($upd_plugins) {
-            echo '<div class="panel panel-default"><div class="panel-heading">'. $_LANG['AD_PLUGINS_UPDATE'] .'</div><div class="panel-body">';
-                pluginsList($upd_plugins, $_LANG['AD_UPDATE'], 'upgrade_plugin');
-            echo '</div></div>';
-        }
-
-        echo '<p><a href="javascript:window.history.go(-1);" class="btn btn-default">'. $_LANG['BACK'] .'</a></p>';
+        
+        $tpl->display();
     }
 
     //--------------------------- Установка плагина ----------------------------

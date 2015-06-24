@@ -9,7 +9,7 @@
                 </li>
                 <li class="list-group-item fa fa-folder-open">
                     <?php if (!$only_hidden) { ?>
-                        <a href="<?php echo $base_uri.'&orderby=pubdate&orderto=desc&only_hidden=1'; ?>" style="font-weight:bold"><?php echo $_LANG['ON_MODERATE']; ?></a>
+                        <a href="<?php echo $base_uri .'&orderby=pubdate&orderto=desc&only_hidden=1'; ?>" style="font-weight:bold"><?php echo $_LANG['ON_MODERATE']; ?></a>
                     <?php } else { $current_cat = $_LANG['ON_MODERATE']; echo $current_cat; } ?>
                 </li>
                 <li class="list-group-item fa fa-folder-open">
@@ -19,14 +19,14 @@
                 </li>
                 <li class="list-group-item fa fa-folder-open">
                     <?php if ($category_id != 1) { ?>
-                        <a href="<?php echo $base_uri.'&cat_id=1'; ?>" style="font-weight:bold"><?php echo $_LANG['AD_ROOT_CATEGORY']; ?></a>
+                        <a href="<?php echo $base_uri .'&cat_id=1'; ?>" style="font-weight:bold"><?php echo $_LANG['AD_ROOT_CATEGORY']; ?></a>
                     <?php } else { $current_cat = $_LANG['AD_ROOT_CATEGORY']; echo $current_cat; } ?>
                 </li>
                 <?php if (is_array($cats)) { ?>
                     <?php foreach($cats as $num => $cat) { ?>
                         <li class="list-group-item fa fa-folder-open" style="padding-left:<?php echo ($cat['NSLevel'])*20; ?>px;">
                         <?php if ($category_id != $cat['id']) { ?>
-                            <a href="<?php echo $base_uri.'&cat_id='.$cat['id']; ?>" style="<?php if ($cat['NSLevel']==1){ echo 'font-weight:bold'; } ?>"><?php echo $cat['title']; ?></a>
+                            <a href="<?php echo $base_uri .'&cat_id='.$cat['id']; ?>" style="<?php if ($cat['NSLevel']==1){ echo 'font-weight:bold'; } ?>"><?php echo $cat['title']; ?></a>
                         <?php } else { ?>
                             <?php echo $cat['title']; $current_cat = $cat['title']; ?>
                         <?php } ?>
@@ -117,7 +117,7 @@
                                     <td><input type="checkbox" name="item[]" value="<?php echo $item['id']; ?>" /></td>
                                     <td><?php echo $item['id']; ?></td>
                                     <td width="16">
-                                        <img src="/templates/<?php echo TEMPLATE; ?>/images/icons/article.png" border="0"/>
+                                        <img src="/templates/<?php echo cmsCore::c('config')->template; ?>/images/icons/article.png" border="0"/>
                                     </td>
                                     <td>
                                         <a href="index.php?view=content&do=edit&id=<?php echo $item['id']; ?>">
@@ -189,9 +189,7 @@
                                 <td class="sel_move" style="display:none">
                                     <select id="move_cat_id" class="form-control" style="width:250px;margin-left:5px;">
                                         <option value="1"><?php echo $_LANG['AD_ROOT_CATEGORY']; ?></option>
-                                        <?php
-                                           echo $inCore->getListItemsNS('cms_category', $category_id);
-                                        ?>
+                                        <?php echo $category_opt; ?>
                                     </select>
                                 </td>
                                 <td class="sel_move" style="display:none">

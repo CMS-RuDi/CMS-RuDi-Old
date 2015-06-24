@@ -35,13 +35,23 @@ function applet_cron() {
         );
 
         cpToolMenu($toolmenu);
+        
+        $fields = array(
+            array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
+            array( 'title' => $_LANG['TITLE'], 'field' => 'job_name', 'width' => '80', 'link' => '?view=cron&do=edit&id=%id%' ),
+            array( 'title' => $_LANG['DESCRIPTION'], 'field' => 'comment', 'width' => '' ),
+            array( 'title' => $_LANG['AD_MISSION_INTERVAL'], 'field' => 'job_interval', 'width' => '30', 'prc' => function($interval) { global $_LANG; return $interval .' '. $_LANG['HOUR']; } ),
+            array( 'title' => $_LANG['AD_LAST_START'], 'field' => 'job_run_date', 'width' => '150' ),  
+            array( 'title' => $_LANG['AD_IS_ACTIVE'], 'field' => 'is_enabled', 'width' => '50', 'published' => true )
+        );
 
-        $items = cmsCron::getJobs(false);
+        $actions = array(
+            array( 'title' => $_LANG['AD_PERFORM_TASK'], 'icon' => 'play.gif', 'confirm' => $_LANG['AD_PERFORM_TASK'] .' %job_name%?', 'link' => '?view=cron&do=execute&id=%id%' ),
+            array( 'title' => $_LANG['EDIT'], 'icon' => 'edit.gif', 'link' => '?view=cron&do=edit&id=%id%' ),
+            array( 'title' => $_LANG['DELETE'], 'icon' => 'delete.gif', 'confirm' => $_LANG['AD_IF_COMENT_DELETE'], 'link' => '?view=cron&do=delete&id=%id%' )
+        );
 
-        $tpl_file   = 'admin/cron.php';
-        $tpl_dir    = file_exists(TEMPLATE_DIR . $tpl_file) ? TEMPLATE_DIR : DEFAULT_TEMPLATE_DIR;
-
-        include($tpl_dir . $tpl_file);
+        cpListTable('cms_cron_jobs', $fields, $actions, '1=1', 'job_run_date ASC');
     }
 
     if ($do == 'show') {
@@ -157,91 +167,10 @@ function applet_cron() {
             cpAddPathway($_LANG['AD_CREATE_CRON_MISSION'], 'index.php?view=cron&do=add');
             $mod = array();
 	}
-?>
-<form action="index.php?view=cron" method="post" enctype="multipart/form-data" name="addform" id="addform">
-    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
-    
-    <div style="width:650px;">
-        <div class="form-group">
-            <label><?php echo $_LANG['TITLE']; ?>:</label>
-            <input type="text" class="form-control" name="job_name" value="<?php echo cmsCore::getArrVal($mod, 'job_name', ''); ?>" />
-            <div class="help-block"><?php echo $_LANG['AD_ONLY_LATIN']; ?></div>
-        </div>
         
-        <div class="form-group">
-            <label><?php echo $_LANG['DESCRIPTION']; ?>:</label>
-            <input type="text" class="form-control" name="comment" maxlength="200" value="<?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'comment', '')); ?>" />
-            <div class="help-block"><?php echo $_LANG['AD_ONLY_200_SIMBOLS']; ?></div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_MISSION_ON']; ?>:</label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if (cmsCore::getArrVal($mod, 'is_enabled')) { echo 'active'; } ?>">
-                    <input type="radio" name="enabled" <?php if ($mod['is_enabled']) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($mod, 'is_enabled')) { echo 'active'; } ?>">
-                    <input type="radio" name="enabled" <?php if (!$mod['is_enabled']) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-            <div class="help-block"><?php echo $_LANG['AD_MISSION_OFF']; ?></div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_MISSION_INTERVAL']; ?> (<?php echo $_LANG['HOUR1']; ?>):</label>
-            <input type="number" class="form-control" name="job_interval" min="0" value="<?php echo cmsCore::getArrVal($mod, 'job_interval', ''); ?>" /> 
-            <div class="help-block"><?php echo $_LANG['AD_MISSION_PERIOD']; ?></div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_PHP_FILE']; ?>:</label>
-            <input type="text" class="form-control" name="custom_file" maxlength="250" value="<?php echo cmsCore::getArrVal($mod, 'custom_file', ''); ?>" /> 
-            <div class="help-block"><?php echo $_LANG['AD_EXAMPLE'] ; ?>: <b>includes/myphp/test.php</b></div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_COMPONENT']; ?>:</label>
-            <input type="text" class="form-control" name="component" maxlength="250" value="<?php echo cmsCore::getArrVal($mod, 'component', ''); ?>" /> 
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_METHOD']; ?>:</label>
-            <input type="text" class="form-control" name="model_method" maxlength="250" value="<?php echo cmsCore::getArrVal($mod, 'model_method', ''); ?>" /> 
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo icms_ucfirst($_LANG['AD_CLASS']); ?></label>
-            <input type="text" class="form-control" name="class_name" maxlength="50" value="<?php echo cmsCore::getArrVal($mod, 'class_name', ''); ?>" />
-            <div class="help-block">
-                <span style="color:#666;font-family: mono"><?php echo $_LANG['AD_FILE_CLASS']; ?></span>, <?php echo $_LANG['AD_EXAMPLE']; ?> <b>actions|cmsActions</b>&nbsp;<?php echo $_LANG['OR']; ?><br/>
-                <span style="color:#666;font-family: mono"><?php echo $_LANG['AD_CLASS']; ?></span>, <?php echo $_LANG['AD_EXAMPLE']; ?> <b>cmsDatabase</b>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_CLASS_METHOD']; ?>:</label>
-            <input type="text" class="form-control" name="class_method" maxlength="50" value="<?php echo cmsCore::getArrVal($mod, 'class_method', ''); ?>" /> 
-        </div>
-    </div>
-    
-    <div>
-        <?php if ($do == 'edit') { ?>
-            <input type="hidden" name="do" value="update" />
-            <input type="submit" class="btn btn-primary" name="add_mod" value="<?php echo $_LANG['AD_SAVE_CRON_MISSION']; ?>" />
-        <?php } else { ?>
-            <input type="hidden" name="do" value="submit" />
-            <input type="submit" class="btn btn-primary" name="add_mod" value="<?php echo $_LANG['AD_CREATE_CRON_MISSION'] ; ?>" />
-        <?php } ?>
-        
-        <input type="button" class="btn btn-default" name="back2" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.history.back();" />
-          
-        <?php
-            if ($do == 'edit') {
-                echo '<input type="hidden" name="id" value="'. $mod['id'] .'" />';
-            }
-        ?>
-        </div>
-</form>
-<?php
+        cmsCore::c('page')->initTemplate('applets', 'cron_edit')->
+            assign('do', $do)->
+            assign('mod', $mod)->
+            display();
    }
 }

@@ -78,14 +78,15 @@ function applet_main() {
     cmsCore::c('actions')->showTargets(true);
     $total = cmsCore::c('actions')->getCountActions();
     cmsCore::c('db')->limitPage(1, 10);
-    $actions = cmsCore::c('actions')->getActionsLog();
-    $pagebar = cmsPage::getPagebar($total, 1, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false');
+    
+    $actions_html = cmsCore::c('page')->initTemplate('components', 'actions_list')->
+        assign('actions', cmsCore::c('actions')->getActionsLog())->
+        assign('pagebar', cmsPage::getPagebar($total, 1, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false'))->
+        fetch();
     
     $tpl->assign('new', $new)->
         assign('rssfeed_installed', $inCore->isComponentInstalled('rssfeed'))->
-        assign('total', $total)->
-        assign('actions', $actions)->
-        assign('pagebar', $pagebar)->
+        assign('actions_html', $actions_html)->
         assign('new_quests', cmsCore::c('db')->rows_count('cms_faq_quests', 'published = 0'))->
         assign('new_content', cmsCore::c('db')->rows_count('cms_content', 'published = 0 AND is_arhive = 0'))->
         assign('new_catalog', cmsCore::c('db')->rows_count('cms_uc_items', 'on_moderate = 1'))->

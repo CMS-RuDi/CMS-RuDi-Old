@@ -112,7 +112,7 @@
                 <div class="panel-heading"><?php echo $_LANG['AD_LATEST_EVENTS']; ?></div>
                 <div class="panel-body" id="actions_box">
                     <div id="actions">
-                        <?php include('../components/actions_list.php'); ?>
+                        <?php echo $actions_html; ?>
                     </div>
                 </div>
             </div>

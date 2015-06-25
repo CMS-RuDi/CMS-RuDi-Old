@@ -12,7 +12,7 @@
 /******************************************************************************/
 if(!defined('VALID_CMS_ADMIN')) { die(); }
 
-cmsCore::c('page')->addHeadCSS('admin/css/styles.css?17');
+cmsCore::c('page')->addHeadCSS('/templates/admin/_default_/css/styles.css');
 cmsCore::c('page')->addHeadCSS('admin/js/hmenu/hmenu.css');
 cmsCore::c('page')->addHeadCSS('includes/jquery/tablesorter/style.css');
 cmsCore::c('page')->addHeadCSS('includes/jqueryui/css/smoothness/jquery-ui.min.css');

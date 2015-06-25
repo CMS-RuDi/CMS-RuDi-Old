@@ -15,7 +15,7 @@
             <tbody>
             <?php foreach ($templates as $template) { ?>
                 <?php if ($template == 'admin') { continue; } ?>
-                <?php $tpl_info = $this->getTplInfo($template); ?>
+                <?php $tpl_info = cmsCore::c('page')->getTplInfo($template); ?>
                 <tr>
                     <td><strong><?php echo $template; ?></strong></td>
                     <td><?php echo $tpl_info['author']; ?></td>

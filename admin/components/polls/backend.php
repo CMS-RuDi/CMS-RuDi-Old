@@ -107,17 +107,18 @@ if ($opt == 'update') {
 }
 
 if ($opt == 'add' || $opt == 'edit') {
+    $answers_title = array();
+    $answers_num   = array();
+    $mod = array();
+    
     if ($opt == 'add') {
         cpAddPathway($_LANG['AD_ADD_POLL']);
-        $mod = array();
     } else {
         $mod = $model->getPoll(cmsCore::request('poll_id', 'int'));
         if (!$mod) { cmsCore::error404(); }
         
         cpAddPathway($_LANG['AD_EDIT_POLL']);
-        
-        $answers_title = array();
-        $answers_num   = array();
+
         $item = 1;
         foreach ($mod['answers'] as $answer => $num) {
             $answers_title[$item] = htmlspecialchars($answer);
@@ -126,36 +127,9 @@ if ($opt == 'add' || $opt == 'edit') {
         }
     }
 
-?>
-<form id="addform" name="addform" method="post" action="index.php?view=components&do=config&id=<?php echo $id; ?>">
-    <div style="width:600px;">
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_QUESTION']; ?>:</label>
-            <input type="text" class="form-control" name="title" size="30" value="<?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'title', '')); ?>" />
-        </div>
-        
-        <?php for ($v=1; $v<=12; $v++) { ?>
-            <div class="form-group">
-                <label><?php echo $_LANG['AD_ANSWER']; ?> №<?php echo $v ?> <?php if (isset($answers_num[$v])) { echo '('. $_LANG['AD_VOTES'] .': '. $answers_num[$v] .')'; } ?>:</label>
-                <input type="text" class="form-control" name="answers[<?php echo $v; ?>]" size="30" value="<?php echo cmsCore::getArrVal($answers_title, $v, ''); ?>" />
-                <?php if (isset($answers_num[$v])) { echo '<input type="hidden" name="num['. $v .']" value="'. $answers_num[$v] .'" />';  } ?>
-            </div>
-        <?php } ?>
-    </div>
-    
-    <div>
-      <input type="submit" class="btn btn-primary" name="add_mod" value="<?php echo $_LANG['SAVE']; ?>" />
-      
-      <input type="hidden" name="opt" <?php if ($opt=='add') { echo 'value="submit"'; } else { echo 'value="update"'; } ?> />
-      
-      <?php
-        if ($opt == 'edit') {
-            echo '<input type="hidden" name="poll_id" value="'. $mod['id'] .'" /> ';
-            echo ' <label><input type="checkbox" name="is_clear" value="1" /> '. $_LANG['AD_CLEAN_LOG'] .'</label>';
-        }
-        ?>
-    </div>
-</form>
-
-<?php
+    cmsCore::c('page')->initTemplate('components', 'polls_add')->
+        assign('answers_title', $answers_title)->
+        assign('answers_num', $answers_num)->
+        assign('mod', $mod)->
+        display();
 }

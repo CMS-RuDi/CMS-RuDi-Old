@@ -16,7 +16,7 @@ $actions = cmsCore::c('actions')->getActionsLog();
 
 $pagebar = cmsPage::getPagebar($total, $page, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false');
 
-$tpl_file = 'admin/actions.php';
-$tpl_dir  = file_exists(TEMPLATE_DIR . $tpl_file) ? TEMPLATE_DIR : DEFAULT_TEMPLATE_DIR;
-
-include($tpl_dir . $tpl_file);
+cmsCore::c('page')->initTemplate('components', 'actions_list')->
+    assign('actions', $actions)->
+    assign('pagebar', $pagebar)->
+    display();

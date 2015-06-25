@@ -334,7 +334,7 @@ function cpMenu($type='main') {
             );
         }
         
-        $items['admin/exit']['items']['AD_EXIT'] = array(
+        $items['admin/user_menu']['items']['AD_EXIT'] = array(
             'class' => 'fa-power-off admin_exit',
             'link'  => '/logout',
             'title' => $_LANG['AD_EXIT']

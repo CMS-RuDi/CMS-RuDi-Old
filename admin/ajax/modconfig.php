@@ -30,13 +30,13 @@ if (!cmsUser::isAdminCan('admin/modules', $adminAccess)) {
 
 $module_id = cmsCore::request('id', 'int');
 
-$mod = cmsCore::c('db')->get_fields('cms_modules', "id='{$module_id}'", '*');
+$mod = cmsCore::c('db')->get_fields('cms_modules', "id='". $module_id ."'", '*');
 if (!$mod) { cmsCore::halt(); }
 
 $mod_name = $mod['user'] ? '' : preg_replace('/[^a-z0-9_\-]/iu', '', $mod['content']);
 
-$xml_file = PATH.'/admin/modules/'.$mod_name.'/backend.xml';
-$php_file = PATH.'/admin/modules/'.$mod_name.'/backend.php';
+$xml_file = PATH .'/admin/modules/'. $mod_name .'/backend.xml';
+$php_file = PATH .'/admin/modules/'. $mod_name .'/backend.php';
 
 $mode       = 'none';
 $cfg_form   = '';
@@ -52,4 +52,8 @@ if (file_exists($xml_file)) {
     $mode = 'custom';
 }
 
-cmsPage::includeTemplateFile('admin/modconfig.php');
+cmsCore::c('page')->initTemplate('special', 'modconfig')->
+    assign('mod', $mod)->
+    assign('mode', $mode)->
+    assign('cfg_form', $cfg_form)->
+    display();

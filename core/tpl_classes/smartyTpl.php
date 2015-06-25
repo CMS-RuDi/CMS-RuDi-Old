@@ -31,23 +31,20 @@ class smartyTpl {
 
         $this->smarty = $this->loadSmarty();
         
+        $tdirs = array(
+            'components' => $template_dir . '/components',
+            'modules'    => $template_dir . '/modules',
+            'plugins'    => $template_dir . '/plugins',
+            'special'    => $template_dir . '/special',
+            'splash'     => $template_dir . '/splash',
+        );
+        
         if (defined('VALID_CMS_ADMIN')) {
-            $this->smarty->setTemplateDir(array(
-                'applets'    => $template_dir . '/applets',
-                'components' => $template_dir . '/components',
-                'modules'    => $template_dir . '/modules',
-                'plugins'    => $template_dir . '/plugins',
-                'special'    => $template_dir . '/special'
-            ));
-        } else {
-            $this->smarty->setTemplateDir(array(
-                'components' => $template_dir . '/components',
-                'modules'    => $template_dir . '/modules',
-                'plugins'    => $template_dir . '/plugins',
-                'special'    => $template_dir . '/special',
-                'splash'     => $template_dir . '/splash',
-            ));
+            unset($tdirs['splash']);
+            $tdirs['applets'] = $template_dir . '/applets';
         }
+        
+        $this->smarty->setTemplateDir($tdirs);
         
         $this->smarty->compile_id = $tpl_folder[count($tpl_folder)-1];
         

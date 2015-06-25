@@ -25,7 +25,7 @@
         <?php } ?>
     </div>
 <?php
-    if($pagebar) { echo $pagebar; }
+    if ($pagebar) { echo $pagebar; }
 } else {
     echo $_LANG['OBJECTS_NOT_FOUND'];
 }

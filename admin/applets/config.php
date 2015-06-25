@@ -53,6 +53,7 @@ function applet_config() {
             'sitemail_name'           => array('sitemail_name', 'str', ''),
             'wmark'                   => array('wmark', 'str', ''),
             'template'                => array('template', 'str', ''),
+            'admin_template'          => array('admin_template', 'str', ''),
             'cache'                   => array('cache', 'int', 0),
             'cache_type'              => array('cache_type', array('file', 'memcached'), ''),
             'memcached_host'          => array('memcached_host', 'str', ''),
@@ -116,6 +117,7 @@ function applet_config() {
     cmsCore::c('page')->initTemplate('applets', 'config')->
         assign('config', $config)->
         assign('timezone_opt', cmsCore::getTimeZonesOptions($config['timezone']))->
+        assign('admin_templates', cmsCore::getDirsList('/templates/admin'))->
         assign('templates', cmsCore::getDirsList('/templates'))->
         assign('tpl_info', cmsCore::c('page')->getTplInfo(cmsCore::c('page')->template))->
         assign('components_opt', cmsCore::getListItems('cms_components', $config['com_without_name_in_url'], 'title', 'ASC', 'internal=0', 'link'))->

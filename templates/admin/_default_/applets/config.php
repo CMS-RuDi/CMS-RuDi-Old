@@ -44,6 +44,19 @@
                 </div>
                 
                 <div class="form-group">
+                    <label class="col-sm-5 control-label"><?php echo $_LANG['ADMIN_TEMPLATE']; ?></label>
+                    <div class="col-sm-7">
+                        <select class="form-control" name="admin_template" onchange="document.CFGform.submit();">
+                        <?php
+                            foreach ($admin_templates as $template) {
+                                echo '<option value="admin/'. $template .'" '. ($config['admin_template'] == 'admin/'. $template ? 'selected="selected"' : '') .'>'. $template .'</option>';
+                            }
+                        ?>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
                     <label class="col-sm-5 control-label"><?php echo $_LANG['TEMPLATE']; ?></label>
                     <div class="col-sm-7">
                         <select id="template" class="form-control" name="template" onchange="document.CFGform.submit();">

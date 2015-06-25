@@ -114,3 +114,4 @@ $_LANG['AD_SCHEME_TYPE']               = 'Protocol';
 $_LANG['AD_SCHEME_ANY']                = 'Any';
 $_LANG['AD_SCHEME_http']               = 'Only HTTP';
 $_LANG['AD_SCHEME_https']              = 'Only HTTPS';
+$_LANG['ADMIN_TEMPLATE']               = 'Admin template';

@@ -32,7 +32,7 @@ if ($opt != 'config') {
     
     $toolmenu[] = array( 'icon' => 'config.gif', 'title' => $_LANG['AD_SETTINGS'], 'link' => '?view=components&do=config&id='. $id .'&opt=config' );
 }
-if ($opt == 'config'){
+if ($opt == 'config') {
     $toolmenu = array(
         array( 'icon' => 'save.gif', 'title' => $_LANG['SAVE'], 'link' => 'javascript:document.optform.submit();' ),
         array( 'icon' => 'cancel.gif', 'title' => $_LANG['CANCEL'], 'link' => '?view=components&do=config&id='. $id )
@@ -65,70 +65,11 @@ if ($opt == 'saveconfig') {
 
 if ($opt == 'config') {
     cpAddPathway($_LANG['AD_SETTINGS']);
-?>
-
-<form action="index.php?view=components&do=config&id=<?php echo (int)$_REQUEST['id'];?>&opt=config" method="post" name="optform" target="_self" id="form1">
-    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
     
-    <div style="width:650px;">
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_QUEST_FROM_UNREG']; ?>:</label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'guest_enabled', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="guest_enabled" <?php if(cmsCore::getArrVal($cfg, 'guest_enabled', false)) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'guest_enabled', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="guest_enabled" <?php if (!cmsCore::getArrVal($cfg, 'guest_enabled', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_SHOW_LINK_QUEST_MEM']; ?>:</label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'user_link', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="user_link" <?php if(cmsCore::getArrVal($cfg, 'user_link', false)) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'user_link', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="user_link" <?php if (!cmsCore::getArrVal($cfg, 'user_link', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_POST_QUEST_NO_MODERAT']; ?>:</label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'publish', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="publish" <?php if(cmsCore::getArrVal($cfg, 'publish', false)) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'publish', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="publish" <?php if (!cmsCore::getArrVal($cfg, 'publish', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-            <div class="help-block"><?php echo $_LANG['AD_POST_QUEST_NO_MODERAT_HINT']; ?>.</div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_ALLOW_COMMENTS']; ?>:</label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'is_comment', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="is_comment" <?php if(cmsCore::getArrVal($cfg, 'is_comment', false)) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'is_comment', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="is_comment" <?php if (!cmsCore::getArrVal($cfg, 'is_comment', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div>
-        <input type="hidden" name="opt" value="saveconfig" />
-        <input type="submit" class="btn btn-primary" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
-        <input type="button" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components&do=config&id=<?php echo $id; ?>';" />
-    </div>
-</form>
-
-<?php }
+    cmsCore::c('page')->initTemplate('components', 'faq_config')->
+        assign('cfg', $cfg)->
+        display();
+}
 
 if ($opt == 'show_item') {
     if (!cmsCore::inRequest('item')){
@@ -336,7 +277,6 @@ if ($opt == 'list_items') {
 
 if ($opt == 'add_item' || $opt == 'edit_item') {
     if ($opt == 'add_item') {
-        echo '<h3>'. $_LANG['AD_ADD_QUESTION'] .'</h3>';
         cpAddPathway($_LANG['AD_ADD_QUESTION']);
         $mod = array();
     } else {
@@ -373,86 +313,15 @@ if ($opt == 'add_item' || $opt == 'edit_item') {
             cmsCore::error404();
         }
 
-        echo '<h3>'. $_LANG['AD_VIEW_QUESTION'] .'</h3>';
         cpAddPathway($_LANG['AD_VIEW_QUESTION']);
     }
 
-    ?>
-<form action="index.php?view=components&amp;do=config&amp;id=<?php echo $id; ?>" method="post" enctype="multipart/form-data" name="addform" id="addform">
-    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
-    
-    <div style="width:600px;">
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_CAT_QUESTION']; ?>:</label>
-            <select class="form-control" name="category_id">
-                <?php
-                    echo $inCore->getListItems('cms_faq_cats', cmsCore::getArrVal($mod, 'category_id', cmsCore::request('addto', 'int', 0)));
-                ?>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_ASKER']; ?>:</label>
-            <select class="form-control" name="user_id">
-                <option value="0" <?php if (!$mod['user_id']) { echo 'selected="selected"'; } ?>>-- <?php echo $_LANG['AD_ANONYMOUS']; ?> --</option>
-                <?php
-                    echo $inCore->getListItems('cms_users', cmsCore::getArrVal($mod, 'user_id', cmsCore::c('user')->id), 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname');
-                ?>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_POST_QUESTION']; ?>:</label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if(cmsCore::getArrVal($mod, 'published', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="published" <?php if(cmsCore::getArrVal($mod, 'published', false)) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($mod, 'published', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="published" <?php if (!cmsCore::getArrVal($mod, 'published', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label class="col-sm-5" style="padding-left:0;"><?php echo $_LANG['AD_DATE_QUESTION']; ?>:</label>
-            <div class="col-sm-7">
-                <input type="text" id="pubdate" class="form-control" style="display:inline-block;width:auto;" name="pubdate" value="<?php if (!cmsCore::getArrVal($mod, 'pubdate', false)) { echo date('d.m.Y'); } else { echo $mod['pubdate']; } ?>" />
-                <input type="hidden" name="oldpubdate" value="<?php echo cmsCore::getArrVal($mod, 'pubdate', ''); ?>" />
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label class="col-sm-5" style="padding-left:0;"><?php echo $_LANG['AD_DATE_REPLY']; ?>:</label>
-            <div class="col-sm-7">
-                <input type="text" id="answerdate" class="form-control" style="display:inline-block;width:auto;" name="answerdate" value="<?php if (!cmsCore::getArrVal($mod, 'answerdate', false)) { echo date('d.m.Y'); } else { echo $mod['answerdate']; } ?>" />
-                <input type="hidden" name="oldanswerdate" value="<?php echo cmsCore::getArrVal($mod, 'answerdate', ''); ?>" />
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_TEXT_QUESTION']; ?>:</label>
-            <textarea id="quest" class="form-control" name="quest" rows="6"><?php echo cmsCore::getArrVal($mod, 'quest', ''); ?></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_ANSWER_QUESTION']; ?>:</label>
-            <?php $inCore->insertEditor('answer', $mod['answer'], '300', '605'); ?>
-        </div>
-    </div>
-
-    <div>
-        <input type="submit" class="btn btn-primary" name="add_mod" value="<?php echo $_LANG['SAVE']; ?>" />
-        <input type="button" class="btn btn-default" name="back2" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components&do=config&id=<?php echo $id; ?>';" />
-        
-        <input type="hidden" id="do" name="opt" value="<?php if ($opt == 'add_item') { echo 'submit_item'; } else { echo 'update_item'; } ?>" />
-        <?php
-            if ($opt == 'edit_item') {
-                echo '<input type="hidden" name="item_id" value="'. $mod['id'] .'" />';
-            }
-        ?>
-    </div>
-</form>
-<?php
+    cmsCore::c('page')->initTemplate('components', 'faq_add')->
+        assign('opt', $opt)->
+        assign('faq_cats_opt', $inCore->getListItems('cms_faq_cats', cmsCore::getArrVal($mod, 'category_id', cmsCore::request('addto', 'int', 0))))->
+        assign('users_opt', $inCore->getListItems('cms_users', cmsCore::getArrVal($mod, 'user_id', cmsCore::c('user')->id), 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname'))->
+        assign('mod', $mod)->
+        display();
 }
 
 if ($opt == 'add_cat' || $opt == 'edit_cat') {
@@ -476,58 +345,10 @@ if ($opt == 'add_cat' || $opt == 'edit_cat') {
         cpAddPathway($_LANG['AD_CAT_QUESTION'], '?view=components&do=config&id='. $id .'&opt=list_cats');
         cpAddPathway($mod['title']);
     }
-?>
-<form id="addform" name="addform" method="post" action="index.php?view=components&amp;do=config&amp;id=<?php echo (int)$_REQUEST['id'];?>">
-    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
     
-    <div style="width:600px;">
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_NAME_CATEGORY']; ?>:</label>
-            <input type="text" class="form-control" name="title" value="<?php echo htmlspecialchars(cmsCore::getArrVal($mod, 'title', '')); ?>" />
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_PARENT_CATEGORY']; ?>:</label>
-            <select class="form-control" name="parent_id">
-                <option value="0" <?php if (cmsCore::getArrVal($mod, 'parent_id', 0) == 0) { echo 'selected="selected"'; } ?>>--</option>
-                <?php echo $inCore->getListItems('cms_faq_cats', cmsCore::getArrVal($mod, 'parent_id', 0)); ?>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_POST_CATEGORY']; ?>:</label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if(cmsCore::getArrVal($mod, 'published', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="published" <?php if(cmsCore::getArrVal($mod, 'published', false)) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($mod, 'published', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="published" <?php if (!cmsCore::getArrVal($mod, 'published', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-        </div>
-<?php
-        if (cmsCore::getArrVal($mod, 'user', 1) == 1) {
-?>
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_DESCR_CATEGORY']; ?>:</label>
-            <?php echo $inCore->insertEditor('description', $mod['description'], '260', '605'); ?>
-        </div>
-<?php
-        }
-?>
-    </div>
-    
-    <div>
-        <input type="submit" class="btn btn-primary" name="add_mod" value="<?php echo $_LANG['SAVE']; ?>" />
-        <input type="button" class="btn btn-default" name="back3" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components&do=config&id=<?php echo $id; ?>';" />
-        
-        <input type="hidden" id="do" name="opt" value="<?php if ($opt=='add_cat') { echo 'submit_cat'; } else { echo 'update_cat'; } ?>" />
-        <?php
-            if ($opt == 'edit_cat') {
-                echo '<input type="hidden" name="item_id" value="'. $mod['id'] .'" />';
-            }
-        ?>
-    </div>
-</form>
-<?php
+    cmsCore::c('page')->initTamplate('components', 'faq_add_cat')->
+        assign('opt', $opt)->
+        assign('faq_cats_opt', $inCore->getListItems('cms_faq_cats', cmsCore::getArrVal($mod, 'parent_id', 0)))->
+        assign('mod', $mod)->
+        display();
 }

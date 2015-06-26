@@ -144,7 +144,7 @@ class cmsFormGen {
             $tpl_data['fields'] = $this->params;
             $tpl_data['info']   = $this->xml->info;
 
-            cmsPage::includeTemplateFile('admin/autoform.php');
+            cmsPage::includeTemplateFile('special/autoform.php');
 
         $this->html = ob_get_clean();
 

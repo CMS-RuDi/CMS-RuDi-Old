@@ -51,7 +51,7 @@ $toolmenu = array(
 );
 
 
-if ($opt == 'countries'){
+if ($opt == 'countries') {
     $toolmenu[] = array( 'icon' => 'reorder.gif', 'title' => $_LANG['AD_SAVE_ORDER'], 'link' => "javascript:checkSel('?view=components&do=config&id=". $id ."&opt=saveorder');" );
 }
 
@@ -59,13 +59,12 @@ $toolmenu[] = array( 'icon' => 'config.gif', 'title' => $_LANG['AD_SETTINGS'], '
 
 cpToolMenu($toolmenu);
 
-
-if ($opt == 'move_up'){
+if ($opt == 'move_up') {
     dbMoveUp('cms_geo_countries', cmsCore::request('item_id', 'int', 0), cmsCore::request('co', 'int', 0));
     cmsCore::redirectBack();
 }
 
-if ($opt == 'move_down'){
+if ($opt == 'move_down') {
     dbMoveDown('cms_geo_countries', cmsCore::request('item_id', 'int', 0), cmsCore::request('co', 'int', 0));
     cmsCore::redirectBack();
 }
@@ -82,7 +81,7 @@ if ($opt == 'saveorder') {
     cmsCore::redirectBack();
 }
 
-if ($opt == 'countries'){
+if ($opt == 'countries') {
     echo '<h3>'. $_LANG['AD_COUNTRIES'] .'</h3>';
     
     $fields = array(
@@ -102,7 +101,7 @@ if ($opt == 'countries'){
     cpListTable('cms_geo_countries', $fields, $actions, '', 'ordering, name');
 }
 
-if ($opt == 'regions'){
+if ($opt == 'regions') {
     cpAddPathway($_LANG['AD_REGIONS']);
     echo '<h3>'. $_LANG['AD_REGIONS'] .'</h3>';
 
@@ -141,38 +140,10 @@ if ($opt == 'cities'){
 
 if ($opt == 'config') {
     cpAddPathway($_LANG['AD_SETTINGS']);
-?>
-<form action="index.php?view=components&amp;do=config&amp;id=<?php echo $id;?>" method="post" name="optform">
-    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
     
-    <div style="width:500px;">
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_AUTODETECT']; ?></label>
-            <div class="btn-group" data-toggle="buttons" style="float:right;">
-                <label class="btn btn-default <?php if(cmsCore::getArrVal($cfg, 'autodetect', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="autodetect" <?php if(cmsCore::getArrVal($cfg, 'autodetect', false)) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES']; ?>
-                </label>
-                <label class="btn btn-default <?php if (!cmsCore::getArrVal($cfg, 'autodetect', false)) { echo 'active'; } ?>">
-                    <input type="radio" name="autodetect" <?php if (!cmsCore::getArrVal($cfg, 'autodetect', false)) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO']; ?>
-                </label>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label><?php echo $_LANG['AD_CLASS']; ?>:</label>
-            <input type="text" id="maxitems" class="form-control" name="class" size="20" value="<?php echo $cfg['class']; ?>" />
-            <div class="help-block"><?php echo $_LANG['AD_CLASS_HINT']; ?></div>
-        </div>
-    </div>
-    
-    <div>
-        <input type="hidden" name="opt" value="saveconfig" />
-        
-        <input type="submit" class="btn btn-primary" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
-        <input type="button" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components&amp;do=config&amp;id=<?php echo $id; ?>';"/>
-    </div>
-</form>
-<?php
+    cmsCore::c('page')->initTemplate('components', 'geo_config')->
+        assign('cfg', $cfg)->
+        display();
 }
 
 if ($opt == 'saveconfig') {
@@ -241,98 +212,32 @@ if ($opt == 'delete') {
 if ($opt=='add' || $opt == 'edit'){
     $sub_opt = cmsCore::request('sub_opt', 'str', '');
     $item_id = cmsCore::request('item_id', 'int', 0);
+    
+    $tpl = cmsCore::c('page')->initTemplate('components', 'geo_add')->
+        assign('opt', $opt)->
+        assign('sub_opt', $sub_opt)->
+        assign('item_id', $item_id)->
+        assign('countries_opt', cmsCore::getListItems('cms_geo_countries', cmsCore::getArrVal($item, 'country_id', 0), 'name', 'ASC', '', 'id', 'name'))->
+        assign('regions_opt', cmsCore::getListItems('cms_geo_regions', cmsCore::getArrVal($item, 'region_id', 0), 'name', 'ASC', (isset($item['country_id']) ? "country_id = '". $item['country_id'] ."'" : ''), 'id', 'name'));
 
     if ($item_id) {
         $table = ($sub_opt == 'country') ? 'cms_geo_countries' : ($sub_opt == 'region' ? 'cms_geo_regions' : 'cms_geo_cities');
 
         $item = cmsCore::c('db')->get_fields($table, "id='". $item_id ."'", '*');
         if (!$item) { cmsCore::error404(); }
+        
+        if (!isset($item['ordering'])) {
+            $item['ordering'] = 1 + cmsCore::c('db')->get_field('cms_geo_countries', "1=1 ORDER BY ordering DESC", 'ordering');
+        }
+        
+        $tpl->assign('item', $item);
+        
         cpAddPathway($_LANG['EDIT'] .' '. mb_strtolower($_LANG['AD_'. mb_strtoupper($sub_opt)]));
     } else if ($sub_opt) {
         cpAddPathway($_LANG['ADD'] .' '. mb_strtolower($_LANG['AD_'. mb_strtoupper($sub_opt)]));
     } else {
         cpAddPathway($_LANG['ADD']);
     }
-
-    if(!$sub_opt && !$item_id){
-?>
-        <h3><?php echo $_LANG['AD_WHAT_ADD']; ?></h3>
-        <ul style="font-size: 14px;">
-            <li><a href="?view=components&do=config&id=<?php echo $id; ?>&opt=add&sub_opt=country"><?php echo $_LANG['AD_COUNTRY']; ?></a></li>
-            <li><a href="?view=components&do=config&id=<?php echo $id; ?>&opt=add&sub_opt=region"><?php echo $_LANG['AD_REGION']; ?></a></li>
-            <li><a href="?view=components&do=config&id=<?php echo $id; ?>&opt=add&sub_opt=city"><?php echo $_LANG['AD_CITY']; ?></a></li>
-        </ul>
-<?php
-        return;
-    }
-?>
-
-<form action="index.php?view=components&amp;do=config&amp;id=<?php echo $id; ?>" method="post" name="optform">
-    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
     
-    <div style="width:400px;">
-        <div class="form-group">
-            <label><?php echo $_LANG['TITLE']; ?></label>
-            <input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars(cmsCore::getArrVal($item, 'name', '')); ?>" />
-        </div>
-        
-        <?php if ($sub_opt == 'country') {
-            if (!isset($item['ordering'])) {
-                $item['ordering'] = 1 + cmsCore::c('db')->get_field('cms_geo_countries', "1=1 ORDER BY ordering DESC", 'ordering');
-            }
-        ?>
-        
-            <div class="form-group">
-                <label>alpha2</label>
-                <input type="text" class="form-control" name="alpha2" value="<?php echo htmlspecialchars(cmsCore::getArrVal($item, 'alpha2', '')); ?>" />
-            </div>
-        
-            <div class="form-group">
-                <label>alpha3</label>
-                <input type="text" class="form-control" name="alpha3" value="<?php echo htmlspecialchars(cmsCore::getArrVal($item, 'alpha3', '')); ?>" />
-            </div>
-        
-            <div class="form-group">
-                <label>alpha3</label>
-                <input type="text" class="form-control" name="iso" value="<?php echo htmlspecialchars(cmsCore::getArrVal($item, 'iso', '')); ?>" />
-            </div>
-        
-            <div class="form-group">
-                <label><?php echo $_LANG['AD_ORDER']; ?></label>
-                <input type="text" class="form-control" name="ordering" value="<?php echo cmsCore::getArrVal($item, 'ordering', ''); ?>" />
-            </div>
-        <?php } else if($sub_opt == 'region') { ?>
-            <div class="form-group">
-                <label><?php echo $_LANG['AD_COUNTRY1']; ?></label>
-                <select class="form-control" name="country_id">
-                    <?php echo cmsCore::getListItems('cms_geo_countries', cmsCore::getArrVal($item, 'country_id', 0), 'name', 'ASC', '', 'id', 'name'); ?>
-                </select>
-            </div>
-        <?php } else { ?>
-            <div class="form-group">
-                <label><?php echo $_LANG['AD_COUNTRY1']; ?></label>
-                <select class="form-control" name="country_id">
-                    <?php echo cmsCore::getListItems('cms_geo_countries', cmsCore::getArrVal($item, 'country_id', 0), 'name', 'ASC', '', 'id', 'name'); ?>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label><?php echo $_LANG['AD_REGION']; ?></label>
-                <select class="form-control" name="region_id">
-                    <?php echo cmsCore::getListItems('cms_geo_regions', cmsCore::getArrVal($item, 'region_id', 0), 'name', 'ASC', (isset($item['country_id']) ? "country_id = '". $item['country_id'] ."'" : ''), 'id', 'name'); ?>
-                </select>
-            </div>
-        <?php } ?>
-    </div>
-
-    <div>
-        <input type="hidden" name="opt" value="do_<?php echo $opt; ?>" />
-        <input type="hidden" name="sub_opt" value="<?php echo $sub_opt; ?>" />
-        <input type="hidden" name="item_id" value="<?php echo cmsCore::getArrVal($item, 'id', ''); ?>" />
-        
-        <input type="submit" class="btn btn-primary" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
-        <input type="button" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.location.href='index.php?view=components&amp;do=config&amp;id=<?php echo $id; ?>';"/>
-    </div>
-</form>
-<?php
+    $tpl->display();
 }

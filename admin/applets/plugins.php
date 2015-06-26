@@ -134,51 +134,31 @@ function applet_plugins() {
 
         cmsCore::c('page')->setTitle($plugin->info['title']);
         cpAddPathway($plugin->info['title'], 'index.php?view=plugins&do=config&id='. $id);
-
-        echo '<fieldset style="width:610px;"><legend>'. $plugin->info['title'] .'</legend>';
         
         $xml_file = PATH .'/plugins/'. $plugin_name .'/backend.xml';
+        
+        $tpl = cmsCore::c('page')->initTemplate('applets', 'plugins_config')->
+            assign('plugin_title', $plugin->info['title'])->
+            assign('config', $config)->
+            assign('plugin_cfg_fields', $plugin_cfg_fields)->
+            assign('xml_file_exist', file_exists($xml_file))->
+            assign('plugin_name', $plugin_name);
+        
+        if (!empty($plugin_cfg_fields)) {
+            $tpl->assign('form_gen_form', cmsCore::c('form_gen')->generateForm($plugin->getConfigFields(), $config));
+        } else if (file_exists($xml_file)) {
+            $toolmenu[] = array('icon'=>'save.gif', 'title'=>$_LANG['SAVE'], 'link'=>'javascript:document.addform.submit();');
+            $toolmenu[] = array('icon'=>'cancel.gif', 'title'=>$_LANG['CANCEL'], 'link'=>'index.php?view=modules');
 
-        if (!$config && empty($plugin_cfg_fields) && !file_exists($xml_file)) {
-            echo '<p>'. $_LANG['AD_PLUGIN_DISABLE'] .'.</p>';
-            echo '<p><a href="javascript:window.history.go(-1);">'. $_LANG['BACK'] .'</a></p>';
-        } else {
-            echo '<form action="index.php?view=plugins&do=save_config&plugin='. $plugin_name .'" method="POST">';
-                if (!empty($plugin_cfg_fields)) {
-                    echo '<div style="width:610px;">'. cmsCore::c('form_gen')->generateForm($plugin->getConfigFields(), $config) .'</div>';
-                } else if (file_exists($xml_file)) {
-                    $toolmenu[] = array('icon'=>'save.gif', 'title'=>$_LANG['SAVE'], 'link'=>'javascript:document.addform.submit();');
-                    $toolmenu[] = array('icon'=>'cancel.gif', 'title'=>$_LANG['CANCEL'], 'link'=>'index.php?view=modules');
-                    
-                    cpToolMenu($toolmenu);
-                    
-                    cmsCore::loadClass('formgen');
-                    
-                    $formGen = new cmsFormGen($xml_file, $config);
-                    
-                    echo $formGen->getHTML();
-                } else {
-                    echo '<input type="hidden" name="csrf_token" value="'. cmsUser::getCsrfToken() .'" />';
-                    echo '<table class="proptable" width="605" cellpadding="8" cellspacing="0" border="0">';
-                        foreach ($config as $field => $value) {
-                            echo '<tr>';
-                                echo '<td width="150"><strong>'. cmsCore::getArrVal($_LANG, mb_strtoupper($field), $field) .':</strong></td>';
-                                echo '<td><input type="text" style="width:90%" name="config['. $field .']" value="'. htmlspecialchars($value) .'" /></td>';
-                            echo '</tr>';
-                        }
-                    echo '</table>';
-                }
-                
-                if (!file_exists($xml_file)) {
-                    echo '<input type="hidden" name="do" value="save_config" />';
-                    echo '<div style="margin-top:6px;">';
-                        echo '<input type="submit" class="btn btn-primary" name="save" value="'. $_LANG['SAVE'] .'" /> ';
-                        echo '<input type="button" class="btn btn-default" name="back" value="'. $_LANG['CANCEL'] .'" onclick="window.history.go(-1)" />';
-                    echo '</div>';
-                }
+            cpToolMenu($toolmenu);
 
-            echo '</form>';
+            cmsCore::loadClass('formgen');
+
+            $formGen = new cmsFormGen($xml_file, $config);
+
+            $tpl->assign('form_gen_form', $formGen->getHTML());
         }
-        echo '</fieldset>';
+
+        $tpl->display();
     }
 }

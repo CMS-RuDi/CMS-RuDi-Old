@@ -85,13 +85,10 @@ function applet_components() {
             }
             
             if (!empty($com_cfg)) {
-                echo '<form action="index.php?view=components&do=save_config&id='. $com['id'] .'" method="POST">';
-                    echo '<div style="width:650px;">'. cmsCore::c('form_gen')->generateForm($com_cfg, $inCore->loadComponentConfig($com['link'])) .'</div>';
-                    echo '<div style="margin-top:6px;">';
-                        echo '<input type="submit" class="btn btn-primary" name="save" value="'. $_LANG['SAVE'] .'" /> ';
-                        echo '<input type="button" class="btn btn-default" name="back" value="'. $_LANG['CANCEL'] .'" onclick="window.history.go(-1)" />';
-                    echo '</div>';
-                echo '</form>';
+                cmsCore::c('page')->initTemplate('applets', 'components_config')->
+                    assign('com_id', $com['id'])->
+                    assign('formConfig', cmsCore::c('form_gen')->generateForm($com_cfg, $inCore->loadComponentConfig($com['link'])))->
+                    display();
             }
             
             return;

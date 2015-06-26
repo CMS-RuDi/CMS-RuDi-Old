@@ -114,3 +114,4 @@ $_LANG['AD_SCHEME_TYPE']               = 'Протокол';
 $_LANG['AD_SCHEME_ANY']                = 'Любой';
 $_LANG['AD_SCHEME_http']               = 'Только HTTP';
 $_LANG['AD_SCHEME_https']              = 'Только HTTPS';
+$_LANG['ADMIN_TEMPLATE']               = 'Шаблон админки';

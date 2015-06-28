@@ -33,3 +33,4 @@ $_LANG['AD_IS_ACTIVE']           = 'Is it active?';
 $_LANG['AD_PERFORM_TASK']        = 'Perform task';
 $_LANG['AD_DELETE_TASK']         = 'Delete task';
 $_LANG['AD_TASKS_NOTFOUND']      = 'Tasks are not found';
+$_LANG['AD_CRON_RUN_URL']        = 'Add file <strong>/cron.php</strong> in CRON task schedule in the panel of your hosting.';

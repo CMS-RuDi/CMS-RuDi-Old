@@ -129,6 +129,10 @@ class cmsCore {
     }
     
     public static function getScheme() {
+        if (PHP_SAPI == 'cli') {
+            return !empty(self::c('config')->scheme) ? self::c('config')->scheme : 'http';
+        }
+        
         if (isset($_SERVER['HTTP_SCHEME'])) {
             $scheme = $_SERVER['HTTP_SCHEME'];
         } else if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {

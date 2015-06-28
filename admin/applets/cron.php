@@ -36,13 +36,16 @@ function applet_cron() {
 
         cpToolMenu($toolmenu);
         
+        echo $_LANG['AD_CRON_RUN_URL'];
+        echo '<pre>php -f '. PATH .'/cron.php '. str_replace(array('http://', 'https://'), '', cmsCore::c('config')->host) .' > /dev/null</pre>';
+        
         $fields = array(
             array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
             array( 'title' => $_LANG['TITLE'], 'field' => 'job_name', 'width' => '80', 'link' => '?view=cron&do=edit&id=%id%' ),
             array( 'title' => $_LANG['DESCRIPTION'], 'field' => 'comment', 'width' => '' ),
-            array( 'title' => $_LANG['AD_MISSION_INTERVAL'], 'field' => 'job_interval', 'width' => '30', 'prc' => function($interval) { global $_LANG; return $interval .' '. $_LANG['HOUR']; } ),
+            array( 'title' => $_LANG['AD_MISSION_INTERVAL'], 'field' => 'job_interval', 'width' => '80', 'prc' => function($interval) { global $_LANG; return $interval .' '. $_LANG['HOUR']; } ),
             array( 'title' => $_LANG['AD_LAST_START'], 'field' => 'job_run_date', 'width' => '150' ),  
-            array( 'title' => $_LANG['AD_IS_ACTIVE'], 'field' => 'is_enabled', 'width' => '50', 'published' => true )
+            array( 'title' => $_LANG['AD_IS_ACTIVE'], 'field' => 'is_enabled', 'width' => '80', 'published' => true )
         );
 
         $actions = array(

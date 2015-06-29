@@ -17,8 +17,8 @@ header('X-Frame-Options: DENY');
 
 session_start();
 
-define("VALID_CMS", 1);
-define("VALID_CMS_ADMIN", 1);
+define('VALID_CMS', 1);
+define('VALID_CMS_ADMIN', 1);
 
 define('PATH', $_SERVER['DOCUMENT_ROOT']);
 
@@ -36,7 +36,9 @@ if (!cmsCore::c('user')->update()) {
 }
 
 // проверяем доступ по Ip
-if (!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) { cmsCore::error404(); }
+if (!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) {
+    cmsCore::error404();
+}
 
 cmsCore::loadLanguage('admin/lang');
 global $_LANG;

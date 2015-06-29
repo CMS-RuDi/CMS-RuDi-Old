@@ -31,17 +31,19 @@ function applet_cron() {
     
     if ($do == 'list') {
         $toolmenu = array(
-            array( 'icon' => 'new.gif', 'title' => $_LANG['AD_CREATE_CRON_MISSION'], 'link' => '?view=cron&do=add' )
+            array( 'icon' => 'new.gif', 'title' => $_LANG['AD_CREATE_CRON_MISSION'], 'link' => '?view=cron&do=add' ),
+            array( 'icon' => 'liststuff.gif', 'title' => $_LANG['AD_CRON_MISSION'], 'link' => '?view=cron&do=list' ),
+            array( 'icon' => 'listcomments.gif', 'title' => $_LANG['AD_JOB_LOG'], 'link' => '?view=cron&do=view_log' ),
         );
 
-        cpToolMenu($toolmenu);
+        cpToolMenu($toolmenu, 'list', 'do');
         
         echo $_LANG['AD_CRON_RUN_URL'];
         echo '<pre>php -f '. PATH .'/cron.php '. str_replace(array('http://', 'https://'), '', cmsCore::c('config')->host) .' > /dev/null</pre>';
         
         $fields = array(
             array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
-            array( 'title' => $_LANG['TITLE'], 'field' => 'job_name', 'width' => '80', 'link' => '?view=cron&do=edit&id=%id%' ),
+            array( 'title' => $_LANG['TITLE'], 'field' => 'job_name', 'width' => '80', 'link' => '?view=cron&do=view_log&id=%id%' ),
             array( 'title' => $_LANG['DESCRIPTION'], 'field' => 'comment', 'width' => '' ),
             array( 'title' => $_LANG['AD_MISSION_INTERVAL'], 'field' => 'job_interval', 'width' => '80', 'prc' => function($interval) { global $_LANG; return $interval .' '. $_LANG['HOUR']; } ),
             array( 'title' => $_LANG['AD_LAST_START'], 'field' => 'job_run_date', 'width' => '150' ),  
@@ -175,5 +177,46 @@ function applet_cron() {
             assign('do', $do)->
             assign('mod', $mod)->
             display();
-   }
-}
+    }
+    
+    if ($do == 'view_log') {
+        $job = cmsCron::getJobById($id);
+        if (empty($job) && !empty($id)) {
+            cmsCore::error404();
+        }
+        
+        $toolmenu = array(
+            array( 'icon' => 'new.gif', 'title' => $_LANG['AD_CREATE_CRON_MISSION'], 'link' => '?view=cron&do=add' ),
+            array( 'icon' => 'liststuff.gif', 'title' => $_LANG['AD_CRON_MISSION'], 'link' => '?view=cron&do=list' ),
+            array( 'icon' => 'listcomments.gif', 'title' => $_LANG['AD_JOB_LOG'], 'link' => '?view=cron&do=view_log' ),
+            array( 'icon' => 'delete.gif', 'title' => $_LANG['AD_CLEAR_LOG'], 'link' => '?view=cron&do=clear_log'. (!empty($job['id']) ? '&id='. $id : '') )
+        );
+
+        cpToolMenu($toolmenu, 'list', 'do');
+        
+        cpAddPathway($_LANG['AD_JOB_LOG'] . (!empty($job) ? ': '. $job['job_name'] : ''), 'index.php?view=cron&do=view_log'. (!empty($job['id']) ? '&id='. $id : ''));
+        
+        $fields = array(
+            array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
+            array( 'title' => $_LANG['AD_JOB_NAME'], 'field' => 'cron_id', 'width' => '80' ),
+            array( 'title' => $_LANG['AD_MSG'], 'field' => 'msg', 'width' => '' ),
+            array( 'title' => $_LANG['AD_RUN_DATE'], 'field' => 'run_date', 'width' => '150' )
+        );
+
+        $actions = array();
+
+        cpListTable('cms_cron_logs', $fields, $actions, (!empty($job['id']) ? 'cron_id='. $job['id'] : '1=1'), 'run_date DESC');
+    }
+    
+    if ($do == 'clear_log') {
+        $job = cmsCron::getJobById($id);
+        if (empty($job) && !empty($id)) {
+            cmsCore::error404();
+        }
+        
+        cmsCore::c('db')->delete('cms_cron_logs', (!empty($id) ? 'cron_id='. $id : '1=1'));
+        
+        cmsCore::addSessionMessage($_LANG['AD_CRON_LOGS_SUCCESS_CLEAR']);
+        cmsCore::redirectBack();
+    }
+} 

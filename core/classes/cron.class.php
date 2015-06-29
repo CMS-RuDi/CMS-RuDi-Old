@@ -11,26 +11,21 @@
 //                                                                            //
 /******************************************************************************/
 
-class cmsCron {
-
+class cmsCron
+{
     private static $instance;
-
-// ============================================================================ //
-// ============================================================================ //
 
     private function __construct() {}
 
     private function __clone() {}
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance === null) {
             self::$instance = new self;
         }
         return self::$instance;
     }
-
-// ============================================================================ //
-// ============================================================================ //
 
     /**
      * Регистрирует новую задачу СRON
@@ -38,10 +33,19 @@ class cmsCron {
      * @param array $job (interval, component, model_method, custom_file, comment)
      * @return bool
      */
-    public static function registerJob($job_name, $job){
-        if (!isset($job['enabled'])) { $job['enabled'] = 1; }
-        if (!isset($job['class_name'])) { $job['class_name'] = ''; }
-        if (!isset($job['class_method'])) { $job['class_method'] = ''; }
+    public static function registerJob($job_name, $job)
+    {
+        if (!isset($job['enabled'])) {
+            $job['enabled'] = 1;
+        }
+        
+        if (!isset($job['class_name'])) {
+            $job['class_name'] = '';
+        }
+        
+        if (!isset($job['class_method'])) {
+            $job['class_method'] = '';
+        }
 
         $sql = "INSERT INTO cms_cron_jobs (job_name, job_interval, job_run_date,
                                            component, model_method, custom_file,
@@ -63,12 +67,10 @@ class cmsCron {
      * @param array $job (interval, component, model_method, custom_file, comment, enabled)
      * @return bool
      */
-    public static function updateJob($job_id, $job){
+    public static function updateJob($job_id, $job)
+    {
         return cmsCore::c('db')->update('cms_cron_jobs', $job, $job_id);
     }
-
-// ============================================================================ //
-// ============================================================================ //
 
     /**
      * Находит описание задачи CRON по названию
@@ -76,9 +78,9 @@ class cmsCron {
      * @param bool $only_enabled
      * @return array | false
      */
-    public static function getJob($job_name, $only_enabled=true){
+    public static function getJob($job_name, $only_enabled = true)
+    {
         $enabled = $only_enabled ? 'AND is_enabled=1' : '';
-
         return cmsCore::c('db')->get_fields('cms_cron_jobs', "job_name='{$job_name}' {$enabled}", '*');
     }
 
@@ -87,12 +89,10 @@ class cmsCron {
      * @param int $job_id
      * @return array | false
      */
-    public static function getJobById($job_id){
+    public static function getJobById($job_id)
+    {
         return cmsCore::c('db')->get_fields('cms_cron_jobs', "id='{$job_id}'", '*');
     }
-
-// ============================================================================ //
-// ============================================================================ //
 
     /**
      * Возвращает список задач CRON
@@ -100,7 +100,8 @@ class cmsCron {
      * @param bool $only_custom Только задачи выполнения скрипта
      * @return array
      */
-    public static function getJobs($only_enabled=true, $only_custom=false){
+    public static function getJobs($only_enabled = true, $only_custom = false)
+    {
         $enabled = $only_enabled ? 'AND is_enabled=1' : '';
 
         $custom = $only_custom ? "AND component='' AND model_method='' AND class_name='' AND class_method=''" : '';
@@ -128,31 +129,30 @@ class cmsCron {
 
         $result = cmsCore::c('db')->query($sql);
 
-        if (!cmsCore::c('db')->num_rows($result)){ return false; }
+        if (!cmsCore::c('db')->num_rows($result)) {
+            return false;
+        }
 
         $jobs = array();
 
-        while($job = cmsCore::c('db')->fetch_assoc($result)){
-
+        while ($job = cmsCore::c('db')->fetch_assoc($result)) {
             $job['hours_ago'] = round((time() - strtotime($job['run_date']))/3600, 2);
 
             $jobs[] = $job;
-
         }
 
         return $jobs;
     }
-
-// ============================================================================ //
-// ============================================================================ //
 
     /**
      * Удаляет задачу CRON
      * @param string $job_name
      * @return bool
      */
-    public static function removeJob($job_name){
-        return cmsCore::c('db')->delete('cms_cron_jobs', "job_name = '{$job_name}'", 1);
+    public static function removeJob($job_name)
+    {
+        $job_id = cmsCore::c('db')->get_field('cms_cron_jobs', "job_name = '". $job_name ."'", 'id');
+        self::removeJobById($job_id);
     }
 
     /**
@@ -160,8 +160,10 @@ class cmsCron {
      * @param int $job_id
      * @return bool
      */
-    public static function removeJobById($job_id){
-        return cmsCore::c('db')->delete('cms_cron_jobs', "id = '{$job_id}'", 1);
+    public static function removeJobById($job_id)
+    {
+        cmsCore::c('db')->delete('cms_cron_jobs', "id = '". $job_id ."'", 1);
+        cmsCore::c('db')->delete('cms_cron_logs', "cron_id = '". $job_id ."'");
     }
 
     /**
@@ -170,7 +172,8 @@ class cmsCron {
      * @param bool $is_enabled Активность
      * @return bool
      */
-    public static function jobEnabled($job_id, $is_enabled){
+    public static function jobEnabled($job_id, $is_enabled)
+    {
         $is_enabled = (int)$is_enabled;
 
         $sql = "UPDATE cms_cron_jobs SET is_enabled = '{$is_enabled}' WHERE id = '{$job_id}'";
@@ -180,32 +183,33 @@ class cmsCron {
         return true;
     }
 
-
-// ============================================================================ //
-// ============================================================================ //
-
     /**
      * Отмечает задачу как успешно выполненную
      * @param int $job_id ID задачи
      * @return bool
      */
-    public static function jobSuccess($job_id){
-        $sql = "UPDATE cms_cron_jobs SET job_run_date = CURRENT_TIMESTAMP, is_new = 0 WHERE id = '{$job_id}'";
+    public static function jobSuccess($job_id, $job_result)
+    {
+        $sql = "UPDATE cms_cron_jobs SET job_run_date = CURRENT_TIMESTAMP, is_new = 0 WHERE id = '". $job_id ."'";
 
         cmsCore::c('db')->query($sql);
+        
+        cmsCore::c('db')->insert('cms_cron_logs', array(
+            'cron_id'  => $job_id,
+            'msg'      => cmsCore::c('db')->escape_string((string)$job_result),
+            'run_date' => date('Y-m-d H:i:s')
+        ));
 
         return true;
     }
-
-// ============================================================================ //
-// ============================================================================ //
 
     /**
      * Выполняет задачу с указанным именем
      * @param str $job_name
      * @return bool
      */
-    public static function executeJobByName($job_name){
+    public static function executeJobByName($job_name)
+    {
         $job = self::getJob($job_name);
         return self::executeJob($job);
     }
@@ -215,7 +219,8 @@ class cmsCron {
      * @param int $job_id
      * @return bool
      */
-    public static function executeJobById($job_id){
+    public static function executeJobById($job_id)
+    {
         $job = self::getJobById($job_id);
         return self::executeJob($job);
     }
@@ -225,7 +230,8 @@ class cmsCron {
      * @param array $job
      * @return bool
      */
-    public static function executeJob($job){
+    public static function executeJob($job)
+    {
         $job_result = true;
 
         /* ================================================ */
@@ -238,14 +244,12 @@ class cmsCron {
         /* ================================================ */
         /* ================  метод модели ================= */
         /* ================================================ */
-        if ($job['component'] && $job['model_method']){
-
+        if ($job['component'] && $job['model_method']) {
             cmsCore::loadModel($job['component']);
 
             $classname  = "cms_model_{$job['component']}";
 
             if (class_exists($classname)) {
-
                 $model = new $classname();
 
                 if (method_exists($model, $job['model_method'])){
@@ -253,19 +257,16 @@ class cmsCron {
                     $job_result = call_user_func(array($model, $job['model_method']));
 
                 }
-
             }
-
         }
 
         /* ================================================ */
         /* =================  метод класса ================ */
         /* ================================================ */
-        if ($job['class_name'] && $job['class_method']){
-
+        if ($job['class_name'] && $job['class_method']) {
             $classfile = '';
 
-            if (!mb_strstr($job['class_name'], '|')){
+            if (!mb_strstr($job['class_name'], '|')) {
                 $classname = $job['class_name'];
             } else {
                 $job['class_name'] = explode('|', $job['class_name']);
@@ -273,28 +274,22 @@ class cmsCron {
                 $classname = $job['class_name'][1];
             }
 
-            if ($classfile){ cmsCore::loadClass($classfile); }
+            if ($classfile) {
+                cmsCore::loadClass($classfile);
+            }
 
             if (class_exists($classname)) {
-
                 if (method_exists($classname, $job['class_method'])){
-
                     $job_result = $job_result && call_user_func(array($classname, $job['class_method']));
-
                 }
-
             }
 
         }
 
-        if ($job_result){ self::jobSuccess($job['id']); }
+        if (!empty($job_result)) {
+            self::jobSuccess($job['id'], $job_result);
+        }
 
-		return $job_result;
-
+        return $job_result;
     }
-
-
-// ============================================================================ //
-// ============================================================================ //
-
 }

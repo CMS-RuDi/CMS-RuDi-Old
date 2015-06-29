@@ -520,6 +520,13 @@ INSERT INTO `#__cron_jobs` (`id`, `job_name`, `job_interval`, `job_run_date`, `c
 (10, 'clearOnlineUsers', 0, '2013-09-21 17:30:01', '', '', '', 1, 0, 'Удаляет просроченные данные об online пользователях', 'user|cmsUser', 'clearOnlineUsers'),
 (11, 'generateSitemaps', 12, '2014-10-14 17:30:01', 'sitemap', 'generateSitemaps', '', 1, 0, 'Генерирует карту сайта.', '', '');
 
+CREATE TABLE #__cron_logs (
+  id int(11) DEFAULT NULL,
+  cron_id int(11) DEFAULT NULL,
+  msg text DEFAULT NULL,
+  run_date datetime DEFAULT NULL
+) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 DROP TABLE IF EXISTS `#__downloads`;
 CREATE TABLE `#__downloads` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

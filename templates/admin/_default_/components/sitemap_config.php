@@ -1,4 +1,4 @@
-<?php if (empty($components)) { ?>
+<?php if (!empty($components)) { ?>
 <form action="index.php?view=components&do=config&link=sitemap&opt=saveconfig" method="post">
     <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
     

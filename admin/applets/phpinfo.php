@@ -25,7 +25,7 @@ function applet_phpinfo() {
 
     ob_start(); phpinfo();
 
-    cmsCore::c('page')->initTemplate()->
-        assign('phpinfo',ob_get_clean() )->
+    cmsCore::c('page')->initTemplate('applets', 'phpinfo')->
+        assign('phpinfo', ob_get_clean())->
         display();
 }

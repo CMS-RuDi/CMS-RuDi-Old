@@ -606,9 +606,9 @@ function cpListTable($table, $_fields, $_actions, $where='', $orderby='title', $
 
             $inputname = 'filter['.$_fields[$key]['field'].']';
             if (!isset($_fields[$key]['filterlist'])) {
-                $f_html .= str_replace('%field%', '<input type="text" class="form-control" name="'. $inputname .'" size="'. $_fields[$key]['filter'] .'" value="'. ($initval === false ? '' : $initval) .'" />', $f_html);
+                $f_html = str_replace('%field%', '<input type="text" class="form-control" name="'. $inputname .'" size="'. $_fields[$key]['filter'] .'" value="'. ($initval === false ? '' : $initval) .'" />', $f_html);
             } else {
-                $f_html .= str_replace('%field%', cpBuildList($inputname, $_fields[$key]['filterlist'], $initval), $f_html);
+                $f_html = str_replace('%field%', cpBuildList($inputname, $_fields[$key]['filterlist'], $initval), $f_html);
             }
 
             $filters += 1;

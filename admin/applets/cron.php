@@ -13,6 +13,21 @@
 
 if (!defined('VALID_CMS_ADMIN')) { die('ACCESS DENIED'); }
 
+class cp_cron_tasks {
+    public static $cp_cron_tasks;
+}
+function cp_cron_get_task_name($task_id) {
+    if (empty(cp_cron_tasks::$cp_cron_tasks)) {
+        cp_cron_tasks::$cp_cron_tasks = array();
+        $result = cmsCore::c('db')->query('SELECT id, job_name FROM cms_cron_jobs WHERE 1=1');
+        while ($item = cmsCore::c('db')->fetch_assoc($result)) {
+            cp_cron_tasks::$cp_cron_tasks[$item['id']] = $item['job_name'];
+        }
+    }
+    
+    return isset(cp_cron_tasks::$cp_cron_tasks[$task_id]) ? cp_cron_tasks::$cp_cron_tasks[$task_id] : $task_id;
+}
+
 function applet_cron() {
     cmsCore::loadClass('cron');
     
@@ -75,9 +90,11 @@ function applet_cron() {
     }
     
     if ($do == 'execute') {
-        if ($id) { $job_result = cmsCron::executeJobById($id); }
+        if ($id) {
+            $job_result = cmsCron::executeJobById($id);
+        }
 
-        if ($job_result) {
+        if (!empty($job_result)) {
             cmsCore::addSessionMessage($_LANG['AD_MISSION_SUCCESS'], 'success');
         } else {
             cmsCore::addSessionMessage($_LANG['AD_MISSION_ERROR'], 'error');
@@ -198,7 +215,7 @@ function applet_cron() {
         
         $fields = array(
             array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),
-            array( 'title' => $_LANG['AD_JOB_NAME'], 'field' => 'cron_id', 'width' => '80' ),
+            array( 'title' => $_LANG['AD_JOB_NAME'], 'field' => 'cron_id', 'width' => '80', 'prc' => 'cp_cron_get_task_name' ),
             array( 'title' => $_LANG['AD_MSG'], 'field' => 'msg', 'width' => '' ),
             array( 'title' => $_LANG['AD_RUN_DATE'], 'field' => 'run_date', 'width' => '150' )
         );

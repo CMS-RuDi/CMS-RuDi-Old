@@ -1,17 +1,23 @@
 <div class="bar" style="padding:10px 10px;margin-top: 10px;">
-    <div>
-        <strong><?php echo $_LANG['VIDEOS']; ?>:</strong>
-        <div class="hinttext">
+    <div class="form-group">
+        <label><?php echo $_LANG['VIDEOS']; ?>:</label>
+        <div class="help-block">
             <?php echo $_LANG['VIDEOS_HINT']; ?> <b><?php echo $cfg['PIV_DOMENS']; ?></b>
         </div>
     </div>
-    <div style="margin-top:10px;">
+    
+    <div class="form-group">
         <?php echo $_LANG['INSERT_PLAYER_CODE']; ?>
-        <textarea name="piv_video_code" style="width:97%"></textarea>
-        <div align="right">
-            <input type="button" class="button" onclick="attachVideoCode();" value="<?php echo $_LANG['ATTACH']; ?>" />
+ 
+        <div class="form-group">
+            <textarea class="form-control" name="piv_video_code" style="height:150px;"></textarea>
+        </div>
+        
+        <div class="form-group text-right">
+            <input type="button" class="btn btn-primary" onclick="attachVideoCode();" value="<?php echo $_LANG['ATTACH']; ?>" />
         </div>
     </div>
+    
     <div class="piv_video_list">
         <?php if (!empty($videos)) { ?>
             <?php foreach ($videos as $video) { ?>

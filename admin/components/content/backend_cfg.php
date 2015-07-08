@@ -13,6 +13,11 @@ $com_cfg = array(
                 'fields' => array(
                     array(
                         'type' => 'btn_yes_no',
+                        'name' => 'multicats',
+                        'title' => $_LANG['AD_ALLOW_MULTICATS']
+                    ),
+                    array(
+                        'type' => 'btn_yes_no',
                         'name' => 'is_url_cyrillic',
                         'title' => $_LANG['AD_GENERATE_CYRYLLIC_URL']
                     ),

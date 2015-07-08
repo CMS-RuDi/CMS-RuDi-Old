@@ -166,5 +166,14 @@ $_LANG['AD_ROOT_METADESC']        = 'Homepage descripion (meta description)';
 $_LANG['AD_LIMIT']                = 'Restrictions';
 $_LANG['AD_RETAIN_BOOT']          = 'Save original photos<br />when users loading';
 $_LANG['MOD_TPL']                 = 'Module template';
-
+$_LANG['AD_CATEGORY']             = 'Category';
+$_LANG['AD_NAME']                 = 'Title';
+$_LANG['AD_PUBLIC_DATE']          = 'Date of publication';
+$_LANG['AD_TEMPLATE']             = 'Template';
+$_LANG['AD_NOTICE']               = 'Notice (unnecessarily)';
+$_LANG['AD_FULL_TEXT']            = 'Full text';
+$_LANG['AD_TAGS']                 = 'Tags';
+$_LANG['AD_OPTIONS']              = 'Options';
 $_LANG['AD_CHECK_SYSTEM']         = 'Check system';
+$_LANG['AD_ADDITIONAL_CATEGORIES']= 'Additional categories';
+$_LANG['AD_SELECT_CATEGORIES']    = 'Select categories...';

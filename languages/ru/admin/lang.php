@@ -168,5 +168,14 @@ $_LANG['AD_IF_UNKNOWN_PAGETITLE'] = 'Если не указан, будет со
 $_LANG['AD_LIMIT']                = 'Ограничения';
 $_LANG['AD_RETAIN_BOOT']          = 'Сохранять оригиналы при загрузке<br />фотографий пользователями';
 $_LANG['MOD_TPL']                 = 'Шаблон для вывода';
-
+$_LANG['AD_CATEGORY']             = 'Категория';
+$_LANG['AD_NAME']                 = 'Название';
+$_LANG['AD_PUBLIC_DATE']          = 'Дата публикации';
+$_LANG['AD_TEMPLATE']             = 'Шаблон';
+$_LANG['AD_NOTICE']               = 'Анонс (не обязательно)';
+$_LANG['AD_FULL_TEXT']            = 'Полный текст';
+$_LANG['AD_TAGS']                 = 'Теги';
+$_LANG['AD_OPTIONS']              = 'Опции';
 $_LANG['AD_CHECK_SYSTEM']         = 'Проверить систему';
+$_LANG['AD_ADDITIONAL_CATEGORIES']= 'Дополнительные категории';
+$_LANG['AD_SELECT_CATEGORIES']    = 'Выберите категории...';

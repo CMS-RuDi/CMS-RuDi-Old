@@ -64,8 +64,8 @@ $(function() {
     //altFormat: '',
     //appendText: '',
     autoSize: true,
-    buttonImage: '/images/icons/date.gif',
-    buttonImageOnly: true,
+    //buttonImage: '/images/icons/date.gif',
+    //buttonImageOnly: true,
     //buttonText: '...',
     calculateWeek: jQuery.datepicker.iso8601Week,
     changeMonth: true,
@@ -100,7 +100,7 @@ $(function() {
     showButtonPanel: true,
     //showCurrentAtPos: 0,
     //showMonthAfterYear: false,
-    showOn: 'both',
+    //showOn: 'both',
     //showOptions: {},
     showOtherMonths: true,
     //showWeek: false,
@@ -161,4 +161,24 @@ $(function() {
     //подхватываем от lightbox
     //$('.lightbox-enabled').colorbox({ transition: 'none', width: '90%', height: '90%' });
 
+    $('.chosen-select').chosen();
+    
+    $('.nav-tabs a.ajax_tab_link').click(function (e) {
+        e.preventDefault();
+
+        var url = $(this).attr("data-url");
+        var href = this.hash;
+        var pane = $(this);
+
+        // ajax load from data-url
+        $(href).load(url, function(result) {
+            pane.tab('show');
+        });
+    });
+    
+    if ($('.nav-tabs li.active a.ajax_tab_link').length) {
+        $('.nav-tabs li.active a.ajax_tab_link').each(function(e) {
+            $(this).trigger('click');
+        });
+    }
 });

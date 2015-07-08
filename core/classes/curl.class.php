@@ -32,10 +32,10 @@ class class_curl {
     public $response_header = array();
     public $response_encoding = false;
     public $meta_tags = array();
-    public $code     = false;
-    public $info     = false;
-    public $error    = false;
-    public $errno    = false;
+    public $code  = false;
+    public $info  = false;
+    public $error = false;
+    public $errno = false;
     
     public function __construct($cfg=array()) {
         $this->setConfig($cfg);
@@ -154,6 +154,10 @@ class class_curl {
             $this->requestFromServer();
         } else {
             $this->exec();
+            if ($this->code === 0) {
+                usleep(100000);
+                $this->exec();
+            }
         }
         
         if ($this->method == 'put' && $this->multipart === true) {

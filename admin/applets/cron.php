@@ -71,7 +71,7 @@ function applet_cron() {
             array( 'title' => $_LANG['DELETE'], 'icon' => 'delete.gif', 'confirm' => $_LANG['AD_IF_COMENT_DELETE'], 'link' => '?view=cron&do=delete&id=%id%' )
         );
 
-        cpListTable('cms_cron_jobs', $fields, $actions, '1=1', 'job_run_date ASC');
+        cpListTable('cms_cron_jobs', $fields, $actions, '1=1', 'job_run_date DESC');
     }
 
     if ($do == 'show') {

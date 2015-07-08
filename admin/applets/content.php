@@ -132,96 +132,22 @@ function applet_content() {
         cmsCore::redirectBack();
     }
 
-    if ($do == 'update'){
+    if ($do == 'update') {
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
         
-        if (cmsCore::inRequest('id')) {
-            $id                     = cmsCore::request('id', 'int', 0);
-            $article['category_id'] = cmsCore::request('category_id', 'int', 1);
-            $article['title']       = cmsCore::request('title', 'str');
-            $article['url']         = cmsCore::request('url', 'str');
-            $article['showtitle']   = cmsCore::request('showtitle', 'int', 0);
-            $article['description'] = cmsCore::request('description', 'html', '');
-            $article['description'] = cmsCore::c('db')->escape_string($article['description']);
-            $article['content']     = cmsCore::request('content', 'html', '');
-            $article['content']     = cmsCore::c('db')->escape_string($article['content']);
-            $article['published']   = cmsCore::request('published', 'int', 0);
-
-            $article['showdate']    = cmsCore::request('showdate', 'int', 0);
-            $article['showlatest']  = cmsCore::request('showlatest', 'int', 0);
-            $article['showpath']    = cmsCore::request('showpath', 'int', 0);
-            $article['comments']    = cmsCore::request('comments', 'int', 0);
-            $article['canrate']     = cmsCore::request('canrate', 'int', 0);
-
-            $enddate                = explode('.', cmsCore::request('enddate', 'str'));
-            $article['enddate']     = $enddate[2] .'-'. $enddate[1] .'-'. $enddate[0];
-
-            $article['is_end']      = cmsCore::request('is_end', 'int', 0);
-            $article['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
-
-            $article['tags']        = cmsCore::request('tags', 'str');
-
-            $olddate                = cmsCore::request('olddate', 'str', '');
-            $pubdate                = cmsCore::request('pubdate', 'str', '');
-
-            $article['user_id']     = cmsCore::request('user_id', 'int', cmsCore::c('user')->id);
-
-            $article['tpl']         = cmsCore::request('tpl', 'str', 'com_content_read');
-
-            if ($olddate != $pubdate) {
-                $date = explode('.', $pubdate);
-                $article['pubdate'] = $date[2] .'-'. $date[1] .'-'. $date[0] .' '.  date('H:i');
-            }
-
-            $autokeys               = cmsCore::request('autokeys', 'int');
-
-            switch($autokeys){
-                case 1: $article['meta_keys'] = $inCore->getKeywords($article['content']);
-                        $article['meta_desc'] = $article['title'];
-                        break;
-
-                case 2: $article['meta_desc'] = strip_tags($article['description']);
-                        $article['meta_keys'] = $article['tags'];
-                        break;
-
-                case 3: $article['meta_desc'] = cmsCore::request('meta_desc', 'str');
-                        $article['meta_keys'] = cmsCore::request('meta_keys', 'str');
-                        break;
-            }
-
-            cmsCore::m('content')->updateArticle($id, $article);
-
-            if (!cmsCore::request('is_public', 'int', 0)) {
-                $showfor = cmsCore::request('showfor', 'array_int', array());
-                cmsCore::setAccess($id, $showfor, 'material');
-            } else {
-                cmsCore::clearAccess($id, 'material');
-            }
-
-            cmsCore::m('content')->uploadArticeImage($id, cmsCore::request('delete_image', 'int', 0));
-
-            cmsCore::addSessionMessage($_LANG['AD_ARTICLE_SAVE'], 'success');
-
-            if (!isset($_SESSION['editlist']) || count($_SESSION['editlist']) == 0) {
-                cmsCore::redirect('?view=tree&cat_id='.$article['category_id']);
-            } else {
-                cmsCore::redirect('?view=content&do=edit');
-            }
-        }
-    }
-
-    if ($do == 'submit') {
-        if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
+        $article = array();
         
         $article['category_id'] = cmsCore::request('category_id', 'int', 1);
+        $article['categories']  = cmsCore::request('categories', 'array_int', array());
+        $article['categories'][] = $article['category_id'];
+        $article['categories']  = implode(',', $article['categories']);
         $article['title']       = cmsCore::request('title', 'str');
         $article['url']         = cmsCore::request('url', 'str');
         $article['showtitle']   = cmsCore::request('showtitle', 'int', 0);
         $article['description'] = cmsCore::request('description', 'html', '');
         $article['description'] = cmsCore::c('db')->escape_string($article['description']);
         $article['content']     = cmsCore::request('content', 'html', '');
-        $article['content']    	= cmsCore::c('db')->escape_string($article['content']);
-
+        $article['content']     = cmsCore::c('db')->escape_string($article['content']);
         $article['published']   = cmsCore::request('published', 'int', 0);
 
         $article['showdate']    = cmsCore::request('showdate', 'int', 0);
@@ -237,16 +163,26 @@ function applet_content() {
 
         $article['tags']        = cmsCore::request('tags', 'str');
 
-        $article['pubdate']     = cmsCore::request('pubdate', 'str');
-        $date                   = explode('.', $article['pubdate']);
-        $article['pubdate']     = $date[2] .'-'. $date[1] .'-'. $date[0] .' '. date('H:i');
-
+        $olddate                = cmsCore::request('olddate', 'str', '');
+        $pubdate                = cmsCore::request('pubdate', 'str', '');
+        
         $article['user_id']     = cmsCore::request('user_id', 'int', cmsCore::c('user')->id);
-
         $article['tpl']         = cmsCore::request('tpl', 'str', 'com_content_read');
+        
+        $autokeys = cmsCore::request('autokeys', 'int');
+        
+        if (cmsCore::inRequest('id')) {
+            $article['id'] = cmsCore::request('id', 'int', 0);
 
-        $autokeys               = cmsCore::request('autokeys', 'int');
-
+            if ($olddate != $pubdate) {
+                $date = explode('.', $pubdate);
+                $article['pubdate'] = $date[2] .'-'. $date[1] .'-'. $date[0] .' '.  date('H:i');
+            }
+        } else {
+            $date = explode('.', $pubdate);
+            $article['pubdate'] = $date[2] .'-'. $date[1] .'-'. $date[0] .' '. date('H:i');
+        }
+        
         switch ($autokeys) {
             case 1: $article['meta_keys'] = $inCore->getKeywords($article['content']);
                     $article['meta_desc'] = $article['title'];
@@ -260,35 +196,54 @@ function applet_content() {
                     $article['meta_keys'] = cmsCore::request('meta_keys', 'str');
                     break;
         }
+        
+        if (!empty($article['id'])) {
+            cmsCore::m('content')->updateArticle($article['id'], $article);
+            
+            cmsCore::addSessionMessage($_LANG['AD_ARTICLE_SAVE'], 'success');
+        } else {
+            $article['id'] = cmsCore::m('content')->addArticle($article);
+            
+            $inmenu = cmsCore::request('createmenu', 'str', '');
 
-        $article['id'] = cmsCore::m('content')->addArticle($article);
+            if ($inmenu) {
+                createMenuItem($inmenu, $article['id'], $article['title']);
+            }
+            
+            cmsCore::addSessionMessage($_LANG['AD_ARTICLE_ADD'], 'success');
+        }
 
         if (!cmsCore::request('is_public', 'int', 0)) {
             $showfor = cmsCore::request('showfor', 'array_int', array());
             cmsCore::setAccess($article['id'], $showfor, 'material');
+        } else {
+            cmsCore::clearAccess($article['id'], 'material');
         }
 
-        $inmenu = cmsCore::request('createmenu', 'str', '');
+        cmsCore::m('content')->uploadArticeImage($article['id'], cmsCore::request('delete_image', 'int', 0));
 
-        if ($inmenu) {
-            createMenuItem($inmenu, $article['id'], $article['title']);
+        if (!isset($_SESSION['editlist']) || count($_SESSION['editlist']) == 0) {
+            cmsCore::redirect('?view=tree&cat_id='. $article['category_id']);
+        } else {
+            cmsCore::redirect('?view=content&do=edit');
         }
-
-        cmsCore::m('content')->uploadArticeImage($article['id']);
-
-        cmsCore::addSessionMessage($_LANG['AD_ARTICLE_ADD'], 'success');
-
-        cmsCore::redirect('?view=tree&cat_id='. $article['category_id']);
+    }
+    
+    if ($do == 'get_cat_fields') {
+        ob_end_clean();
+        
+        $cat_id = cmsCore::request('cat_id', 'int', 0, 'post');
+        $article_id = cmsCore::request('article_id', 'int', 0, 'post');
+        
+        if (empty($cat_id) || $cat_id == 1 || !cmsCore::isAjax()) {
+            cmsCore::halt();
+        }
+        
+        // Поля пока не готовы, возвращаем просто id категории для тестирования
+        cmsCore::halt($cat_id);
     }
 
     if ($do == 'add' || $do == 'edit') {
-        $toolmenu = array(
-            array( 'icon' => 'save.gif', 'title' => $_LANG['SAVE'], 'link' => 'javascript:document.addform.submit();' ),
-            array( 'icon' => 'cancel.gif', 'title' => $_LANG['CANCEL'], 'link' => 'javascript:history.go(-1);' )
-        );
-
-        cpToolMenu($toolmenu);
-
         if ($do == 'add') {
             echo '<h3>'. $_LANG['AD_CREATE_ARTICLE'] .'</h3>';
             cpAddPathway($_LANG['AD_CREATE_ARTICLE'], 'index.php?view=content&do=add');
@@ -322,8 +277,18 @@ function applet_content() {
             $result = cmsCore::c('db')->query($sql) ;
             if (cmsCore::c('db')->num_rows($result)) {
                 $mod = cmsCore::c('db')->fetch_assoc($result);
+                
                 if (!empty($mod['images'])) {
                     $mod['images'] = json_decode($mod['images'], true);
+                }
+                
+                if (!empty($mod['categories'])) {
+                    $mod['categories'] = explode(',', $mod['categories']);
+                    foreach ($mod['categories'] as $k => $v) {
+                        if ($v == $mod['category_id']) {
+                            unset($mod['categories'][$k]);
+                        }
+                    }
                 }
             }
 
@@ -383,6 +348,7 @@ function applet_content() {
             assign('tags', isset($mod['id']) ? cmsTagLine('content', $mod['id'], false) : '')->
             assign('tab_plugins', cmsCore::callTabEventPlugins('ADMIN_CONTENT_TABS', !empty($mod['id']) ? $mod : array()))->
             assign('cats_opt', $inCore->getListItemsNS('cms_category', cmsCore::getArrVal($mod, 'category_id', array())))->
+            assign('multi_cats_opt', $inCore->getListItemsNS('cms_category', cmsCore::getArrVal($mod, 'categories', array())))->
             assign('users_opt', $inCore->getListItems('cms_users', cmsCore::getArrVal($mod, 'user_id', cmsCore::c('user')->id), 'nickname', 'ASC', 'is_deleted=0 AND is_locked=0', 'id', 'nickname'))->
             assign('menu_list', cpGetList('menu'))->
             assign('user_groups', $user_groups)->

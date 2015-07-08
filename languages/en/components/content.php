@@ -11,6 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
+$_LANG['AD_ALLOW_MULTICATS']       = 'Allow multicategories';
 $_LANG['ERR_DEFINE_USER']          = 'Error in determining the user!';
 $_LANG['CATALOG_ARTICLES']         = 'Articles Directory';
 $_LANG['NO_PERM_FOR_VIEW']         = 'No permission to view';

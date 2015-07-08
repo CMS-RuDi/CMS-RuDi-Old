@@ -44,7 +44,7 @@ function applet_templates() {
             if (!empty($tpl_cfgs)) {
                 $tpl_cfgs_val = cmsCore::getTplCfg($template);
                 
-                cmsCore::c('page')->initTemplate('applets', 'templates')->
+                cmsCore::c('page')->initTemplate('applets', 'templates_config')->
                     assign('template', $template)->
                     assign('form_gen_form', cmsCore::c('form_gen')->generateForm($tpl_cfgs, $tpl_cfgs_val))->
                     display();

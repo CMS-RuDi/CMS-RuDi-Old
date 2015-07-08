@@ -16,6 +16,7 @@ cmsCore::c('page')->addHeadCSS('templates/admin/_default_/css/styles.css');
 cmsCore::c('page')->addHeadCSS('admin/js/hmenu/hmenu.css');
 cmsCore::c('page')->addHeadCSS('includes/jquery/tablesorter/style.css');
 cmsCore::c('page')->addHeadCSS('includes/jqueryui/css/smoothness/jquery-ui.min.css');
+cmsCore::c('page')->addHeadCSS('includes/chosen/chosen.min.css');
 
 cmsCore::c('page')->addHeadJS('admin/js/admin.js');
 cmsCore::c('page')->addHeadJS('includes/jquery/jquery.columnfilters.js');
@@ -26,10 +27,13 @@ cmsCore::c('page')->addHeadJS('includes/jqueryui/init-ui.js');
 cmsCore::c('page')->addHeadJS('includes/jqueryui/i18n/jquery.ui.datepicker-'. cmsConfig::getConfig('lang') .'.min.js');
 cmsCore::c('page')->addHeadJS('includes/jquery/jquery.form.js');
 cmsCore::c('page')->addHeadJS('admin/js/hltable.js');
+cmsCore::c('page')->addHeadJS('includes/chosen/chosen.jquery.min.js');
 
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap.min.css');
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap-theme.min.css');
 cmsCore::c('page')->addHeadJS('includes/bootstrap/js/bootstrap.min.js');
+
+cmsCore::c('page')->addHeadCSS('templates/admin/_default_/css/new_styles.css');
 
 cmsCore::c('page')->prependHeadJS('admin/js/common.js');
 cmsCore::c('page')->prependHeadJS('includes/jquery/jquery.js');

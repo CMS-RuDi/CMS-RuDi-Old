@@ -31,6 +31,8 @@ cmsCore::loadClass('page');
 cmsCore::loadClass('user');
 cmsCore::loadClass('actions');
 
+cmsCore::c('user')->autoLogin();
+
 if (!cmsCore::c('user')->update()) {
     cmsCore::error404();
 }

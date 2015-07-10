@@ -310,6 +310,7 @@ CREATE TABLE `#__category` (
   `pagetitle` varchar(255) NOT NULL,
   `meta_desc` varchar(1024) NOT NULL,
   `meta_keys` varchar(1024) NOT NULL,
+  `fields` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `seolink` (`seolink`),
   KEY `parent_id` (`parent_id`),

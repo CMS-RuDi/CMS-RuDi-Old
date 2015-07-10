@@ -11,9 +11,7 @@
 //                                                                            //
 /******************************************************************************/
 
-$_LANG['AD_TITLE_PARTITION']              = 'Section name';
-$_LANG['AD_TEMPLATE_PARTITION']           = 'Section template';
-$_LANG['AD_PARENT_PARTITION']             = 'Parent partition';
+$_LANG['AD_PARENT_PARTITION']             = 'Parent category';
 $_LANG['AD_CATEGORY_REMOVED']             = 'Category inserted in it and its articles have successfully been deleted';
 $_LANG['AD_CATEGORY_REMOVED_NOT_ARTICLE'] = 'Category and inserted articles have successfully been deleted. Belonging articles have been moved to the root partition and archive.';
 $_LANG['AD_CATEGORY_SAVED']               = 'Category is successfully saved';
@@ -54,3 +52,4 @@ $_LANG['AD_PHOTO_BY_ARTICLES']            = 'Viewing the section - images from t
 $_LANG['AD_OVER_PHOTOS']                  = 'Shown over photographies';
 $_LANG['AD_PHOTOS_SORT']                  = 'Sort photos';
 $_LANG['AD_IF_NOTED']                     = 'If checked, the category will be shown to all visitors. Remove check to select allowed groups of users manually.';
+$_LANG['AD_ADDITIONAL_FIELDS']    = 'Additional fields';

@@ -16,6 +16,9 @@
 .alert {
     word-break: break-word;
 }
+#fields_list .row.list-group-item {
+    cursor: move;
+}
 
 /*======== https://github.com/flatlogic/awesome-bootstrap-checkbox ===========*/
 .checkbox {

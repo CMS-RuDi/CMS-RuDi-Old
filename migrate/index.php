@@ -45,6 +45,7 @@
             array( 'table' => 'cms_category', 'name' => 'pagetitle', 'type' => 'VARCHAR(255)' ),
             array( 'table' => 'cms_category', 'name' => 'meta_desc', 'type' => 'VARCHAR(1024)' ),
             array( 'table' => 'cms_category', 'name' => 'meta_keys', 'type' => 'VARCHAR(1024)' ),
+            array( 'table' => 'cms_category', 'name' => 'fields', 'type' => 'TEXT', 'default' => "''" ),
             
             array( 'table' => 'cms_content', 'name' => 'images', 'type' => 'longtext' ),
             array( 'table' => 'cms_content', 'name' => 'slidecfg', 'type' => 'varchar(64)' ),

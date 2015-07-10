@@ -33,7 +33,7 @@
                     <label class="col-lg-2 text-right"><?php echo $_LANG['AD_NAME']; ?></label>
 
                     <div class="col-lg-10">
-                        <input type="text" class="form-control inline w750" name="title" value="<?php echo $this->escape($mod['title']); ?>" />
+                        <input type="text" class="form-control inline w750" name="title" value="<?php echo $this->escape(cmsCore::getArrVal($mod, 'title', '')); ?>" />
 
                         <div class="checkbox">
                             <input type="checkbox" id="showtitle" name="showtitle" <?php if ($mod['showtitle'] || $do == 'add') { echo 'checked="checked"'; } ?> value="1" />
@@ -80,7 +80,7 @@
                     <label class="col-lg-2 text-right"><?php echo $_LANG['AD_TEMPLATE']; ?></label>
 
                     <div class="col-lg-10">
-                        <input type="text" class="form-control w750" name="tpl" value="<?php echo cmsCore::getArrVal($mod, 'tpl'); ?>" />
+                        <input type="text" class="form-control w750" name="tpl" value="<?php echo cmsCore::getArrVal($mod, 'tpl', ''); ?>" />
                     </div>
                 </div>
 
@@ -239,7 +239,7 @@
             
             <div role="tabpanel" class="tab-pane fade" id="upr_seo">
                 <div class="form-group row">
-                    <label class="col-lg-2"><?php echo $_LANG['AD_PAGE_TITLE']; ?></label>
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_PAGE_TITLE']; ?></label>
 
                     <div class="col-lg-10">
                         <input type="text" class="form-control w750" name="pagetitle" value="<?php if (isset($mod['pagetitle'])) { echo $this->escape($mod['pagetitle']); } ?>" />
@@ -281,7 +281,7 @@
                 </div>
                 
                 <div class="form-group row">
-                    <label class="col-lg-2"><?php echo $_LANG['KEYWORDS']; ?></label>
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['KEYWORDS']; ?></label>
 
                     <div class="col-lg-10">
                         <textarea class="form-control w750" name="meta_keys" rows="4" <?php if ($do == 'add') { ?>disabled="disabled"<?php } ?>><?php echo $this->escape($mod['meta_keys']);?></textarea>
@@ -290,7 +290,7 @@
                 </div>
                 
                 <div class="form-group row">
-                    <label class="col-lg-2"><?php echo $_LANG['DESCRIPTION']; ?></label>
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['DESCRIPTION']; ?></label>
 
                     <div class="col-lg-10">
                         <textarea class="form-control w750" name="meta_desc" rows="6" <?php if ($do == 'add') { ?>disabled="disabled"<?php } ?>><?php echo $this->escape($mod['meta_desc']);?></textarea>
@@ -299,7 +299,7 @@
                 </div>
                 
                 <div class="form-group row">
-                    <label class="col-lg-2"><?php echo $_LANG['AD_PATHWAY']; ?></label>
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_PATHWAY']; ?></label>
 
                     <div class="col-lg-10">
                         <div class="radio radio-primary">
@@ -317,7 +317,7 @@
                 </div>
                 
                 <div class="form-group row">
-                    <label class="col-lg-2"><?php echo $_LANG['AD_ARTICLE_URL']; ?></label>
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_ARTICLE_URL']; ?></label>
 
                     <div class="col-lg-10">
                         <input type="text" class="form-control w750" name="url" value="<?php echo $mod['url']; ?>" />
@@ -327,30 +327,39 @@
             </div>
 
             <div role="tabpanel" class="tab-pane fade" id="upr_restrictions">
-                <div class="form-group">
-                    <label>
-                        <input name="is_public" type="checkbox" id="is_public" onclick="checkGroupList()" value="1" <?php echo $group_public; ?> />
-                        <?php echo $_LANG['AD_SHARE']; ?>
-                    </label>
-                    <div class="help-block"><?php echo $_LANG['AD_IF_NOTED']; ?></div>
+                <div class="form-group row">
+                    <div class="col-lg-2"></div>
+                    
+                    <div class="col-lg-10">
+                        <div class="checkbox checkbox-primary">
+                            <input name="is_public" type="checkbox" id="is_public" onclick="checkGroupList()" value="1" <?php echo $group_public; ?> />
+                            <label for="is_public">
+                                <?php echo $_LANG['AD_SHARE']; ?>
+                            </label>
+                        </div>
+                        <div class="help-block w750"><?php echo $_LANG['AD_IF_NOTED']; ?></div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label><?php echo $_LANG['AD_GROUPS_VIEW']; ?></label>
-                    <select id="showin" class="form-control" name="showfor[]" size="6" multiple="multiple" <?php echo $group_style; ?>>
-                        <?php
-                        if (!empty($user_groups)) {
-                            foreach ($user_groups as $group) {
-                                echo '<option value="'. $group['value'] .'"';
-                                if (isset($group['selected'])) {
-                                    echo 'selected="selected"';
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_GROUPS_VIEW']; ?></label>
+                    
+                    <div class="col-lg-10">
+                        <select id="showin" class="form-control w750" name="showfor[]" size="6" multiple="multiple" <?php echo $group_style; ?>>
+                            <?php
+                            if (!empty($user_groups)) {
+                                foreach ($user_groups as $group) {
+                                    echo '<option value="'. $group['value'] .'"';
+                                    if (isset($group['selected'])) {
+                                        echo 'selected="selected"';
+                                    }
+                                    echo '>';
+                                    echo $group['title'] .'</option>';
                                 }
-                                echo '>';
-                                echo $group['title'] .'</option>';
-                            }
-                        } ?>
-                    </select>
-                    <div class="help-block"><?php echo $_LANG['AD_SELECT_MULTIPLE_CTRL']; ?></div>
+                            } ?>
+                        </select>
+                        <div class="help-block w750"><?php echo $_LANG['AD_SELECT_MULTIPLE_CTRL']; ?></div>
+                    </div>
                 </div>
             </div>
 

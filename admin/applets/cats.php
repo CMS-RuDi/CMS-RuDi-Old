@@ -91,6 +91,12 @@ function applet_cats() {
             
             $category['cost']        = cmsCore::request('cost', 'str', '');
             if (!is_numeric($category['cost'])) { $category['cost'] = ''; }
+            
+            $category['fields'] = cmsCore::request('fields', 'array', array());
+            foreach ($category['fields'] as $k => $v) {
+                $category['fields'][$k] = json_decode(urldecode($category['fields'][$k]), true);
+            }
+            $category['fields'] = cmsCore::c('db')->escape_string(cmsCore::jsonEncode($category['fields'], true));
 
             $album = array();
             $album['id']      = cmsCore::request('album_id', 'int', 0);
@@ -183,6 +189,12 @@ function applet_cats() {
 
         $category['cost']        = cmsCore::request('cost', 'str', 0);
         if (!is_numeric($category['cost'])) { $category['cost'] = ''; }
+        
+        $category['fields'] = cmsCore::request('fields', 'array', array());
+        foreach ($category['fields'] as $k => $v) {
+            $category['fields'][$k] = json_decode(urldecode($category['fields'][$k]), true);
+        }
+        $category['fields'] = cmsCore::c('db')->escape_string(cmsCore::jsonEncode($category['fields'], true));
 
         $album = array();
         $album['id']      = cmsCore::request('album_id', 'int', 0);
@@ -226,13 +238,6 @@ function applet_cats() {
     }
 
     if ($do == 'add' || $do == 'edit') {
-        $toolmenu = array(
-            array( 'icon' => 'save.gif', 'title' => $_LANG['SAVE'], 'link' => 'javascript:document.addform.submit();' ),
-            array( 'icon' => 'cancel.gif', 'title' => $_LANG['CANCEL'], 'link' => 'javascript:history.go(-1);' ),
-        );
-        
-        cpToolMenu($toolmenu);
-        
         $menu_list = cpGetList('menu');
         
         if ($do == 'add') {
@@ -266,8 +271,17 @@ function applet_cats() {
             }
             
             $mod = cmsCore::c('db')->get_fields('cms_category', 'id='.$id, '*');
+            
             if (!empty($mod['photoalbum'])) {
                 $mod['photoalbum'] = unserialize($mod['photoalbum']);
+            }
+            
+            if (!empty($mod['fields'])) {
+                $mod['fields'] = json_decode($mod['fields'], true);
+                foreach ($mod['fields'] as $k => $field) {
+                    $field['json'] = urlencode(json_encode($field));
+                    $mod['fields'][$k] = $field;
+                }
             }
             
             echo '<h3>'. $_LANG['AD_EDIT_SECTION'] . $ostatok .'</h3>';

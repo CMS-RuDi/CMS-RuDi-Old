@@ -2,372 +2,542 @@
     <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
     <input type="hidden" name="view" value="cats" />
 
-    <table class="table">
-        <tr>
-            <!-- главная ячейка -->
-            <td valign="top">
-                <div class="form-group">
-                    <label><?php echo $_LANG['AD_TITLE_PARTITION']; ?></label>
-                    <input type="text" id="title" class="form-control" name="title" value="<?php echo $this->escape(cmsCore::getArrVal($mod, 'title', '')); ?>" />
+    <div class="tabs-container">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#upr_cat" aria-controls="upr_cat" role="tab" data-toggle="tab"><?php echo $_LANG['AD_CATEGORY']; ?></a>
+            </li>
+            <li role="presentation">
+                <a href="#upr_addit_fields" aria-controls="upr_addit_fields" role="tab" data-toggle="tab"><?php echo $_LANG['AD_ADDITIONAL_FIELDS']; ?></a>
+            </li>
+            <li role="presentation">
+                <a href="#upr_seo" aria-controls="upr_seo" role="tab" data-toggle="tab">SEO</a>
+            </li>
+            <li role="presentation">
+                <a href="#upr_foto" aria-controls="upr_foto" role="tab" data-toggle="tab"><?php echo $_LANG['AD_FOTO']; ?></a>
+            </li>
+            <li role="presentation">
+                <a href="#upr_access" aria-controls="upr_access" role="tab" data-toggle="tab"><?php echo $_LANG['AD_TAB_ACCESS']; ?></a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="upr_cat">
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_NAME']; ?></label>
+
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control inline w750" name="title" value="<?php echo $this->escape(cmsCore::getArrVal($mod, 'title', '')); ?>" />
+                    </div>
                 </div>
+                
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_TEMPLATE']; ?></label>
+
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control w750" name="tpl" value="<?php echo cmsCore::getArrVal($mod, 'tpl', ''); ?>" />
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_PARENT_PARTITION'];?></label>
                     
-                <div class="form-group">
-                    <label><?php echo $_LANG['AD_TEMPLATE_PARTITION'];?></label>
-                    <input type="text" class="form-control" name="tpl" value="<?php echo cmsCore::getArrVal($mod, 'tpl', ''); ?>" />
+                    <div class="col-lg-10">
+                        <div class="alert alert-danger" role="alert" style="display:none;">
+                            <?php echo $_LANG['AD_ANOTHER_PARENT']; ?>
+                        </div>
+
+                        <select name="parent_id" id="parent_id" class="form-control w750" onchange="if($('option:selected',this).data('nsleft')>='<?php echo cmsCore::getArrVal($mod, 'NSLeft', 0); ?>' && $('option:selected',this).data('nsright')<='<?php echo cmsCore::getArrVal($mod, 'NSRight', 0); ?>'){ $('.parent_notice').show();$('#add_mod').prop('disabled', true); } else { $('.parent_notice').hide();$('#add_mod').prop('disabled', false); }">
+                            <option value="<?php echo $rootid; ?>" <?php if (!isset($mod['parent_id']) || cmsCore::getArrVal($mod, 'parent_id', '') == $rootid) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_SECTION'];?></option>
+                            <?php echo $category_opt; ?>
+                        </select>
+                    </div>
                 </div>
+                
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_EDITORS_SECTION'];?></label>
                     
-                <div class="form-group">
-                    <label><?php echo $_LANG['AD_PARENT_PARTITION'];?></label>
-                    <div class="parent_notice" style="color:red;margin:4px 0px;display:none"><?php echo $_LANG['AD_ANOTHER_PARENT']; ?></div>
-
-                    <select name="parent_id" size="12" id="parent_id" class="form-control" onchange="if($('option:selected',this).data('nsleft')>='<?php echo cmsCore::getArrVal($mod, 'NSLeft', 0); ?>' && $('option:selected',this).data('nsright')<='<?php echo cmsCore::getArrVal($mod, 'NSRight', 0); ?>'){ $('.parent_notice').show();$('#add_mod').prop('disabled', true); } else { $('.parent_notice').hide();$('#add_mod').prop('disabled', false); }">
-                        <option value="<?php echo $rootid; ?>" <?php if (!isset($mod['parent_id']) || cmsCore::getArrVal($mod, 'parent_id', '') == $rootid) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_SECTION'];?></option>
-                        <?php echo $category_opt; ?>
-                    </select>
+                    <div class="col-lg-10">
+                        <select class="form-control w750" name="modgrp_id">
+                            <option value="0" <?php if (cmsCore::getArrVal($mod, 'modgrp_id', 0) == 0) { echo 'selected'; }?>><?php echo $_LANG['AD_ONLY_ADMINS'];?></option>
+                            <?php echo $user_group_opt; ?>
+                        </select>
+                        <div class="help-block w750"><?php echo $_LANG['AD_USERS_CAN_ADMIN'];?></div>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label><?php echo $_LANG['AD_SECTION_DESCRIPT'];?></label>
-                    <?php cmsCore::insertEditor('description', cmsCore::getArrVal($mod, 'description', ''), '250', '100%'); ?>
+                
+                <?php if ($is_billing) { ?>
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_COST_ARTICLES_ADD'];?></label>
+                    
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control inline" style="width:50px" name="cost" value="<?php echo cmsCore::getArrVal($mod, 'cost', ''); ?>" /><?php echo $_LANG['BILLING_POINT10'];?>
+                        <div class="help-block w750"><?php echo $_LANG['AD_COST_ARTICLES_BY_DEFAULT'];?></div>
+                    </div>
                 </div>
-            </td>
-
-            <!-- боковая -->
-            <td valign="top" style="width:500px;">
-                <div class="uitabs">
-                    <ul id="tabs">
-                        <li><a href="#upr_publish"><span><?php echo $_LANG['AD_TAB_PUBLISH']; ?></span></a></li>
-                        <li><a href="#upr_seo"><span>SEO</span></a></li>
-                        <li><a href="#upr_editors"><span><?php echo $_LANG['AD_EDITORS']; ?></span></a></li>
-                        <li><a href="#upr_foto"><span><?php echo $_LANG['AD_FOTO']; ?></span></a></li>
-                        <li><a href="#upr_access"><span><?php echo $_LANG['AD_TAB_ACCESS']; ?></span></a></li>
-                    </ul>
+                <?php } ?>
+                
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_SECTION_DESCRIPT'];?></label>
+                    
+                    <div class="col-lg-10">
+                        <div class="w750">
+                            <?php cmsCore::insertEditor('description', cmsCore::getArrVal($mod, 'description', ''), '250', '100%'); ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_SORT_ARTICLES'];?></label>
+                    
+                    <div class="col-lg-10">
+                        <select id="orderby" class="form-control w750" name="orderby">
+                            <?php $mod['orderby'] = cmsCore::getArrVal($mod, 'orderby', ''); ?>
+                            <option value="pubdate" <?php if ($mod['orderby'] == 'pubdate') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_CALENDAR'];?></option>
+                            <option value="title" <?php if ($mod['orderby'] == 'title') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_TITLE'];?></option>
+                            <option value="ordering" <?php if ($mod['orderby'] == 'ordering') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_ORDER'];?></option>
+                            <option value="hits" <?php if ($mod['orderby'] == 'hits') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_VIEWS'];?></option>
+                        </select>
                         
-                    <div id="upr_publish">
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="published" id="published" value="1" <?php if (cmsCore::getArrVal($mod, 'published', 0) || $do=='add') { echo 'checked="checked"'; } ?> />
-                                <?php echo $_LANG['AD_PUBLIC_SECTION'];?>
-                            </label>
-                        </div>
-                            
-                        <div class="form-group url_cat" style=" <?php if ($do == 'edit'){  ?>display:none;<?php } ?>">
-                            <label><?php echo $_LANG['AD_SECTION_URL'];?></label>
-                            <input type="text" class="form-control" name="url" value="<?php echo cmsCore::getArrVal($mod, 'url', ''); ?>" />
-                            <div class="help-block"><?php echo $_LANG['AD_FROM_TITLE'];?></div>
-                        </div>
-                            
-                        <?php if ($do == 'edit') {  ?>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" name="update_seolink" value="1" onclick="$('.url_cat').slideToggle('fast');" />
-                                    <?php echo $_LANG['AD_NEW_LINK'];?>
-                            </label>
-                            <div class="help-block url_cat" style="display:none;"><b style="color:#F00;"><?php echo $_LANG['ATTENTION'];?>:</b> <?php echo $_LANG['AD_NO_LINKS'];?></div>
-                        </div>
-                        <?php } ?>
-                            
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_SORT_ARTICLES'];?></label>
-                            <select id="orderby" class="form-control" name="orderby">
-                                <?php $mod['orderby'] = cmsCore::getArrVal($mod, 'orderby', ''); ?>
-                                <option value="pubdate" <?php if ($mod['orderby'] == 'pubdate') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_CALENDAR'];?></option>
-                                <option value="title" <?php if ($mod['orderby'] == 'title') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_TITLE'];?></option>
-                                <option value="ordering" <?php if ($mod['orderby'] == 'ordering') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_ORDER'];?></option>
-                                <option value="hits" <?php if ($mod['orderby'] == 'hits') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_VIEWS'];?></option>
-                            </select>
-                            <select id="orderto" class="form-control" name="orderto">
-                                <?php $mod['orderto'] = cmsCore::getArrVal($mod, 'orderto', ''); ?>
-                                <option value="ASC" <?php if ($mod['orderto'] == 'ASC') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_INCREMENT'];?></option>
-                                <option value="DESC" <?php if ($mod['orderto'] == 'DESC') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_DECREMENT'];?></option>
-                            </select>
-                        </div>
+                        <select id="orderto" class="form-control w750" name="orderto">
+                            <?php $mod['orderto'] = cmsCore::getArrVal($mod, 'orderto', ''); ?>
+                            <option value="ASC" <?php if ($mod['orderto'] == 'ASC') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_INCREMENT'];?></option>
+                            <option value="DESC" <?php if ($mod['orderto'] == 'DESC') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_DECREMENT'];?></option>
+                        </select>
+                    </div>
+                </div>
+                
+                <?php if ($do == 'add') { ?>
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_CREATE_LINK']; ?></label>
 
-                        <table width="100%">
-                            <tr>
-                                <td>
-                                    <strong><?php echo $_LANG['AD_HOW_MANY_COLUMNS'];?></strong>
-                                </td>
-                                <td>
-                                    <input class="form-control uispin" name="maxcols" type="text" style="width:50px" value="<?php echo cmsCore::getArrVal($mod, 'maxcols', 1); ?>" />
-                                </td>
-                            </tr>
-                        </table>
-                            
-                        <div class="form-group">
-                            <h4><?php echo $_LANG['AD_HOW_PUBLISH_SET'];?></h4>
-                            <table class="table">
-                                <tr>
-                                    <td>
-                                        <?php echo $_LANG['AD_PREVIEW'];?>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" data-toggle="buttons">
-                                            <?php
-                                                $act1=$act2=$chk1=$chk2='';
-                                                if (cmsCore::getArrVal($mod, 'showdesc') || $do == 'add') {
-                                                    $act1 = 'active';
-                                                    $chk1 = 'checked="checked"';
-                                                } else {
-                                                    $act2 = 'active';
-                                                    $chk2 = 'checked="checked"';
-                                                }
-                                            ?>
-                                            <label class="btn btn-default <?php echo $act1; ?>">
-                                                <input type="radio" name="showdesc" <?php echo $chk1; ?> value="1" /> <?php echo $_LANG['YES'];?>
-                                            </label>
-                                            <label class="btn btn-default <?php echo $act2; ?>">
-                                                <input type="radio" name="showdesc" <?php echo $chk2; ?> value="0" /> <?php echo $_LANG['NO'];?>
-                                            </label>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <?php echo $_LANG['AD_CALENDAR_VIEW'];?>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" data-toggle="buttons">
-                                            <?php
-                                                $act1=$act2=$chk1=$chk2='';
-                                                if (cmsCore::getArrVal($mod, 'showdate') || $do == 'add') {
-                                                    $act1 = 'active';
-                                                    $chk1 = 'checked="checked"';
-                                                } else {
-                                                    $act2 = 'active';
-                                                    $chk2 = 'checked="checked"';
-                                                }
-                                            ?>
-                                            <label class="btn btn-default <?php echo $act1; ?>">
-                                                <input type="radio" name="showdate" <?php echo $chk1; ?> value="1" /> <?php echo $_LANG['YES'];?>
-                                            </label>
-                                            <label class="btn btn-default <?php echo $act2; ?>">
-                                                <input type="radio" name="showdate" <?php echo $chk2; ?> value="0" /> <?php echo $_LANG['NO'];?>
-                                            </label>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <?php echo $_LANG['AD_HOW_MANY_COMENTS'];?>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" data-toggle="buttons">
-                                            <?php
-                                                $act1=$act2=$chk1=$chk2='';
-                                                if (cmsCore::getArrVal($mod, 'showcomm') || $do == 'add') {
-                                                    $act1 = 'active';
-                                                    $chk1 = 'checked="checked"';
-                                                } else {
-                                                    $act2 = 'active';
-                                                    $chk2 = 'checked="checked"';
-                                                }
-                                            ?>
-                                            <label class="btn btn-default <?php echo $act1; ?>">
-                                                <input type="radio" name="showcomm" <?php echo $chk1; ?> value="1" /> <?php echo $_LANG['YES'];?>
-                                            </label>
-                                            <label class="btn btn-default <?php echo $act2; ?>">
-                                                <input type="radio" name="showcomm" <?php echo $chk2; ?> value="0" /> <?php echo $_LANG['NO'];?>
-                                            </label>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <?php echo $_LANG['AD_HOW_MANY_TAGS'];?>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" data-toggle="buttons">
-                                            <?php
-                                                $act1=$act2=$chk1=$chk2='';
-                                                if (cmsCore::getArrVal($mod, 'showtags') || $do == 'add') {
-                                                    $act1 = 'active';
-                                                    $chk1 = 'checked="checked"';
-                                                } else {
-                                                    $act2 = 'active';
-                                                    $chk2 = 'checked="checked"';
-                                                }
-                                            ?>
-                                            <label class="btn btn-default <?php echo $act1; ?>">
-                                                <input type="radio" name="showtags" <?php echo $chk1; ?> value="1" /> <?php echo $_LANG['YES'];?>
-                                            </label>
-                                            <label class="btn btn-default <?php echo $act2; ?>">
-                                                <input type="radio" name="showtags" <?php echo $chk2; ?> value="0" /> <?php echo $_LANG['NO'];?>
-                                            </label>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <?php echo $_LANG['AD_RSS_VIEW'];?>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" data-toggle="buttons">
-                                            <?php
-                                                $act1=$act2=$chk1=$chk2='';
-                                                if (cmsCore::getArrVal($mod, 'showrss') || $do == 'add') {
-                                                    $act1 = 'active';
-                                                    $chk1 = 'checked="checked"';
-                                                } else {
-                                                    $act2 = 'active';
-                                                    $chk2 = 'checked="checked"';
-                                                }
-                                            ?>
-                                            <label class="btn btn-default <?php echo $act1; ?>">
-                                                <input type="radio" name="showrss" <?php echo $chk1; ?> value="1" /> <?php echo $_LANG['YES'];?>
-                                            </label>
-                                            <label class="btn btn-default <?php echo $act2; ?>">
-                                                <input type="radio" name="showrss" <?php echo $chk2; ?> value="0" /> <?php echo $_LANG['NO'];?>
-                                            </label>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                            
-                        <?php if ($do == 'add') { ?>
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_CREATE_LINK'];?></label>
-                            <select class="form-control" style="width:99%" name="createmenu">
-                                <option value="0" selected="selected"><?php echo $_LANG['AD_DONT_CREATE'];?></option>
-                                <?php foreach ($menu_list as $menu) { ?>
+                    <div class="col-lg-10">
+                        <select class="form-control w750" name="createmenu">
+                            <option value="0" selected="selected"><?php echo $_LANG['AD_DONT_CREATE_LINK']; ?></option>
+                            <?php foreach ($menu_list as $menu) { ?>
                                 <option value="<?php echo $menu['id']; ?>">
                                     <?php echo $menu['title']; ?>
                                 </option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                        <?php } ?>
+                            <?php } ?>
+                        </select>
                     </div>
-                        
-                    <div id="upr_seo">
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_PAGE_TITLE']; ?></label>
-                            <input type="text" id="pagetitle" class="form-control" name="pagetitle" value="<?php echo $this->escape(cmsCore::getArrVal($mod, 'pagetitle', '')); ?>" />
-                            <div class="help-block"><?php echo $_LANG['AD_IF_UNKNOWN_PAGETITLE']; ?></div>
-                        </div>
-                            
-                        <div class="form-group">
-                            <label><?php echo $_LANG['KEYWORDS']; ?></label>
-                            <textarea class="form-control" name="meta_keys" rows="4"><?php echo $this->escape(cmsCore::getArrVal($mod, 'meta_keys', ''));?></textarea>
-                            <div class="help-block"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
-                        </div>
-                            
-                        <div class="form-group">
-                            <label><?php echo $_LANG['DESCRIPTION']; ?></label>
-                            <textarea class="form-control" name="meta_desc" rows="6"><?php echo $this->escape(cmsCore::getArrVal($mod, 'meta_desc', ''));?></textarea>
-                            <div class="help-block"><?php echo $_LANG['AD_LESS_THAN']; ?></div>
-                        </div>
-                    </div>
-                        
-                    <div id="upr_editors">
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_USERS_ARTICLES'];?></label>
-                            <div class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-default <?php echo $act1; ?>">
-                                    <input type="radio" name="is_public" <?php if (cmsCore::getArrVal($mod, 'is_public')) { echo 'checked="checked"'; } ?> value="1" /> <?php echo $_LANG['YES'];?>
-                                </label>
-                                <label class="btn btn-default <?php echo $act2; ?>">
-                                    <input type="radio" name="is_public" <?php if (!cmsCore::getArrVal($mod, 'is_public')) { echo 'checked="checked"'; } ?> value="0" /> <?php echo $_LANG['NO'];?>
-                                </label>
-                            </div>
-                            <div class="help-block"><?php echo $_LANG['AD_IF_SWITCH'];?></div>
-                        </div>
+                </div>
+                <?php } ?>
+                
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_OPTIONS']; ?></label>
 
-                        <?php if ($is_billing) { ?>
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_COST_ARTICLES_ADD'];?></label>
-                            <input type="text" class="form-control" style="width:50px" name="cost" value="<?php echo cmsCore::getArrVal($mod, 'cost', ''); ?>" /><?php echo $_LANG['BILLING_POINT10'];?>
-                            <div class="help-block"><?php echo $_LANG['AD_COST_ARTICLES_BY_DEFAULT'];?></div>
+                    <div class="col-lg-10">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="published" name="published" value="1" <?php if ($mod['published'] || $do == 'add') { echo 'checked="checked"'; } ?> />
+
+                                    <label for="published">
+                                        <?php echo $_LANG['AD_PUBLIC_SECTION']; ?>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <?php } ?>
-                            
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_EDITORS_SECTION'];?></label>
-                            <select class="form-control" name="modgrp_id">
-                                <option value="0" <?php if (!isset($mod['modgrp_id']) || cmsCore::getArrVal($mod, 'modgrp_id', '') == 0) { echo 'selected'; }?>><?php echo $_LANG['AD_ONLY_ADMINS'];?></option>
-                                <?php echo $user_group_opt; ?>
-                            </select>
-                            <div class="help-block"><?php echo $_LANG['AD_USERS_CAN_ADMIN'];?></div>
-                        </div>
-                    </div>
                         
-                    <div id="upr_foto">
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_PHOTOALBUM_CONNECT'];?></label>
-                            <select id="album_id" class="form-control" name="album_id" onchange="choosePhotoAlbum()">
-                                <option value="0" <?php if (empty($mod['photoalbum']['id'])) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_DONT_CONNECT'];?></option>
-                                <?php echo $photo_albums_opt; ?>
-                            </select>
-                            <div class="help-block"><?php echo $_LANG['AD_PHOTO_BY_ARTICLES'];?></div>
-                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="showdesc" name="showdesc" value="1" <?php if ($mod['showdesc'] || $do == 'add') { echo 'checked="checked"'; } ?> />
+
+                                    <label for="showdesc">
+                                        <?php echo $_LANG['AD_PREVIEW']; ?>
+                                    </label>
+                                </div>
+                            </div>
                             
-                        <div id="con_photoalbum" <?php if (empty($mod['photoalbum']['id'])) { echo 'style="display:none;"'; }?>>
-                            <div class="form-group">
-                                <label><?php echo $_LANG['AD_TITLE'];?></label>
-                                <input type="text" id="album_header" class="form-control" name="album_header" value="<?php echo cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'header', 0); ?>" />
-                                <div class="help-block"><?php echo $_LANG['AD_OVER_PHOTOS'];?></div>
+                            <div class="col-lg-3">
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="showdate" name="showdate" value="1" <?php if ($mod['showdate'] || $do == 'add') { echo 'checked="checked"'; } ?> />
+
+                                    <label for="showdate">
+                                        <?php echo $_LANG['AD_CALENDAR_VIEW']; ?>
+                                    </label>
+                                </div>
                             </div>
-                                
-                            <div class="form-group">
-                                <label><?php echo $_LANG['AD_PHOTOS_SORT'];?></label>
-                                <select class="form-control" name="album_orderby">
-                                    <?php $mod['photoalbum']['orderby'] = cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'orderby', 0); ?>
-                                    <option value="title" <?php if ($mod['photoalbum']['orderby'] == 'title') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_ALPHABET'];?></option>
-                                    <option value="pubdate" <?php if ($mod['photoalbum']['orderby'] == 'pubdate') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_CALENDAR'];?></option>
-                                    <option value="rating" <?php if ($mod['photoalbum']['orderby'] == 'rating') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_RATING'];?></option>
-                                    <option value="hits" <?php if ($mod['photoalbum']['orderby'] == 'hits') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_VIEWS'];?></option>
-                                </select>
-                                <select class="form-control" name="album_orderto">
-                                    <?php $mod['photoalbum']['orderto'] = cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'orderto', 0); ?>
-                                    <option value="desc" <?php if ($mod['photoalbum']['orderto'] == 'desc') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_DECREMENT'];?></option>
-                                    <option value="asc" <?php if ($mod['photoalbum']['orderto'] == 'asc') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_INCREMENT'];?></option>
-                                </select>
-                            </div>
-                                
-                            <div class="form-group">
-                                <label><?php echo $_LANG['AD_HOW_MANY_COLUMNS'];?></label>
-                                <input type="text" class="form-control" name="album_maxcols" value="<?php echo cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'maxcols', 2); ?>"/>
-                            </div>
-                                
-                            <div class="form-group">
-                                <label><?php echo $_LANG['AD_HOW_MANY_PHOTO'];?></label>
-                                <input type="text" class="form-control" name="album_max" value="<?php echo cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'max', 8); ?>"/>
-                            </div>
+
+                            <div class="col-lg-6"></div>
                         </div>
-                    </div>
                         
-                    <div id="upr_access">
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="is_public" name="is_access" onclick="checkGroupList()" value="1" <?php echo $group_public; ?> />
-                                <?php echo $_LANG['AD_SHARE'];?>
-                            </label>
-                            <div class="help-block"><?php echo $_LANG['AD_IF_NOTED']; ?></div>
-                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="showcomm" name="showcomm" value="1" <?php if ($mod['showcomm'] || $do == 'add') { echo 'checked="checked"'; } ?> />
+
+                                    <label for="showcomm">
+                                        <?php echo $_LANG['AD_HOW_MANY_COMENTS']; ?>
+                                    </label>
+                                </div>
+                            </div>
                             
-                        <div class="form-group">
-                            <label><?php echo $_LANG['AD_GROUPS_VIEW']; ?></label>
-                            <select id="showin" class="form-control" name="showfor[]" size="6" multiple="multiple" <?php echo $group_style; ?>>
-                                <?php
-                                if (!empty($user_groups)) {
-                                    foreach ($user_groups as $group) {
-                                        echo '<option value="'. $group['value'] .'"';
-                                        if (isset($group['selected'])) {
-                                            echo 'selected="selected"';
-                                        }
-                                        echo '>';
-                                        echo $group['title'] .'</option>';
-                                    }
-                                } ?>
-                            </select>
-                            <div class="help-block"><?php echo $_LANG['AD_SELECT_MULTIPLE_CTRL'];?></div>
+                            <div class="col-lg-3">
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="showtags" name="showtags" value="1" <?php if ($mod['showtags'] || $do == 'add') { echo 'checked="checked"'; } ?> />
+
+                                    <label for="showtags">
+                                        <?php echo $_LANG['AD_HOW_MANY_TAGS']; ?>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-6"></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="showrss" name="showrss" value="1" <?php if ($mod['showrss'] || $do == 'add') { echo 'checked="checked"'; } ?> />
+
+                                    <label for="showrss">
+                                        <?php echo $_LANG['AD_RSS_VIEW']; ?>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-3">
+                                <?php echo $_LANG['AD_HOW_MANY_COLUMNS']; ?>
+                                <input class="form-control uispin" name="maxcols" type="text" style="width:50px" value="<?php echo cmsCore::getArrVal($mod, 'maxcols', 1); ?>" />
+                            </div>
+                            
+                            <div class="col-lg-6"></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="checkbox checkbox-primary">
+                                    <input type="checkbox" id="ispublic" name="is_public" value="1" <?php if ($mod['is_public']) { echo 'checked="checked"'; } ?> />
+
+                                    <label for="ispublic">
+                                        <?php echo $_LANG['AD_USERS_ARTICLES']; ?>
+                                    </label>
+                                </div>
+                                <div class="help-block w750"><?php echo $_LANG['AD_IF_SWITCH'];?></div>
+                            </div>
+                            
+                            <div class="col-lg-3"></div>
+                            
+                            <div class="col-lg-6"></div>
                         </div>
                     </div>
                 </div>
-            </td>
-        </tr>
-    </table>
+            </div>
+            
+            <div role="tabpanel" class="tab-pane fade" id="upr_addit_fields">
+                <div class="form-group" id="add_field_btn">
+                    <input type="button" class="btn btn-default" value="Добавить новое поле" onclick="$('#add_field').show(); $('#add_field_btn').hide();" />
+                </div>
+                
+                <div id="add_field" style="display: none;">
+                    <input type="hidden" name="field_key" value="0" />
+                    
+                    <div class="form-group row">
+                        <label class="col-lg-2">Название поля</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control w750" name="field_title" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-2">Идентификатор поля</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control w750" name="field_name" value="" />
+                            <div class="help-block w750">Латинскими буквами</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-lg-2">Тип поля</label>
+                        <div class="col-lg-10">
+                            <select name="field_type" class="form-control w750">
+                                <option value="text">Текст: одна строка</option>
+                                <option value="html">Текст: многострочный</option>
+                                <option value="select">Список</option>
+                                <?php foreach ($fields as $field) { ?>
+                                    <option value="<?php echo $field['name']; ?>"><?php echo $field['title']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row field_item field_item_text">
+                        <label class="col-lg-2">Значение по умолчанию</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control w750" name="field_text_default" value="" data-name="default"/>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row field_item field_item_html" style="display:none;">
+                        <label class="col-lg-2">Значение по умолчанию</label>
+                        <div class="col-lg-10">
+                            <textarea class="form-control w750" name="field_html_default" style="height:100px;" data-name="default"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row field_item field_item_select" style="display:none;">
+                        <label class="col-lg-2">Список значений</label>
+                        <div class="col-lg-10">
+                            <textarea class="form-control w750" name="field_select_default" style="height:100px;" data-name="default"></textarea>
+                            <div class="help-block w750">Каждое значение с новой строки</div>
+                        </div>
+                    </div>
+
+                    <?php foreach ($fields as $field) { if (!empty($field['items'])) { ?>
+                        <?php foreach ($field['items'] as $item) { ?>
+                        <div class="form-group row field_item field_item_<?php echo $field['name']; ?>" style="display:none;">
+                            <label class="col-lg-2"><?php echo $item['title']; ?></label>
+                            <div class="col-lg-10">
+                                <?php
+                                    switch ($item['type']) {
+                                        case 'text':
+                                            echo '<input type="text" class="form-control w750" name="field_'. $field['name'] .'_'. $item['name'] .'" value="'. $item['value'] .'" data-name="'. $item['name'] .'" />';
+                                            break;
+                                        case 'textarea':
+                                            echo '<textarea class="form-control w750" name="field_'. $field['name'] .'_'. $item['name'] .'" data-name="'. $item['name'] .'">'. $item['value'] .'</textarea>';
+                                            break;
+                                        case 'html':
+                                            echo $item['html'];
+                                            break;
+                                        case 'checkbox':
+                                            echo '<input type="checkbox" name="field_'. $field['name'] .'_'. $item['name'] .'" value="'. $item['value'] .'" data-name="'. $item['name'] .'" />';
+                                            break;
+                                        case 'radio':
+                                            echo '<div class="radio radio-primary">';
+                                            foreach ($item['items'] as $k => $it) {
+                                                echo '<div>';
+                                                echo '<input type="radio" id="field_'. $field['name'] .'_'. $item['name'] .'_'. $k .'" name="field_'. $field['name'] .'_'. $item['name'] .'" value="'. $it['value'] .'" data-name="'. $item['name'] .'" />';
+                                                echo '<label for="field_'. $field['name'] .'_'. $item['name'] .'_'. $k .'">'. $it['title'] .'</label>';
+                                                echo '</div>';
+                                            }
+                                            echo '</div>';
+                                            break;
+                                    }
+                                ?>
+                                <?php echo $item['html']; ?>
+                                <?php if (!empty($item['description'])) { ?>
+                                    <div class="help-block w750"><?php echo $item['description']; ?></div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                        <?php } ?>
+                    <?php } } ?>
+
+                    <div class="form-group row">
+                        <label class="col-lg-2"><?php echo $_LANG['AD_OPTIONS']; ?></label>
+                        <div class="col-lg-10">
+                            <div class="checkbox checkbox-primary">
+                                <div>
+                                    <input type="checkbox" id="field_required" name="field_required" value="1" />
+                                    <label for="field_required">Обязательное к заполнению поле</label>
+                                </div>
+                                <div class="field_option field_option_text">
+                                    <input type="checkbox" id="field_text_link" name="field_text_link" data-name="link" value="1" />
+                                    <label for="field_text_link">Использовать значение поля как ссылку</label>
+                                </div>
+                                <div class="field_option field_option_select" style="display:none;">
+                                    <input type="checkbox" id="field_select_link" name="field_select_link" data-name="link" value="1" />
+                                    <label for="field_select_link">Использовать значение поля как ссылку</label>
+                                </div>
+                                <?php foreach ($fields as $field) { if (!empty($field['options'])) { ?>
+                                    <?php foreach ($field['options'] as $option) { ?>
+                                    <div class="field_option field_option_<?php echo $field['name']; ?>" style="display:none;">
+                                        <input type="checkbox" id="field_<?php echo $field['name'] .'_'. $option['name']; ?>" name="field_<?php echo $field['name'] .'_'. $option['name']; ?>" data-name="<?php echo $option['name']; ?>" value="1" />
+                                        <label for="field_<?php echo $field['name'] .'_'. $option['name']; ?>"><?php echo $option['title']; ?></label>
+                                    </div>
+                                    <?php } ?>
+                                <?php } } ?>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="button" class="btn btn-success" value="<?php echo $_LANG['SAVE']; ?>" onclick="add_new_field();" />
+                        <input type="button" class="btn btn-default" value="<?php echo $_LANG['CANCEL']; ?>" onclick="$('#add_field').hide();reset_fields();" />
+                    </div>
+                </div>
+                
+                <hr/>
+                
+                <div class="form-group row">
+                    <label class="col-lg-2">Список полей</label>
+                    
+                    <div class="col-lg-10">
+                        <div id="fields_list" class="uisort list-group" style="padding-right: 20px;">
+                            <?php foreach ($mod['fields'] as $k => $field) { ?>
+                            <div id="field_<?php echo $k + 1; ?>" class="row list-group-item">
+                                <div class="col-lg-4">
+                                    <?php echo $field['title']; ?> (<?php echo $field['name']; ?>)
+                                </div>
+                                <div class="col-lg-3">
+                                    Тип поля: <span><?php echo $field['type']; ?></span>
+                                </div>
+                                <div class="col-lg-3">
+                                    Обязателен к заполнению: <span><?php echo $field['required'] ? $_LANG['YES'] : $_LANG['NO']; ?></span>
+                                </div>
+                                <div class="col-lg-2 text-right">
+                                    <a href="#" onclick="field_edit(<?php echo $k + 1; ?>);return false;" class="btn btn-default"><i class="fa fa-edit"></i></a>
+                                    <a href="#" onclick="field_delete(<?php echo $k + 1; ?>);return false;" class="btn btn-default"><i class="fa fa-trash-o"></i></a>
+                                </div>
+                                <input type="hidden" name="fields[]" value="<?php echo $field['json']; ?>" /> </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div role="tabpanel" class="tab-pane fade" id="upr_seo">
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_PAGE_TITLE']; ?></label>
+
+                    <div class="col-lg-10">
+                        <input type="text" id="pagetitle" class="form-control w750" name="pagetitle" value="<?php echo $this->escape(cmsCore::getArrVal($mod, 'pagetitle', '')); ?>" />
+                        <div class="help-block w750"><?php echo $_LANG['AD_IF_UNKNOWN_PAGETITLE']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['KEYWORDS']; ?></label>
+                    
+                    <div class="col-lg-10">
+                        <textarea class="form-control w750" name="meta_keys" rows="4"><?php echo $this->escape(cmsCore::getArrVal($mod, 'meta_keys', ''));?></textarea>
+                        <div class="help-block w750"><?php echo $_LANG['AD_FROM_COMMA']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['DESCRIPTION']; ?></label>
+                    
+                    <div class="col-lg-10">
+                        <textarea class="form-control w750" name="meta_desc" rows="6"><?php echo $this->escape(cmsCore::getArrVal($mod, 'meta_desc', ''));?></textarea>
+                        <div class="help-block w750"><?php echo $_LANG['AD_LESS_THAN']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group row url_cat" style=" <?php if ($do == 'edit'){  ?>display:none;<?php } ?>">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_SECTION_URL'];?></label>
+                    
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control w750" name="url" value="<?php echo cmsCore::getArrVal($mod, 'url', ''); ?>" />
+                        <div class="help-block w750"><?php echo $_LANG['AD_FROM_TITLE'];?></div>
+                    </div>
+                </div>
+
+                <?php if ($do == 'edit') { ?>
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right">
+                        <input type="checkbox" name="update_seolink" value="1" onclick="$('.url_cat').slideToggle('fast');" />
+                        <?php echo $_LANG['AD_NEW_LINK'];?>
+                    </label>
+                    <div class="col-lg-10">
+                        <div class="help-block url_cat w750" style="display:none;"><b style="color:#F00;"><?php echo $_LANG['ATTENTION'];?>:</b> <?php echo $_LANG['AD_NO_LINKS'];?></div>
+                    </div>
+                </div>
+                <?php } ?>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="upr_foto">
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_PHOTOALBUM_CONNECT'];?></label>
+                    
+                    <div class="col-lg-10">
+                        <select id="album_id" class="form-control w750" name="album_id" onchange="choosePhotoAlbum()">
+                            <option value="0" <?php if (empty($mod['photoalbum']['id'])) { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_DONT_CONNECT'];?></option>
+                            <?php echo $photo_albums_opt; ?>
+                        </select>
+                        <div class="help-block w750"><?php echo $_LANG['AD_PHOTO_BY_ARTICLES'];?></div>
+                    </div>
+                </div>
+
+                <div id="con_photoalbum" <?php if (empty($mod['photoalbum']['id'])) { echo 'style="display:none;"'; }?>>
+                    <div class="form-group row">
+                        <label class="col-lg-2 text-right"><?php echo $_LANG['AD_TITLE'];?></label>
+                        
+                        <div class="col-lg-10">
+                            <input type="text" id="album_header" class="form-control w750" name="album_header" value="<?php echo cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'header', 0); ?>" />
+                            <div class="help-block w750"><?php echo $_LANG['AD_OVER_PHOTOS'];?></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-2 text-right"><?php echo $_LANG['AD_PHOTOS_SORT'];?></label>
+                        
+                        <div class="col-lg-10">
+                            <select class="form-control w750" name="album_orderby">
+                                <?php $mod['photoalbum']['orderby'] = cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'orderby', 0); ?>
+                                <option value="title" <?php if ($mod['photoalbum']['orderby'] == 'title') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_ALPHABET'];?></option>
+                                <option value="pubdate" <?php if ($mod['photoalbum']['orderby'] == 'pubdate') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_CALENDAR'];?></option>
+                                <option value="rating" <?php if ($mod['photoalbum']['orderby'] == 'rating') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_RATING'];?></option>
+                                <option value="hits" <?php if ($mod['photoalbum']['orderby'] == 'hits') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_VIEWS'];?></option>
+                            </select>
+                            
+                            <select class="form-control w750" name="album_orderto">
+                                <?php $mod['photoalbum']['orderto'] = cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'orderto', 0); ?>
+                                <option value="desc" <?php if ($mod['photoalbum']['orderto'] == 'desc') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_DECREMENT'];?></option>
+                                <option value="asc" <?php if ($mod['photoalbum']['orderto'] == 'asc') { echo 'selected="selected"'; } ?>><?php echo $_LANG['AD_BY_INCREMENT'];?></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-2 text-right"><?php echo $_LANG['AD_HOW_MANY_COLUMNS'];?></label>
+                        
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control uispin" name="album_maxcols" value="<?php echo cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'maxcols', 2); ?>" style="width:50px" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-lg-2 text-right"><?php echo $_LANG['AD_HOW_MANY_PHOTO'];?></label>
+                        
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control uispin" name="album_max" value="<?php echo cmsCore::getArrVal(cmsCore::getArrVal($mod, 'photoalbum'), 'max', 8); ?>" style="width:50px" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="upr_access">
+                <div class="form-group row">
+                    <div class="col-lg-2"></div>
+                    
+                    <div class="col-lg-10">
+                        <div class="checkbox checkbox-primary">
+                            <input type="checkbox" id="is_public" name="is_access" onclick="checkGroupList()" value="1" <?php echo $group_public; ?> />
+                            <label for="is_public">
+                                <?php echo $_LANG['AD_SHARE'];?>
+                            </label>
+                        </div>
+                        <div class="help-block w750"><?php echo $_LANG['AD_IF_NOTED']; ?></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-lg-2 text-right"><?php echo $_LANG['AD_GROUPS_VIEW']; ?></label>
+                    
+                    <div class="col-lg-10">
+                        <select id="showin" class="form-control w750" name="showfor[]" size="6" multiple="multiple" <?php echo $group_style; ?>>
+                            <?php
+                            if (!empty($user_groups)) {
+                                foreach ($user_groups as $group) {
+                                    echo '<option value="'. $group['value'] .'"';
+                                    if (isset($group['selected'])) {
+                                        echo 'selected="selected"';
+                                    }
+                                    echo '>';
+                                    echo $group['title'] .'</option>';
+                                }
+                            } ?>
+                        </select>
+                        <div class="help-block w750"><?php echo $_LANG['AD_SELECT_MULTIPLE_CTRL'];?></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div>
         <input type="submit" class="btn btn-primary" name="add_mod" <?php if ($do == 'add') { echo 'value="'.$_LANG['AD_SAVE_SECTION'].'"'; } else { echo 'value="'.$_LANG['AD_SAVE_SECTION'].'"'; } ?> />
         <input type="button" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.history.back();" />
@@ -380,6 +550,9 @@
     </div>
 </form>
 <script type="text/javascript">
+    var field_key=0;
+    var field_html='<div id="field_%id%" class="row list-group-item"> <div class="col-lg-4">%title% (%name%)</div> <div class="col-lg-3">Тип поля: <span>%type%</span></div> <div class="col-lg-3">Обязателен к заполнению: <span>%req%</span></div> <div class="col-lg-2 text-right"> <a href="#" onclick="field_edit(%id%);return false;" class="btn btn-default"> <i class="fa fa-edit"></i> </a> <a href="#" onclick="field_delete(%id%);return false;" class="btn btn-default"> <i class="fa fa-trash-o"></i> </a> </div> <input type="hidden" name="fields[]" value="%json%" /> </div>';
+    
     function choosePhotoAlbum() {
         id = $('select[name=album_id]').val();
         if(id != 0){
@@ -388,4 +561,158 @@
             $('#con_photoalbum').hide();
         }
     }
+    
+    function field_edit(id) {
+        var field = JSON.parse(decodeURIComponent($('#field_'+ id +' input').val()));
+        
+        $('input[name=field_key]').val(id);
+        
+        $('.field_option').hide();
+        $('.field_item').hide();
+
+        $('.field_item_'+ field.type).show();
+        $('.field_option_'+ field.type).show();
+        
+        $('input[name=field_title]').val(field.title);
+        $('input[name=field_name]').val(field.name);
+        
+        $('select[name=field_type] option[value='+ field.type +']').prop('selected', true);
+        $('select[name=field_type]').trigger('change');
+        
+        $('input[name=field_required]').prop('checked', field.required);
+        
+        for (i in field.options) {
+            $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').prop('checked', field.options[i].value);
+        }
+        
+        for (i in field.items) {
+            switch (field.items[i].type) {
+                case 'text':
+                    $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').val(field.options[i].value);
+                    break
+                case 'select':
+                    $('select[name=field_'+ field.type +'_'+ field.options[i].name +'] option[value='+ field.options[i].value +']').prop('selected', true);
+                    $('select[name=field_'+ field.type +'_'+ field.options[i].name +']').trigger('change');
+                    break
+                case 'textarea':
+                    $('textarea[name=field_'+ field.type +'_'+ field.options[i].name +']').val(field.options[i].value);
+                    break
+                case 'checkbox':
+                    $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').prop('checked', field.options[i].value);
+                    break
+                case 'radio':
+                    $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').each(function(){
+                        if ($(this).val() == field.options[i].value) {
+                            $(this).prop('checked', true);
+                        }
+                    });
+                    break
+            }
+        }
+        
+        $('#add_field').show();
+        $('#add_field_btn').hide();
+    }
+    
+    function field_delete(id) {
+        $('#field_'+ id).remove();
+    }
+    
+    function add_new_field() {
+        var html = field_html;
+        var id = $('input[name=field_key]').val();
+        if (id == 0) {
+            field_key++;
+            id = field_key;
+        }
+        
+        var field = {
+            title: $('input[name=field_title]').val(),
+            name: $('input[name=field_name]').val(),
+            type: $('select[name=field_type]').val(),
+            required: $('input[name=field_required]').prop('checked'),
+            options: [],
+            items: []
+        };
+        
+        $('.field_option_'+ field.type +' input').each(function(){
+            field.options.push({name: $(this).data('name'), value: $(this).prop('checked')})
+        });
+        
+        $('.field_item_'+ field.type +' input[type=text]').each(function(){
+            field.items.push({type: 'text', name: $(this).data('name'), value: $(this).val()})
+        });
+        
+        $('.field_item_'+ field.type +' select').each(function(){
+            field.items.push({type: 'select', name: $(this).data('name'), value: $(this).val()})
+        });
+        
+        $('.field_item_'+ field.type +' textarea').each(function(){
+            field.items.push({type: 'textarea', name: $(this).data('name'), value: $(this).val()})
+        });
+        
+        $('.field_item_'+ field.type +' input[type=checkbox]').each(function(){
+            if ($(this).prop('checked')) {
+                field.items.push({type: 'checkbox', name: $(this).data('name'), value: $(this).val()});
+            }
+        });
+        
+        $('.field_item_'+ field.type +' input[type=radio]').each(function(){
+            if ($(this).prop('checked')) {
+                field.items.push({type: 'radio', name: $(this).data('name'), value: $(this).val()});
+            }
+        });
+        
+        html = html.replace(new RegExp('%id%', 'g'), id);
+        html = html.replace(new RegExp('%title%', 'g'), field.title);
+        html = html.replace(new RegExp('%name%', 'g'), field.name);
+        html = html.replace(new RegExp('%type%', 'g'), field.type);
+        html = html.replace(new RegExp('%req%', 'g'), field.required ? '<?php echo $_LANG['YES'] ?>' : '<?php echo $_LANG['NO'] ?>');
+        html = html.replace(new RegExp('%json%', 'g'), encodeURIComponent(JSON.stringify(field)));
+        
+        if ($('#field_'+ id).length) {
+            $('#field_'+ id).replaceWith(html);
+        } else {
+            $('#fields_list').append(html);
+        }
+        
+        reset_fields();
+    }
+    
+    function reset_fields() {
+        $('input[name=field_key]').val('0');
+        
+        $('#add_field').hide();
+        $('#add_field_btn').show();
+        
+        $('.field_option').hide();
+        $('.field_item').hide();
+        
+        $('.field_option input').each(function(){
+            $(this).prop('checked', false);
+        });
+        
+        $('input[name=field_title]').val('');
+        $('input[name=field_name]').val('');
+        $('select[name=field_type] option:first').attr('selected', 'selected');
+        
+        $('.field_item input').val('');
+        $('.field_item textarea').val('');
+        $('.field_item select option:first').attr('selected', 'selected');
+        
+        $('.field_item_text').show();
+        $('.field_option_text').show();
+    }
+    
+    $(function(){
+        $('select[name=field_type]').change(function(){
+            var v = $(this).val();
+            
+            $('.field_option').hide();
+            $('.field_item').hide();
+            
+            $('.field_item_'+ v).show();
+            $('.field_option_'+ v).show();
+        });
+    });
 </script>

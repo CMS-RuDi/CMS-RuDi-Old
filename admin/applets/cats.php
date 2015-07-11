@@ -93,11 +93,21 @@ function applet_cats() {
             if (!is_numeric($category['cost'])) { $category['cost'] = ''; }
             
             $category['fields'] = cmsCore::request('fields', 'array', array());
-            foreach ($category['fields'] as $k => $v) {
-                $category['fields'][$k] = json_decode(urldecode($category['fields'][$k]), true);
+            foreach ($category['fields'] as $key => $field) {
+                $field = json_decode(urldecode($field), true);
+
+                if (!cmsCore::c('db')->isFieldExists('cms_content_fields', $field['name'])) {
+                    cmsCore::c('db')->query("ALTER TABLE `cms_content_fields` ADD `". $field['name'] ."` text NOT NULL DEFAULT ''");
+                }
+
+                if ($field['type'] == 'select') {
+                    $field['items']['default']['items'] = explode("\n", $field['items']['default']['value']);
+                }
+
+                $category['fields'][$key] = $field;
             }
             $category['fields'] = cmsCore::c('db')->escape_string(cmsCore::jsonEncode($category['fields'], true));
-
+            
             $album = array();
             $album['id']      = cmsCore::request('album_id', 'int', 0);
             $album['header']  = cmsCore::request('album_header', 'str', '');
@@ -191,8 +201,18 @@ function applet_cats() {
         if (!is_numeric($category['cost'])) { $category['cost'] = ''; }
         
         $category['fields'] = cmsCore::request('fields', 'array', array());
-        foreach ($category['fields'] as $k => $v) {
-            $category['fields'][$k] = json_decode(urldecode($category['fields'][$k]), true);
+        foreach ($category['fields'] as $key => $field) {
+            $field = json_decode(urldecode($field), true);
+            
+            if (!cmsCore::c('db')->isFieldExists('cms_content_fields', $field['name'])) {
+                cmsCore::c('db')->query("ALTER TABLE `cms_content_fields` ADD `". $field['name'] ."` text NOT NULL DEFAULT ''");
+            }
+
+            if ($field['type'] == 'select') {
+                $field['items']['default']['items'] = explode("\n", $field['items']['default']['value']);
+            }
+
+            $category['fields'][$key] = $field;
         }
         $category['fields'] = cmsCore::c('db')->escape_string(cmsCore::jsonEncode($category['fields'], true));
 

@@ -1,7 +1,6 @@
-<form id="addform" name="addform" method="post" action="index.php" enctype="multipart/form-data">
+<form id="addform" name="addform" method="post" action="index.php?view=content&do=submit" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
-    <input type="hidden" name="view" value="content" />
-    
+
     <div class="tabs-container">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
@@ -234,7 +233,9 @@
                     </div>
                 </div>
                 
-                <div id="article_fields_html"></div>
+                <div id="article_fields_html">
+                    
+                </div>
             </div>
             
             <div role="tabpanel" class="tab-pane fade" id="upr_seo">
@@ -395,7 +396,7 @@
     <div>
         <input type="submit" class="btn btn-primary" name="add_mod" <?php if ($do == 'add') { echo 'value="'. $_LANG['AD_CREATE_CONTENT'] .'"'; } else { echo 'value="'. $_LANG['AD_SAVE_CONTENT'] .'"'; } ?> />
         <input type="button" class="btn btn-default" name="back" value="<?php echo $_LANG['CANCEL']; ?>" onclick="window.history.back();"/>
-        <input type="hidden" name="do" value="submit" />
+
         <?php
             if ($do == 'edit') {
                 echo '<input type="hidden" name="id" value="'. $mod['id'] .'" />';
@@ -405,11 +406,10 @@
 </form>
 
 <script type="text/javascript">
-$(function() {
     var fields_html = [];
     fields_html[1] = false;
     
-    function insertFieldsHTml(cat_id) {
+    function insert_fields_html(cat_id) {
         if (fields_html[cat_id]) {
             $('#no_fields_info').hide();
             $('#article_fields_html').html(fields_html[cat_id])
@@ -419,25 +419,15 @@ $(function() {
         }
     }
     
-    $('input[name=autokeys]').click(function(e) {
-        if ($(this).val() === 3) {
-            $('textarea[name=meta_keys]').prop('disabled', false);
-            $('textarea[name=meta_desc]').prop('disabled', false);
-        } else {
-            $('textarea[name=meta_keys]').prop('disabled', true);
-            $('textarea[name=meta_desc]').prop('disabled', true);
-        }
-    });
-    
-    $('select[name=category_id]').change(function() {
-        var cat_id = $(this).val(), isset = false;
+    function get_article_fields() {
+        var cat_id = $('select[name=category_id]').val(), isset = false;
         
         for (i in fields_html) {
             if (i === cat_id) {
                 isset = true;
             }
         }
-        
+
         if (isset === false) {
             $.post(
                 '/admin/index.php?view=content&do=get_cat_fields',
@@ -447,12 +437,29 @@ $(function() {
                 },
                 function (msg) {
                     fields_html[cat_id] = msg;
-                    insertFieldsHTml(cat_id);
+                    insert_fields_html(cat_id);
                 }
             );
         } else {
-            insertFieldsHTml(cat_id);
+            insert_fields_html(cat_id);
         }
+    }
+    
+    $(function() {
+        $('input[name=autokeys]').click(function(e) {
+            if ($(this).val() === 3) {
+                $('textarea[name=meta_keys]').prop('disabled', false);
+                $('textarea[name=meta_desc]').prop('disabled', false);
+            } else {
+                $('textarea[name=meta_keys]').prop('disabled', true);
+                $('textarea[name=meta_desc]').prop('disabled', true);
+            }
+        });
+
+        $('select[name=category_id]').change(function() {
+            get_article_fields();
+        });
+        
+        get_article_fields();
     });
-});
 </script>

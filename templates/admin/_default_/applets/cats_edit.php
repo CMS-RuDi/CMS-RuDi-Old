@@ -365,8 +365,10 @@
                     
                     <div class="col-lg-10">
                         <div id="fields_list" class="uisort list-group" style="padding-right: 20px;">
-                            <?php foreach ($mod['fields'] as $k => $field) { ?>
-                            <div id="field_<?php echo $k + 1; ?>" class="row list-group-item">
+                            <?php $k = 0; ?>
+                            <?php foreach ($mod['fields'] as $field) { ?>
+                            <?php $k++; ?>
+                            <div id="field_<?php echo $k; ?>" class="row list-group-item">
                                 <div class="col-lg-4">
                                     <?php echo $field['title']; ?> (<?php echo $field['name']; ?>)
                                 </div>
@@ -377,8 +379,8 @@
                                     Обязателен к заполнению: <span><?php echo $field['required'] ? $_LANG['YES'] : $_LANG['NO']; ?></span>
                                 </div>
                                 <div class="col-lg-2 text-right">
-                                    <a href="#" onclick="field_edit(<?php echo $k + 1; ?>);return false;" class="btn btn-default"><i class="fa fa-edit"></i></a>
-                                    <a href="#" onclick="field_delete(<?php echo $k + 1; ?>);return false;" class="btn btn-default"><i class="fa fa-trash-o"></i></a>
+                                    <a href="#" onclick="field_edit(<?php echo $k; ?>);return false;" class="btn btn-default"><i class="fa fa-edit"></i></a>
+                                    <a href="#" onclick="field_delete(<?php echo $k; ?>);return false;" class="btn btn-default"><i class="fa fa-trash-o"></i></a>
                                 </div>
                                 <input type="hidden" name="fields[]" value="<?php echo $field['json']; ?>" /> </div>
                             <?php } ?>
@@ -550,7 +552,7 @@
     </div>
 </form>
 <script type="text/javascript">
-    var field_key=0;
+    var field_key=<?php echo $k + 1; ?>;
     var field_html='<div id="field_%id%" class="row list-group-item"> <div class="col-lg-4">%title% (%name%)</div> <div class="col-lg-3">Тип поля: <span>%type%</span></div> <div class="col-lg-3">Обязателен к заполнению: <span>%req%</span></div> <div class="col-lg-2 text-right"> <a href="#" onclick="field_edit(%id%);return false;" class="btn btn-default"> <i class="fa fa-edit"></i> </a> <a href="#" onclick="field_delete(%id%);return false;" class="btn btn-default"> <i class="fa fa-trash-o"></i> </a> </div> <input type="hidden" name="fields[]" value="%json%" /> </div>';
     
     function choosePhotoAlbum() {
@@ -588,21 +590,21 @@
         for (i in field.items) {
             switch (field.items[i].type) {
                 case 'text':
-                    $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').val(field.options[i].value);
+                    $('input[name=field_'+ field.type +'_'+ field.items[i].name +']').val(field.items[i].value);
                     break
                 case 'select':
-                    $('select[name=field_'+ field.type +'_'+ field.options[i].name +'] option[value='+ field.options[i].value +']').prop('selected', true);
-                    $('select[name=field_'+ field.type +'_'+ field.options[i].name +']').trigger('change');
+                    $('select[name=field_'+ field.type +'_'+ field.items[i].name +'] option[value='+ field.items[i].value +']').prop('selected', true);
+                    $('select[name=field_'+ field.type +'_'+ field.items[i].name +']').trigger('change');
                     break
                 case 'textarea':
-                    $('textarea[name=field_'+ field.type +'_'+ field.options[i].name +']').val(field.options[i].value);
+                    $('textarea[name=field_'+ field.type +'_'+ field.items[i].name +']').val(field.items[i].value);
                     break
                 case 'checkbox':
-                    $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').prop('checked', field.options[i].value);
+                    $('input[name=field_'+ field.type +'_'+ field.items[i].name +']').prop('checked', field.items[i].value);
                     break
                 case 'radio':
-                    $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').each(function(){
-                        if ($(this).val() == field.options[i].value) {
+                    $('input[name=field_'+ field.type +'_'+ field.items[i].name +']').each(function(){
+                        if ($(this).val() == field.items[i].value) {
                             $(this).prop('checked', true);
                         }
                     });
@@ -631,37 +633,45 @@
             name: $('input[name=field_name]').val(),
             type: $('select[name=field_type]').val(),
             required: $('input[name=field_required]').prop('checked'),
-            options: [],
-            items: []
+            options: {},
+            items: {}
         };
         
         $('.field_option_'+ field.type +' input').each(function(){
-            field.options.push({name: $(this).data('name'), value: $(this).prop('checked')})
+            field.options[$(this).data('name')] = {name: $(this).data('name'), value: $(this).prop('checked')};
+            //field.options.push({name: $(this).data('name'), value: $(this).prop('checked')})
         });
         
         $('.field_item_'+ field.type +' input[type=text]').each(function(){
-            field.items.push({type: 'text', name: $(this).data('name'), value: $(this).val()})
+            field.items[$(this).data('name')] = {type: 'text', name: $(this).data('name'), value: $(this).val()};
+            //field.items.push({type: 'text', name: $(this).data('name'), value: $(this).val()})
         });
         
         $('.field_item_'+ field.type +' select').each(function(){
-            field.items.push({type: 'select', name: $(this).data('name'), value: $(this).val()})
+            field.items[$(this).data('name')] = {type: 'select', name: $(this).data('name'), value: $(this).val()};
+            //field.items.push({type: 'select', name: $(this).data('name'), value: $(this).val()})
         });
         
         $('.field_item_'+ field.type +' textarea').each(function(){
-            field.items.push({type: 'textarea', name: $(this).data('name'), value: $(this).val()})
+            field.items[$(this).data('name')] = {type: 'textarea', name: $(this).data('name'), value: $(this).val()};
+            //field.items.push({type: 'textarea', name: $(this).data('name'), value: $(this).val()})
         });
         
         $('.field_item_'+ field.type +' input[type=checkbox]').each(function(){
             if ($(this).prop('checked')) {
-                field.items.push({type: 'checkbox', name: $(this).data('name'), value: $(this).val()});
+                field.items[$(this).data('name')] = {type: 'checkbox', name: $(this).data('name'), value: $(this).val()};
+                //field.items.push({type: 'checkbox', name: $(this).data('name'), value: $(this).val()});
             }
         });
         
         $('.field_item_'+ field.type +' input[type=radio]').each(function(){
             if ($(this).prop('checked')) {
-                field.items.push({type: 'radio', name: $(this).data('name'), value: $(this).val()});
+                field.items[$(this).data('name')] = {type: 'radio', name: $(this).data('name'), value: $(this).val()};
+                //field.items.push({type: 'radio', name: $(this).data('name'), value: $(this).val()});
             }
         });
+        
+        console.log(field);
         
         html = html.replace(new RegExp('%id%', 'g'), id);
         html = html.replace(new RegExp('%title%', 'g'), field.title);

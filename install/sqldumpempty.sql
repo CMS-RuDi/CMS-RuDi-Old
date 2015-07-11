@@ -490,6 +490,30 @@ CREATE TABLE `#__content_access` (
   KEY `content_id` (`content_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `#__content_fields`;
+CREATE TABLE `#__content_fields` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `cat_id` int DEFAULT NULL,
+  `article_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `cat_id` (`cat_id`),
+  INDEX `article_id` (`article_id`)
+) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DROP TABLE IF EXISTS `#__content_images`;
+CREATE TABLE `#__content_images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `target_id` int(11) NOT NULL DEFAULT '0',
+  `session_id` varchar(50) NOT NULL,
+  `fileurl` varchar(250) NOT NULL,
+  `target` varchar(25) NOT NULL DEFAULT '',
+  `title` varchar(256) NOT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `target_id` (`target_id`),
+  KEY `session_id` (`session_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
 DROP TABLE IF EXISTS `#__cron_jobs`;
 CREATE TABLE `#__cron_jobs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

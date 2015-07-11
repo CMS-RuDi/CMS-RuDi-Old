@@ -311,7 +311,7 @@ class cmsDatabase {
     }
 
     public function isFieldExists($table, $field) {
-        $sql    = "SHOW COLUMNS FROM ". $table ." WHERE Field = '". $field ."'";
+        $sql    = "SHOW COLUMNS FROM `". $table ."` WHERE Field = '". $field ."'";
         $result = $this->query($sql);
 
         if ($this->errno()) { return false; }

@@ -529,6 +529,16 @@ CREATE TABLE `#__content_access` (
   KEY `content_id` (`content_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `#__content_fields`;
+CREATE TABLE `#__content_fields` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `cat_id` int DEFAULT NULL,
+  `article_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `cat_id` (`cat_id`),
+  INDEX `article_id` (`article_id`)
+) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 DROP TABLE IF EXISTS `#__content_images`;
 CREATE TABLE `#__content_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

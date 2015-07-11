@@ -189,7 +189,8 @@
             array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_ticket_msg` ( `id` int(11) NOT NULL AUTO_INCREMENT, `ticket_id` int(11) NOT NULL, `msg` text NOT NULL, `pubdate` datetime NOT NULL, `support` varchar(128) NOT NULL, PRIMARY KEY (`id`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1" ),
             array( 'sql' => "UPDATE `cms_plugins` SET  `version`='0.0.3' WHERE `plugin` = 'p_ckeditor'" ),
             array( 'sql' => "UPDATE `cms_plugins` SET  `version`='1.12' WHERE `plugin` = 'p_hidetext'" ),
-            array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_cron_logs` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron_id` int(11) DEFAULT NULL, `msg` longtext DEFAULT NULL, `run_date` datetime DEFAULT NULL, PRIMARY KEY (`id`) ) ENGINE = INNODB AUTO_INCREMENT=1 CHARACTER SET utf8 COLLATE utf8_general_ci", 'msg' => 'Таблица cms_cron_logs создана' )
+            array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_cron_logs` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron_id` int(11) DEFAULT NULL, `msg` longtext DEFAULT NULL, `run_date` datetime DEFAULT NULL, PRIMARY KEY (`id`) ) ENGINE = INNODB AUTO_INCREMENT=1 CHARACTER SET utf8 COLLATE utf8_general_ci", 'msg' => 'Таблица cms_cron_logs создана' ),
+            array( 'sql' => "CREATE TABLE IF NOT EXISTS `#__content_fields` ( `id` int UNSIGNED NOT NULL AUTO_INCREMENT, `cat_id` int DEFAULT NULL, `article_id` int DEFAULT NULL, PRIMARY KEY (`id`), INDEX `cat_id` (`cat_id`), INDEX `article_id` (`article_id`) ) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;", 'msg' => 'Таблица cms_content_fields создана' )
         ),
         
         'com_cfgs' => array(

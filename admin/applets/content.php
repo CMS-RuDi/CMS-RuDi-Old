@@ -132,7 +132,7 @@ function applet_content() {
         cmsCore::redirectBack();
     }
 
-    if ($do == 'update') {
+    if ($do == 'submit') {
         if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
         
         $article = array();
@@ -212,6 +212,15 @@ function applet_content() {
             
             cmsCore::addSessionMessage($_LANG['AD_ARTICLE_ADD'], 'success');
         }
+        
+        cmsCore::c('db')->delete('cms_content_fields', 'article_id='. $article['id'], 1);
+        $fields = cmsCore::request('fields', 'array', array());
+        foreach ($fields as $key => $val) {
+            $fields[$key] = cmsCore::c('db')->escape_string($val);
+        }
+        $fields['cat_id'] = $article['category_id'];
+        $fields['article_id'] = $article['id'];
+        cmsCore::c('db')->insert('cms_content_fields', $fields);
 
         if (!cmsCore::request('is_public', 'int', 0)) {
             $showfor = cmsCore::request('showfor', 'array_int', array());
@@ -235,12 +244,24 @@ function applet_content() {
         $cat_id = cmsCore::request('cat_id', 'int', 0, 'post');
         $article_id = cmsCore::request('article_id', 'int', 0, 'post');
         
-        if (empty($cat_id) || $cat_id == 1 || !cmsCore::isAjax()) {
+        $cat = cmsCore::c('db')->get_fields('cms_category', 'id='. $cat_id, '*');
+        
+        if (empty($cat) || $cat_id == 1 || !cmsCore::isAjax()) {
             cmsCore::halt();
         }
         
-        // Поля пока не готовы, возвращаем просто id категории для тестирования
-        cmsCore::halt($cat_id);
+        if (!empty($cat['fields'])) {
+            $cat['fields'] = json_decode($cat['fields'], true);
+        }
+        
+        if (!empty($cat['fields'])) {
+            cmsCore::c('page')->initTemplate('applets', 'content_fields')->
+                assign('fields', $cat['fields'])->
+                assign('values', cmsCore::c('db')->get_fields('cms_content_fields', 'article_id='.$article_id, '*'))->
+                display();
+        }
+        
+        cmsCore::halt();
     }
 
     if ($do == 'add' || $do == 'edit') {

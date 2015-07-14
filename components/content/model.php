@@ -306,6 +306,17 @@ class cms_model_content {
         if (!empty($article['images'])) {
             $article['images'] = json_decode($article['images'], true);
         }
+        
+        if (!empty($article['categories'])) {
+            $article['categories'] = explode(',', $article['categories']);
+            foreach ($article['categories'] as $k => $v) {
+                if ($v == $article['category_id']) {
+                    unset($article['categories'][$k]);
+                }
+            }
+        }
+        
+        $article['categories_str'] = !empty($article['categories']) ? implode(',', $article['categories']) : '';
 
         return $article;
     }

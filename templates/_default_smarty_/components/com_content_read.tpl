@@ -54,6 +54,16 @@
     </div>
 {/if}
 
+{if $fields}
+    {foreach item=field from=$fields}
+        {if $field.value}
+        <div class="field_{$field.type} field_{$field.type}_{$field.name}">
+            {$field.value}
+        </div>
+        {/if}
+    {/foreach}
+{/if}
+
 {if $article.showtags}
     {$tagbar}
 {/if}

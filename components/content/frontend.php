@@ -31,7 +31,7 @@ function content() {
     
     $page    = cmsCore::request('page', 'int', 1);
 
-///////////////////////////////////// VIEW CATEGORY ////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// VIEW CATEGORY ////////////////////////////
 if ($do == 'view') {
     $cat = cmsCore::c('db')->getNsCategory('cms_category', $seolink);
 
@@ -157,7 +157,7 @@ if ($do == 'view') {
         assign('pagebar', $pagebar)->
         display();
 }
-///////////////////////////////////// READ ARTICLE ////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// READ ARTICLE /////////////////////////////
 if ($do == 'read') {
     // Получаем статью
     $article = cmsCore::m('content')->getArticle($seolink);
@@ -239,8 +239,10 @@ if ($do == 'read') {
         $karma_points = cmsKarmaFormatSmall($karma['points']);
         $btns = cmsKarmaButtonsText('content', $article['id'], $karma['points'], $is_author);
     }
+    
+    
 
-    cmsPage::initTemplate('components', $article['tpl'])->
+    $tpl = cmsPage::initTemplate('components', $article['tpl'])->
         assign('article', $article)->
         assign('cfg', cmsCore::m('content')->config)->
         assign('page', $page)->
@@ -253,8 +255,29 @@ if ($do == 'read') {
         assign('tagbar', cmsTagBar('content', $article['id']))->
         assign('karma_points', @$karma_points)->
         assign('karma_votes', @$karma['votes'])->
-        assign('karma_buttons', @$btns)->
-        display();
+        assign('karma_buttons', @$btns);
+    
+    //Получаем данные категории статьи и дополнительных полей
+    $cat = $article['category_id'] > 1 ? cmsCore::c('db')->getNsCategory('cms_category', $article['category_id']) : array();
+    if (!empty($cat['fields'])) {
+        $cat['fields'] = json_decode($cat['fields'], true);
+        $values = cmsCore::c('db')->get_fields('cms_content_fields', 'article_id='. $article['id'], '*');
+        
+        foreach ($cat['fields'] as $k => $field) {
+            $field['value'] = cmsCore::getArrVal($values, $field['name'], '');
+            $field = cmsCore::callEvent('GET_FIELD_'. mb_strtoupper($field['type']) .'_VALUE', $field);
+            
+            if ($field['del_from_list']) {
+                $tpl->assign('field_'. $field['name'], $field);
+            } else {
+                $cat['fields'][$k] = $field;
+            }
+        }
+        
+        $tpl->assign('fields', $cat['fields']);
+    }
+
+    $tpl->display();
 
     // Комментарии статьи
     if ($article['published'] && $article['comments'] && $inCore->isComponentEnable('comments')) {
@@ -262,7 +285,7 @@ if ($do == 'read') {
         comments('article', $article['id'], array(), $is_author);
     }
 }
-///////////////////////////////////// ADD ARTICLE //////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// ADD ARTICLE //////////////////////////////
 if ($do == 'addarticle' || $do == 'editarticle') {
     $is_add      = cmsUser::isUserCan('content/add');     // может добавлять статьи
     $is_auto_add = cmsUser::isUserCan('content/autoadd'); // добавлять статьи без модерации
@@ -503,7 +526,7 @@ if ($do == 'addarticle' || $do == 'editarticle') {
         }
     }
 }
-///////////////////////// PUBLISH ARTICLE /////////////////////////////////////////////////////////////////////////////
+///////////////////////// PUBLISH ARTICLE //////////////////////////////////////
 if ($do == 'publisharticle') {
     if (!cmsCore::c('user')->id) { cmsCore::error404(); }
 
@@ -543,7 +566,7 @@ if ($do == 'publisharticle') {
 
     cmsCore::redirectBack();
 }
-///////////////////////////////////// DELETE ARTICLE ///////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// DELETE ARTICLE //////////////////////////////
 if ($do == 'deletearticle') {
     if (!cmsCore::c('user')->id) { cmsCore::error404(); }
 
@@ -589,7 +612,7 @@ if ($do == 'deletearticle') {
         }
     }
 }
-///////////////////////////////////// MY ARTICLES ///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// MY ARTICLES //////////////////////////////
 if ($do == 'my'){
     if (!cmsUser::isUserCan('content/add')) { cmsCore::error404(); }
 
@@ -621,7 +644,7 @@ if ($do == 'my'){
         assign('pagebar', cmsPage::getPagebar($total, $page, $perpage, '/content/my%page%.html'))->
         display();
 }
-///////////////////////////////////// BEST ARTICLES ///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// BEST ARTICLES ////////////////////////////
 if ($do == 'best') {
     cmsCore::c('page')->setTitle($_LANG['ARTICLES_RATING']);
     cmsCore::c('page')->addPathway($_LANG['ARTICLES_RATING']);
@@ -640,5 +663,4 @@ if ($do == 'best') {
         assign('articles', $content_list)->
         display();
 }
-
 }

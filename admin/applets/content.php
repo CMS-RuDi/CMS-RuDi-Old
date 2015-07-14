@@ -215,12 +215,14 @@ function applet_content() {
         
         cmsCore::c('db')->delete('cms_content_fields', 'article_id='. $article['id'], 1);
         $fields = cmsCore::request('fields', 'array', array());
-        foreach ($fields as $key => $val) {
-            $fields[$key] = cmsCore::c('db')->escape_string($val);
+        if (!empty($fields)) {
+            foreach ($fields as $key => $val) {
+                $fields[$key] = cmsCore::c('db')->escape_string($val);
+            }
+            $fields['cat_id'] = $article['category_id'];
+            $fields['article_id'] = $article['id'];
+            cmsCore::c('db')->insert('cms_content_fields', $fields);
         }
-        $fields['cat_id'] = $article['category_id'];
-        $fields['article_id'] = $article['id'];
-        cmsCore::c('db')->insert('cms_content_fields', $fields);
 
         if (!cmsCore::request('is_public', 'int', 0)) {
             $showfor = cmsCore::request('showfor', 'array_int', array());
@@ -291,27 +293,15 @@ function applet_content() {
             } else {
                 $id = (int)$_REQUEST['id'];
             }
-
-            $sql = "SELECT *, (TO_DAYS(enddate) - TO_DAYS(CURDATE())) as daysleft, DATE_FORMAT(pubdate, '%d.%m.%Y') as pubdate, DATE_FORMAT(enddate, '%d.%m.%Y') as enddate
-                     FROM cms_content
-                     WHERE id = ". $id ." LIMIT 1";
-            $result = cmsCore::c('db')->query($sql) ;
-            if (cmsCore::c('db')->num_rows($result)) {
-                $mod = cmsCore::c('db')->fetch_assoc($result);
-                
-                if (!empty($mod['images'])) {
-                    $mod['images'] = json_decode($mod['images'], true);
-                }
-                
-                if (!empty($mod['categories'])) {
-                    $mod['categories'] = explode(',', $mod['categories']);
-                    foreach ($mod['categories'] as $k => $v) {
-                        if ($v == $mod['category_id']) {
-                            unset($mod['categories'][$k]);
-                        }
-                    }
-                }
-            }
+            
+            $mod = cmsCore::m('content')->getArticle($id);
+            if (empty($mod)) { cmsCore::error404(); }
+            
+            $dt = new DateTime($mod['pubdate']);
+            $mod['pubdate'] = $dt->format('d.m.Y');
+            
+            $dt = new DateTime($mod['enddate']);
+            $mod['enddate'] = $dt->format('d.m.Y');
 
             echo '<h3>'. $_LANG['AD_EDIT_ARTICLE'] . $ostatok .'</h3>';
             cpAddPathway($mod['title'], 'index.php?view=content&do=edit&id='. $mod['id']);
@@ -363,7 +353,7 @@ function applet_content() {
             }
         }
         
-        $tpl = cmsCore::c('page')->initTemplate('applets', 'content_edit')->
+        cmsCore::c('page')->initTemplate('applets', 'content_edit')->
             assign('do', $do)->
             assign('cfg', $cfg)->
             assign('tags', isset($mod['id']) ? cmsTagLine('content', $mod['id'], false) : '')->
@@ -376,12 +366,7 @@ function applet_content() {
             assign('group_public', $group_public)->
             assign('group_style', $group_style)->
             assign('ajaxUploader', $ajaxUploader)->
-            assign('mod', $mod);
-        
-        if ($do == 'edit') {
-            $tpl->assign('image_exist', file_exists(PATH.'/images/photos/small/article'. $mod['id'] .'.jpg'));
-        }
-        
-        $tpl->display();
+            assign('mod', $mod)->
+            display();
     }
 }

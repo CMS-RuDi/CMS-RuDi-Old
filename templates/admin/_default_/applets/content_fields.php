@@ -7,17 +7,17 @@
             switch ($field['type']) {
                 case 'text':
                     ?>
-                    <input type="text" class="form-control w750" name="fields[<?php echo $field['name'] ?>]" value="<?php echo $this->escape(isset($values[$field['name']]) ? $values[$field['name']] : (!empty($field['default']['value']) ? $field['default']['value'] : '')); ?>" />
+            <input type="text" class="form-control w750" name="fields[<?php echo $field['name'] ?>]" value="<?php echo $this->escape(isset($values[$field['name']]) ? $values[$field['name']] : (!empty($field['default']['value']) ? $field['default']['value'] : '')); ?>" <?php if ($field['required']) { ?>required="required"<?php } ?> />
                     <?php
                     break;
                 case 'html':
                     ?>
-                    <textarea class="form-control w750" name="fields[<?php echo $field['name'] ?>]"><?php echo $this->escape(isset($values[$field['name']]) ? $values[$field['name']] : (!empty($field['default']['value']) ? $field['default']['value'] : '')); ?></textarea>
+                    <textarea class="form-control w750" name="fields[<?php echo $field['name'] ?>]" <?php if ($field['required']) { ?>required="required"<?php } ?>><?php echo $this->escape(isset($values[$field['name']]) ? $values[$field['name']] : (!empty($field['default']['value']) ? $field['default']['value'] : '')); ?></textarea>
                     <?php
                     break;
                 case 'select':
                     ?>
-                    <select class="form-control w750" name="fields[<?php echo $field['name'] ?>]">
+                    <select class="form-control w750" name="fields[<?php echo $field['name'] ?>]" <?php if ($field['required']) { ?>required="required"<?php } ?>>
                         <?php foreach ($field['items']['default']['items'] as $option) { ?>
                         <option value="<?php $option; ?>" <?php if (cmsCore::getArrVal($values, $field['name']) == $option) { ?>selected="selected"<?php } ?>><?php $option; ?></option>
                         <?php } ?>
@@ -31,4 +31,4 @@
             ?>
         </div>
     </div>
-<?php } ?>
+<?php }

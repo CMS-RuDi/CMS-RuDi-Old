@@ -229,32 +229,32 @@
             
             <div role="tabpanel" class="tab-pane fade" id="upr_addit_fields">
                 <div class="form-group" id="add_field_btn">
-                    <input type="button" class="btn btn-default" value="Добавить новое поле" onclick="$('#add_field').show(); $('#add_field_btn').hide();" />
+                    <input type="button" class="btn btn-default" value="<?php echo $_LANG['AD_ADD_NEW_FIELD']; ?>" onclick="$('#add_field').show(); $('#add_field_btn').hide();" />
                 </div>
                 
                 <div id="add_field" style="display: none;">
                     <input type="hidden" name="field_key" value="0" />
                     
                     <div class="form-group row">
-                        <label class="col-lg-2">Название поля</label>
+                        <label class="col-lg-2"><?php echo $_LANG['AD_FIELD_TITLE']; ?></label>
                         <div class="col-lg-10">
                             <input type="text" class="form-control w750" name="field_title" value="" />
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-lg-2">Идентификатор поля</label>
+                        <label class="col-lg-2"><?php echo $_LANG['AD_FIELD_NAME']; ?></label>
                         <div class="col-lg-10">
                             <input type="text" class="form-control w750" name="field_name" value="" />
-                            <div class="help-block w750">Латинскими буквами</div>
+                            <div class="help-block w750"><?php echo $_LANG['AD_LATIN_LETTERS']; ?></div>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-lg-2">Тип поля</label>
+                        <label class="col-lg-2"><?php echo $_LANG['AD_FIELD_TYPE']; ?></label>
                         <div class="col-lg-10">
                             <select name="field_type" class="form-control w750">
-                                <option value="text">Текст: одна строка</option>
-                                <option value="html">Текст: многострочный</option>
-                                <option value="select">Список</option>
+                                <option value="text"><?php echo $_LANG['AD_TYPE_TEXT']; ?></option>
+                                <option value="html"><?php echo $_LANG['AD_TYPE_HTML']; ?></option>
+                                <option value="select"><?php echo $_LANG['AD_TYPE_SELECT']; ?></option>
                                 <?php foreach ($fields as $field) { ?>
                                     <option value="<?php echo $field['name']; ?>"><?php echo $field['title']; ?></option>
                                 <?php } ?>
@@ -263,24 +263,24 @@
                     </div>
                     
                     <div class="form-group row field_item field_item_text">
-                        <label class="col-lg-2">Значение по умолчанию</label>
+                        <label class="col-lg-2"><?php echo $_LANG['AD_DEFAULT_VALUE']; ?></label>
                         <div class="col-lg-10">
                             <input type="text" class="form-control w750" name="field_text_default" value="" data-name="default"/>
                         </div>
                     </div>
                     
                     <div class="form-group row field_item field_item_html" style="display:none;">
-                        <label class="col-lg-2">Значение по умолчанию</label>
+                        <label class="col-lg-2"><?php echo $_LANG['AD_DEFAULT_VALUE']; ?></label>
                         <div class="col-lg-10">
                             <textarea class="form-control w750" name="field_html_default" style="height:100px;" data-name="default"></textarea>
                         </div>
                     </div>
                     
                     <div class="form-group row field_item field_item_select" style="display:none;">
-                        <label class="col-lg-2">Список значений</label>
+                        <label class="col-lg-2"><?php echo $_LANG['AD_VALUES_LIST']; ?></label>
                         <div class="col-lg-10">
                             <textarea class="form-control w750" name="field_select_default" style="height:100px;" data-name="default"></textarea>
-                            <div class="help-block w750">Каждое значение с новой строки</div>
+                            <div class="help-block w750"><?php echo $_LANG['AD_VALUE_ON_NEW_LINE']; ?></div>
                         </div>
                     </div>
 
@@ -330,15 +330,19 @@
                             <div class="checkbox checkbox-primary">
                                 <div>
                                     <input type="checkbox" id="field_required" name="field_required" value="1" />
-                                    <label for="field_required">Обязательное к заполнению поле</label>
+                                    <label for="field_required"><?php echo $_LANG['AD_REQUIRE']; ?></label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="field_del_from_list" name="field_del_from_list" value="1" />
+                                    <label for="field_del_from_list"><?php echo $_LANG['AD_DEL_FROM_LIST']; ?></label>
                                 </div>
                                 <div class="field_option field_option_text">
                                     <input type="checkbox" id="field_text_link" name="field_text_link" data-name="link" value="1" />
-                                    <label for="field_text_link">Использовать значение поля как ссылку</label>
+                                    <label for="field_text_link"><?php echo $_LANG['AD_FIELD_AS_LINK']; ?></label>
                                 </div>
                                 <div class="field_option field_option_select" style="display:none;">
                                     <input type="checkbox" id="field_select_link" name="field_select_link" data-name="link" value="1" />
-                                    <label for="field_select_link">Использовать значение поля как ссылку</label>
+                                    <label for="field_select_link"><?php echo $_LANG['AD_FIELD_AS_LINK']; ?></label>
                                 </div>
                                 <?php foreach ($fields as $field) { if (!empty($field['options'])) { ?>
                                     <?php foreach ($field['options'] as $option) { ?>
@@ -361,7 +365,7 @@
                 <hr/>
                 
                 <div class="form-group row">
-                    <label class="col-lg-2">Список полей</label>
+                    <label class="col-lg-2"><?php echo $_LANG['AD_FIELDS_LIST']; ?></label>
                     
                     <div class="col-lg-10">
                         <div id="fields_list" class="uisort list-group" style="padding-right: 20px;">
@@ -373,10 +377,10 @@
                                     <?php echo $field['title']; ?> (<?php echo $field['name']; ?>)
                                 </div>
                                 <div class="col-lg-3">
-                                    Тип поля: <span><?php echo $field['type']; ?></span>
+                                    <?php echo $_LANG['AD_FIELD_TYPE']; ?>: <span><?php echo $field['type']; ?></span>
                                 </div>
                                 <div class="col-lg-3">
-                                    Обязателен к заполнению: <span><?php echo $field['required'] ? $_LANG['YES'] : $_LANG['NO']; ?></span>
+                                    <?php echo $_LANG['AD_REQUIRED']; ?>: <span><?php echo $field['required'] ? $_LANG['YES'] : $_LANG['NO']; ?></span>
                                 </div>
                                 <div class="col-lg-2 text-right">
                                     <a href="#" onclick="field_edit(<?php echo $k; ?>);return false;" class="btn btn-default"><i class="fa fa-edit"></i></a>
@@ -552,8 +556,9 @@
     </div>
 </form>
 <script type="text/javascript">
-    var field_key=<?php echo $k + 1; ?>;
-    var field_html='<div id="field_%id%" class="row list-group-item"> <div class="col-lg-4">%title% (%name%)</div> <div class="col-lg-3">Тип поля: <span>%type%</span></div> <div class="col-lg-3">Обязателен к заполнению: <span>%req%</span></div> <div class="col-lg-2 text-right"> <a href="#" onclick="field_edit(%id%);return false;" class="btn btn-default"> <i class="fa fa-edit"></i> </a> <a href="#" onclick="field_delete(%id%);return false;" class="btn btn-default"> <i class="fa fa-trash-o"></i> </a> </div> <input type="hidden" name="fields[]" value="%json%" /> </div>';
+    var field_key = <?php echo $k + 1; ?>;
+    var field_html = '<div id="field_%id%" class="row list-group-item"> <div class="col-lg-4">%title% (%name%)</div> <div class="col-lg-3"><?php echo $_LANG['AD_FIELD_TYPE']; ?>: <span>%type%</span></div> <div class="col-lg-3"><?php echo $_LANG['AD_REQUIRED']; ?>: <span>%req%</span></div> <div class="col-lg-2 text-right"> <a href="#" onclick="field_edit(%id%);return false;" class="btn btn-default"> <i class="fa fa-edit"></i> </a> <a href="#" onclick="field_delete(%id%);return false;" class="btn btn-default"> <i class="fa fa-trash-o"></i> </a> </div> <input type="hidden" name="fields[]" value="%json%" /> </div>';
+    var fields = [];
     
     function choosePhotoAlbum() {
         id = $('select[name=album_id]').val();
@@ -582,6 +587,7 @@
         $('select[name=field_type]').trigger('change');
         
         $('input[name=field_required]').prop('checked', field.required);
+        $('input[name=field_del_from_list]').prop('checked', field.del_from_list);
         
         for (i in field.options) {
             $('input[name=field_'+ field.type +'_'+ field.options[i].name +']').prop('checked', field.options[i].value);
@@ -621,7 +627,7 @@
     }
     
     function add_new_field() {
-        var html = field_html;
+        var html = field_html, error = '';
         var id = $('input[name=field_key]').val();
         if (id == 0) {
             field_key++;
@@ -633,60 +639,81 @@
             name: $('input[name=field_name]').val(),
             type: $('select[name=field_type]').val(),
             required: $('input[name=field_required]').prop('checked'),
+            del_from_list: $('input[name=field_del_from_list]').prop('checked'),
             options: {},
             items: {}
         };
         
-        $('.field_option_'+ field.type +' input').each(function(){
-            field.options[$(this).data('name')] = {name: $(this).data('name'), value: $(this).prop('checked')};
-            //field.options.push({name: $(this).data('name'), value: $(this).prop('checked')})
-        });
-        
-        $('.field_item_'+ field.type +' input[type=text]').each(function(){
-            field.items[$(this).data('name')] = {type: 'text', name: $(this).data('name'), value: $(this).val()};
-            //field.items.push({type: 'text', name: $(this).data('name'), value: $(this).val()})
-        });
-        
-        $('.field_item_'+ field.type +' select').each(function(){
-            field.items[$(this).data('name')] = {type: 'select', name: $(this).data('name'), value: $(this).val()};
-            //field.items.push({type: 'select', name: $(this).data('name'), value: $(this).val()})
-        });
-        
-        $('.field_item_'+ field.type +' textarea').each(function(){
-            field.items[$(this).data('name')] = {type: 'textarea', name: $(this).data('name'), value: $(this).val()};
-            //field.items.push({type: 'textarea', name: $(this).data('name'), value: $(this).val()})
-        });
-        
-        $('.field_item_'+ field.type +' input[type=checkbox]').each(function(){
-            if ($(this).prop('checked')) {
-                field.items[$(this).data('name')] = {type: 'checkbox', name: $(this).data('name'), value: $(this).val()};
-                //field.items.push({type: 'checkbox', name: $(this).data('name'), value: $(this).val()});
-            }
-        });
-        
-        $('.field_item_'+ field.type +' input[type=radio]').each(function(){
-            if ($(this).prop('checked')) {
-                field.items[$(this).data('name')] = {type: 'radio', name: $(this).data('name'), value: $(this).val()};
-                //field.items.push({type: 'radio', name: $(this).data('name'), value: $(this).val()});
-            }
-        });
-        
-        console.log(field);
-        
-        html = html.replace(new RegExp('%id%', 'g'), id);
-        html = html.replace(new RegExp('%title%', 'g'), field.title);
-        html = html.replace(new RegExp('%name%', 'g'), field.name);
-        html = html.replace(new RegExp('%type%', 'g'), field.type);
-        html = html.replace(new RegExp('%req%', 'g'), field.required ? '<?php echo $_LANG['YES'] ?>' : '<?php echo $_LANG['NO'] ?>');
-        html = html.replace(new RegExp('%json%', 'g'), encodeURIComponent(JSON.stringify(field)));
-        
-        if ($('#field_'+ id).length) {
-            $('#field_'+ id).replaceWith(html);
-        } else {
-            $('#fields_list').append(html);
+        if (!field.title) {
+            error += '<div><?php echo $_LANG['AD_EMPTY_AF_TITLE']; ?></div>';
         }
         
-        reset_fields();
+        if (!field.name) {
+            error += '<div><?php echo $_LANG['AD_EMPTY_AF_NAME']; ?></div>';
+        }
+        
+        if (id == 0) {
+            for (i in fields) {
+                if (fields[i].name == field.name) {
+                    error += '<div><?php echo $_LANG['AD_EMPTY_AF_DOUBLE']; ?></div>';
+                }
+            }
+        }
+        
+        if (error) {
+            adminAlert(error);
+        } else {
+            $('.field_option_'+ field.type +' input').each(function(){
+                field.options[$(this).data('name')] = {name: $(this).data('name'), value: $(this).prop('checked')};
+                //field.options.push({name: $(this).data('name'), value: $(this).prop('checked')})
+            });
+
+            $('.field_item_'+ field.type +' input[type=text]').each(function(){
+                field.items[$(this).data('name')] = {type: 'text', name: $(this).data('name'), value: $(this).val()};
+                //field.items.push({type: 'text', name: $(this).data('name'), value: $(this).val()})
+            });
+
+            $('.field_item_'+ field.type +' select').each(function(){
+                field.items[$(this).data('name')] = {type: 'select', name: $(this).data('name'), value: $(this).val()};
+                //field.items.push({type: 'select', name: $(this).data('name'), value: $(this).val()})
+            });
+
+            $('.field_item_'+ field.type +' textarea').each(function(){
+                field.items[$(this).data('name')] = {type: 'textarea', name: $(this).data('name'), value: $(this).val()};
+                //field.items.push({type: 'textarea', name: $(this).data('name'), value: $(this).val()})
+            });
+
+            $('.field_item_'+ field.type +' input[type=checkbox]').each(function(){
+                if ($(this).prop('checked')) {
+                    field.items[$(this).data('name')] = {type: 'checkbox', name: $(this).data('name'), value: $(this).val()};
+                    //field.items.push({type: 'checkbox', name: $(this).data('name'), value: $(this).val()});
+                }
+            });
+
+            $('.field_item_'+ field.type +' input[type=radio]').each(function(){
+                if ($(this).prop('checked')) {
+                    field.items[$(this).data('name')] = {type: 'radio', name: $(this).data('name'), value: $(this).val()};
+                    //field.items.push({type: 'radio', name: $(this).data('name'), value: $(this).val()});
+                }
+            });
+
+            fields[id] = field;
+
+            html = html.replace(new RegExp('%id%', 'g'), id);
+            html = html.replace(new RegExp('%title%', 'g'), field.title);
+            html = html.replace(new RegExp('%name%', 'g'), field.name);
+            html = html.replace(new RegExp('%type%', 'g'), field.type);
+            html = html.replace(new RegExp('%req%', 'g'), field.required ? '<?php echo $_LANG['YES'] ?>' : '<?php echo $_LANG['NO'] ?>');
+            html = html.replace(new RegExp('%json%', 'g'), encodeURIComponent(JSON.stringify(field)));
+
+            if ($('#field_'+ id).length) {
+                $('#field_'+ id).replaceWith(html);
+            } else {
+                $('#fields_list').append(html);
+            }
+
+            reset_fields();
+        }
     }
     
     function reset_fields() {

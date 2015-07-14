@@ -54,6 +54,20 @@
     </div>
 <?php } ?>
 
+<?php
+if (!empty($fields)) {
+    foreach ($fields as $field) {
+        if (!empty($field['value'])) {
+?>
+        <div class="<?php echo 'field_'. $field['type'] .' field_'. $field['type'] .'_'. $field['name']; ?>">
+            <?php echo $field['value']; ?>
+        </div>
+<?php
+        }
+    }
+}
+?>
+
 <?php if ($article['showtags']) { ?>
 	<?php echo $tagbar; ?>
 <?php } ?>

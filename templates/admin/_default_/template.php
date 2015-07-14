@@ -17,6 +17,7 @@ cmsCore::c('page')->addHeadCSS('admin/js/hmenu/hmenu.css');
 cmsCore::c('page')->addHeadCSS('includes/jquery/tablesorter/style.css');
 cmsCore::c('page')->addHeadCSS('includes/jqueryui/css/smoothness/jquery-ui.min.css');
 cmsCore::c('page')->addHeadCSS('includes/chosen/chosen.min.css');
+cmsCore::c('page')->addHeadCSS('includes/jquery/tagsinput/jquery.tagsinput.css');
 
 cmsCore::c('page')->addHeadJS('admin/js/admin.js');
 cmsCore::c('page')->addHeadJS('includes/jquery/jquery.columnfilters.js');
@@ -28,6 +29,7 @@ cmsCore::c('page')->addHeadJS('includes/jqueryui/i18n/jquery.ui.datepicker-'. cm
 cmsCore::c('page')->addHeadJS('includes/jquery/jquery.form.js');
 cmsCore::c('page')->addHeadJS('admin/js/hltable.js');
 cmsCore::c('page')->addHeadJS('includes/chosen/chosen.jquery.min.js');
+cmsCore::c('page')->addHeadJS('includes/jquery/tagsinput/jquery.tagsinput.js');
 
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap.min.css');
 cmsCore::c('page')->addHeadCSS('includes/bootstrap/css/bootstrap-theme.min.css');
@@ -42,20 +44,14 @@ cmsCore::c('page')->prependHeadJS('includes/jquery/jquery.js');
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        
         <?php $this->printHead(); ?>
-        
-        <style type="text/css">
-            .hoverRow { color:#FF3300; background-color:#CFFFFF;}
-            .clickedRow { color:#009900; background-color:#FFFFCC;}
-        </style>
     </head>
 
     <body>
         <div class="main_body">
             <div id="container">
-                <div id="header" style="height:50px">
-                    <nav class="navbar navbar-inverse navbar-collapse" role="navigation" style="margin-bottom:0;">
+                <div id="header">
+                    <nav class="navbar navbar-inverse navbar-collapse" role="navigation">
                         <ul class="nav navbar-nav">
                             <li>
                                 <a href="/admin/">
@@ -69,14 +65,14 @@ cmsCore::c('page')->prependHeadJS('includes/jquery/jquery.js');
                             <?php cpMenu('user'); ?>
                         </ul>
                     </nav>
+                    
+                    <nav class="navbar navbar-default navbar-collapse" role="navigation">
+                        <ul class="nav navbar-nav">
+                            <?php cpMenu('main'); ?>
+                        </ul>
+                    </nav>
                 </div>
-                
-                <nav class="navbar navbar-default navbar-collapse" role="navigation" style="margin-bottom:0;">
-                    <ul class="nav navbar-nav">
-                        <?php cpMenu('main'); ?>
-                    </ul>
-                </nav>
-                
+
                 <?php $this->printPathway(); ?>
                 
                 <?php $messages = cmsCore::getSessionMessages(true);
@@ -94,12 +90,12 @@ cmsCore::c('page')->prependHeadJS('includes/jquery/jquery.js');
                     ?>
                 <?php } ?>
                 
-                <div id="body" style="padding:0px 10px 10px 10px;">
+                <div id="body">
                     <?php $this->printBody(); ?>
                 </div>
             </div>
             
-            <div class="well" style="text-align:center;">
+            <div class="well text-center">
                 &copy; <a href="http://cmsrudi.ru/"><strong>CMS RuDi</strong></a><strong> v<?php echo CMS_RUDI_V; ?>, 2014</strong>
             </div>
         </div>

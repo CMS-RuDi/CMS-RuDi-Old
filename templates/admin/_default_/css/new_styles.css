@@ -1,3 +1,17 @@
+#header .navbar {
+    margin-bottom: 0;
+}
+#body {
+    padding: 0px 10px 10px 10px;
+}
+.hoverRow {
+    color: #FF3300;
+    background-color: #CFFFFF;
+}
+.clickedRow {
+    color:#009900;
+    background-color:#FFFFCC;
+}
 .form-control.inline {
     display: inline-block;
 }
@@ -18,6 +32,13 @@
 }
 #fields_list .row.list-group-item {
     cursor: move;
+}
+.article_img {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding: 10px;
+    border: solid 1px gray;
+    text-align: center
 }
 
 /*======== https://github.com/flatlogic/awesome-bootstrap-checkbox ===========*/

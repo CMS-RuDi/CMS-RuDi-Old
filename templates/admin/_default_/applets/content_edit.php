@@ -368,9 +368,9 @@
                 <div class="form-group">
                     <label><?php echo $_LANG['AD_PHOTO']; ?></label>
 
-                    <?php if ($do == 'edit' && $image_exist) { ?>
-                    <div style="margin-top:3px;margin-bottom:3px;padding:10px;border:solid 1px gray;text-align:center">
-                        <img src="/images/photos/small/article<?php echo $id; ?>.jpg" border="0" />
+                    <?php if (!empty($mod['image_small'])) { ?>
+                    <div class="article_img">
+                        <img src="<?php echo $mod['image_small']; ?>" border="0" />
                     </div>
                     <label>
                         <input type="checkbox" name="delete_image" value="1" />
@@ -446,6 +446,14 @@
     }
     
     $(function() {
+        $('input[name=tags]').tagsInput({
+            'autocomplete_url': '/core/ajax/tagsearch.php',
+            'defaultText': '',
+            'delimiter': ',',
+            'width': '750px',
+            'height': 'auto'
+        });
+    
         $('input[name=autokeys]').click(function(e) {
             if ($(this).val() === 3) {
                 $('textarea[name=meta_keys]').prop('disabled', false);

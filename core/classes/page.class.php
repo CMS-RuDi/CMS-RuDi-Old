@@ -692,9 +692,6 @@ class cmsPage {
         $inDB   = cmsCore::c('db');
         $tpl_cfgs = cmsCore::getTplCfg();
 
-        // Формируем модули заранее
-        $this->loadModulesForMenuItem();
-
         global $_LANG;
 
         if ($this->adminka) {
@@ -705,6 +702,9 @@ class cmsPage {
             
             cmsCore::halt($_LANG['TEMPLATE'] .' "'. cmsCore::c('config')->admin_template .'" '. $_LANG['NOT_FOUND']);
         } else {
+            // Формируем модули заранее
+            $this->loadModulesForMenuItem();
+            
             if (file_exists(cmsCore::c('config')->template_dir .'template.php')) {
                 require(cmsCore::c('config')->template_dir .'template.php');
                 return;

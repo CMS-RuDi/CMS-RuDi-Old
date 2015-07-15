@@ -45,16 +45,11 @@ if (!cmsCore::checkAccessByIp(cmsCore::c('config')->allow_ip)) {
 cmsCore::loadLanguage('admin/lang');
 global $_LANG;
 
-//-------CHECK AUTHENTICATION--------------------------------------//
 if (!cmsCore::c('user')->is_admin && cmsAdmin::getApplet() != 'login') {
     cmsCore::redirect('/admin/index.php?view=login');
 }
 
-//--------LOAD ACCESS OPTIONS LIST---------------------------------//
-
 $adminAccess = cmsUser::getAdminAccess();
-
-//------------------------------------------------------------------//
 
 cmsCore::c('user')->onlineStats();
 cmsCore::c('page')->setTitle();

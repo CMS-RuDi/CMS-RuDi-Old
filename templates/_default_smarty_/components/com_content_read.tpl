@@ -40,6 +40,16 @@
     {$article.content}
 </div>
 
+{if $fields}
+    {foreach item=field from=$fields}
+        {if $field.value}
+        <div class="field_{$field.type} field_{$field.type}_{$field.name}">
+            {$field.value}
+        </div>
+        {/if}
+    {/foreach}
+{/if}
+
 {if $is_admin || $is_editor || $is_author}
     <div class="blog_comments">
         {if !$article.published && ($is_admin || $is_editor)}
@@ -52,16 +62,6 @@
             <a href="/content/edit{$article.id}.html" class="blog_entry_edit">{$LANG.EDIT}</a>
         {/if}
     </div>
-{/if}
-
-{if $fields}
-    {foreach item=field from=$fields}
-        {if $field.value}
-        <div class="field_{$field.type} field_{$field.type}_{$field.name}">
-            {$field.value}
-        </div>
-        {/if}
-    {/foreach}
 {/if}
 
 {if $article.showtags}

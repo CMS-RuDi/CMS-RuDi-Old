@@ -299,7 +299,7 @@ function applet_cats() {
             if (!empty($mod['fields'])) {
                 $mod['fields'] = json_decode($mod['fields'], true);
                 foreach ($mod['fields'] as $k => $field) {
-                    $field['json'] = urlencode(json_encode($field));
+                    $field['json'] = htmlspecialchars(json_encode($field));
                     $mod['fields'][$k] = $field;
                 }
             }

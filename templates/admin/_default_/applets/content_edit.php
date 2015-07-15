@@ -369,16 +369,18 @@
                     <label><?php echo $_LANG['AD_PHOTO']; ?></label>
 
                     <?php if (!empty($mod['image_small'])) { ?>
-                    <div class="article_img">
+                    <div class="article_img w750">
                         <img src="<?php echo $mod['image_small']; ?>" border="0" />
                     </div>
-                    <label>
-                        <input type="checkbox" name="delete_image" value="1" />
-                        <?php echo $_LANG['AD_PHOTO_REMOVE']; ?>
-                    </label>
+                    <div class="checkbox">
+                        <input type="checkbox" id="delete_image" name="delete_image" value="1" />
+                        <label for="delete_image">
+                            <?php echo $_LANG['AD_PHOTO_REMOVE']; ?>
+                        </label>
+                    </div>
                     <?php } ?>
 
-                    <input type="file" class="form-control" name="picture" />
+                    <input type="file" class="form-control w750" name="picture" />
                 </div>
 
                 <div class="form-group">

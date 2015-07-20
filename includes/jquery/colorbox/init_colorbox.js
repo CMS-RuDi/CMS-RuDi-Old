@@ -16,7 +16,7 @@ imgError: LANG_CBOX_IMG_ERROR
 $( '.lightbox-enabled' ).colorbox({ transition: "none"});
 
 //статьи анонсы и основной текст
-$( '.con_text img, .con_desc img' ).not('a img:first-child').wrap( function(){
+$( '.con_text img, .con_desc img' ).not('a img:first-child').not('.carousel-navigation img').wrap( function(){
     var ahref = $( '<a href="' + $( this ).attr( 'src' ) + '" />').colorbox({ transition: "none" });
     return ahref;
 });

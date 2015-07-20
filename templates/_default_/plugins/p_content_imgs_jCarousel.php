@@ -10,7 +10,7 @@
         if ($slider_mode == 3) {
             cmsCore::c('page')->addHeadJS('includes/sliders/jCarousel/js/jcarousel.responsive.js');
             cmsCore::c('page')->addHeadCSS('includes/sliders/jCarousel/css/jcarousel.responsive.css');
-            echo '<style type="text/css">.jcarousel img { border: #000000 2px solid; width: 240px; min-height: 250px; max-height: 250px; }</style>';
+            echo '<style type="text/css">.jcarousel img { border: #000000 2px solid; min-height: 250px; max-height: 250px; }</style>';
         }
         ?>
         <div class="jcarousel-wrapper">

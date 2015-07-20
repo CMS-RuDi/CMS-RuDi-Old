@@ -70,7 +70,6 @@ cpToolMenu($toolmenu);
 
 cmsCore::loadClass('form');
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if ($opt == 'up_field') {
     moveField(cmsCore::request('item_id', 'int'), cmsCore::request('form_id', 'int'), -1);
     cmsCore::redirectBack();
@@ -157,7 +156,7 @@ if (in_array($opt, array('add_field', 'update_field'))) {
     cmsCore::addSessionMessage($_LANG['AD_DO_SUCCESS']);
     cmsCore::redirect('?view=components&do=config&id='.$id.'&opt=edit&item_id='.$item['form_id']);
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 if (in_array($opt, array('submit', 'update'))) {
     if (!cmsUser::checkCsrfToken()) { cmsCore::error404(); }
 
@@ -202,7 +201,6 @@ if ($opt == 'delete') {
     cmsCore::redirect('?view=components&do=config&id='. $id .'&opt=list');
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if ($opt == 'list') {
     $fields = array(
         array( 'title' => 'id', 'field' => 'id', 'width' => '40' ),

@@ -35,16 +35,16 @@ class p_content_imgs extends cmsPlugin {
                 'title' => $_LANG['PCI_SLIDER'],
                 'name' => 'slider',
                 'options' => array(
-                    'title' => $_LANG['PCI_JCAROUSEL_1'], 'value' => 'jCarousel__1',
-                    'title' => $_LANG['PCI_JCAROUSEL_2'], 'value' => 'jCarousel__2',
-                    'title' => $_LANG['PCI_JCAROUSEL_3'], 'value' => 'jCarousel__3',
+                    array( 'title' => $_LANG['PCI_JCAROUSEL_1'], 'value' => 'jCarousel__1' ),
+                    array( 'title' => $_LANG['PCI_JCAROUSEL_2'], 'value' => 'jCarousel__2' ),
+                    array( 'title' => $_LANG['PCI_JCAROUSEL_3'], 'value' => 'jCarousel__3' ),
                 )
             )
         );
     }
 
     public function execute($event='', $item=array()) {
-        if (empty($this->config['PCI_SLIDER'])) {
+        if (empty($this->config['slider'])) {
             $this->config['slider'] = 'jCarousel__1';
         }
 
@@ -56,12 +56,8 @@ class p_content_imgs extends cmsPlugin {
     }
     
     private function eventGetArticle($item) {
-        if (!empty($item['images']) && $item['slidecfg'] != '-1') {
-            if (!empty($item['slidecfg'])) {
-                list($this->config['slider_name'], $this->config['slider_mode']) = explode('__', $item['slidecfg']);
-            } else {
-                list($this->config['slider_name'], $this->config['slider_mode']) = explode('__', $this->config['slider']);
-            }
+        if (!empty($item['images'])) {
+            list($this->config['slider_name'], $this->config['slider_mode']) = explode('__', $this->config['slider']);
             $item['content'] = $item['content'] .' '. $this->insertSlider($item['images'], $item['title']);
         }
         

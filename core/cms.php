@@ -2425,29 +2425,29 @@ class cmsCore {
      * @param string $table
      * @return boolean
      */
-    public static function requestUploadImgTitles($target_id, $component){
+    public static function requestUploadImgTitles($target_id, $component) {
         $data = array();
         
         $titles = self::request('ajax_file_title', 'array_str');
         $descriptions = self::request('ajax_file_description', 'array_str');
         
-        if (!empty($titles)){
-            foreach ($titles as $k=>$v){
-                if (empty($data[$k])){ $data[$k] = array(); }
-                $data[$k]['title'] = $v;
+        if (!empty($titles)) {
+            foreach ($titles as $k => $v) {
+                $data[$k] = array(
+                    'title' => $v
+                );
             }
         }
         
-        if (!empty($descriptions)){
-            foreach ($descriptions as $k=>$v){
-                if (empty($data[$k])){ $data[$k] = array(); }
+        if (!empty($descriptions)) {
+            foreach ($descriptions as $k => $v) {
                 $data[$k]['description'] = $v;
             }
         }
         
-        if (!empty($data)){
-            foreach ($data as $k=>$v){
-                self::c('db')->query("UPDATE `cms_upload_images` SET title='". (empty($data[$k]['title']) ? '' : self::c('db')->escape_string($data[$k]['title'])) ."', description='". (empty($data[$k]['description']) ? '' : self::c('db')->escape_string($data[$k]['description'])) ."' WHERE `id` = '". $k ."' AND `target_id` = '". $target_id ."' AND `component` = '". $component ."' AND `user_id` != 0");
+        if (!empty($data)) {
+            foreach ($data as $k => $v) {
+                self::c('db')->query("UPDATE `cms_upload_images` SET title='". self::c('db')->escape_string($data[$k]['title']) ."', description='". self::c('db')->escape_string($data[$k]['description']) ."' WHERE `id` = '". $k ."' AND `target_id` = '". $target_id ."' AND `component` = '". $component ."'");
             }
         }
         

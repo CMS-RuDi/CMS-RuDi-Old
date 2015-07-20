@@ -129,8 +129,11 @@ function applet_plugins() {
 
         $plugin = $inCore->loadPlugin($plugin_name);
         $config = $inCore->loadPluginConfig($plugin_name);
+        $plugin_cfg_fields = array();
         
-        $plugin_cfg_fields = $plugin->getConfigFields();
+        if (method_exists($plugin, 'getConfigFields')) {
+            $plugin_cfg_fields = $plugin->getConfigFields();
+        }
 
         cmsCore::c('page')->setTitle($plugin->info['title']);
         cpAddPathway($plugin->info['title'], 'index.php?view=plugins&do=config&id='. $id);

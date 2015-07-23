@@ -469,6 +469,8 @@
             }
         }
         
+        cmsCore::loadClass('user');
+        
         cmsUser::registerGroupAccessType('comments/target_author_delete', 'Удаление неугодных комментариев к своим публикациям', 1);
         echo '<p>В права доступа добавлено новое правило "Удаление неугодных комментариев к своим публикациям"</p>';
         

@@ -2906,11 +2906,40 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
                 </div>' . "\n";
     }
     
-    //Возвращает ностройки шаблона
-    public static function getTplCfg($template=false) {
+    /**
+     * Возвращает массив опций настройки шаблона
+     * @param string $template название шаблона
+     * @return mixed
+     */
+    public static function getTplCfgFields($template = false)
+    {
         $template = empty($template) ? self::c('config')->template : $template;
         
-        if (self::includeFile('templates/'. $template .'/config.php')) {
+        if (file_exists(PATH .'/templates/'. $template .'/config.php')) {
+            $cfg_fields = array();
+            
+            include(PATH .'/templates/'. $template .'/config.php');
+            
+            return $cfg_fields;
+        }
+
+        return false;
+    }
+    
+    /**
+     * Возвращает массив значений настроей шаблона
+     * @param string $template название шаблона
+     * @return mixed
+     */
+    public static function getTplCfg($template = false)
+    {
+        $template = empty($template) ? self::c('config')->template : $template;
+        
+        if (file_exists(PATH .'/templates/'. $template .'/config.php')) {
+            $cfg_values = array();
+            
+            include(PATH .'/templates/'. $template .'/config.php');
+            
             $cfg = array();
             
             if (file_exists(PATH .'/cache/tpl_cfg/'. $template .'.cfg')) {
@@ -2920,9 +2949,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
                 }
             }
             
-            if (function_exists('get_template_default_cfg')) {
-                $cfg = array_merge(get_template_default_cfg(), $cfg);
-            }
+            $cfg = array_merge($cfg_values, $cfg);
             
             return $cfg;
         }

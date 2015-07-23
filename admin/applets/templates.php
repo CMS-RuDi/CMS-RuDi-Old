@@ -36,11 +36,9 @@ function applet_templates() {
             cmsCore::error404();
         }
         
-        include(PATH .'/templates/'. $template .'/config.php');
+        $tpl_cfgs = cmsCore::getTplCfgFields($template);
         
-        if (function_exists('get_template_cfg_fields')) {
-            $tpl_cfgs  = get_template_cfg_fields();
-            
+        if (!empty($tpl_cfgs)) {
             if (!empty($tpl_cfgs)) {
                 $tpl_cfgs_val = cmsCore::getTplCfg($template);
                 
@@ -65,10 +63,9 @@ function applet_templates() {
             cmsCore::error404();
         }
 
-        include(PATH .'/templates/'. $template .'/config.php');
-        
-        if (function_exists('get_template_cfg_fields')) {
-            $tpl_cfgs  = get_template_cfg_fields();
+        $tpl_cfgs = cmsCore::getTplCfgFields($template);
+
+        if (!empty($tpl_cfgs)) {
             if (!empty($tpl_cfgs)) {
                 $tpl_cfgs = cmsCore::c('form_gen')->requestForm($tpl_cfgs);
                 cmsCore::saveTplCfg($tpl_cfgs, $template);

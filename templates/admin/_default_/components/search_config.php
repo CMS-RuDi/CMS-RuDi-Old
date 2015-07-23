@@ -44,7 +44,7 @@
                     if (in_array($component['link'], $cfg['comp'])) {
                         $checked = 'checked="checked"';
                     }
-                    echo '<div class="checkbox"><label><input name="comp[]" id="'. $component['link'] .'" type="checkbox" value="'. $component['link'] .'" '. $checked .'/>'. $component['title'] .'</label></div>';
+                    echo '<div class="checkbox checkbox-primary"><input name="comp[]" id="scom_'. $component['link'] .'" type="checkbox" value="'. $component['link'] .'" '. $checked .'/> <label for="scom_'. $component['link'] .'">'. $component['title'] .'</label></div>';
                 }
             ?>
         </div>

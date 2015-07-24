@@ -656,7 +656,8 @@ class cmsPage {
      * @param boolean|string $full_print - определяет слудует ли выводить js и css теги. Возможные значение: 'true' - выводятся оба, 'css' - выводятся css теги js нет, 'js' - выводятся js теги css нет)
      * @param integer $indent $name - величина отступа (в пробелах) тегов от левого края введен чисто для декоративных целей
      */
-    public function printHead($full_print=true, $indent=4) {
+    public function printHead($full_print = true, $indent = 4)
+    {
         if ($this->adminka) {
             return $this->printAdminHead();
         }
@@ -945,6 +946,9 @@ class cmsPage {
         $this->loadModulesForMenuItem();
         
         self::initTemplate(false, PATH .'/templates/'. $template .'/template.'. $tpl_info['ext'])->
+            assign('inConf', cmsCore::c('config')->getConfig())->
+            assign('langs', cmsCore::getDirsList('/languages'))->
+            assign('year', date('Y'))->
             display();
     }
     

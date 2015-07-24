@@ -1,15 +1,18 @@
 <?php
 /******************************************************************************/
 //                                                                            //
-//                           InstantCMS v1.10.6                               //
-//                        http://www.instantcms.ru/                           //
-//                                                                            //
-//                   written by InstantCMS Team, 2007-2015                    //
-//                produced by InstantSoft, (www.instantsoft.ru)               //
-//                                                                            //
-//                        LICENSED BY GNU/GPL v2                              //
+//                             CMS RuDi v0.0.10                               //
+//                            http://cmsrudi.ru/                              //
+//              Copyright (c) 2014 DS Soft (http://ds-soft.ru/)               //
+//                  Данный код защищен авторскими правами                     //
 //                                                                            //
 /******************************************************************************/
+
 function smarty_function_printHead($params, $template) {
-    cmsCore::c('page')->printHead();
+    if (!isset($params['full_print']) || !in_array($params['full_print'], array('js', 'css'))) {
+        $params['full_print'] = true;
+    }
+    $params['indent'] = isset($params['indent']) ? (int)$params['indent'] : 4;
+    
+    cmsCore::c('page')->printHead($params['full_print'], $params['indent']);
 }

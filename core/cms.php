@@ -567,45 +567,42 @@ class cmsCore {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
+    
     /**
      * Добавляет сообщение в сессию
      * @param string $message
      * @param string $class
      */
-    public static function addSessionMessage($message, $type='info'){
-        $_SESSION['core_message'][] = '<div class="message_'.$type.'">'.$message.'</div>'; //Удалить через несколько версий
-        $_SESSION['core_messages'][] = array('type' => $type, 'msg' => $message);
+    public static function addSessionMessage($message, $type = 'info')
+    {
+        $_SESSION['core_messages'][] = array(
+            'type' => $type,
+            'msg'  => $message
+        );
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
     /*
      * Возвращает массив сообщений сохраненных в сессии
      */
-    public static function getSessionMessages($new=false){
-        if ($new) {
-            $messages = isset($_SESSION['core_messages']) ? $_SESSION['core_messages'] : false;
-        } else {
-            $messages = isset($_SESSION['core_message']) ? $_SESSION['core_message'] : false;
-        }
+    public static function getSessionMessages($new = false)
+    {
+        $messages = isset($_SESSION['core_messages']) ? $_SESSION['core_messages'] : false;
 
         self::clearSessionMessages();
+        
         return $messages;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
     /*
      * Очищает очередь сообщений сессии
      */
-    public static function clearSessionMessages(){
-        unset($_SESSION['core_message']);
+    public static function clearSessionMessages()
+    {
         unset($_SESSION['core_messages']);
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
+
     /**
      * Возвращает текущий URI
      * Нужна для того, чтобы иметь возможность переопределить URI.

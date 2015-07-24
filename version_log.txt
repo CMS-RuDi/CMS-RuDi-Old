@@ -91,3 +91,19 @@ CMS RuDi v0.1.0 (10.08.2015)
     Теперь вместо функций get_template_cfg_fields и get_template_default_cfg 
     возвращающих соотвественно список полей настроек и дефолтовые настройки, в
     файле config.php должны быть два массива $cfg_fields и $cfg_values соответственно;
+[=] Изменен метод инициализации шаблона, раньше для инициализации шаблона например
+    страницы статей com_content_read.tpl нужно было вызвать
+        cmsPage::initTemplate('components', 'com_content_read')->
+            display();
+    а теперь так
+        cmsCore::c('page')->initTemplate('components/com_content_read')->
+            display();
+    или (до версии 0.2.0)
+        cmsPage::initTemplate('components/com_content_read')->
+            display();
+    Старый метод так же поддерживается до версии 0.2.0.
+    Так же до версии 0.2.0 поддерживается и метод инициализации шаблона как в 
+    Instant CMS:
+        cmsPage::initTemplate('components', 'com_content_read.tpl')->
+            display('com_content_read.tpl');
+[=] Роль phpTpl шаблонизатора теперь играет класс cmsPage;

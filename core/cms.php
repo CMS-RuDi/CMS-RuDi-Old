@@ -54,6 +54,7 @@ class cmsCore {
         'upload_photo' => 'cmsUploadPhoto', 'user'         => 'cmsUser',      'form_gen'=> 'rudi_form_generate',
         'cache'        => 'rudiCache'
     );
+    private static $host;
 
     protected function __construct($install_mode = false) {
         $this->start_time = microtime(true);
@@ -154,21 +155,26 @@ class cmsCore {
         return $scheme;
     }
 
-    public static function getHost(){
-        // если вызван из командной строки
-        // ожидаем параметр с именем домена, например команда для CRON
-        // php -f /path_to_site/cron.php site.ru
-        if (PHP_SAPI == 'cli') {
-            global $argv;
-            return isset($argv[1]) ?  $argv[1] : '';
+    public static function getHost() {
+        if (empty(self::$halt)) {
+            // если вызван из командной строки
+            // ожидаем параметр с именем домена, например команда для CRON
+            // php -f /path_to_site/cron.php site.ru
+            if (PHP_SAPI == 'cli') {
+                global $argv;
+                self::$host = isset($argv[1]) ?  $argv[1] : '';
+            }
+            elseif (mb_strpos($_SERVER['HTTP_HOST'], 'xn--') !== false)
+            {
+                self::$host = self::c('idna_convert')->decode($_SERVER['HTTP_HOST']);
+            }
+            else
+            {
+                self::$host = $_SERVER['HTTP_HOST'];
+            }
         }
-
-        // если интернационализованный домен
-        if (mb_strpos($_SERVER['HTTP_HOST'], 'xn--') !== false) {
-            return self::c('idna_convert')->decode($_SERVER['HTTP_HOST']);
-        }
-
-        return $_SERVER['HTTP_HOST'];
+        
+        return self::$host;
     }
     ////////////////////////////////////////////////////////////////////////////
     /**

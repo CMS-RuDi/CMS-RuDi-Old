@@ -305,7 +305,7 @@ CREATE TABLE `#__category` (
   `photoalbum` text NOT NULL,
   `seolink` varchar(200) NOT NULL,
   `url` varchar(100) NOT NULL,
-  `tpl` varchar(50) NOT NULL DEFAULT 'com_content_view',
+  `tpl` varchar(50) NOT NULL DEFAULT 'content/view',
   `cost` varchar(5) NOT NULL,
   `pagetitle` varchar(255) NOT NULL,
   `meta_desc` varchar(1024) NOT NULL,
@@ -318,7 +318,7 @@ CREATE TABLE `#__category` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 INSERT INTO `#__category` (`id`, `parent_id`, `title`, `description`, `published`, `showdate`, `showcomm`, `orderby`, `orderto`, `modgrp_id`, `NSLeft`, `NSRight`, `NSLevel`, `NSDiffer`, `NSIgnore`, `ordering`, `maxcols`, `showtags`, `showrss`, `showdesc`, `is_public`, `photoalbum`, `seolink`, `url`, `tpl`, `cost`) VALUES
-(1, 0, '--root category--', '', 1, 1, 1, 'pubdate', 'asc', 0, 1, 2, 0, '', 0, 1, 1, 1, 1, 0, 0, '', '--kornevoi-razdel--', '', 'com_content_view', '');
+(1, 0, '--root category--', '', 1, 1, 1, 'pubdate', 'asc', 0, 1, 2, 0, '', 0, 1, 1, 1, 1, 0, 0, '', '--kornevoi-razdel--', '', 'content/view', '');
 
 DROP TABLE IF EXISTS `#__clubs`;
 CREATE TABLE `#__clubs` (
@@ -468,7 +468,7 @@ CREATE TABLE `#__content` (
   `canrate` tinyint(1) NOT NULL DEFAULT '1',
   `pagetitle` varchar(255) NOT NULL,
   `url` varchar(100) NOT NULL,
-  `tpl` varchar(50) NOT NULL DEFAULT 'com_content_read',
+  `tpl` varchar(50) NOT NULL DEFAULT 'content/read',
   PRIMARY KEY (`id`),
   KEY `seolink` (`seolink`),
   KEY `category_id` (`category_id`),

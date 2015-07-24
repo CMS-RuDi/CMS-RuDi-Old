@@ -167,7 +167,7 @@ function applet_content() {
         $pubdate                = cmsCore::request('pubdate', 'str', '');
         
         $article['user_id']     = cmsCore::request('user_id', 'int', cmsCore::c('user')->id);
-        $article['tpl']         = cmsCore::request('tpl', 'str', 'com_content_read');
+        $article['tpl']         = cmsCore::request('tpl', 'str', 'content/read');
         
         $autokeys = cmsCore::request('autokeys', 'int');
         
@@ -274,7 +274,7 @@ function applet_content() {
             $mod = array(
                 'category_id' => cmsCore::request('to', 'int'),
                 'showpath' => 1,
-                'tpl' => 'com_content_read'
+                'tpl' => 'content/read'
             );
         } else {
             if (isset($_REQUEST['item'])){

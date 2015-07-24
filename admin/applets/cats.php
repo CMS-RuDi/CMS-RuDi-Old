@@ -87,7 +87,7 @@ function applet_cats() {
             if (!empty($category['url'])) {
                 $category['url'] = cmsCore::strToURL($category['url'], cmsCore::m('content')->config['is_url_cyrillic']);
             }
-            $category['tpl']         = cmsCore::request('tpl', 'str', 'com_content_view');
+            $category['tpl']         = cmsCore::request('tpl', 'str', 'content/view');
             
             $category['cost']        = cmsCore::request('cost', 'str', '');
             if (!is_numeric($category['cost'])) { $category['cost'] = ''; }
@@ -192,7 +192,7 @@ function applet_cats() {
         $category['showrss']     = cmsCore::request('showrss', 'int', 0);
         $category['showdesc']    = cmsCore::request('showdesc', 'int', 0);
         $category['is_public']   = cmsCore::request('is_public', 'int', 0);
-        $category['tpl']         = cmsCore::request('tpl', 'str', 'com_content_view');
+        $category['tpl']         = cmsCore::request('tpl', 'str', 'content/view');
         $category['pagetitle']   = cmsCore::request('pagetitle', 'str', '');
         $category['meta_desc']   = cmsCore::request('meta_desc', 'str', '');
         $category['meta_keys']   = cmsCore::request('meta_keys', 'str', '');
@@ -266,7 +266,7 @@ function applet_cats() {
             cpAddPathway($_LANG['AD_CREATE_SECTION'], 'index.php?view=cats&do=add');
             
             $mod = array();
-            $mod['tpl'] = 'com_content_view';
+            $mod['tpl'] = 'content/view';
         } else {
             if (cmsCore::inRequest('multiple')) {
                 if (cmsCore::inRequest('item')) {

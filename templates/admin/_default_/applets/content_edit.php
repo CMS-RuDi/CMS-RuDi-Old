@@ -79,7 +79,7 @@
                     <label class="col-lg-2 text-right"><?php echo $_LANG['AD_TEMPLATE']; ?></label>
 
                     <div class="col-lg-10">
-                        <input type="text" class="form-control w750" name="tpl" value="<?php echo cmsCore::getArrVal($mod, 'tpl', ''); ?>" />
+                        <input type="text" class="form-control w750" name="tpl" value="<?php echo cmsCore::getArrVal($mod, 'tpl', 'content/read'); ?>" />
                     </div>
                 </div>
 

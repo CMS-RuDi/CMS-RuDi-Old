@@ -143,9 +143,9 @@ if ($do == 'view') {
     
     $pagebar = cmsPage::getPagebar($total, $page, cmsCore::m('content')->config['perpage'], cmsCore::m('content')->getCategoryURL(null, $cat['seolink'], 0, true));
 
-    $template = ($cat['tpl'] ? $cat['tpl'] : 'com_content_view');
+    $template = ($cat['tpl'] ? $cat['tpl'] : 'content/view');
 
-    cmsPage::initTemplate('components', $template)->
+    cmsPage::initTemplate($template)->
         assign('cat', $cat)->
         assign('is_homepage', (bool)($inCore->menuId()==1))->
         assign('showdate', $showdate)->
@@ -190,7 +190,7 @@ if ($do == 'read') {
     // Дата публикации
     $article['pubdate'] = cmsCore::dateFormat($article['pubdate']);
     // Шаблон статьи
-    $article['tpl'] = $article['tpl'] ? $article['tpl'] : 'com_content_read';
+    $article['tpl'] = $article['tpl'] ? $article['tpl'] : 'content/read';
 
     cmsCore::c('page')->setTitle($article['pagetitle']);
 
@@ -239,10 +239,8 @@ if ($do == 'read') {
         $karma_points = cmsKarmaFormatSmall($karma['points']);
         $btns = cmsKarmaButtonsText('content', $article['id'], $karma['points'], $is_author);
     }
-    
-    
 
-    $tpl = cmsPage::initTemplate('components', $article['tpl'])->
+    $tpl = cmsPage::initTemplate($article['tpl'])->
         assign('article', $article)->
         assign('cfg', cmsCore::m('content')->config)->
         assign('page', $page)->
@@ -392,7 +390,7 @@ if ($do == 'addarticle' || $do == 'editarticle') {
             );
         }
 
-        cmsPage::initTemplate('components', 'com_content_edit')->
+        cmsPage::initTemplate('content/edit')->
             assign('mod', $item)->
             assign('do', $do)->
             assign('cfg', cmsCore::m('content')->config)->
@@ -589,7 +587,7 @@ if ($do == 'deletearticle') {
         $confirm['yes_button']         = array();
         $confirm['yes_button']['type'] = 'submit';
         $confirm['yes_button']['name'] = 'goadd';
-        cmsPage::initTemplate('components', 'action_confirm')->
+        cmsPage::initTemplate('components/action_confirm')->
         assign('confirm', $confirm)->
         display();
     } else {
@@ -637,7 +635,7 @@ if ($do == 'my'){
     $content_list = $total ? cmsCore::m('content')->getArticlesList(false) : array();
     cmsCore::c('db')->resetConditions();
 
-    cmsPage::initTemplate('components', 'com_content_my')->
+    cmsPage::initTemplate('content/my')->
         assign('articles', $content_list)->
         assign('total', $total)->
         assign('user_can_delete', cmsUser::isUserCan('content/delete'))->
@@ -659,7 +657,7 @@ if ($do == 'best') {
     // Получаем статьи
     $content_list = cmsCore::m('content')->getArticlesList();
 
-    cmsPage::initTemplate('components', 'com_content_rating')->
+    cmsPage::initTemplate('content/rating')->
         assign('articles', $content_list)->
         display();
 }

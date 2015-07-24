@@ -10,7 +10,7 @@
 <h1 class="con_heading">{$pagetitle}</h1>
 
 {if $sub_do == 'threads'}
-    {include file='com_forum_view.tpl'}
+    {include file='components/com_forum_view.tpl'}
 {else}
 
     {if $post_count}
@@ -62,7 +62,7 @@
                     <div class="post_content">{$post.content_html}</div>
                     {if $post.attached_files && $cfg.fa_on}
                         <div id="attached_files_{$post.id}">
-                        {include file='com_forum_attached_files.tpl'}
+                        {include file='components/com_forum_attached_files.tpl'}
                         </div>
                     {/if}
                     {if $post.edittimes}

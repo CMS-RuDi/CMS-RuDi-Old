@@ -56,7 +56,7 @@ function actions() {
         $actions = cmsCore::c('actions')->getActionsLog();
         if (!$actions && $page > 1) { cmsCore::error404(); }
 
-        cmsPage::initTemplate('components', 'com_actions_view')->
+        cmsPage::initTemplate('actions/view')->
             assign('actions', $actions)->
             assign('pagetitle', $pagetitle)->
             assign('total', $total)->
@@ -88,7 +88,7 @@ function actions() {
             $actions = cmsCore::c('actions')->getActionsLog();
         }
 
-        cmsPage::initTemplate('components', 'com_actions_view_tab')->
+        cmsPage::initTemplate('actions/view_tab')->
             assign('actions', $actions)->
             assign('friends', $friends)->
             assign('user_id', $user_id)->
@@ -121,7 +121,7 @@ function actions() {
             $user = cmsUser::getShortUserData($user_id);
         } 
 
-        cmsPage::initTemplate('components', 'com_actions_tab')->
+        cmsPage::initTemplate('actions/tab')->
             assign('actions', $actions)->
             assign('user_id', $user_id)->
             assign('user', $user)->
@@ -142,7 +142,7 @@ function actions() {
         // нам нужно только определенное количество друзей
         $friends = array_slice($friends, ($page-1)*$perpage, $perpage, true);
 
-        cmsPage::initTemplate('components', 'com_actions_friends')->
+        cmsPage::initTemplate('actions/friends')->
             assign('friends', $friends)->
             assign('page', $page)->
             assign('user_id', $user_id)->

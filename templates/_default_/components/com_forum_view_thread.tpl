@@ -6,13 +6,13 @@
 <table width="100%" cellspacing="0" cellpadding="5"  class="forum_toolbar"><tr>
     <td width="5">&nbsp;</td>
     <td class="forum_toollinks">
-        {include file='com_forum_toolbar.tpl'}
+        {include file='components/com_forum_toolbar.tpl'}
     </td>
 </tr></table>
 {/if}
 
 {if $thread_poll}
-    <div id="thread_poll">{include file='com_forum_thread_poll.tpl'}</div>
+    <div id="thread_poll">{include file='components/com_forum_thread_poll.tpl'}</div>
 {/if}
 
 <table class="posts_table" width="100%" cellspacing="2" cellpadding="5" border="0" bordercolor="#999999">
@@ -85,7 +85,7 @@
             <div class="post_content">{$post.content_html}</div>
             {if $post.attached_files && $cfg.fa_on}
                 <div id="attached_files_{$post.id}">
-                {include file='com_forum_attached_files.tpl'}
+                {include file='components/com_forum_attached_files.tpl'}
                 </div>
             {/if}
             {if $post.edittimes}
@@ -105,7 +105,7 @@
 <table width="100%" cellspacing="0" cellpadding="5"  class="forum_toolbar"><tr>
     <td><a href="#">{$LANG.GOTO_BEGIN_PAGE}</a></td>
     <td class="forum_toollinks">
-        {include file='com_forum_toolbar.tpl'}
+        {include file='components/com_forum_toolbar.tpl'}
     </td>
 </tr>
 </table>

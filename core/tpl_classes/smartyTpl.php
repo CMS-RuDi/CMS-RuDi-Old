@@ -39,7 +39,7 @@ class smartyTpl {
             mkdir($compile_dir, 0777);
         }
         
-        //self::$i_smarty->setTemplateDir(PATH .'/templates/'. $template);
+        self::$i_smarty->setTemplateDir(PATH .'/templates/'. $template);
         self::$i_smarty->setCompileDir($compile_dir);
         
         self::$i_smarty->rudi_tpl_file = $tpl_file;

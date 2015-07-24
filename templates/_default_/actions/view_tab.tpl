@@ -1,7 +1,7 @@
 {if $actions}
-{include file='com_actions_friends.tpl'}
+{include file='actions/friends.tpl'}
 
-{include file='com_actions_tab.tpl'}
+{include file='actions/tab.tpl'}
 
 {else}
     <p>{$LANG.FEED_DESC}</p>

@@ -42,9 +42,7 @@ function echoRudiField($field) {
 
 
 <div class="rudi_form">
-    <?php if ($insert_token) { ?>
-        <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
-    <?php } ?>
+    <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
 <?php
     foreach ($data as $dat) {
         echoRudiField($dat);

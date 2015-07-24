@@ -107,3 +107,4 @@ CMS RuDi v0.1.0 (10.08.2015)
         cmsPage::initTemplate('components', 'com_content_read.tpl')->
             display('com_content_read.tpl');
 [=] Роль phpTpl шаблонизатора теперь играет класс cmsPage;
+[-] Удален дефолтовый php шаблон;

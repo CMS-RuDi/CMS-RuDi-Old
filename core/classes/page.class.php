@@ -31,10 +31,7 @@ class cmsPage {
     private $is_ajax   = false;
 
     private $modules;
-    private $tpl_info = array(
-        '_default_' => array( 'author' => 'CMS RuDi Team', 'renderer' => 'phpTpl', 'ext' => 'php' ),
-        'admin/_default_' => array( 'author' => 'CMS RuDi Team', 'renderer' => 'phpTpl', 'ext' => 'php' )
-    );
+    private $tpl_info = array();
     private $default_tpl_info = array( 'author' => 'CMS RuDi Team', 'renderer' => 'smartyTpl', 'ext' => 'tpl' );
     
     private $tpl_vars = array();

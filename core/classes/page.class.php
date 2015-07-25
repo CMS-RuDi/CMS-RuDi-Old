@@ -185,7 +185,8 @@ class cmsPage {
      * Производит инициализацию класса шаблонизатора
      * @return obj $tpl_info['renderer']
      */
-    public static function initTemplate($tpl_folder, $tpl_file = null, $new = false) {
+    public static function initTemplate($tpl_folder, $tpl_file = null, $new = false)
+    {
         $thisObj = self::getInstance();
         
         // Костыль для определения используется старый или новый метод инициализации
@@ -203,7 +204,8 @@ class cmsPage {
      * Показывает файл шаблона
      * параметр $tpl_file оставлен для совместимости
      */
-    public function display($tpl_file=false){
+    public function display($tpl_file = false)
+    {
         global $_LANG;
         
         $is_ajax = cmsCore::isAjax();

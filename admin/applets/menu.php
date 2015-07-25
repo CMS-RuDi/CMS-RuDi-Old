@@ -413,6 +413,8 @@ function applet_menu() {
         
         $linktype = cmsCore::getArrVal($mod, 'linktype', 'link');
         
+        $iconList = iconList();
+        
         $tpl = cmsCore::c('page')->initTemplate('applets', 'menu_add')->
             assign('linktype', $linktype)->
             assign('langs', cmsCore::getDirsList('/languages'))->
@@ -427,11 +429,16 @@ function applet_menu() {
             assign('uc_cats_opt', $inCore->getListItems('cms_uc_cats', (($link_type == 'uccat') ? $mod['linkid'] : 0)))->
             assign('photo_albums_opt', $inCore->getListItems('cms_photo_albums', (($link_type == 'photoalbum') ? $mod['linkid'] : 0), 'id', 'ASC', 'NSDiffer = ""'))->
             assign('video_installed', $inCore->isComponentInstalled('video'))->
-            assign('iconList', iconList())->
+            assign('groups', cmsUser::getGroups())->
+            assign('iconList', $iconList)->
             assign('mod', $mod);
         
         if ($inCore->isComponentInstalled('video')) {
             $tpl->assign('video_cats_opt', $inCore->getListItemsNS('cms_video_category', (($linktype == 'video_cat') ? $mod['linkid'] : 0)));
+        }
+        
+        if ($do == 'edit') {
+            $tpl->assign('access_list', !empty($mod['access_list']) ? $inCore->yamlToArray($mod['access_list']) : array());
         }
         
         $tpl->display();

@@ -41,7 +41,7 @@
                                 <?php $link_type = cmsCore::getArrVal($mod, 'linktype', 'link') ?>
                                 <option value="link" <?php if ($link_type == 'link') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_LINK']; ?></option>
                                 <option value="content" <?php if ($link_type == 'content') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_ARTICLE']; ?></option>
-                                <?php if($inCore->isComponentInstalled('video')){ ?> 
+                                <?php if ($video_installed) { ?> 
                                     <option value="video_cat" <?php if ($link_type == 'video_cat') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_VIDEO_PARTITION']; ?></option> 
                                 <?php } ?>
                                 <option value="category" <?php if ($link_type == 'category') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_PARTITION']; ?></option>
@@ -170,16 +170,6 @@
                         
                     <div id="upr_access">
                         <div class="form-group">
-                            <?php
-                                $groups = cmsUser::getGroups();
-
-                                if ($do == 'edit') {
-                                    if ($mod['access_list']) {
-                                        $access_list = $inCore->yamlToArray($mod['access_list']);
-                                    }
-                                }
-                            ?>
-                                
                             <label>
                                 <input type="checkbox" name="is_public" id="is_public" onclick="checkAccesList()" value="1" <?php if ($do != 'edit' || !$mod['access_list']) { ?>checked="checked"<?php } ?> />
                                 <?php echo $_LANG['AD_SHARE']; ?>
@@ -190,16 +180,14 @@
                         <div class="form-group">
                             <label><?php echo $_LANG['AD_GROUPS_VIEW']; ?></label>
                             <select id="allow_group" class="form-control" style="width: 99%" name="allow_group[]"  size="6" multiple="multiple" <?php if ($do != 'edit' || !$mod['access_list']) { ?>disabled="disabled"<?php } ?>>
-                            <?php if ($groups) { ?>
-                                <?php foreach($groups as $group) { ?>
-                                    <option value="<?php $group['id']; ?>"
-                                    <?php if ($do == 'edit' && cmsCore::getArrVal($mod, 'access_list')) {
-                                        if (in_array($group['id'], $access_list)){
-                                            echo 'selected="selected"';
-                                        }
-                                    } ?>
-                                    <?php echo $group['title']; ?></option>
-                                <?php } ?>
+                            <?php foreach($groups as $group) { ?>
+                                <option value="<?php echo $group['id']; ?>"
+                                <?php if ($do == 'edit' && cmsCore::getArrVal($mod, 'access_list')) {
+                                    if (in_array($group['id'], $access_list)){
+                                        echo 'selected="selected"';
+                                    }
+                                } ?>>
+                                <?php echo $group['title']; ?></option>
                             <?php } ?>
                             </select>
                             <div class="help-block"><?php echo $_LANG['AD_SELECT_MULTIPLE_CTRL'];?></div>

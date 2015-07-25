@@ -918,7 +918,7 @@ class cmsPage {
         
         cmsCore::loadLanguage('templates/'. $template);
         
-        if (!file_exists(PATH .'/templates/'. $template .'/template.'. $tpl_info['ext'])) {
+        if ($tpl_info['renderer'] == 'phpTpl' || !file_exists(PATH .'/templates/'. $template .'/template.'. $tpl_info['ext'])) {
             // Оставлен до версии 0.1.2 для совместимости со старыми шаблонами
             if (file_exists(PATH .'/templates/'. $template .'/template.php')) {
                 // Инициализируем нужные объекты

@@ -26,6 +26,15 @@ function applet_main() {
     
     cmsCore::c('page')->setTitle($_LANG['PATH_HOME']);
     
+    cmsCore::c('actions')->showTargets(true);
+    $total = cmsCore::c('actions')->getCountActions();
+    cmsCore::c('db')->limitPage(1, 10);
+    
+    $actions_html = cmsCore::c('page')->initTemplate('components', 'actions_list')->
+        assign('actions', cmsCore::c('actions')->getActionsLog())->
+        assign('pagebar', cmsPage::getPagebar($total, 1, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false'))->
+        fetch();
+    
     $new = array();
 
     $tpl = cmsCore::c('page')->initTemplate('applets', 'main')->
@@ -74,15 +83,6 @@ function applet_main() {
         $tpl->assign('forum_enable', true);
         $new['forum'] = (int)newContent('cms_forum_posts');
     }
-    
-    cmsCore::c('actions')->showTargets(true);
-    $total = cmsCore::c('actions')->getCountActions();
-    cmsCore::c('db')->limitPage(1, 10);
-    
-    $actions_html = cmsCore::c('page')->initTemplate('components', 'actions_list')->
-        assign('actions', cmsCore::c('actions')->getActionsLog())->
-        assign('pagebar', cmsPage::getPagebar($total, 1, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false'))->
-        fetch();
     
     $tpl->assign('new', $new)->
         assign('rssfeed_installed', $inCore->isComponentInstalled('rssfeed'))->

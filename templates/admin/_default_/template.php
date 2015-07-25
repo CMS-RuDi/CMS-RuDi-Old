@@ -75,7 +75,7 @@ cmsCore::c('page')->prependHeadJS('includes/jquery/jquery.js');
 
                 <?php $this->printPathway(); ?>
                 
-                <?php $messages = cmsCore::getSessionMessages(true);
+                <?php $messages = cmsCore::getSessionMessages();
                 if ($messages) { ?>
                     <?php
                         foreach($messages as $msg){

@@ -32,7 +32,9 @@ $page = cmsCore::request('page', 'int', 1);
 
 cmsCore::c('db')->limitPage($page, 10);
 
+$pagebar = cmsPage::getPagebar($total, $page, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false');
+
 cmsCore::c('page')->initTemplate('components', 'actions_list')->
     assign('actions', cmsCore::c('actions')->getActionsLog())->
-    assign('pagebar', cmsPage::getPagebar($total, $page, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false'))->
+    assign('pagebar', $pagebar)->
     display();

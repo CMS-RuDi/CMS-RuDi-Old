@@ -6,7 +6,7 @@
         <a href="<?php echo str_replace('%page%', $page-1, $href); ?>" class="pagebar_page"><?php echo $_LANG['PREVIOUS']; ?></a>
     <?php } ?>
     
-        <?php for ($i=$current; $i<=$max_links-1; $i++) { ?>
+        <?php for ($i = $current; $i <= $max_links-1; $i++) { ?>
             <?php if ($i == $page) { ?>
                 <span class="pagebar_current"><?php echo $i; ?></span>
             <?php } else { ?>

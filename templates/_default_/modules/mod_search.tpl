@@ -1,10 +1,10 @@
-<form id="search_form"action="/search" method="GET" enctype="multipart/form-data" style="clear:both">
+<form id="search_form" action="/search" method="GET" enctype="multipart/form-data" style="clear:both">
     <strong>{$LANG.SEARCH_ON_SITE}: </strong>
     <input type="text" name="query" id="query" size="40" value="" class="text-input" />
     <select name="look" style="width:100px" onchange="$('#search_form').submit();	">
-            <option value="allwords" selected="selected">{$LANG.ALL_WORDS}</option>
-            <option value="anyword" >{$LANG.ANY_WORD}</option>
-            <option value="phrase" >{$LANG.PHRASE}</option>
+        <option value="allwords" selected="selected">{$LANG.ALL_WORDS}</option>
+        <option value="anyword" >{$LANG.ANY_WORD}</option>
+        <option value="phrase" >{$LANG.PHRASE}</option>
     </select>
     <input type="submit" value="{$LANG.FIND}"/>
     <a href="javascript:" onclick="$('#from_search').fadeIn('slow');" class="ajaxlink">{$LANG.SEARCH_PARAMS}</a>

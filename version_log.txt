@@ -106,7 +106,6 @@ CMS RuDi v0.1.0 (10.08.2015)
     Instant CMS:
         cmsPage::initTemplate('components', 'com_content_read.tpl')->
             display('com_content_read.tpl');
-[=] Роль phpTpl шаблонизатора теперь играет класс cmsPage;
 [-] Удален дефолтовый php шаблон;
 [=] Файл шаблона template.php для smarty шаблонов теперь переведен на smarty
     синтаксис и называется template.tpl

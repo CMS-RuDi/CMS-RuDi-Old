@@ -366,7 +366,7 @@ function applet_menu() {
         cmsCore::c('page')->setTitle($_LANG['AD_MENU_ADD']);
         cpAddPathway($_LANG['AD_MENU_ADD']);
 
-        cmsCore::c('page')->initTemlate('applets', 'menu_addmenu')->
+        cmsCore::c('page')->initTemplate('applets', 'menu_addmenu')->
             assign('menu_list', cpGetList('menu'))->
             assign('pos', cpModulePositions(cmsCore::c('config')->template))->
             assign('groups', cmsUser::getGroups())->

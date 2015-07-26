@@ -431,6 +431,7 @@ function applet_menu() {
             assign('video_installed', $inCore->isComponentInstalled('video'))->
             assign('groups', cmsUser::getGroups())->
             assign('iconList', $iconList)->
+            assign('do', $do)->
             assign('mod', $mod);
         
         if ($inCore->isComponentInstalled('video')) {

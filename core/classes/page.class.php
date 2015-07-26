@@ -1024,8 +1024,11 @@ class cmsPage {
      * Загружает все модули для данного пункта меню и шаблона
      * @return bool
      */
-    private function loadModulesForMenuItem() {
-        if (isset($this->modules)) { return true; }
+    private function loadModulesForMenuItem()
+    {
+        if (isset($this->modules) || $this->adminka) {
+            return true;
+        }
 
         $this->modules = array();
 

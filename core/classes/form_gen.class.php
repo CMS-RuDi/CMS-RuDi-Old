@@ -103,7 +103,7 @@ class rudi_form_generate
         }
     }
 
-    public function generateForm($fields, $values = array(), $tpl = 'rudiFormGen.php', $name_prefix = '', $insert_token = true)
+    public function generateForm($fields, $values = array(), $tpl = 'rudiFormGen', $name_prefix = '', $insert_token = true)
     {
         return cmsCore::c('page')->initTemplate('special/'. $tpl)->
                 assign('data', $this->getFormFields($fields, $values, $name_prefix))->

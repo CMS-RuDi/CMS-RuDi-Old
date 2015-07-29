@@ -32,7 +32,7 @@ function applet_main() {
     
     $pagebar = cmsPage::getPagebar($total, 1, 10, '#" onclick="$.post(\'/admin/ajax/getActions.php\', \'page=%page%\', function(m){ $(\'#actions\').html(m); }); return false');
     
-    $actions_html = cmsCore::c('page')->initTemplate('components', 'actions_list')->
+    $actions_html = cmsCore::c('page')->initTemplate('components/actions_list')->
         assign('actions', cmsCore::c('actions')->getActionsLog())->
         assign('pagebar', $pagebar)->
         fetch();

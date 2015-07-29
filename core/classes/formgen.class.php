@@ -136,17 +136,17 @@ class cmsFormGen {
 //============================================================================//
 //============================================================================//
 
-    public function getHTML(){
-        ob_start();
+    public function getHTML()
+    {
+        global $tpl_data;
 
-            global $tpl_data;
+        $tpl_data['fields'] = $this->params;
+        $tpl_data['info']   = $this->xml->info;
 
-            $tpl_data['fields'] = $this->params;
-            $tpl_data['info']   = $this->xml->info;
-
-            cmsPage::includeTemplateFile('special/autoform.php');
-
-        $this->html = ob_get_clean();
+            
+        $this->html = cmsCore::c('page')->initTemplate('special/autoform')->
+           assign($tpl_data)->
+           fetch();
 
         return $this->html;
     }

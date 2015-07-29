@@ -20,7 +20,9 @@ cmsCore::loadClass('formgen');
 cmsCore::loadLanguage('admin/lang');
 cmsCore::loadLanguage('admin/applets/applet_modules');
 
-if (!cmsCore::c('user')->is_admin) { cmsCore::halt($_LANG['ACCESS_DENIED']); }
+if (!cmsCore::c('user')->is_admin) {
+    cmsCore::halt($_LANG['ACCESS_DENIED']);
+}
 
 $adminAccess = cmsUser::getAdminAccess();
 
@@ -43,16 +45,22 @@ $cfg_form   = '';
 
 if (file_exists($xml_file)) {
     $cfg = $inCore->loadModuleConfig($module_id);
+
     $formGen = new cmsFormGen($xml_file, $cfg);
     $cfg_form = $formGen->getHTML();
+    
     $mode = 'xml';
-} else if (file_exists($php_file)) {
+}
+elseif (file_exists($php_file))
+{
     $mode = 'php';
-} else if ($mod['user']) {
+}
+elseif ($mod['user'])
+{
     $mode = 'custom';
 }
 
-cmsCore::c('page')->initTemplate('special', 'modconfig')->
+cmsCore::c('page')->initTemplate('special/modconfig')->
     assign('mod', $mod)->
     assign('mode', $mode)->
     assign('cfg_form', $cfg_form)->

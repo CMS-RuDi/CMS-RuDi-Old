@@ -25,22 +25,17 @@
             <div class="params-form">
                 <?php echo sprintf($_LANG['AD_MODULE_CONFIGURED_IN_CP'], $mod['id']); ?>.
             </div>
-            <div class="params-buttons">
-                <input type="submit" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
-            </div>
         <?php } else if ($mode == 'none') { ?>
             <div class="params-form">
                 <?php echo $_LANG['AD_MODULE_NO_CONFIGURED']; ?>.
             </div>
-            <div class="params-buttons">
-                <input type="submit" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
-            </div>
         <?php } else { ?>
             <input type="hidden" name="csrf_token" value="<?php echo cmsUser::getCsrfToken(); ?>" />
             <?php cmsCore::insertEditor('content', $mod['content'], '500', '99%'); ?>
-            <div class="params-buttons">
-               <input type="submit" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
-            </div>
         <?php } ?>
+            
+        <div class="params-buttons">
+           <input type="submit" name="save" value="<?php echo $_LANG['SAVE']; ?>" />
+        </div>
     </div>
 </form>

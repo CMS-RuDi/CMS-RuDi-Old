@@ -175,7 +175,7 @@ if ($do == 'read') {
 
     if (!cmsCore::checkUserAccess('material', $article['id'])) {
         cmsCore::addSessionMessage($_LANG['NO_PERM_FOR_VIEW_TEXT'].'<br>'.$_LANG['NO_PERM_FOR_VIEW_RULES'], 'error');
-        cmsCore::redirect(cmsCore::m('content')->getCategoryURL(null, $article['catseolink']));
+        cmsCore::redirect($article['cat_link']);
     }
 
     // увеличиваем кол-во просмотров
@@ -483,12 +483,12 @@ if ($do == 'addarticle' || $do == 'editarticle') {
             } else {
                 //регистрируем событие
                 cmsActions::log('add_article', array(
-                    'object' => $article['title'],
-                    'object_url' =>  cmsCore::m('content')->getArticleURL(null, $article['seolink']),
-                    'object_id' =>  $article['id'],
-                    'target' => $article['cat_title'],
-                    'target_url' => cmsCore::m('content')->getCategoryURL(null, $article['catseolink']),
-                    'target_id' =>  $article['category_id'],
+                    'object'      => $article['title'],
+                    'object_url'  =>  $article['link'],
+                    'object_id'   =>  $article['id'],
+                    'target'      => $article['cat_title'],
+                    'target_url'  => $article['cat_link'],
+                    'target_id'   =>  $article['category_id'],
                     'description' => ''
                 ));
 
@@ -546,13 +546,13 @@ if ($do == 'publisharticle') {
 
     //регистрируем событие
     cmsActions::log('add_article', array(
-       'object' => $article['title'],
-       'user_id' => $article['user_id'],
-       'object_url' =>  cmsCore::m('content')->getArticleURL(null, $article['seolink']),
-       'object_id' =>  $article['id'],
-       'target' => $article['cat_title'],
-       'target_url' => cmsCore::m('content')->getCategoryURL(null, $article['catseolink']),
-       'target_id' =>  $article['cat_id'],
+       'object'      => $article['title'],
+       'user_id'     => $article['user_id'],
+       'object_url'  =>  $article['link'],
+       'object_id'   =>  $article['id'],
+       'target'      => $article['cat_title'],
+       'target_url'  => $article['cat_link'],
+       'target_id'   =>  $article['cat_id'],
        'description' => ''
     ));
 
@@ -606,7 +606,7 @@ if ($do == 'deletearticle') {
                 cmsCore::addSessionMessage($_LANG['ARTICLE_DELETED'], 'info');
             }
             
-            cmsCore::redirect(cmsCore::m('content')->getCategoryURL(null, $article['catseolink']));
+            cmsCore::redirect($article['cat_link']);
         }
     }
 }

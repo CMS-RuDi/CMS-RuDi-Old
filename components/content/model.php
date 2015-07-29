@@ -199,7 +199,7 @@ class cms_model_content {
 
         $sql = "SELECT con.*,
                     con.pubdate as fpubdate,
-                    cat.title as cat_title, cat.seolink as catseolink,
+                    cat.title as cat_title, cat.seolink as cat_seolink,
                     cat.showdesc,
                     u.nickname as author,
                     u.login as user_login
@@ -226,7 +226,7 @@ class cms_model_content {
             $article['tagline']  = cmsTagLine('content', $article['id'], true);
             $article['comments'] = cmsCore::getCommentsCount('article', $article['id']);
             $article['link']     = $this->getArticleURL(null, $article['seolink']);
-            $article['cat_link'] = $this->getCategoryURL(null, $article['catseolink']);
+            $article['cat_link'] = $this->getCategoryURL(null, $article['cat_seolink']);
             
             if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')) {
                 $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
@@ -290,7 +290,7 @@ class cms_model_content {
         
         $sql = "SELECT  con.*,
                         cat.title cat_title, cat.id cat_id, cat.NSLeft as leftkey, cat.NSRight as rightkey, cat.modgrp_id,
-                        cat.showtags as showtags, cat.seolink as catseolink, cat.cost, u.nickname as author, u.login as user_login
+                        cat.showtags as showtags, cat.seolink as cat_seolink, cat.cost, u.nickname as author, u.login as user_login
                         FROM cms_content con
                         INNER JOIN cms_category cat ON cat.id = con.category_id
                         LEFT JOIN cms_users u ON u.id = con.user_id
@@ -324,7 +324,7 @@ class cms_model_content {
         $article['categories_str'] = !empty($article['categories']) ? implode(',', $article['categories']) : '';
         
         $article['link']     = $this->getArticleURL(null, $seolink);
-        $article['cat_link'] = $this->getCategoryURL(null, $article['catseolink']);
+        $article['cat_link'] = $this->getCategoryURL(null, $article['cat_seolink']);
 
         return $article;
     }

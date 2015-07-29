@@ -1769,8 +1769,8 @@ class cmsCore {
 
         return $list;
     }
-    // RATINGS  //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // RATINGS  ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     /**
      * Регистрирует тип цели для рейтингов в базе
      * @param string $target
@@ -2360,21 +2360,27 @@ class cmsCore {
         return self::c('db')->rows_count('cms_upload_images', "`target_id` = '". (int)$target_id ."' AND `session_id` = '". session_id() ."' AND `target` = '". $target ."'". (!empty($component) ? " AND `component` = '". $component ."'" : ""));
     }
     
-    public static function getUploadImages($target_id=0, $target=false, $component=''){
+    public static function getUploadImages($target_id = 0, $target = false, $component = '')
+    {
         $rs = self::c('db')->query("SELECT * FROM `cms_upload_images` WHERE `target_id` = '". $target_id ."'". ($target_id == 0 ? " AND `session_id` = '". session_id() ."'" : '') . ($target === false ? '' : " AND `target` = '". $target ."'") ." ". (!empty($component) ? " AND `component` = '". $component ."'" : "") ." ORDER BY id ASC");
         
-        if (self::c('db')->num_rows($rs)){
+        if (self::c('db')->num_rows($rs)) {
             $items = array();
-            while($item = self::c('db')->fetch_assoc($rs)){
-                if (!mb_substr($item['fileurl'], 0, 7) != '/upload'){
+            
+            while ($item = self::c('db')->fetch_assoc($rs)) {
+                if (!mb_substr($item['fileurl'], 0, 7) != '/upload') {
                     $item['small_src'] = '/upload/'. $component .'/small/'. $item['fileurl'];
                     $item['medium_src'] = '/upload/'. $component .'/medium/'. $item['fileurl'];
                     $item['big_src'] = '/upload/'. $component .'/big/'. $item['fileurl'];
-                }else{
+                }
+                else
+                {
                     $item['big_src'] = $item['medium_src'] = $item['small_src'] = $item['fileurl'];
                 }
+                
                 $items[$item['id']] = $item;
             }
+            
             return $items;
         }
         

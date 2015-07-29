@@ -732,6 +732,7 @@ class cmsPage {
         $this->loadModulesForMenuItem();
         
         self::initTemplate(false, PATH .'/templates/'. $template .'/template.'. $tpl_info['ext'])->
+            assign('inConf', cmsCore::c('config')->getConfig())->
             assign('langs', cmsCore::getDirsList('/languages'))->
             assign('tpl_cfgs', $tpl_cfgs)->
             assign('year', date('Y'))->

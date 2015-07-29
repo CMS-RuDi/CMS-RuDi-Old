@@ -75,10 +75,10 @@ class cmsPage {
         }
         
         if (!isset($this->tpl_info[$tpl])) {
-            $info_file = PATH .'/templates/'. $tpl .'/system.php';
+            $info_file = PATH .'/templates/'. $tpl .'/system.json';
         
             if (file_exists($info_file)) {
-                include $info_file;
+                $info = json_decode(file_get_contents($info_file), true);
             }
             
             if (empty($info)) {
@@ -158,7 +158,6 @@ class cmsPage {
         if (!file_exists($tpl_file)) {
             cmsCore::halt('Template File Not Exists: '. $tpl_file);
         }
-
 
         // загружаем шаблонизатор текущего шаблона
         if (!cmsCore::includeFile('core/tpl_classes/'. $tpl_info['renderer'] .'.php') ||
@@ -784,13 +783,13 @@ class cmsPage {
      * Показывает Splash страницу
      * @return bool
      */
-    public static function showSplash(){
-        if (self::includeTemplateFile('splash/splash.php')){
-            cmsCore::setCookie('splash', md5('splash'), time()+60*60*24*30);
-            return true;
-        }
+    public static function showSplash() {
+        cmsCore::c('page')->initTemplate('special/splash')->
+            display();
 
-        return false;
+        cmsCore::setCookie('splash', md5('splash'), time()+60*60*24*30);
+        
+        return true;
     }
     
     /**
@@ -1042,7 +1041,8 @@ class cmsPage {
      * @param string $placekind
      * @return html
      */
-    public static function getBBCodeToolbar($field_id, $images=0, $component='forum', $target='post', $target_id=0){
+    public static function getBBCodeToolbar($field_id, $images = 0, $component = 'forum', $target = 'post', $target_id = 0)
+    {
         // Поддержка плагинов панели ббкодов (ее замены)
         $p_toolbar = cmsCore::callEvent(
             'REPLACE_BBCODE_BUTTONS',
@@ -1056,28 +1056,25 @@ class cmsPage {
             )
         );
 
-        if($p_toolbar['html']){ return cmsCore::callEvent('GET_BBCODE_BUTTON', $p_toolbar['html']); }
-
-        $inPage = self::getInstance();
-
-        $inPage->addHeadJS('core/js/smiles.js');
-        if($images){
-            $inPage->addHeadJS('includes/jquery/upload/ajaxfileupload.js');
+        if ($p_toolbar['html']) {
+            return cmsCore::callEvent('GET_BBCODE_BUTTON', $p_toolbar['html']);
         }
 
-        ob_start();
-        self::includeTemplateFile(
-            'special/bbcode_panel.php',
-            array(
-                'field_id' => $field_id,
-                'images' => $images,
-                'component' => $component,
-                'target' => $target,
-                'target_id' => $target_id
-            )
-        );
+        cmsCore::c('page')->addHeadJS('core/js/smiles.js');
+        
+        if ($images) {
+            cmsCore::c('page')->addHeadJS('includes/jquery/upload/ajaxfileupload.js');
+        }
 
-        return cmsCore::callEvent('GET_BBCODE_BUTTON', ob_get_clean());
+        return cmsCore::callEvent('GET_BBCODE_BUTTON',
+                cmsCore::c('page')->initTemplate('special/bbcode_panel')->
+                    assign('field_id', $field_id)->
+                    assign('images', $images)->
+                    assign('component', $component)->
+                    assign('target', $target)->
+                    assign('target_id', $target_id)->
+                    fatch()
+            );
     }
     
     /**
@@ -1139,11 +1136,10 @@ class cmsPage {
                 
                 $options['ses_id'] = session_id();
                 
-                ob_start();
-                    self::includeTemplateFile('special/ajaxFileUpload.php', array('options' => $options, 'files' => $files));
-                return ob_get_clean();
-
-                break;
+                return $this->initTemplate('special/ajaxFileUpload')->
+                        assign('options', $options)->
+                        assign('files', $files)->
+                        fetch();
         }
 
         return false;
@@ -1261,8 +1257,11 @@ class cmsPage {
      * Печатает строки js с языковыми переменными
      * @param array $keys массив ключей нужных ячеек массива $_LANG
      */
-    public static function displayLangJS($keys){
-        if(!is_array($keys)){ return; }
+    public static function displayLangJS($keys)
+    {
+        if (!is_array($keys)) {
+            return;
+        }
 
         echo '<script type="text/javascript">';
         foreach ($keys as $key) {
@@ -1278,12 +1277,16 @@ class cmsPage {
      * @param array|string $key
      * @return \cmsPage
      */
-    public function addHeadJsLang($key){
+    public function addHeadJsLang($key)
+    {
         if (is_array($key)) {
             array_map(array($this, __FUNCTION__), $key);
-        } else {
+        }
+        else
+        {
             $this->page_lang[$key] = self::getLangJS($key);
         }
+        
         return $this;
     }
 }

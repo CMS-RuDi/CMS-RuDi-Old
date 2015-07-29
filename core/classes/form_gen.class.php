@@ -105,15 +105,10 @@ class rudi_form_generate
 
     public function generateForm($fields, $values = array(), $tpl = 'rudiFormGen.php', $name_prefix = '', $insert_token = true)
     {
-        ob_start();
-            cmsPage::includeTemplateFile(
-                'special/'. $tpl,
-                array(
-                    'data' => $this->getFormFields($fields, $values, $name_prefix),
-                    'insert_token' => $insert_token
-                )
-            );
-        return ob_get_clean();
+        return cmsCore::c('page')->initTemplate('special/'. $tpl)->
+                assign('data', $this->getFormFields($fields, $values, $name_prefix))->
+                assign('insert_token', $insert_token)->
+                fetch();
     }
     
     public function getFormFields($fields, $values = array(), $name_prefix = '')

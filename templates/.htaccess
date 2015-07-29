@@ -1,4 +1,4 @@
-<Files ~ "\.tpl|php|txt$">
+<Files ~ "\.tpl|php|txt|json$">
     Order allow,deny
     Deny from all
 </Files>

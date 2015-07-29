@@ -32,7 +32,7 @@ function applet_templates() {
         
         cpAddPathway($_LANG['AD_TEMPLATE'] .': '. $template, 'index.php?view=templates&do=config&template='. $template);
 
-        if (!file_exists(PATH .'/templates/'. $template) || !file_exists(PATH .'/templates/'. $template .'/config.php')) {
+        if (!file_exists(PATH .'/templates/'. $template) || !file_exists(PATH .'/templates/'. $template .'/cfg_fields.json')) {
             cmsCore::error404();
         }
         
@@ -59,7 +59,7 @@ function applet_templates() {
     if ($do == 'save_config') {
         $template = cmsCore::request('template', 'str', '');
         
-        if (!file_exists(PATH .'/templates/'. $template) || !file_exists(PATH .'/templates/'. $template .'/config.php') || !cmsUser::checkCsrfToken()) {
+        if (!file_exists(PATH .'/templates/'. $template) || !file_exists(PATH .'/templates/'. $template .'/cfg_fields.json') || !cmsUser::checkCsrfToken()) {
             cmsCore::error404();
         }
 

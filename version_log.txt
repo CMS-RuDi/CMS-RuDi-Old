@@ -111,3 +111,6 @@ CMS RuDi v0.1.0 (10.08.2015)
     синтаксис и называется template.tpl
     Использование template.php для сторонних smarty шаблонов будет поддерживаться
     до версии 0.2.0
+[=] Полностью избавились от php файлов в smarty шаблонах.
+        system.php заменен на system.json
+        config.php заменен на cfg_fields.json и cfg_values.json

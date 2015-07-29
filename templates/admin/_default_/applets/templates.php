@@ -40,7 +40,7 @@
                         <?php } ?>
                     </td>
                     <td>
-                    <?php if (file_exists(PATH .'/templates/'. $template .'/config.php')) { ?>
+                    <?php if (file_exists(PATH .'/templates/'. $template .'/cfg_fields.json')) { ?>
                         <a href="/admin/index.php?view=templates&do=config&template=<?php echo $template; ?>" class="btn btn-sm btn-primary"><?php echo $_LANG['AD_CONFIG']; ?></a>
                     <?php } ?>
                     </td>

@@ -224,10 +224,16 @@ class cmsUser {
 
         } else {
             global $_LANG;
+            
             $ban['bandate'] = cmsCore::dateFormat($ban['bandate']);
             $ban['enddate'] = cmsCore::spellCount($ban['int_num'], $_LANG[$ban['int_period'].'1'], $_LANG[$ban['int_period'].'2'], $_LANG[$ban['int_period'].'10']);
-            cmsPage::includeTemplateFile('special/bantext.php', array('ban' => $ban));
-$this->logout();
+
+            cmsCore::c('page')->initTemplate('special/bantext')->
+                assign('ban', $ban)->
+                display();
+            
+            $this->logout();
+            
             cmsCore::halt();
         }
 

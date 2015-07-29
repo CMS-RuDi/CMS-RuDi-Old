@@ -266,12 +266,13 @@ if ($do=='register'){
 
     cmsCore::callEvent('USER_REGISTER', $item);
 
-    if ($item['is_locked']){
-
+    if ($item['is_locked']) {
         cmsCore::m('registration')->sendActivationNotice($pass, $item['id']);
-        cmsPage::includeTemplateFile('special/regactivate.php');
+        
+        cmsCore::c('page')->initTemplate('special/regactivate')->
+            display();
+        
         cmsCore::halt();
-
     } else {
 
         cmsActions::log('add_user', array(
@@ -448,12 +449,10 @@ if ($do=='auth'){
 
 
 //============================================================================//
-if ($do=='autherror'){
-
+if ($do == 'autherror') {
     cmsUser::sessionPut('anti_brute_force', 1);
-    cmsPage::includeTemplateFile('special/autherror.php');
+    cmsCore::c('page')->initTemplate('special/autherror')->display();
     cmsCore::halt();
-
 }
 
 //============================================================================//

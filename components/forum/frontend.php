@@ -73,9 +73,9 @@ if ($do=='forum'){
 	if(!in_array($order_to, array('asc', 'desc'))) { $order_to = 'desc'; }
     $daysprune = (int)cmsCore::getSearchVar('daysprune');
 
-	if(!cmsCore::checkContentAccess($forum['access_list'])) {
-		cmsPage::includeTemplateFile('special/accessdenied.php');
-		return;
+	if (!cmsCore::checkContentAccess($forum['access_list'])) {
+            cmsCore::c('page')->initTemplate('special/accessdenied')->display();
+            return;
 	}
 
 	$inPage->addHead('<link rel="alternate" type="application/rss+xml" title="'.htmlspecialchars($forum['title']).'" href="'.HOST.'/rss/forum/'.$forum['id'].'/feed.rss">');
@@ -90,7 +90,7 @@ if ($do=='forum'){
     if ($path_list){
         foreach($path_list as $pcat){
 			if(!cmsCore::checkContentAccess($pcat['access_list'])){
-                cmsPage::includeTemplateFile('special/accessdenied.php');
+                cmsCore::c('page')->initTemplate('special/accessdenied')->display();
                 return;
 			}
             $inPage->addPathway($pcat['title'], '/forum/'.$pcat['id']);
@@ -144,7 +144,7 @@ if ($do=='thread'){
     if ($path_list){
         foreach($path_list as $pcat){
 			if(!cmsCore::checkContentAccess($pcat['access_list'])){
-                cmsPage::includeTemplateFile('special/accessdenied.php');
+                cmsCore::c('page')->initTemplate('special/accessdenied')->display();
                 return;
 			}
             $inPage->addPathway($pcat['title'], '/forum/'.$pcat['id']);
@@ -250,14 +250,14 @@ if (in_array($do, array('newthread','newpost','editpost'))){
 
         // права доступа
         if(!cmsUser::isUserCan('forum/add_thread') && !$inUser->is_admin) {
-            cmsPage::includeTemplateFile('special/accessdenied.php');
+            cmsCore::c('page')->initTemplate('special/accessdenied')->display();
             return;
         }
 
         $forum = $model->getForum($id);
         if(!$forum) { cmsCore::error404(); }
         if(!cmsCore::checkContentAccess($forum['access_list'])) {
-            cmsPage::includeTemplateFile('special/accessdenied.php');
+            cmsCore::c('page')->initTemplate('special/accessdenied')->display();
             return;
         }
 
@@ -265,7 +265,7 @@ if (in_array($do, array('newthread','newpost','editpost'))){
         if ($path_list){
             foreach($path_list as $pcat){
                 if(!cmsCore::checkContentAccess($pcat['access_list'])){
-                    cmsPage::includeTemplateFile('special/accessdenied.php');
+                    cmsCore::c('page')->initTemplate('special/accessdenied')->display();
                     return;
                 }
                 $inPage->addPathway($pcat['title'], '/forum/'.$pcat['id']);
@@ -291,7 +291,7 @@ if (in_array($do, array('newthread','newpost','editpost'))){
 
         // права доступа
         if(!cmsUser::isUserCan('forum/add_post') && !$inUser->is_admin) {
-            cmsPage::includeTemplateFile('special/accessdenied.php');
+            cmsCore::c('page')->initTemplate('special/accessdenied')->display();
             return;
         }
 
@@ -302,7 +302,7 @@ if (in_array($do, array('newthread','newpost','editpost'))){
         if ($path_list){
             foreach($path_list as $pcat){
                 if(!cmsCore::checkContentAccess($pcat['access_list'])){
-                    cmsPage::includeTemplateFile('special/accessdenied.php');
+                    cmsCore::c('page')->initTemplate('special/accessdenied')->display();
                     return;
                 }
                 $inPage->addPathway($pcat['title'], '/forum/'.$pcat['id']);
@@ -340,7 +340,7 @@ if (in_array($do, array('newthread','newpost','editpost'))){
         if ($path_list){
             foreach($path_list as $pcat){
                 if(!cmsCore::checkContentAccess($pcat['access_list'])){
-                    cmsPage::includeTemplateFile('special/accessdenied.php');
+                    cmsCore::c('page')->initTemplate('special/accessdenied')->display();
                     return;
                 }
                 $inPage->addPathway($pcat['title'], '/forum/'.$pcat['id']);

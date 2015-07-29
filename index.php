@@ -57,7 +57,9 @@ if (cmsCore::c('config')->siteoff &&
     $_SERVER['REQUEST_URI'] != '/login' &&
     $_SERVER['REQUEST_URI'] != '/logout'
 ) {
-    cmsPage::includeTemplateFile('special/siteoff.php');
+    cmsCore::c('page')->initTemplate('special/siteoff')->
+        assign('offtext', cmsCore::c('config')->offtext)->
+        display();
     cmsCore::halt();
 }
 

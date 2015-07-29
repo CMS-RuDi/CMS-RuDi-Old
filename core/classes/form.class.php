@@ -188,23 +188,21 @@ class cmsForm {
      * @param bool $is_admin
      * @return str HTML
      */
-	public static function displayForm($form_id, $values = array(), $is_admin = false){
+	public static function displayForm($form_id, $values = array(), $is_admin = false)
+        {
+            $formObj = new self($form_id, $values, $is_admin);
 
-		$formObj = new self($form_id, $values, $is_admin);
+            if (!$formObj->form || !$formObj->form_fields) { return ''; }
 
-		if(!$formObj->form || !$formObj->form_fields) { return ''; }
-
-        // Формируем поля формы
-        foreach ($formObj->form_fields as $key => $field) {
-            $formObj->form_fields[$key]['field'] = $formObj->getFormField($field);
-        }
-
-		ob_start();
-
-		cmsPage::includeTemplateFile('special/'.$formObj->form['tpl'].'.php', array('formObj'=>$formObj));
-
-		return ob_get_clean();
-
+            // Формируем поля формы
+            foreach ($formObj->form_fields as $key => $field) {
+                $formObj->form_fields[$key]['field'] = $formObj->getFormField($field);
+            }
+            
+            return cmsCore::c('page')->initTemplate('special/'. $formObj->form['tpl'])->
+                    assign('formObj', (array)$formObj)->
+                    assign('id', cmsCore::request('id', 'int', 0))->
+                    fetch();
 	}
 
 // ============================================================================ //

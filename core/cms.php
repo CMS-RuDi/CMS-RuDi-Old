@@ -917,10 +917,34 @@ class cmsCore {
         header("HTTP/1.0 404 Not Found");
         header("HTTP/1.1 404 Not Found");
         header("Status: 404 Not Found");
-
-        if (!cmsPage::includeTemplateFile('special/error404.php')){
-            echo '<h1>404</h1>';
+        
+        $debug = self::c('config')->debug && self::c('user')->is_admin;
+        
+        $tpl = self::c('page')->initTemplate('special/error404')->
+            assign('debug', $debug);
+        
+        if ($debug) {
+            $backtrace = array();
+            $stack = debug_backtrace();
+                    
+            for ($i=2; $i<=14; $i++) {
+                if (!isset($stack[$i])) {
+                    break;
+                }
+                
+                $row = $stack[$i];
+                
+                if (isset($row['file'])) {
+                    $row['file'] = str_replace(PATH, '', $row['file']);
+                }
+                
+                $backtrace[] = $row;
+            }
+            
+            $tpl->assign('backtrace', $backtrace);
         }
+        
+        $tpl->display();
 
         self::halt();
     }
@@ -1451,8 +1475,11 @@ class cmsCore {
      * Перетирает содержание страницы
      * в случае остутствия у группы доступа к текущему пункту меню
      */
-    public function checkMenuAccess(){
-        if (!$this->menu_item) { return true; }
+    public function checkMenuAccess()
+    {
+        if (!$this->menu_item) {
+            return true;
+        }
         
         $access_list = $this->menu_item['access_list'];
         
@@ -1463,12 +1490,12 @@ class cmsCore {
         }
         
         if (!self::checkContentAccess($access_list)) {
-            ob_start();
-                cmsPage::includeTemplateFile('special/accessdenied.php');
-            self::c('page')->page_body = ob_get_clean();
+            self::c('page')->page_body = self::c('page')->initTemplate('special/accessdenied')->fetch();
             
             return false;
-        }else{
+        }
+        else
+        {
             return true;
         }
     }
@@ -2924,12 +2951,8 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
     {
         $template = empty($template) ? self::c('config')->template : $template;
         
-        if (file_exists(PATH .'/templates/'. $template .'/config.php')) {
-            $cfg_fields = array();
-            
-            include(PATH .'/templates/'. $template .'/config.php');
-            
-            return $cfg_fields;
+        if (file_exists(PATH .'/templates/'. $template .'/cfg_fields.json')) {
+           return json_decode(file_get_contents(PATH .'/templates/'. $template .'/cfg_fields.json'), true);
         }
 
         return false;
@@ -2944,10 +2967,8 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
     {
         $template = empty($template) ? self::c('config')->template : $template;
         
-        if (file_exists(PATH .'/templates/'. $template .'/config.php')) {
-            $cfg_values = array();
-            
-            include(PATH .'/templates/'. $template .'/config.php');
+        if (file_exists(PATH .'/templates/'. $template .'/cfg_values.json')) {
+            $cfg_values = json_decode(PATH .'/templates/'. $template .'/cfg_values.json', true);
             
             $cfg = array();
             

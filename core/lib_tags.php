@@ -37,7 +37,7 @@ function cmsClearTags($target, $item_id){
     return cmsCore::c('db')->delete('cms_tags', "target='". $target ."' AND item_id = '". $item_id ."'");
 }
 
-function cmsTagLine($target, $item_id, $links=true, $selected=''){
+function cmsTagLine($target, $item_id, $links = true, $selected = '') {
     $sql  = "SELECT tag
                     FROM cms_tags
                     WHERE target='$target' AND item_id='$item_id'
@@ -47,30 +47,38 @@ function cmsTagLine($target, $item_id, $links=true, $selected=''){
     $html = '';
     $tags = cmsCore::c('db')->num_rows($rs);
     
-    if ($tags){
+    if ($tags) {
         $t = 1;
-        while ($tag=cmsCore::c('db')->fetch_assoc($rs)){
-            if ($links){
-                if ($selected==$tag['tag']){
-                    $html .= '<a href="/search/tag/'. urlencode($tag['tag']) .'" style="font-weight:bold;text-decoration:underline">'. $tag['tag'] .'</a>';
-                } else {
-                    $html .= '<a href="/search/tag/'. urlencode($tag['tag']) .'">'. $tag['tag'] .'</a>';
+        while ($tag=cmsCore::c('db')->fetch_assoc($rs)) {
+            if ($links) {
+                if ($selected==$tag['tag']) {
+                    $html .= '<a href="/search/tag/'. urlencode($tag['tag']) .'" style="font-weight:bold;text-decoration:underline" rel="tag">'. $tag['tag'] .'</a>';
                 }
-            } else {
+                else
+                {
+                    $html .= '<a href="/search/tag/'. urlencode($tag['tag']) .'" rel="tag">'. $tag['tag'] .'</a>';
+                }
+            }
+            else
+            {
                 $html .= $tag['tag'];
             }
             if ($t < $tags) { $html .= ', '; $t++; }
         }
-    } else {
+    }
+    else
+    {
         $html = '';
     }
     
     return $html;
 }
 
-function cmsTagBar($target, $item_id, $selected=''){
-    if ($tagline = cmsTagLine($target, $item_id, true, $selected)){
-        return '<div class="taglinebar"><span class="label">Теги: </span><span class="tags">'.$tagline.'</span></div>';
+function cmsTagBar($target, $item_id, $selected = '') {
+    if ($tagline = cmsTagLine($target, $item_id, true, $selected)) {
+        return cmsCore::c('page')->initTemplate('special/tagbar')->
+                assign('$tagline', $tagline)->
+                fetch();
     } else {
         return '';
     }

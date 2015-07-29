@@ -52,7 +52,7 @@ function rss_content($item_id, $cfg) {
 
     if ($content) {
         foreach($content as $con){
-            $con['link']     = HOST . $con['url'];
+            $con['link']     = HOST . $con['link'];
             $con['comments'] = $con['link'].'#c';
             $con['category'] = $con['cat_title'];
 

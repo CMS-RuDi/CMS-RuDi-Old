@@ -5,7 +5,7 @@
             <td class="mod_blog_karma" valign="top" width="30">{$article.rating|rating}</td>
             <td valign="top">
                 <div>
-                    <a class="mod_bcon_content" style="font-size:16px" href="{$article.url}">{$article.title|truncate:60}</a> &mdash;
+                    <a class="mod_bcon_content" style="font-size:16px" href="{$article.link}">{$article.title|truncate:60}</a> &mdash;
                     <span class="mod_bcon_date">{$article.fpubdate}</span> (<a class="mod_bcon_author" href="{profile_url login=$article.user_login}">{$article.author}</a>)
                 </div>
                 {if $cfg.showdesc neq 0}

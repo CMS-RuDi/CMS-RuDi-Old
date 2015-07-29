@@ -114,9 +114,9 @@ class cms_model_arhive{
             if(!isset($item['seolink'])){
                 $item['fmonth'] = cmsCore::intMonthToStr($item['month']);
             } else {
-                $item['url']          = cmsCore::m('content')->getArticleURL(0, $item['seolink']);
-                $item['category_url'] = cmsCore::m('content')->getCategoryURL(0, $item['cat_seolink']);
-                $item['fpubdate']     = cmsCore::dateFormat($item['pubdate']);
+                $item['link']     = cmsCore::m('content')->getArticleURL(0, $item['seolink']);
+                $item['cat_link'] = cmsCore::m('content')->getCategoryURL(0, $item['cat_seolink']);
+                $item['fpubdate'] = cmsCore::dateFormat($item['pubdate']);
             }
             $item['image'] = (file_exists(PATH.'/images/photos/small/article'.$item['id'].'.jpg') ?
                                 'article'.$item['id'].'.jpg' : '');

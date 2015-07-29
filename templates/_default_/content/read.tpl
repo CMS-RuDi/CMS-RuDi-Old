@@ -20,7 +20,7 @@
                 {foreach key=tid item=pages from=$pt_pages}
                     {if ($tid+1 != $page)}
                         {math equation="x + 1" x=$tid assign="key"}
-                        <li><a href="{$pages.url}">{$pages.title}</a></li>
+                        <li><a href="{$pages.link}">{$pages.title}</a></li>
                     {else}
                         <li>{$pages.title}</li>
                     {/if}

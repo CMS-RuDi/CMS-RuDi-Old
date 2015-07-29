@@ -22,14 +22,14 @@
 {/if}
 
 {if $subcats}
-	<div class="categorylist">
-		{foreach key=tid item=subcat from=$subcats}
-            <div class="subcat">
-                <a href="{$subcat.url}" class="con_subcat">{$subcat.title}</a> ({$subcat.content_count})
-                <div class="con_description">{$subcat.description}</div>
-            </div>
-		{/foreach}
-	</div>
+    <div class="categorylist">
+        {foreach key=tid item=subcat from=$subcats}
+        <div class="subcat">
+            <a href="{$subcat.link}" class="con_subcat">{$subcat.title}</a> ({$subcat.content_count})
+            <div class="con_description">{$subcat.description}</div>
+        </div>
+        {/foreach}
+    </div>
 {/if}
 
 {if $cat_photos}
@@ -64,7 +64,7 @@
         {if $col==1} <tr> {/if}
             <td width="" valign="top">
                 <div class="con_title">
-                    <a href="{$article.url}" class="con_titlelink">{$article.title}</a>
+                    <a href="{$article.link}" class="con_titlelink">{$article.title}</a>
                 </div>
                 {if $cat.showdesc}
                     <div class="con_desc">
@@ -84,8 +84,8 @@
                         {/if}
                         {if $cat.showcomm}
                             {if $showdate} | {/if}
-                            <a href="{$article.url}" title="{$LANG.DETAIL}">{$LANG.DETAIL}</a>
-                            | <a href="{$article.url}#c" title="{$LANG.COMMENTS}">{$article.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}</a>
+                            <a href="{$article.link}" title="{$LANG.DETAIL}">{$LANG.DETAIL}</a>
+                            | <a href="{$article.link}#c" title="{$LANG.COMMENTS}">{$article.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}</a>
                         {/if}
                          | {$article.hits|spellcount:$LANG.HIT:$LANG.HIT2:$LANG.HIT10}
                         {if $cat.showtags && $article.tagline}

@@ -33,7 +33,7 @@
         <tr>
             <td>{$article.fpubdate}</td>
             <td><img src="/templates/{template}/images/icons/article.png" border="0"></td>
-            <td><a href="{$article.url}">{$article.title}</a></td>
+            <td><a href="{$article.link}">{$article.title}</a></td>
             <td align="center">
                 {if $article.published}
                     <span style="color:green">{$LANG.PUBLISHED}</span>
@@ -43,7 +43,7 @@
             </td>
             <td><img src="/templates/{template}/images/icons/comments.png" border="0"></td>
             <td>{$article.comments}</td>
-            <td><a href="{$article.cat_url}">{$article.cat_title}</a></td>
+            <td><a href="{$article.cat_link}">{$article.cat_title}</a></td>
             <td align="center">
                 <a href="/content/edit{$article.id}.html" title="{$LANG.EDIT}"><img src="/templates/{template}/images/icons/edit.png" border="0"/></a>
                 {if $user_can_delete}

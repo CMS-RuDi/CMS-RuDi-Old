@@ -11,10 +11,10 @@
                 <img src="{$article.image_small}" border="0" width="32" height="32" alt="{$article.title|escape:'html'}"/>
             </div>
         {/if}
-	    <a class="mod_latest_title" href="{$article.url}">{$article.title}</a>
+	    <a class="mod_latest_title" href="{$article.link}">{$article.title}</a>
 		{if $cfg.showdate}
             <div class="mod_latest_date">
-                {$article.fpubdate} - <a href="{profile_url login=$article.user_login}">{$article.author}</a>{if $cfg.showcom} - <a href="{$article.url}" title="{$article.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}" class="mod_latest_comments">{$article.comments}</a>{/if} - <span class="mod_latest_hits">{$article.hits}</span>
+                {$article.fpubdate} - <a href="{profile_url login=$article.user_login}">{$article.author}</a>{if $cfg.showcom} - <a href="{$article.link}" title="{$article.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}" class="mod_latest_comments">{$article.comments}</a>{/if} - <span class="mod_latest_hits">{$article.hits}</span>
             </div>
         {/if}
         {if $cfg.showdesc}

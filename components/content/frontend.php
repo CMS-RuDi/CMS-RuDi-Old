@@ -229,7 +229,7 @@ if ($do == 'read') {
     if (!empty($GLOBALS['pt'])) {
         foreach ($GLOBALS['pt'] as $num=>$page_title) {
             $pt_pages[$num]['title'] = $page_title;
-            $pt_pages[$num]['url']   = cmsCore::m('content')->getArticleURL(null, $article['seolink'], $num+1);
+            $pt_pages[$num]['link']  = cmsCore::m('content')->getArticleURL(null, $article['seolink'], $num+1);
         }
     }
 

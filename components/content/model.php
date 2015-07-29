@@ -91,7 +91,7 @@ class cms_model_content {
 
         while ($subcat = cmsCore::c('db')->fetch_assoc($result)) {
             $subcat['content_count'] = $this->getArticleCountFromCat($subcat['NSLeft'], $subcat['NSRight']);
-            $subcat['url']           = $this->getCategoryURL(null, $subcat['seolink']);
+            $subcat['link']          = $this->getCategoryURL(null, $subcat['seolink']);
 
             $subcats[] = $subcat;
         }
@@ -225,8 +225,8 @@ class cms_model_content {
             $article['fpubdate'] = cmsCore::dateFormat($article['fpubdate']);
             $article['tagline']  = cmsTagLine('content', $article['id'], true);
             $article['comments'] = cmsCore::getCommentsCount('article', $article['id']);
-            $article['url']      = $this->getArticleURL(null, $article['seolink']);
-            $article['cat_url']  = $this->getCategoryURL(null, $article['catseolink']);
+            $article['link']     = $this->getArticleURL(null, $article['seolink']);
+            $article['cat_link'] = $this->getCategoryURL(null, $article['catseolink']);
             
             if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')) {
                 $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg';
@@ -278,10 +278,13 @@ class cms_model_content {
      * Получает статью
      * @return array
      */
-    public function getArticle($id_or_link) {
+    public function getArticle($id_or_link)
+    {
         if (is_numeric($id_or_link)) {
             $where = "con.id = '". $id_or_link ."'";
-        } else {
+        }
+        else
+        {
             $where = "con.seolink = '". $id_or_link ."'";
         }
         
@@ -294,7 +297,9 @@ class cms_model_content {
                         WHERE ". $where ." LIMIT 1";
         $result = cmsCore::c('db')->query($sql);
 
-        if (!cmsCore::c('db')->num_rows($result)) { return false; }
+        if (!cmsCore::c('db')->num_rows($result)) {
+            return false;
+        }
 
         $article = cmsCore::c('db')->fetch_assoc($result);
         
@@ -317,6 +322,9 @@ class cms_model_content {
         }
         
         $article['categories_str'] = !empty($article['categories']) ? implode(',', $article['categories']) : '';
+        
+        $article['link']     = $this->getArticleURL(null, $seolink);
+        $article['cat_link'] = $this->getCategoryURL(null, $article['catseolink']);
 
         return $article;
     }
@@ -424,10 +432,13 @@ class cms_model_content {
      * параметр $menuid устаревший, оставлен для совместимости
      * @return str
      */
-    public static function getArticleURL($menuid, $seolink, $page=1) {
+    public static function getArticleURL($menuid, $seolink, $page = 1)
+    {
         if ((is_numeric($page) && $page>1) || is_string($page)) {
             $page_section = '/page-'. $page;
-        } else {
+        }
+        else
+        {
             $page_section = '';
         }
 
@@ -445,10 +456,13 @@ class cms_model_content {
      * параметр $menuid устаревший, оставлен для совместимости
      * @return str
      */
-    public static function getCategoryURL($menuid, $seolink, $page=1, $pagetag = false) {
+    public static function getCategoryURL($menuid, $seolink, $page = 1, $pagetag = false)
+    {
         if (!$pagetag) {
             $page_section = ($page > 1 ? '/page-'. $page : '');
-        } else {
+        }
+        else
+        {
             $page_section = '/page-%page%';
         }
 
@@ -573,7 +587,7 @@ class cms_model_content {
         cmsCore::updateComImages($article['id'], 'content', '', 'cms_content', 'images');
 
         if (!$not_upd_seo) {
-            if (@$article['url']) {
+            if (!empty($article['url'])) {
                 $article['url'] = cmsCore::strToURL($article['url'], $this->config['is_url_cyrillic']);
             }
 

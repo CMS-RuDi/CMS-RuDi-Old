@@ -3,7 +3,7 @@
 {if $items}
     {foreach key=id item=item from=$items}
         <div class="arhive_date"><a href="/arhive/{$item.year}/{$item.month}/{$item.day}">{$item.fpubdate}</a></div>
-        <h2 class="arhive_title"><a href="{$item.url}">{$item.title}</a> &rarr; <a href="{$item.category_url}">{$item.cat_title}</a></h2>
+        <h2 class="arhive_title"><a href="{$item.link}">{$item.title}</a> &rarr; <a href="{$item.cat_link}">{$item.cat_title}</a></h2>
         <div class="arhive_desc">
         {if $item.showdesc && $item.description}
             {if $item.image}

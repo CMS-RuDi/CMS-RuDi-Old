@@ -13,7 +13,7 @@
             <li>
         {/if}
         {if $cat.NSLevel <= 1}
-            <a class="folder" href="{$cat.url}">{if $cat.seolink == $current_seolink} <strong>{$cat.title} ({$cat.content_count})</strong>{else}{$cat.title} ({$cat.content_count}){/if}</a>
+            <a class="folder" href="{$cat.link}">{if $cat.seolink == $current_seolink} <strong>{$cat.title} ({$cat.content_count})</strong>{else}{$cat.title} ({$cat.content_count}){/if}</a>
         {else}
             {if $cat.NSLevel > $last_level}
                 <a href="javascript:" class="cat_plus" style="{if $cfg.expand_all}display:none{/if}" title="{$LANG.EXPAND}"></a>
@@ -21,7 +21,7 @@
             	<ul>
             {/if}
                 <li>
-					<a class="folder" href="{$cat.url}">{if $cat.seolink == $current_seolink} <strong>{$cat.title} ({$cat.content_count})</strong>{else}{$cat.title} ({$cat.content_count}){/if}</a>
+					<a class="folder" href="{$cat.link}">{if $cat.seolink == $current_seolink} <strong>{$cat.title} ({$cat.content_count})</strong>{else}{$cat.title} ({$cat.content_count}){/if}</a>
         {/if}
         {assign var="last_level" value=$cat.NSLevel}
     

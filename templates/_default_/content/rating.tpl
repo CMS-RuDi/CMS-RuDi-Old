@@ -7,7 +7,7 @@
             <td width="20" valign="top" style="font-size:20px">{$article.rating|rating}</td>
             <td width="" valign="top">
                 <h2 class="con_title">
-                    <a href="{$article.url}" class="con_titlelink">{$article.title}</a>
+                    <a href="{$article.link}" class="con_titlelink">{$article.title}</a>
                 </h2>
                 {if $article.showdesc}
                     <div class="con_desc">
@@ -27,13 +27,13 @@
                         {/if}
                         {if $article.showcomm}
                             {if $article.showdate} | {/if}
-                            <a href="{$article.url}#c" title="{$LANG.COMMENTS}">{$article.comments|spellcount:$LANG.COMMENT:$LANG.COMMENT2:$LANG.COMMENT10}</a>
+                            <a href="{$article.link}#c" title="{$LANG.COMMENTS}">{$article.comments|spellcount:$LANG.COMMENT:$LANG.COMMENT2:$LANG.COMMENT10}</a>
                         {/if}
                          | {$article.hits|spellcount:$LANG.HIT:$LANG.HIT2:$LANG.HIT10}
                         {if $article.tagline}
                              | <strong>{$LANG.TAGS}:</strong> {$article.tagline}
                         {/if}
-                        	 | <strong>{$LANG.CAT}:</strong> <a href="{$article.cat_url}">{$article.cat_title}</a>
+                        	 | <strong>{$LANG.CAT}:</strong> <a href="{$article.cat_link}">{$article.cat_title}</a>
                     </div>
                 {/if}
             </td>

@@ -17,7 +17,8 @@
  * @author DS Soft <support@ds-soft.ru>
  * @version 0.0.3
  */
-class rudi_form_generate {
+class rudi_form_generate
+{
     private $fields = array(
         'tabs'       => array( 'class' => 'rudi_form_tab',      'count' => 0 ),
         'fieldset'   => array( 'class' => 'rudi_form_fieldset', 'count' => 0 ),
@@ -31,12 +32,14 @@ class rudi_form_generate {
         'btn_yes_no' => 1,
         'img_size'   => 1,
         'ns_list'    => 1,
-        'dir_list'   => 1
+        'dir_list'   => 1,
+        'file_list'  => 1
     );
     private $values = array();
     private $name_prefix = '';
 
-    public function requestForm($fields, $name_prefix='') {
+    public function requestForm($fields, $name_prefix = '')
+    {
         $data = array();
         $this->name_prefix = empty($name_prefix) ? '' : $name_prefix .'_';
         
@@ -47,7 +50,9 @@ class rudi_form_generate {
                         $this->requestField($f, $data);
                     }
                 }
-            } else if ($field['type'] == 'tabs') {
+            }
+            elseif ($field['type'] == 'tabs')
+            {
                 foreach ($field['tabs'] as $tab) {
                     foreach ($tab['fields'] as $f) {
                         if ($f['type'] == 'fieldset') {
@@ -56,12 +61,16 @@ class rudi_form_generate {
                                     $this->requestField($f2, $data);
                                 }
                             }
-                        } else {
+                        }
+                        else
+                        {
                             $this->requestField($f, $data);
                         }
                     }
                 }
-            } else {
+            }
+            else
+            {
                 $this->requestField($field, $data);
             }
         }
@@ -71,10 +80,13 @@ class rudi_form_generate {
         return $data;
     }
     
-    private function requestField($field, &$data) {
+    private function requestField($field, &$data)
+    {
         if ($field['type'] == 'img_size') {
             $name = array($field['nameX'], $field['nameY']);
-        } else {
+        }
+        else
+        {
             $name = array($field['name']);
         }
         
@@ -91,7 +103,8 @@ class rudi_form_generate {
         }
     }
 
-    public function generateForm($fields, $values=array(), $tpl='rudiFormGen.php', $name_prefix='', $insert_token=true) {
+    public function generateForm($fields, $values = array(), $tpl = 'rudiFormGen.php', $name_prefix = '', $insert_token = true)
+    {
         ob_start();
             cmsPage::includeTemplateFile(
                 'special/'. $tpl,
@@ -103,7 +116,8 @@ class rudi_form_generate {
         return ob_get_clean();
     }
     
-    public function getFormFields($fields, $values=array(), $name_prefix='') {
+    public function getFormFields($fields, $values = array(), $name_prefix = '')
+    {
         $this->name_prefix = empty($name_prefix) ? '' : $name_prefix .'_';
 
         $this->values = is_array($values) ? $values : array();
@@ -130,7 +144,8 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array 
      */
-    private function tabs($field) {
+    private function tabs($field)
+    {
         if (empty($field['tabs'])) { return false; }
         
         $data = array(
@@ -174,7 +189,8 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function fieldset($field) {
+    private function fieldset($field)
+    {
         if (empty($field['fields'])) { return false; }
         
         $data = array(
@@ -208,7 +224,8 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function text($field) {
+    private function text($field)
+    {
         if (empty($field['name'])) { return false; }
         
         return array(
@@ -224,7 +241,8 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function number($field) {
+    private function number($field)
+    {
         if (empty($field['name'])) { return false; }
         
         return array(
@@ -240,7 +258,8 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function textarea($field) {
+    private function textarea($field)
+    {
         if (empty($field['name'])) { return false; }
         
         return array(
@@ -255,13 +274,19 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function select($field) {
-        if (empty($field['name']) || empty($field['options'])) { return false; }
+    private function select($field)
+    {
+        if (empty($field['name']) || empty($field['options'])) {
+            return false;
+        }
         
         $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'">' ."\n";
         
         $selected = $this->getValue($field);
-        if (!is_array($selected)) { $selected = array($selected); }
+        
+        if (!is_array($selected)) {
+            $selected = array($selected);
+        }
         
         $optgroup_c = $option_c = 0;
         
@@ -277,7 +302,9 @@ class rudi_form_generate {
                 $html .= '    </optgroup>'. "\n";
                 
                 $optgroup_c++;
-            } else {
+            }
+            else
+            {
                 $html .= '    <option value="'. htmlspecialchars($option['value']) .'"'. (in_array($option['value'],$selected) || isset($option['selected']) ? ' selected="selected"' : '') .''. $this->getOtherAttributes($option) .'>'. $this->getTD($option, 'title', 'select_option_'. $field['name'], $option_c) .'</option>'. "\n";
                 $option_c++;
             }
@@ -298,8 +325,11 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function checkbox($field) {
-        if (empty($field['name'])) { return false; }
+    private function checkbox($field)
+    {
+        if (empty($field['name'])) {
+            return false;
+        }
         
         return array(
             'type' => $field['type'],
@@ -314,8 +344,11 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function radio($field) {
-        if (empty($field['name']) || empty($field['options'])) { return false; }
+    private function radio($field)
+    {
+        if (empty($field['name']) || empty($field['options'])) {
+            return false;
+        }
         
         $data = array(
             'type' => $field['type'],
@@ -353,8 +386,11 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function btn_yes_no($field) {
-        if (empty($field['name'])) { return false; }
+    private function btn_yes_no($field)
+    {
+        if (empty($field['name'])) {
+            return false;
+        }
         
         global $_LANG;
         
@@ -373,8 +409,11 @@ class rudi_form_generate {
      * @param array $field
      * @return boolean|array
      */
-    private function img_size($field) {
-        if (empty($field['nameX']) || empty($field['nameY'])) { return false; }
+    private function img_size($field)
+    {
+        if (empty($field['nameX']) || empty($field['nameY'])) {
+            return false;
+        }
         
         return array(
             'type' => $field['type'],
@@ -391,7 +430,8 @@ class rudi_form_generate {
      * need_field,rootid,no_padding - указание параметра table обязательно остальные нет)
      * @return boolean|array
      */
-    private function ns_list($field) {
+    private function ns_list($field)
+    {
         if (empty($field['name']) || empty($field['table'])) {
             return false;
         }
@@ -424,14 +464,8 @@ class rudi_form_generate {
         );
     }
     
-    /**
-     * Генерирует html код поля <select> из списка названий директорий в указанной папке
-     * @param array $field Массив параметров, вдобавок к стандартным (name, title...)
-     * обязательно должен быть указан параметр path содержащую ссылку на папку 
-     * относительно корня сайта
-     * @return boolean|array
-     */
-    private function dir_list($field) {
+    private function genList($field, $type = 'dirs')
+    {
         if (empty($field['name']) || empty($field['path'])) {
             return false;
         }
@@ -445,26 +479,59 @@ class rudi_form_generate {
         $this->fields['select']['count']++;
         
         $selected = $this->getValue($field);
-        if (!is_array($selected)) { $selected = array($selected); }
+        if (!is_array($selected)) {
+            $selected = array($selected);
+        }
         
         $attr_field = $field;
         unset($attr_field['path']);
         
         $html = '<select id="'. $this->fields['select']['class'] .'_'. $this->fields['select']['count'] .'" class="form-control '. $this->fields['select']['class'] .' '. cmsCore::getArrVal($field, 'class', '') .'"'. $this->getStyle(cmsCore::getArrVal($field, 'style', false)) .''. $this->getOtherAttributes($field) .' name="'. $this->name_prefix . $field['name'] .'">' ."\n";
         
-        $dirs = cmsCore::getDirsList($field['path'] .'/');
-        if (!empty($dirs)) {
-            foreach ($dirs as $dir) {
-                $html .= '    <option value="'. htmlspecialchars($dir) .'"'. (in_array($dir, $selected) ? ' selected="selected"' : '') .'>'. $dir .'</option>'. "\n";
+        if ($type == 'dirs') {
+            $items = cmsCore::getDirsList($field['path']);
+        }
+        elseif ($type == 'files')
+        {
+            $items = cmsCore::getDirFilesList($field['path']);
+        }
+        
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $html .= '    <option value="'. htmlspecialchars($item) .'"'. (in_array($item, $selected) ? ' selected="selected"' : '') .'>'. $item .'</option>'. "\n";
             }
         }
         
         $html .= '</select>';
+    }
+    
+    /**
+     * Генерирует html код поля <select> из списка названий директорий в указанной папке
+     * @param array $field Массив параметров, вдобавок к стандартным (name, title...)
+     * обязательно должен быть указан параметр path содержащую ссылку на папку 
+     * относительно корня сайта
+     * @return boolean|array
+     */
+    private function dir_list($field)
+    {
+        $html = $this->genList($field);
         
         return array(
             'type' => $field['type'],
             'title' => $this->getTD($field, 'title', 'dir_list', $field['name']),
             'description' => $this->getTD($field, 'description', 'dir_list', $field['name']),
+            'html' => $html
+        );
+    }
+    
+    private function file_list($field)
+    {
+        $html = $this->genList($field, 'files');
+        
+        return array(
+            'type' => $field['type'],
+            'title' => $this->getTD($field, 'title', 'file_list', $field['name']),
+            'description' => $this->getTD($field, 'description', 'file_list', $field['name']),
             'html' => $html
         );
     }
@@ -474,7 +541,8 @@ class rudi_form_generate {
      * @param array $field
      * @return array
      */
-    private function hr($field) {
+    private function hr($field)
+    {
         return array( 'html' => '<hr/>' );
     }
     
@@ -485,8 +553,11 @@ class rudi_form_generate {
      * @param mixed $style
      * @return string
      */
-    private function getStyle($style=false) {
-        if (empty($style)) { return ''; }
+    private function getStyle($style = false)
+    {
+        if (empty($style)) {
+            return '';
+        }
         
         if (is_array($style)) {
             $tmp = array();
@@ -506,7 +577,8 @@ class rudi_form_generate {
      * @param array $field
      * @return string
      */
-    private function getOtherAttributes($field) {
+    private function getOtherAttributes($field)
+    {
         $tmp = array();
             
         foreach ($field as $k=>$v) {
@@ -528,7 +600,8 @@ class rudi_form_generate {
      * @param string $value
      * @return mixed
      */
-    private function getValue($field, $return_isset=false, $name='name', $value='value') {
+    private function getValue($field, $return_isset = false, $name = 'name', $value = 'value')
+    {
         $matches = array();
         
         $field[$name] = str_replace('[]', '', $field[$name]);
@@ -544,7 +617,9 @@ class rudi_form_generate {
                 foreach ($matches[1] as $name) {
                     if (!isset($val[$name])) {
                         $error = true;
-                    } else {
+                    }
+                    else
+                    {
                         $val = $val[$name];
                     }
                 }
@@ -553,7 +628,9 @@ class rudi_form_generate {
                     return $return_isset ? true : $val;
                 }
             }
-        } else if (isset($this->values[$field[$name]])) {
+        }
+        elseif (isset($this->values[$field[$name]]))
+        {
             return $return_isset ? true : $this->values[$field[$name]];
         }
         
@@ -569,16 +646,24 @@ class rudi_form_generate {
      * @param string $name
      * @return string
      */
-    private function getTD($var, $key, $type, $name) {
+    private function getTD($var, $key, $type, $name)
+    {
         global $_LANG;
         
         if (!empty($var[$key])) {
             return $var[$key];
-        } else if ((!empty($_LANG[mb_strtoupper($type .'_'. $name)]) && $key == 'title') || (!empty($_LANG[mb_strtoupper($type .'_'. $name .'_desc')]) && $key == 'description')) {
+        }
+        
+        elseif ((!empty($_LANG[mb_strtoupper($type .'_'. $name)]) && $key == 'title') || (!empty($_LANG[mb_strtoupper($type .'_'. $name .'_desc')]) && $key == 'description'))
+        {
             return $key == 'title' ? $_LANG[mb_strtoupper($type .'_'. $name)] : $_LANG[mb_strtoupper($type .'_'. $name .'_desc')];
-        } else if (!is_numeric($name) && $key != 'description') {
+        }
+        elseif (!is_numeric($name) && $key != 'description')
+        {
             return mb_strtoupper($name);
-        } else if ($key != 'description') {
+        }
+        elseif ($key != 'description')
+        {
             return mb_strtoupper($type .'_'. $name);
         }
     }

@@ -2968,7 +2968,7 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
         $template = empty($template) ? self::c('config')->template : $template;
         
         if (file_exists(PATH .'/templates/'. $template .'/cfg_values.json')) {
-            $cfg_values = json_decode(PATH .'/templates/'. $template .'/cfg_values.json', true);
+            $cfg_values = json_decode(file_get_contents(PATH .'/templates/'. $template .'/cfg_values.json'), true);
             
             $cfg = array();
             

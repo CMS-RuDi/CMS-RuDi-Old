@@ -212,7 +212,9 @@ if ($do == 'read') {
     // Мета теги KEYWORDS и DESCRIPTION
     if ($article['meta_keys']) {
         cmsCore::c('page')->setKeywords($article['meta_keys']);
-    } else {
+    }
+    else
+    {
         if (mb_strlen($article['content'])>30) {
             cmsCore::c('page')->setKeywords(cmsCore::getKeywords(cmsCore::strClear($article['content'])));
         }

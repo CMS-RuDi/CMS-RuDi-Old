@@ -18,19 +18,19 @@ cmsCore::includeFile('/includes/smarty/libs/Smarty.class.php');
  * Класс инициализации шаблонизатора Smarty
  */
 class smartyTpl {
-    private static $i_smarty;
-
+    private $smarty;
+    
     public function __construct($tpl_file, $template) {
         global $_LANG;
         
         $folders = explode('/', $tpl_file);
 
-        $this->loadSmarty();
+        $this->smarty = new cmsSmarty();
 
-        self::$i_smarty->compile_id = $folders[count($folders)-2];
+        $this->smarty->compile_id = $folders[count($folders)-2];
         
-        self::$i_smarty->assign('LANG', $_LANG);
-        self::$i_smarty->assign('template', $template);
+        $this->smarty->assign('LANG', $_LANG);
+        $this->smarty->assign('template', $template);
         
         $domain = cmsCore::strToURL(cmsCore::getHost());
         
@@ -39,28 +39,22 @@ class smartyTpl {
             mkdir($compile_dir, 0777);
         }
         
-        self::$i_smarty->setTemplateDir(PATH .'/templates/'. $template);
-        self::$i_smarty->setCompileDir($compile_dir);
+        $this->smarty->setTemplateDir(PATH .'/templates/'. $template);
+        $this->smarty->setCompileDir($compile_dir);
         
-        self::$i_smarty->rudi_tpl_file = $tpl_file;
-    }
-
-    private function loadSmarty() {
-        if (self::$i_smarty  === null) {
-            self::$i_smarty = new cmsSmarty();
-        }
+        $this->smarty->rudi_tpl_file = $tpl_file;
     }
     
     public function __set($name, $value) {
-        self::$i_smarty->{$name} = $value;
+        $this->smarty->{$name} = $value;
     }
     
     public function __get($name) {
-        return self::$i_smarty->{$name};
+        return $this->smarty->{$name};
     }
     
     public function __call($name, $arguments) {
-        return call_user_func_array(array(self::$i_smarty, $name), $arguments);
+        return call_user_func_array(array($this->smarty, $name), $arguments);
     }
 }
 

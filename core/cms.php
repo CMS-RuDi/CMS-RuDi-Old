@@ -843,6 +843,8 @@ class cmsCore {
             $components = cmsCore::callEvent('URL_WITHOUT_COM_NAME', $components);
         }
         
+        cmsCore::loadLanguage('templates/'. self::c('config')->template);
+        
         foreach($components as $component) {
             $this->component = $component;
             

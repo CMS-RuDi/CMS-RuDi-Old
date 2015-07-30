@@ -74,14 +74,17 @@ function cmsTagLine($target, $item_id, $links = true, $selected = '') {
     return $html;
 }
 
-function cmsTagBar($target, $item_id, $selected = '') {
+function cmsTagBar($target, $item_id, $selected = '')
+{
+    $html = '';
+    
     if ($tagline = cmsTagLine($target, $item_id, true, $selected)) {
-        return cmsCore::c('page')->initTemplate('special/tagbar')->
-                assign('$tagline', $tagline)->
+        $html = cmsCore::c('page')->initTemplate('special/tagbar')->
+                assign('tagline', $tagline)->
                 fetch();
-    } else {
-        return '';
     }
+
+    return $html;
 }
 
 function cmsTagItemLink($target, $item_id){

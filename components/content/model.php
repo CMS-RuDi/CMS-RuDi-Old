@@ -303,6 +303,8 @@ class cms_model_content {
 
         $article = cmsCore::c('db')->fetch_assoc($result);
         
+        $article['fpubdate'] = cmsCore::dateFormat($article['pubdate']);
+        
         if (file_exists(PATH .'/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id' ] .'.jpg')) {
             $article['image'] = '/images/content/medium/'. ceil($article['id']/100) .'/article'. $article['id'] .'.jpg';
             $article['image_small'] = '/images/content/small/'. ceil($article['id']/100) .'/article'. $article['id'] .'.jpg';
@@ -323,7 +325,7 @@ class cms_model_content {
         
         $article['categories_str'] = !empty($article['categories']) ? implode(',', $article['categories']) : '';
         
-        $article['link']     = $this->getArticleURL(null, $seolink);
+        $article['link']     = $this->getArticleURL(null, $article['seolink']);
         $article['cat_link'] = $this->getCategoryURL(null, $article['cat_seolink']);
 
         return $article;

@@ -18,6 +18,7 @@ class phpTpl
     {
         $this->tpl_file = $tpl_file;
         $this->tpl_vars['template'] = $template;
+        $this->tpl_vars['tpl_cfgs'] = cmsCore::getTplCfg($template);
     }
 
     /**

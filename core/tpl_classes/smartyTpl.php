@@ -31,6 +31,7 @@ class smartyTpl {
         
         $this->smarty->assign('LANG', $_LANG);
         $this->smarty->assign('template', $template);
+        $this->smarty->assign('tpl_cfgs', cmsCore::getTplCfg($template));
         
         $domain = cmsCore::strToURL(cmsCore::getHost());
         

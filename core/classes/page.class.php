@@ -702,8 +702,6 @@ class cmsPage {
         
         cmsCore::loadLanguage('templates/'. $template);
         
-        $tpl_cfgs = cmsCore::getTplCfg($template);
-        
         if ($tpl_info['renderer'] == 'phpTpl' || !file_exists(PATH .'/templates/'. $template .'/template.'. $tpl_info['ext'])) {
             // Оставлен до версии 0.1.2 для совместимости со старыми шаблонами
             if (file_exists(PATH .'/templates/'. $template .'/template.php')) {
@@ -719,6 +717,8 @@ class cmsPage {
                 // Формируем модули заранее
                 $this->loadModulesForMenuItem();
                 
+                $tpl_cfgs = cmsCore::getTplCfg($template);
+                
                 require(PATH .'/templates/'. $template .'/template.php');
                 return;
             }
@@ -733,7 +733,6 @@ class cmsPage {
         self::initTemplate(false, PATH .'/templates/'. $template .'/template.'. $tpl_info['ext'])->
             assign('inConf', cmsCore::c('config')->getConfig())->
             assign('langs', cmsCore::getDirsList('/languages'))->
-            assign('tpl_cfgs', $tpl_cfgs)->
             assign('year', date('Y'))->
             display();
     }
@@ -1073,7 +1072,7 @@ class cmsPage {
                     assign('component', $component)->
                     assign('target', $target)->
                     assign('target_id', $target_id)->
-                    fatch()
+                    fetch()
             );
     }
     

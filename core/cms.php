@@ -55,6 +55,7 @@ class cmsCore {
         'cache'        => 'rudiCache'
     );
     private static $host;
+    private static $tpl_cfgs = array();
 
     protected function __construct($install_mode = false) {
         $this->start_time = microtime(true);
@@ -2969,24 +2970,26 @@ public static function generateCatSeoLink($category, $table, $is_cyr = false, $d
     {
         $template = empty($template) ? self::c('config')->template : $template;
         
-        if (file_exists(PATH .'/templates/'. $template .'/cfg_values.json')) {
-            $cfg_values = json_decode(file_get_contents(PATH .'/templates/'. $template .'/cfg_values.json'), true);
-            
-            $cfg = array();
-            
-            if (file_exists(PATH .'/cache/tpl_cfg/'. $template .'.cfg')) {
-                $str = file_get_contents(PATH .'/cache/tpl_cfg/'. $template .'.cfg');
-                if (!empty($str)) {
-                    $cfg = unserialize($str);
+        if (!isset(self::$tpl_cfgs[$template])) {
+            if (file_exists(PATH .'/templates/'. $template .'/cfg_values.json')) {
+                $cfg_values = json_decode(file_get_contents(PATH .'/templates/'. $template .'/cfg_values.json'), true);
+
+                $cfg = array();
+
+                if (file_exists(PATH .'/cache/tpl_cfg/'. $template .'.cfg')) {
+                    $str = file_get_contents(PATH .'/cache/tpl_cfg/'. $template .'.cfg');
+                    if (!empty($str)) {
+                        $cfg = unserialize($str);
+                    }
                 }
+
+                self::$tpl_cfgs[$template] = array_merge($cfg_values, $cfg);
+            } else {
+                self::$tpl_cfgs[$template] = false;
             }
-            
-            $cfg = array_merge($cfg_values, $cfg);
-            
-            return $cfg;
         }
 
-        return false;
+        return self::$tpl_cfgs[$template];
     }
     
     //Сохраняет настройки шаблона в файл

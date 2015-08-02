@@ -1,20 +1,20 @@
 {if $comments_count} 
-	{foreach key=cid item=comment from=$comments}
+    {foreach key=cid item=comment from=$comments}
         {math equation="x+1" x=$cid assign="next"}
-		<a name="c{$comment.id}"></a>
+        <a name="c{$comment.id}"></a>
         {if $comment.level < $cfg.max_level-1}
             <div style="margin-left:{math equation="x*35" x=$comment.level}px;">
         {else}
             <div style="margin-left:{math equation="(x-1)*35" x=$cfg.max_level}px;">
         {/if}
         <table class="cmm_entry">
-			<tr>
-				<td class="cmm_title" valign="middle">
-					{if !$comment.is_profile}
-						<span class="cmm_author">{$comment.author} {if $is_admin && $comment.ip}({$comment.ip}){/if}</span>
-					{else}
-						<span class="cmm_author"><a href="{profile_url login=$comment.author.login}">{$comment.author.nickname}</a> {if $is_admin && $comment.ip}({$comment.ip}){/if}</span>
-					{/if}
+            <tr>
+                <td class="cmm_title" valign="middle">
+                    {if !$comment.is_profile}
+                        <span class="cmm_author">{$comment.author} {if $is_admin && $comment.ip}({$comment.ip}){/if}</span>
+                    {else}
+                        <span class="cmm_author"><a href="{profile_url login=$comment.author.login}">{$comment.author.nickname}</a> {if $is_admin && $comment.ip}({$comment.ip}){/if}</span>
+                    {/if}
                     <a class="cmm_anchor" href="#c{$comment.id}" title="{$LANG.LINK_TO_COMMENT}">#</a>
                     <span class="cmm_date">{if $comment.published}{$comment.fpubdate}{else}<span style="color:#F00">{$LANG.WAIT_MODERING}</span>{/if}</span>
                     {if !$is_user || $comment.is_voted || !$comment.is_profile}
@@ -36,27 +36,27 @@
                             </tr></table>
                         </span>
                     {/if}
-				</td>
-			</tr>
-			<tr>
-				{if $comment.is_profile}
-					<td valign="top">
-						<table width="100%" cellpadding="1" cellspacing="0">
-							<tr>
-								<td width="70" height="70"  align="center" valign="top" class="cmm_avatar">
-									<a href="{profile_url login=$comment.author.login}"><img border="0" class="usr_img_small" src="{$comment.user_image}" /></a>
-								</td>
-								<td class="cmm_content_av" valign="top">
-				{else}
-					<td class="cmm_content" valign="top">
-				{/if}
-                	<div id="cm_msg_{$comment.id}">
-					{if $comment.show}
-						{$comment.content}
-					{else}
-						<a href="javascript:void(0)" onclick="expandComment({$comment.id})" id="expandlink{$comment.id}">{$LANG.SHOW_COMMENT}</a>
-						<div id="expandblock{$comment.id}" style="display:none">{$comment.content}</div>
-					{/if}
+                </td>
+            </tr>
+            <tr>
+                {if $comment.is_profile}
+                    <td valign="top">
+                        <table width="100%" cellpadding="1" cellspacing="0">
+                            <tr>
+                                <td width="70" height="70"  align="center" valign="top" class="cmm_avatar">
+                                    <a href="{profile_url login=$comment.author.login}"><img border="0" class="usr_img_small" src="{$comment.user_image}" /></a>
+                                </td>
+                                <td class="cmm_content_av" valign="top">
+                {else}
+                    <td class="cmm_content" valign="top">
+                {/if}
+                    <div id="cm_msg_{$comment.id}">
+                        {if $comment.show}
+                            {$comment.content}
+                        {else}
+                            <a href="javascript:void(0)" onclick="expandComment({$comment.id})" id="expandlink{$comment.id}">{$LANG.SHOW_COMMENT}</a>
+                            <div id="expandblock{$comment.id}" style="display:none">{$comment.content}</div>
+                        {/if}
                     </div>
 
                     <div style="margin-top:15px;">
@@ -78,13 +78,12 @@
                     {if $comment.is_profile}
                         </td></tr></table>
                     {/if}
-					</td>
-				</tr>
-			</table>
-            <div id="cm_addentry{$comment.id}" class="reply" style="display:none"></div>
+                </td>
+            </tr>
+        </table>
+        <div id="cm_addentry{$comment.id}" class="reply" style="display:none"></div>
         </div>
-	{/foreach}
-
+    {/foreach}
 {else}
-	<p>{$labels.not_comments}</p>
+    <p>{$labels.not_comments}</p>
 {/if}

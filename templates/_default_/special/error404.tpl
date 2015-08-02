@@ -51,7 +51,7 @@
             <link href="/includes/jquery/colorbox/colorbox.css" rel="stylesheet" type="text/css" />
             <script>
                 $(function() {
-                    $('.trace_stack').colorbox({inline:true, width:"50%", maxHeight: "100%", transition:"none"});
+                    $('.trace_stack').colorbox({ inline:true, width:"50%", maxHeight: "100%", transition:"none" });
                 });
             </script> 
  	{/if}

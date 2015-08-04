@@ -31,8 +31,8 @@
                         <span class="cmm_votes" id="votes{$comment.id}">
                             <table border="0" cellpadding="0" cellspacing="0"><tr>
                             <td>{$comment.rating|rating}</td>
-                            <td><a href="javascript:void(0);" onclick="voteComment({$comment.id}, -1);" title="{$LANG.BAD_COMMENT}"><img border="0" alt="-" src="/templates/{template}/images/icons/comments/vote_down.gif" style="margin-left:8px"/></a></td>
-                            <td><a href="javascript:void(0);" onclick="voteComment({$comment.id}, 1);" title="{$LANG.GOOD_COMMENT}"><img border="0" alt="+" src="/templates/{template}/images/icons/comments/vote_up.gif" style="margin-left:2px"/></a></td>
+                            <td><a href="javascript:void(0);" onclick="voteComment({$comment.id}, -1);" title="{$LANG.BAD_COMMENT}"><img border="0" alt="-" src="/templates/{$template}/images/icons/comments/vote_down.gif" style="margin-left:8px"/></a></td>
+                            <td><a href="javascript:void(0);" onclick="voteComment({$comment.id}, 1);" title="{$LANG.GOOD_COMMENT}"><img border="0" alt="+" src="/templates/{$template}/images/icons/comments/vote_up.gif" style="margin-left:2px"/></a></td>
                             </tr></table>
                         </span>
                     {/if}

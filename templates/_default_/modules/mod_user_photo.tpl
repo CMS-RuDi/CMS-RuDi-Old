@@ -11,9 +11,9 @@
             <div class="mod_lp_albumlink"><a href="/users/{$photo.login}/photos/private{$photo.album_id}.html" title="{$photo.album_title|escape:'html'}">{$photo.album_title|truncate:18}</a>
                 <div class="mod_lp_details">
                 <table cellpadding="2" cellspacing="0" align="center" border="0"><tr>
-                    <td><img src="/templates/{template}/images/icons/calendar.png" border="0"/></td>
+                    <td><img src="/templates/{$template}/images/icons/calendar.png" border="0"/></td>
                     <td>{$photo.pubdate}</td>
-                    <td><img src="/templates/{template}/images/icons/comment-small.png" border="0"/></td>
+                    <td><img src="/templates/{$template}/images/icons/comment-small.png" border="0"/></td>
                     <td><a href="/users/{$photo.uid}/photo{$photo.id}.html#c" title="{$photo.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}">{$photo.comments}</a></td>
                 </tr></table>
                 </div>

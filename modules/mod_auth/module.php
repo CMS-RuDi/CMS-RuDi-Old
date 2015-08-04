@@ -12,7 +12,9 @@
 /******************************************************************************/
 
 function mod_auth($mod, $cfg) {
-    if (cmsCore::c('user')->id) { return false; }
+    if (cmsCore::c('user')->id && !cmsCore::c('user')->is_admin) {
+        return false;
+    }
 
     cmsUser::sessionPut('auth_back_url', cmsCore::getBackURL());
 

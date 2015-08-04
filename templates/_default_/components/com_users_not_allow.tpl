@@ -18,7 +18,7 @@
                             <div class="usr_profile_menu">
                                 <table cellpadding="0" cellspacing="6" ><tr>
                                         <tr>
-                                            <td><img src="/templates/{template}/images/icons/profile/friends.png" border="0"/></td>
+                                            <td><img src="/templates/{$template}/images/icons/profile/friends.png" border="0"/></td>
                                             <td><a class="ajaxlink" href="javascript:void(0)" title="{$usr.nickname|escape:'html'}" onclick="users.addFriend('{$usr.id}', this);return false;">{$LANG.ADD_TO_FRIEND}</a></td>
 
                                         </tr>

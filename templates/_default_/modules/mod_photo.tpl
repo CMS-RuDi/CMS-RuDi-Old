@@ -11,11 +11,11 @@
             <div class="mod_lp_albumlink"><a href="/{if $photo.NSDiffer != ''}clubs/photoalbum{else}photos/{/if}{$photo.album_id}" title="{$photo.cat_title|escape:'html'}">{$photo.cat_title|truncate:18}</a>
                 <div class="mod_lp_details">
                 <table cellpadding="2" cellspacing="0" align="center" border="0"><tr>
-                    <td><img src="/templates/{template}/images/icons/calendar.png" border="0"/></td>
+                    <td><img src="/templates/{$template}/images/icons/calendar.png" border="0"/></td>
                     <td>{$photo.pubdate}</td>
-                    <td><img src="/templates/{template}/images/icons/comment-small.png" border="0"/></td>
+                    <td><img src="/templates/{$template}/images/icons/comment-small.png" border="0"/></td>
                     <td><a href="/photos/photo{$photo.id}.html#c" title="{$photo.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}">{$photo.comments}</a></td>
-                    <td><img src="/templates/{template}/images/icons/rating.png" /></td>
+                    <td><img src="/templates/{$template}/images/icons/rating.png" /></td>
                     <td>{$photo.rating|rating}</td>
                 </tr></table>
                 </div></div>

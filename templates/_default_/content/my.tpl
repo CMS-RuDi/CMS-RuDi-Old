@@ -32,7 +32,7 @@
     {foreach key=tid item=article from=$articles}
         <tr>
             <td>{$article.fpubdate}</td>
-            <td><img src="/templates/{template}/images/icons/article.png" border="0"></td>
+            <td><img src="/templates/{$template}/images/icons/article.png" border="0"></td>
             <td><a href="{$article.link}">{$article.title}</a></td>
             <td align="center">
                 {if $article.published}
@@ -41,13 +41,13 @@
                     <span style="color:#CC0000">{$LANG.NO_PUBLISHED}</span>
                 {/if}
             </td>
-            <td><img src="/templates/{template}/images/icons/comments.png" border="0"></td>
+            <td><img src="/templates/{$template}/images/icons/comments.png" border="0"></td>
             <td>{$article.comments}</td>
             <td><a href="{$article.cat_link}">{$article.cat_title}</a></td>
             <td align="center">
-                <a href="/content/edit{$article.id}.html" title="{$LANG.EDIT}"><img src="/templates/{template}/images/icons/edit.png" border="0"/></a>
+                <a href="/content/edit{$article.id}.html" title="{$LANG.EDIT}"><img src="/templates/{$template}/images/icons/edit.png" border="0"/></a>
                 {if $user_can_delete}
-                    <a href="/content/delete{$article.id}.html" title="{$LANG.DELETE}"><img src="/templates/{template}/images/icons/delete.png" border="0"/></a>
+                    <a href="/content/delete{$article.id}.html" title="{$LANG.DELETE}"><img src="/templates/{$template}/images/icons/delete.png" border="0"/></a>
                 {/if}
             </td>
         </tr>

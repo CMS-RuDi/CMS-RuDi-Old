@@ -7,7 +7,7 @@
 	{else}
     <td width="85px" id="fr0" {if !$user_id}class="selected"{/if}>
     	<div class="action_fr">
-    		<a href="javascript:void(0);" onclick="selectUser(0);" title="{$LANG.ALL_FRIENDS}"><img alt="all" border="0" src="/templates/{template}/images/actions_people.png"  /></a>
+    		<a href="javascript:void(0);" onclick="selectUser(0);" title="{$LANG.ALL_FRIENDS}"><img alt="all" border="0" src="/templates/{$template}/images/actions_people.png"  /></a>
         </div>
     </td>
     {/if}

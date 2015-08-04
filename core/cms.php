@@ -67,7 +67,9 @@ class cmsCore {
         }
         
         //проверяем был ли переопределен шаблон через сессию
-        if (isset($_SESSION['template'])) { self::c('config')->template = $_SESSION['template']; }
+        if (isset($_SESSION['template'])) {
+            self::c('config')->template = $_SESSION['template'];
+        }
 
         self::c('config')->template_dir = PATH .'/templates/'. self::c('config')->template .'/';
         self::c('config')->default_template_dir = PATH .'/templates/_default_/';
@@ -157,7 +159,7 @@ class cmsCore {
     }
 
     public static function getHost() {
-        if (empty(self::$halt)) {
+        if (empty(self::$host)) {
             // если вызван из командной строки
             // ожидаем параметр с именем домена, например команда для CRON
             // php -f /path_to_site/cron.php site.ru
@@ -1570,7 +1572,9 @@ class cmsCore {
      */
     public function menuId() {
         //если menu_id был определен ранее, то вернем и выйдем
-        if (isset($this->menu_id)) { return $this->menu_id; }
+        if (isset($this->menu_id)) {
+            return $this->menu_id;
+        }
 
         if ($this->url_without_com_name) {
             $uri = mb_substr($this->uri, mb_strlen(cmsConfig::getConfig('com_without_name_in_url') .'/'));

@@ -19,7 +19,7 @@
     {foreach key=pid item=post from=$posts}
     <tr>
         <td colspan="2" class="darkBlue-LightBlue">
-            <div class="post_date">{if $post.pinned && $num > 1}<img src="/templates/{template}/images/icons/forum/sticky.png" width="14px;" alt="{$LANG.ATTACHED_MESSAGE}" title="{$LANG.ATTACHED_MESSAGE}" />  {/if}<strong><a name="{$post.id}" href="/forum/thread{$thread.id}-{$page}.html#{$post.id}">#{$num}</a></strong> - {$post.fpubdate}, {$post.wday}</div>
+            <div class="post_date">{if $post.pinned && $num > 1}<img src="/templates/{$template}/images/icons/forum/sticky.png" width="14px;" alt="{$LANG.ATTACHED_MESSAGE}" title="{$LANG.ATTACHED_MESSAGE}" />  {/if}<strong><a name="{$post.id}" href="/forum/thread{$thread.id}-{$page}.html#{$post.id}">#{$num}</a></strong> - {$post.fpubdate}, {$post.wday}</div>
             {if $user_id && !$thread.closed}
                 <div class="msg_links">
                     <a href="javascript:" onclick="forum.addQuoteText(this);return false;" rel="{$post.nickname|escape:html}" class="ajaxlink" title="{$LANG.ADD_SELECTED_QUOTE}">{$LANG.ADD_QUOTE_TEXT}</a> | <a href="/forum/thread{$thread.id}-quote{$post.id}.html" title="{$LANG.REPLY_FULL_QUOTE}">{$LANG.REPLY}</a>
@@ -77,8 +77,8 @@
             <div class="votes_links" id="votes{$post.id}">
                 <table border="0" cellpadding="0" cellspacing="0"><tr>
                 <td>{$post.rating|rating}</td>
-                <td><a href="javascript:void(0);" onclick="forum.votePost({$post.id}, -1);"><img border="0" alt="-" src="/templates/{template}/images/icons/comments/vote_down.gif" style="margin-left:8px"/></a></td>
-                <td><a href="javascript:void(0);" onclick="forum.votePost({$post.id}, 1);"><img border="0" alt="+" src="/templates/{template}/images/icons/comments/vote_up.gif" style="margin-left:2px"/></a></td>
+                <td><a href="javascript:void(0);" onclick="forum.votePost({$post.id}, -1);"><img border="0" alt="-" src="/templates/{$template}/images/icons/comments/vote_down.gif" style="margin-left:8px"/></a></td>
+                <td><a href="javascript:void(0);" onclick="forum.votePost({$post.id}, 1);"><img border="0" alt="+" src="/templates/{$template}/images/icons/comments/vote_up.gif" style="margin-left:2px"/></a></td>
                 </tr></table>
             </div>
         {/if}

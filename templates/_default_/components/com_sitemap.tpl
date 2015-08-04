@@ -80,12 +80,12 @@
 
 <style>
     #jstree_sitemap .folder {
-        background: url('/templates/{template}/images/icons/folder.png');
+        background: url('/templates/{$template}/images/icons/folder.png');
         background-repeat: no-repeat;
         background-position: center;
     }
     #jstree_sitemap .file {
-        background: url('/templates/{template}/images/icons/article.png');
+        background: url('/templates/{$template}/images/icons/article.png');
         background-repeat: no-repeat;
         background-position: center;
     }

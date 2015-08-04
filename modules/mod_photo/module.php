@@ -100,7 +100,7 @@ function mod_photo($mod, $cfg) {
         
         cmsCore::callEvent('GET_PHOTOS', $photos);
         
-        $tpl = 'mod_user_photo';
+        $tpl = $cfg['tpl'] == 'mod_photo' ? 'mod_user_photo' : $cfg['tpl'];
     }
     
     cmsPage::initTemplate('modules', $tpl)->

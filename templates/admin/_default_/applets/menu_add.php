@@ -37,8 +37,7 @@
                             
                         <div class="form-group">
                             <label><?php echo $_LANG['AD_MENU_POINT_ACTION']; ?></label>
-                            <select id="linktype" class="form-control" style="width:100%" name="mode" onchange="showMenuTarget()">
-                                <?php $link_type = cmsCore::getArrVal($mod, 'linktype', 'link') ?>
+                            <select id="linktype" class="form-control" style="width:100%" name="mode" onchange="showMenuTarget();">
                                 <option value="link" <?php if ($link_type == 'link') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_LINK']; ?></option>
                                 <option value="content" <?php if ($link_type == 'content') { echo 'selected="selected"'; }?>><?php echo $_LANG['AD_OPEN_ARTICLE']; ?></option>
                                 <?php if ($video_installed) { ?> 

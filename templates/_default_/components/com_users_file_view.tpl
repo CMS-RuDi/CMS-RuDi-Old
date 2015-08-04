@@ -60,9 +60,9 @@
             <div class="usr_files_link">{$file.filelink}</div></td>
           {if $myprofile}
           	{if $file.allow_who == 'all'}
-          <td align="center"><img src="/templates/{template}/images/icons/users/yes.gif" border="0" title="{$LANG.FILE_VIS_ALL}"/></td>
+          <td align="center"><img src="/templates/{$template}/images/icons/users/yes.gif" border="0" title="{$LANG.FILE_VIS_ALL}"/></td>
           	{else}
-          <td align="center"><img src="/templates/{template}/images/icons/users/no.gif" border="0" title="{$LANG.FILE_HIDEN}"/></td>
+          <td align="center"><img src="/templates/{$template}/images/icons/users/no.gif" border="0" title="{$LANG.FILE_HIDEN}"/></td>
             {/if}
           {/if}
           <td>{$file.mb} {$LANG.MBITE}</td>

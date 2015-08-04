@@ -416,7 +416,7 @@ function applet_menu() {
         $iconList = iconList();
         
         $tpl = cmsCore::c('page')->initTemplate('applets', 'menu_add')->
-            assign('linktype', $linktype)->
+            assign('link_type', $linktype)->
             assign('langs', cmsCore::getDirsList('/languages'))->
             assign('templates', cmsCore::getDirsList('/templates'))->
             assign('menu_list', cpGetList('menu'))->

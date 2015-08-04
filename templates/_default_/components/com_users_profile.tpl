@@ -14,13 +14,13 @@
                 <table cellpadding="2" cellspacing="0"><tr>
                     <td class="sign_link" style="color:green">
                     {if $usr.can_change_karma}
-                        <a href="javascript:void(0)" onclick="users.changeKarma('{$usr.id}', 'plus');return false;" title="{$LANG.KARMA} +"><img src="/templates/{template}/images/icons/karma_up.png" alt="{$LANG.KARMA} +"/></a>
+                        <a href="javascript:void(0)" onclick="users.changeKarma('{$usr.id}', 'plus');return false;" title="{$LANG.KARMA} +"><img src="/templates/{$template}/images/icons/karma_up.png" alt="{$LANG.KARMA} +"/></a>
                     {/if}
                     </td>
                     <td><span class="user_karma_point" id="u_karma">{$usr.karma}</span></td>
                     <td style="color:red" class="sign_link">
                     {if $usr.can_change_karma}
-                        <a href="javascript:void(0)" onclick="users.changeKarma('{$usr.id}', 'minus'); return false;" title="{$LANG.KARMA} -"><img src="/templates/{template}/images/icons/karma_down.png" border="0" alt="{$LANG.KARMA} -"/></a>
+                        <a href="javascript:void(0)" onclick="users.changeKarma('{$usr.id}', 'minus'); return false;" title="{$LANG.KARMA} -"><img src="/templates/{$template}/images/icons/karma_down.png" border="0" alt="{$LANG.KARMA} -"/></a>
                     {/if}
                     </td>
                 </tr></table>
@@ -67,7 +67,7 @@
 
 							{if !$myprofile}
                                 <tr>
-                                    <td><img src="/templates/{template}/images/icons/profile/message.png" border="0"/></td>
+                                    <td><img src="/templates/{$template}/images/icons/profile/message.png" border="0"/></td>
                                     <td><a class="ajaxlink" href="javascript:void(0)" title="{$LANG.WRITE_MESS}: {$usr.nickname|escape:'html'}" onclick="users.sendMess('{$usr.id}', 0, this);return false;">{$LANG.WRITE_MESS}</a></td>
                                 </tr>
 							{/if}
@@ -75,14 +75,14 @@
                             {if !$myprofile}
                             	{if !$usr.isfriend}
                                     <tr>
-                                        <td><img src="/templates/{template}/images/icons/profile/friends.png" border="0"/></td>
+                                        <td><img src="/templates/{$template}/images/icons/profile/friends.png" border="0"/></td>
                                         <td><a class="ajaxlink" href="javascript:void(0)" title="{$usr.nickname|escape:'html'}" onclick="users.addFriend('{$usr.id}', this);return false;">{$LANG.ADD_TO_FRIEND}</a></td>
                                     </tr>
                                 {else}
                                 <tr>
-                                    <td class="add_friend_ajax" style="display: none;"><img src="/templates/{template}/images/icons/profile/friends.png" border="0"/></td>
+                                    <td class="add_friend_ajax" style="display: none;"><img src="/templates/{$template}/images/icons/profile/friends.png" border="0"/></td>
                                     <td class="add_friend_ajax" style="display: none;"><a class="ajaxlink" href="javascript:void(0)" title="{$usr.nickname|escape:'html'}" onclick="users.addFriend('{$usr.id}', this);return false;">{$LANG.ADD_TO_FRIEND}</a></td>
-                                    <td class="del_friend_ajax"><img src="/templates/{template}/images/icons/profile/nofriends.png" border="0"/></td>
+                                    <td class="del_friend_ajax"><img src="/templates/{$template}/images/icons/profile/nofriends.png" border="0"/></td>
                                     <td class="del_friend_ajax"><a id="del_friend" class="ajaxlink" href="javascript:void(0)" title="{$usr.nickname|escape:'html'}" onclick="users.delFriend('{$usr.id}', this);return false;">{$LANG.STOP_FRIENDLY}</a></td>
                                 </tr>
                                 {/if}
@@ -90,58 +90,58 @@
                          	{if $myprofile}
                             	{if $cfg.sw_msg}
                                 <tr>
-                                    <td><img src="/templates/{template}/images/icons/profile/message.png" border="0"/></td>
+                                    <td><img src="/templates/{$template}/images/icons/profile/message.png" border="0"/></td>
                                     <td><a href="/users/{$usr.id}/messages.html" title="{$LANG.MY_MESS}">{$LANG.MY_MESS}</a></td>
                                 </tr>
                                 {/if}
                                 {if $cfg.sw_photo}
                                 <tr>
-                                    <td><img src="/templates/{template}/images/icons/profile/addphoto.png" border="0"/></td>
+                                    <td><img src="/templates/{$template}/images/icons/profile/addphoto.png" border="0"/></td>
                                     <td><a href="/users/addphoto.html" title="{$LANG.ADD_PHOTO}">{$LANG.ADD_PHOTO}</a></td>
                                 </tr>
                                 {/if}
                                 <tr>
-                                    <td><img src="/templates/{template}/images/icons/profile/avatar.png" border="0"/></td>
+                                    <td><img src="/templates/{$template}/images/icons/profile/avatar.png" border="0"/></td>
                                     <td><a href="/users/{$usr.id}/avatar.html" title="{$LANG.SET_AVATAR}">{$LANG.SET_AVATAR}</a></td>
                                 </tr>
 								{if $usr.invites_count}
                                 <tr>
-                                    <td><img src="/templates/{template}/images/icons/profile/invites.png" border="0"/></td>
+                                    <td><img src="/templates/{$template}/images/icons/profile/invites.png" border="0"/></td>
                                     <td><a href="/users/invites.html" title="{$LANG.MY_INVITES}">{$LANG.MY_INVITES}</a> {$usr.invites_count}</td>
                                 </tr>
 								{/if}
                                 <tr>
-                                    <td><img src="/templates/{template}/images/icons/profile/edit.png" border="0"/></td>
+                                    <td><img src="/templates/{$template}/images/icons/profile/edit.png" border="0"/></td>
                                     <td><a href="/users/{$usr.id}/editprofile.html" title="{$LANG.CONFIG_PROFILE}">{$LANG.MY_CONFIG}</a></td>
                                 </tr>
                             {/if}
                             {if $is_admin && !$myprofile}
                             <tr>
-                                <td><img src="/templates/{template}/images/icons/profile/edit.png" border="0"/></td>
+                                <td><img src="/templates/{$template}/images/icons/profile/edit.png" border="0"/></td>
                                 <td><a href="/users/{$usr.id}/editprofile.html" title="{$LANG.CONFIG_PROFILE}">{$LANG.CONFIG_PROFILE}</a></td>
                             </tr>
                             {/if}
                             <tr>
-                                <td><img src="/templates/{template}/images/icons/profile/karma.png" border="0"/></td>
+                                <td><img src="/templates/{$template}/images/icons/profile/karma.png" border="0"/></td>
                                 <td><a href="/users/{$usr.id}/karma.html" title="{$LANG.KARMA_HISTORY}">{$LANG.KARMA_HISTORY}</a></td>
                             </tr>
 							{if !$myprofile}
                             	{if $is_admin}
                                 	{if !$usr.banned}
                                     <tr>
-                                        <td><img src="/templates/{template}/images/icons/profile/award.png" border="0"/></td>
+                                        <td><img src="/templates/{$template}/images/icons/profile/award.png" border="0"/></td>
                                         <td><a href="/users/{$usr.id}/giveaward.html" title="{$LANG.TO_AWARD}">{$LANG.TO_AWARD}</a></td>
                                     </tr>
                                     {if $usr.id != 1}
                                     <tr>
-                                        <td><img src="/templates/{template}/images/icons/profile/ban.png" border="0"/></td>
+                                        <td><img src="/templates/{$template}/images/icons/profile/ban.png" border="0"/></td>
                                         <td><a href="/admin/index.php?view=userbanlist&do=add&to={$usr.id}" title="{$LANG.TO_BANN}">{$LANG.TO_BANN}</a></td>
                                     </tr>
                                     {/if}
                                     {/if}
                                 {if $usr.id != 1}
                                     <tr>
-                                        <td><img src="/templates/{template}/images/icons/profile/delprofile.png" border="0"/></td>
+                                        <td><img src="/templates/{$template}/images/icons/profile/delprofile.png" border="0"/></td>
                                         <td><a href="/users/{$usr.id}/delprofile.html" title="{$LANG.DEL_PROFILE}">{$LANG.DEL_PROFILE}</a></td>
                                     </tr>
                                 {/if}

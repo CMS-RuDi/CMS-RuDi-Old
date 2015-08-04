@@ -698,6 +698,8 @@ class cmsPage {
             $template = empty($template) ? cmsCore::c('config')->template : $template;
         }
         
+        $inCore = cmsCore::getInstance();
+        
         $tpl_info = $this->getTplInfo($template);
         
         cmsCore::loadLanguage('templates/'. $template);
@@ -706,7 +708,6 @@ class cmsPage {
             // Оставлен до версии 0.1.2 для совместимости со старыми шаблонами
             if (file_exists(PATH .'/templates/'. $template .'/template.php')) {
                 // Инициализируем нужные объекты
-                $inCore = cmsCore::getInstance();
                 $inUser = cmsCore::c('user');
                 $inPage = $this;
                 $inConf = $this->site_cfg;
@@ -733,6 +734,8 @@ class cmsPage {
         self::initTemplate(false, PATH .'/templates/'. $template .'/template.'. $tpl_info['ext'])->
             assign('inConf', cmsCore::c('config')->getConfig())->
             assign('langs', cmsCore::getDirsList('/languages'))->
+            assign('menu_id', $inCore->menuId())->
+            assign('component', $inCore->component)->
             assign('year', date('Y'))->
             display();
     }

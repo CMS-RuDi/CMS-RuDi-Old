@@ -6,7 +6,7 @@
                 <td valign="top" style="padding-left:6px">
                     <div class="con_rss_icon">
                         <a href="/rss/content/{$cat.id}/feed.rss" title="{$LANG.RSS}">
-                            <img src="/templates/{template}/images/icons/rss.png" alt="{$LANG.RSS}"/>
+                            <img src="/templates/{$template}/images/icons/rss.png" alt="{$LANG.RSS}"/>
                         </a>
                     </div>
                 </td>

@@ -2,7 +2,7 @@
 
 <table cellspacing="5" cellpadding="0" border="0" width="100%">
 	<tr>
-		<td width="35" valign="top"><img src="/templates/{template}/images/icons/big/faq_quest.png" border="0" /></td>
+		<td width="35" valign="top"><img src="/templates/{$template}/images/icons/big/faq_quest.png" border="0" /></td>
 		<td width="" valign="top">
 			<div class="faq_questtext">{$quest.quest}</div>
 			{if $cfg.user_link}
@@ -17,7 +17,7 @@
 <table cellspacing="5" cellpadding="0" border="0" width="100%" style="margin:15px 0px;">
 	<tr>
 		<td width="35" valign="top">
-			<img src="/templates/{template}/images/icons/big/faq_answer.png" border="0" />
+			<img src="/templates/{$template}/images/icons/big/faq_answer.png" border="0" />
 		</td>
 		<td width="" valign="top">
 			<div class="faq_answertext">{$quest.answer}</div>

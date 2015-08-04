@@ -2,9 +2,9 @@
 <div class="float_bar">
     <table cellspacing="0" cellpadding="0">
       <tr>
-        <td width="23"><img src="/templates/{template}/images/icons/calendar.png" /></td>
+        <td width="23"><img src="/templates/{$template}/images/icons/calendar.png" /></td>
         <td style="padding-right: 10px"><a href="/photos/latest.html">{$LANG.LAST_UPLOADED}</a></td>
-        <td width="23"><img src="/templates/{template}/images/icons/rating.png" /></td>
+        <td width="23"><img src="/templates/{$template}/images/icons/rating.png" /></td>
         <td><a href="/photos/top.html">{$LANG.BEST_PHOTOS}</a></td>
       </tr>
     </table>
@@ -84,9 +84,9 @@
                 {if $album.showdate}
                     <div class="mod_lp_albumlink"><div class="mod_lp_details">
                     <table cellpadding="2" cellspacing="0" align="center"><tr>
-                        <td><img src="/templates/{template}/images/icons/calendar.png" /></td>
+                        <td><img src="/templates/{$template}/images/icons/calendar.png" /></td>
                         <td>{$photo.pubdate}</td>
-                        <td><img src="/templates/{template}/images/icons/comment-small.png" /></td>
+                        <td><img src="/templates/{$template}/images/icons/comment-small.png" /></td>
                         <td><a href="/photos/photo{$photo.id}.html#c" title="{$photo.comments|spellcount:$LANG.COMMENT1:$LANG.COMMENT2:$LANG.COMMENT10}">{$photo.comments}</a></td>
                     </tr></table>
                     </div></div>

@@ -9,15 +9,15 @@
     {foreach key=id item=thread from=$threads}
         <tr class="{cycle values="row11,row2"}">
             {if $thread.pinned}
-                <td width="30" align="center" valign="middle"><img alt="{$LANG.ATTACHED_THREAD}" src="/templates/{template}/images/icons/forum/pinned.png" border="0" title="{$LANG.ATTACHED_THREAD}" /></td>
+                <td width="30" align="center" valign="middle"><img alt="{$LANG.ATTACHED_THREAD}" src="/templates/{$template}/images/icons/forum/pinned.png" border="0" title="{$LANG.ATTACHED_THREAD}" /></td>
             {else}
                 {if $thread.closed}
-                    <td width="30" align="center" valign="middle"><img alt="{$LANG.THREAD_CLOSE}" src="/templates/{template}/images/icons/forum/closed.png" border="0" title="{$LANG.THREAD_CLOSE}" /></td>
+                    <td width="30" align="center" valign="middle"><img alt="{$LANG.THREAD_CLOSE}" src="/templates/{$template}/images/icons/forum/closed.png" border="0" title="{$LANG.THREAD_CLOSE}" /></td>
                 {else}
                     {if $thread.is_new}
-                        <td width="30" align="center" valign="middle"><img alt="{$LANG.HAVE_NEW_MESS}" src="/templates/{template}/images/icons/forum/new.png" border="0" title="{$LANG.HAVE_NEW_MESS}" /></td>
+                        <td width="30" align="center" valign="middle"><img alt="{$LANG.HAVE_NEW_MESS}" src="/templates/{$template}/images/icons/forum/new.png" border="0" title="{$LANG.HAVE_NEW_MESS}" /></td>
                     {else}
-                        <td width="30" align="center" valign="middle"><img alt="{$LANG.NOT_NEW_MESS}" src="/templates/{template}/images/icons/forum/old.png" border="0" title="{$LANG.NOT_NEW_MESS}" /></td>
+                        <td width="30" align="center" valign="middle"><img alt="{$LANG.NOT_NEW_MESS}" src="/templates/{$template}/images/icons/forum/old.png" border="0" title="{$LANG.NOT_NEW_MESS}" /></td>
                     {/if}
                 {/if}
             {/if}
@@ -48,7 +48,7 @@
             </td>
             <td width="200" style="font-size:12px">
                 {if $thread.last_msg_array}
-                    <a href="/forum/thread{$thread.last_msg_array.thread_id}-{$thread.last_msg_array.lastpage}.html#{$thread.last_msg_array.id}"><img class="last_post_img" title="{$LANG.GO_LAST_POST}" alt="{$LANG.GO_LAST_POST}" src="/templates/{template}/images/icons/anchor.png"></a>
+                    <a href="/forum/thread{$thread.last_msg_array.thread_id}-{$thread.last_msg_array.lastpage}.html#{$thread.last_msg_array.id}"><img class="last_post_img" title="{$LANG.GO_LAST_POST}" alt="{$LANG.GO_LAST_POST}" src="/templates/{$template}/images/icons/anchor.png"></a>
                     {$LANG.FROM} {$thread.last_msg_array.user_link}<br/>
                     {$thread.last_msg_array.fpubdate}
                 {else}

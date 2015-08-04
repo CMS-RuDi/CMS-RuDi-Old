@@ -5,7 +5,7 @@
             {if $cfglink}
                 <span class="fast_cfg_link">
                     <a href="javascript:moduleConfig({$mod.id})" title="{$LANG.CONFIG_MODULE}">
-                        <img src="/templates/{template}/images/icons/settings.png"/>
+                        <img src="/templates/{$template}/images/icons/settings.png"/>
                     </a>
                 </span>
             {/if}

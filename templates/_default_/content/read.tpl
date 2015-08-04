@@ -37,7 +37,10 @@
             <img src="{$article.image}" alt="{$article.title|escape:html}"/>
         </div>
     {/if}
+    
     {$article.content}
+    
+    {callEvent event='INSERT_SLIDER' images=$article.images}
 </div>
 
 {if $fields}

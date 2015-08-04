@@ -115,9 +115,12 @@
         ),
 
         'change_fields' => array(
+            array( 'table' => 'cms_modules', 'name' => 'position', 'type' => 'VARCHAR(32)' ),
+            array( 'table' => 'cms_modules_bind', 'name' => 'position', 'type' => 'VARCHAR(32)' ),
             array( 'table' => 'cms_plugins', 'name' => 'plugin_type', 'new_name' => 'type', 'type' => 'VARCHAR(10)' ),
             array( 'table' => 'cms_banner_hits', 'name' => 'pubdate', 'type' => 'TIMESTAMP', 'default' => 'CURRENT_TIMESTAMP' ),
             array( 'table' => 'cms_menu', 'name' => 'menu', 'type' => 'TINYTEXT' ),
+            array( 'table' => 'cms_content', 'name' => 'tpl', 'type' => 'VARCHAR(50)', 'default' => "'content/read'" ),
         ),
         
         'drop_indexes' => array(
@@ -190,7 +193,7 @@
             array( 'sql' => "UPDATE `cms_plugins` SET `version`='0.0.3' WHERE `plugin` = 'p_ckeditor'" ),
             array( 'sql' => "UPDATE `cms_plugins` SET `version`='1.12' WHERE `plugin` = 'p_hidetext'" ),
             array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_cron_logs` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cron_id` int(11) DEFAULT NULL, `msg` longtext DEFAULT NULL, `run_date` datetime DEFAULT NULL, PRIMARY KEY (`id`) ) ENGINE = INNODB AUTO_INCREMENT=1 CHARACTER SET utf8 COLLATE utf8_general_ci", 'msg' => 'Таблица cms_cron_logs создана' ),
-            array( 'sql' => "CREATE TABLE IF NOT EXISTS `#__content_fields` ( `id` int UNSIGNED NOT NULL AUTO_INCREMENT, `cat_id` int DEFAULT NULL, `article_id` int DEFAULT NULL, PRIMARY KEY (`id`), INDEX `cat_id` (`cat_id`), INDEX `article_id` (`article_id`) ) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;", 'msg' => 'Таблица cms_content_fields создана' ),
+            array( 'sql' => "CREATE TABLE IF NOT EXISTS `cms_content_fields` ( `id` int UNSIGNED NOT NULL AUTO_INCREMENT, `cat_id` int DEFAULT NULL, `article_id` int DEFAULT NULL, PRIMARY KEY (`id`), INDEX `cat_id` (`cat_id`), INDEX `article_id` (`article_id`) ) ENGINE = INNODB CHARACTER SET utf8 COLLATE utf8_general_ci;", 'msg' => 'Таблица cms_content_fields создана' ),
             array( 'sql' => "UPDATE `cms_category` SET `tpl`='content/view' WHERE `tpl` = 'com_content_view' OR `tpl` = 'com_content_view.tpl' OR `tpl` = ''" ),
             array( 'sql' => "UPDATE `cms_content` SET `tpl`='content/read' WHERE `tpl` = 'com_content_read' OR `tpl` = 'com_content_read.tpl' OR `tpl` = ''" )
         ),
@@ -343,17 +346,33 @@
             cmsCore::c('db')->query("UPDATE cms_plugins SET config='". cmsCore::c('db')->escape_string($plg_nconfig) ."' WHERE plugin='p_ckeditor' LIMIT 1");
         }
         // ========== /p_ckeditor =========
-        // ---------- p_content_imgs ----------
-        $plg_config = cmsCore::c('db')->get_field('cms_plugins', "plugin='p_content_imgs'", 'config');
-        $plg_config = cmsCore::yamlToArray($plg_config);
-        if (!isset($plg_config['slider'])) {
-            $plg_nconfig = array(
-                'slider' => $plg_config['PCI_SLIDER'] .'__'. $plg_config['PCI_SLIDER_OPT']
-            );
-            $plg_nconfig = cmsCore::arrayToYaml($plg_nconfig);
-            cmsCore::c('db')->query("UPDATE cms_plugins SET config='". cmsCore::c('db')->escape_string($plg_nconfig) ."' WHERE plugin='p_content_imgs' LIMIT 1");
+        
+        // ---------- p_content_imgs remove ----------
+        if ($plg_id = cmsCore::c('db')->get_field('cms_plugins', "plugin=''", 'id')) {
+            cmsCore::c('db')->delete('cms_plugins', 'id='. $plg_id, 1);
+            cmsCore::c('db')->delete('cms_event_hooks', 'plugin_id='. $plg_id);
         }
-        // ========== /p_content_imgs =========
+        // ========== /p_content_imgs remove =========
+        
+        // ---------- p_insert_slider ----------
+        if (!cmsCore::c('db')->get_fields('cms_plugins', "plugin='p_insert_slider'", 'id')) {
+            $plg_id = cmsCore::c('db')->insert('cms_plugins', array(
+                'plugin'      => 'p_insert_slider',
+                'title'       => 'Слайдер фотографий',
+                'description' => 'Выводит слайдер с фотографиями',
+                'author'      => 'DS Soft',
+                'version'     => '0.0.1',
+                'type'        => 'plugin',
+                'published'   => 1,
+                'config'      => '---\nslider_tpl: jCarousel_1.tpl\n'
+            ));
+            cmsCore::c('db')->insert('cms_event_hooks', array(
+                'event'     => 'GET_SLIDER_OPTS',
+                'plugin_id' => $plg_id
+            ));
+        }
+        // ========== /p_insert_slider =========
+
         //======================================================================
         
         // --------------- Добавляем всем модулям настройку tpl ----------------

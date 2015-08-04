@@ -937,7 +937,7 @@ INSERT INTO `#__menu` (`id`, `menu`, `title`, `css_class`, `link`, `linktype`, `
 DROP TABLE IF EXISTS `#__modules`;
 CREATE TABLE `#__modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `position` varchar(20) NOT NULL,
+  `position` varchar(32) NOT NULL,
   `name` varchar(200) NOT NULL,
   `title` varchar(200) NOT NULL,
   `titles` tinytext NOT NULL,
@@ -1010,7 +1010,7 @@ CREATE TABLE `#__modules_bind` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `module_id` int(11) NOT NULL,
   `menu_id` int(11) NOT NULL,
-  `position` varchar(20) NOT NULL,
+  `position` varchar(32) NOT NULL,
   `tpl` varchar(64) NOT NULL DEFAULT '_default_',
   PRIMARY KEY (`id`),
   KEY `tpl` (`tpl`),

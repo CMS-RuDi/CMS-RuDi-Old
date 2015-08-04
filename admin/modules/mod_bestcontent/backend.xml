@@ -9,8 +9,20 @@
         <param type="flag" name="showlink" default="on" />
         <param type="flag" name="showdesc" default="on" />
         <param type="list_db" name="cat_id" src="cms_category" src_title="title" src_value="id" src_where="published='1' AND NSLevel>0" tree="1" >
-			<option value="0" />
-		</param>
+            <option value="0" />
+        </param>
+        <param type="list" name="ordering">
+            <option value="rating" />
+            <option value="hits" />
+        </param>
+        <param type="list" name="period">
+            <option value="all" />
+            <option value="today" />
+            <option value="today_24" />
+            <option value="week" />
+            <option value="month" />
+            <option value="year" />
+        </param>
         <param type="flag" name="subs" default="off" />
     </params>
 </backend>

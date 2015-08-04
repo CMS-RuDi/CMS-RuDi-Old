@@ -22,6 +22,32 @@ function mod_bestcontent($mod, $cfg) {
     );
     
     cmsCore::c('db')->where("con.canrate = 1");
+    
+    
+    $period = cmsCore::getArrVal($cfg, 'period', 'all');
+    switch ($period) {
+        case 'today':
+            $date_period = date('Y-m-d') ." 00:00:00";
+            break;
+        case 'today_24':
+            $date_period = date('Y-m-d H:i:s', time()-3600*24);
+            break;
+        case 'week':
+            $date_period = date('Y-m-d H:i:s', time()-3600*24*7);
+            break;
+        case 'month':
+            $date_period = date('Y-m-d H:i:s', time()-3600*24*30);
+            break;
+        case 'year':
+            $date_period = date('Y-m-d H:i:s', time()-3600*24*365);
+            break;
+        default:
+            break;
+    }
+    if (!empty($date_period)) {
+        cmsCore::c('db')->where("con.pubdate >= '". $date_period ."'");
+    }
+    
 
     if ($cfg['cat_id']) {
         if (!$cfg['subs']) {
@@ -35,7 +61,7 @@ function mod_bestcontent($mod, $cfg) {
         }
     }
 
-    cmsCore::c('db')->orderBy('con.rating', 'DESC');
+    cmsCore::c('db')->orderBy('con.'. cmsCore::getArrVal($cfg, 'ordering', 'rating'), 'DESC');
     cmsCore::c('db')->limitPage(1, $cfg['shownum']);
 
     $content_list = cmsCore::m('content')->getArticlesList();
